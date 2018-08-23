@@ -29,5 +29,10 @@ module Osdr
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    
+
+    # 追加
+    config.i18n.default_locale = :ja
+
   end
 end
