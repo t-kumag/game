@@ -1,4 +1,4 @@
-require_relative 'boot'
+require_relative "boot"
 
 require "rails"
 # Pick the frameworks you want:
@@ -29,12 +29,16 @@ module Osdr
 
     # Don't generate system test files.
     config.generators.system_tests = nil
-    
 
     # 追加
     config.i18n.default_locale = :ja
-    config.time_zone = 'Tokyo'
+    config.time_zone = "Tokyo"
     config.active_record.default_timezone = :local #DBのタイムゾーンを変更
 
+    # config.generators do |g|
+    #   g.assets false
+    #   g.helper false
+    #   g.test_framework false
+    # end
   end
 end

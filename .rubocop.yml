@@ -1,0 +1,56 @@
+AllCops:
+  # TargetRubyVersion: 2.5.1
+
+  # 除外するファイル
+  Exclude:
+    - bin/*
+    - db/**/*
+    - config/**/*
+    - Gemfile
+    - vendor/**/*
+    - lib/tasks/*
+    - features/**/*
+    - spec/**/*
+
+# 標準の規約 + Railsの規約
+Rails:
+  Enabled: true
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+LineLength:
+  Enabled: false
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 20
+
+FormatString:
+  EnforcedStyle: percent
+
+NumericLiterals:
+  Enabled: false
+
+RedundantReturn:
+  AllowMultipleReturnValues: true
+
+DotPosition:
+  EnforcedStyle: trailing

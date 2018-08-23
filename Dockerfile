@@ -1,5 +1,6 @@
 FROM ruby:2.5.1
 
+ENV RUBYOPT -EUTF-8
 ENV APP_ROOT /usr/src/osdr
 
 WORKDIR $APP_ROOT

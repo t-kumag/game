@@ -54,11 +54,20 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
-end
 
+  gem 'bullet'              # 「N+1 問題」を検出してくれる
+  gem 'annotate'            # 現状のスキーマの注釈をコメントとしてファイルの上部や下部に追記してくれる。
+  gem 'hirb'                # コンソールのModelの出力結果を表形式で分かりやすく表示する
+  gem 'hirb-unicode'        # 日本語などマルチバイト文字の出力時の出力結果のずれに対応
+  gem 'better_errors'       # エラー画面をデバッグしやすい形に整形してくれる
+  gem 'binding_of_caller'   # better-errorsのエラー画面でirbができる
+  gem 'letter_opener_web'   # 送信したメールを確認できる
+  gem 'pry-rails'           # コンソールをirbからpryに置き換える。
+  gem 'pry-byebug'          # ソースコードにブレークポイントを埋め込んで、所定のポイントでpryを起動
+  gem 'rufo'
+  # gem 'rubocop'
+  gem 'rubocop', require: false
+end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
-
-
