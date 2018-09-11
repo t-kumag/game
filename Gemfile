@@ -75,3 +75,15 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 # OAuth
 gem "doorkeeper"
 
+# http client
+gem "faraday"
+
+
+
+
+
+
+
+
+
+

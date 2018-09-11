@@ -35,6 +35,7 @@ module Osdr
     config.time_zone = "Tokyo"
     config.active_record.default_timezone = :local #DBのタイムゾーンを変更
     config.paths.add "lib", eager_load: true
+    config.paths.add "app/models/**/", eager_load: true
 
     # config.after_initialize
     # Railsによるアプリの初期化が完了した 直後 に実行されます。
