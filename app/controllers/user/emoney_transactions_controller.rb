@@ -1,0 +1,2 @@
+class EmoneyTransactionsController < ApplicationController
+end

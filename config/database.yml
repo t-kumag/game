@@ -19,15 +19,13 @@ default: &default
 
 development:
   <<: *default
-  host: db
+  host: localhost
   port: 3306
   database: dev_osdr_db
   username: devusr
   password: pass
 
-
 #  database: db/development.sqlite3
-
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
@@ -40,6 +38,7 @@ production:
   <<: *default
   database: db_production
 #  database: db/production.sqlite3
+
 
 
 

@@ -1,0 +1,2 @@
+class EmoneyAccountsController < ApplicationController
+end
