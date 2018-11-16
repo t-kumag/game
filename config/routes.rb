@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
 
   use_doorkeeper
+  
   namespace :user do
     resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
       resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
@@ -30,12 +31,11 @@ Rails.application.routes.draw do
 
     end
   end
+
   get 'user/at-registerurl', :to => 'users#at_user_create'
 
   namespace :family do
-    reaources :savings_goals, :path => '/goals' do
-      
-
+    resources :savings_goals, :path => '/goals' do
     end
   # groups/:id/goals/:id/summary
   # groups/:id/goals/:id/settings

@@ -1,0 +1,2 @@
+class AtUserCardTransaction < ApplicationRecord
+end

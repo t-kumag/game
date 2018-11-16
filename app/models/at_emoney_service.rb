@@ -1,0 +1,2 @@
+class AtEmoneyService < ApplicationRecord
+end

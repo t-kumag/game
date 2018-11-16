@@ -1,0 +1,2 @@
+class AtTransactionCategorie < ApplicationRecord
+end
