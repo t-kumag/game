@@ -1,4 +1,4 @@
-class User::BankAccountsController < ApplicationController
+class CardAccountsController < ApplicationController
     def index
         render 'list', formats: 'json', handlers: 'jbuilder'
     end
@@ -6,5 +6,4 @@ class User::BankAccountsController < ApplicationController
     def summary
         render 'summary', formats: 'json', handlers: 'jbuilder'
     end
-    
 end

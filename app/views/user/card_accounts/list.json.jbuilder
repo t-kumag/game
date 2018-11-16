@@ -1,4 +1,3 @@
-
 json.meta do
     json.error  'sample'
 end
