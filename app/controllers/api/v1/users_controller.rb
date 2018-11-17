@@ -1,4 +1,4 @@
-class UsersController < ApplicationController
+class Api::V1::UsersController < ApplicationController
   def at_user_create
     @result_json = {
         aaa: ''

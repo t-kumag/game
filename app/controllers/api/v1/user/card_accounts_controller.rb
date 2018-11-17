@@ -1,4 +1,4 @@
-class CardAccountsController < ApplicationController
+class Api::V1::User::CardAccountsController < ApplicationController
     def index
         render 'list', formats: 'json', handlers: 'jbuilder'
     end

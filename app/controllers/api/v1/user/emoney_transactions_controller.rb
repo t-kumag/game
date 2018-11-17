@@ -1,4 +1,4 @@
-class EmoneyTransactionsController < ApplicationController
+class Api::V1::User::EmoneyTransactionsController < ApplicationController
     def index
         render 'list', formats: 'json', handlers: 'jbuilder'
     end
