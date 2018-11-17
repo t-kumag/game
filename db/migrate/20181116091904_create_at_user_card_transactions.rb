@@ -8,8 +8,8 @@ class CreateAtUserCardTransactions < ActiveRecord::Migration[5.2]
 
       t.string :branch_desc, null: false # 加盟店名
 
-      t.decimal :amount, precision: 10, scale: 2 null: false
-      t.decimal :payment_amount, precision: 10, scale: 2 null: false
+      t.decimal :amount, precision: 16, scale: 2 null: false
+      t.decimal :payment_amount, precision: 16, scale: 2 null: false
 
       t.string :trade_gubun, null: false # 支払い方法(例:１回、６回、リボ、均等1/10)
       t.string :etc_desc

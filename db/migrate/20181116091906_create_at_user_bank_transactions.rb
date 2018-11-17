@@ -12,9 +12,9 @@ class CreateAtUserBankTransactions < ActiveRecord::Migration[5.2]
       t.string :description4
       t.string :description5
 
-      t.decimal :amount_receipt, precision: 11, scale: 2
-      t.decimal :amount_payment, precision: 11, scale: 2
-      t.decimal :balance, precision: 11, scale: 2 # null: true
+      t.decimal :amount_receipt, precision: 16, scale: 2
+      t.decimal :amount_payment, precision: 16, scale: 2
+      t.decimal :balance, precision: 16, scale: 2 # null: true
       t.string :currency, null: false
 
       t.seq :integer, null: false

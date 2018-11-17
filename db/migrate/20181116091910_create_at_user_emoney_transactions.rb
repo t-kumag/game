@@ -10,10 +10,10 @@ class CreateAtUserEmoneyTransactions < ActiveRecord::Migration[5.2]
       t.string :branch_desc, null: false # 加盟店名
       t.string :description
 
-      t.decimal :amount_receipt, precision: 10, scale: 2 null: false # チャージ金額
-      t.decimal :amount_payment, precision: 10, scale: 2 null: false # 支払金額
+      t.decimal :amount_receipt, precision: 16, scale: 2 null: false # チャージ金額
+      t.decimal :amount_payment, precision: 16, scale: 2 null: false # 支払金額
 
-      t.decimal :balance, precision: 10, scale: 2
+      t.decimal :balance, precision: 18, scale: 2
 
       t.integer :seq, null: false
 
@@ -32,7 +32,6 @@ class CreateAtUserEmoneyTransactions < ActiveRecord::Migration[5.2]
       # 例:0102"
       # カテゴリー大分類, CATEGORY_NAME1, 全角・半角英数字, 30 , , , 摘要情報を分析してATが分類したカテゴリー大分類情報例:食費
       # カテゴリー小分類, CATEGORY_NAME2, 全角・半角英数字, 30 , , , 摘要情報を分析してATが分類したカテゴリー小分類情報例:外食
-
 
       # スクレイピング応答コード, SCRP_RSLT_CD, 半角数, 8 , ○, , "最終スクレイピングの実行状態/結果コード
       # 例:00000000"
