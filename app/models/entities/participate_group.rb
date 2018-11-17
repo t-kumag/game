@@ -1,4 +1,4 @@
-class ParticipateGroup < ApplicationRecord
+class Entities::ParticipateGroup < ApplicationRecord
   belongs_to :group
   belongs_to :user
 end

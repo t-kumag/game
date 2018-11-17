@@ -1,4 +1,5 @@
-class AtUserBankAccount < ApplicationRecord
+class Entities::tUserBankAccount < ApplicationRecord
   belongs_to :at_user
   belongs_to :at_bank_id
+
 end

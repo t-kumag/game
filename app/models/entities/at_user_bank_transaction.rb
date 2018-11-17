@@ -1,2 +1,2 @@
-class AtUserBankTransaction < ApplicationRecord
+class Entities::AtUserBankTransaction < ApplicationRecord
 end

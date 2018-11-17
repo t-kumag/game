@@ -1,2 +1,2 @@
-class AtCard < ApplicationRecord
+class Entities::AtCard < ApplicationRecord
 end

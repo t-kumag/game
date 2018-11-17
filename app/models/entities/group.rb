@@ -1,2 +1,2 @@
-class Group < ApplicationRecord
+class Entities::Group < ApplicationRecord
 end

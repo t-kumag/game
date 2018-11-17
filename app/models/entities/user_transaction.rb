@@ -1,2 +1,2 @@
-class UserTransaction < ApplicationRecord
+class Entities::UserTransaction < ApplicationRecord
 end

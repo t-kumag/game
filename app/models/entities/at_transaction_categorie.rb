@@ -1,2 +1,2 @@
-class AtTransactionCategorie < ApplicationRecord
+class Entities::AtTransactionCategorie < ApplicationRecord
 end

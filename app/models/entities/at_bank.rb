@@ -1,2 +1,2 @@
-class AtBank < ApplicationRecord
+class Entities::AtBank < ApplicationRecord
 end

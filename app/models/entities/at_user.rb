@@ -1,7 +1,10 @@
 require "securerandom"
 
-class AtUser < ApplicationRecord
+class Entities::AtUser < ApplicationRecord
   belongs_to :user
+  has_many :at_user_bank_accounts
+  has_many :at_user_card_accounts
+  has_many :at_user_emoney_service_accounts
 
   # envに移す
   ACCOUNT_NAME_PREFIX = "osdrdev"

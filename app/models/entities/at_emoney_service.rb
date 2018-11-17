@@ -1,2 +1,2 @@
-class AtEmoneyService < ApplicationRecord
+class Entities::AtEmoneyService < ApplicationRecord
 end

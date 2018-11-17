@@ -1,4 +1,4 @@
-class AtUserToken < ApplicationRecord
+class Entities::AtUserToken < ApplicationRecord
   belongs_to :at_user
 
   def self.create_token(at_user)

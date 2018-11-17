@@ -1,2 +1,2 @@
-class Family < ApplicationRecord
+class Entities::Family < ApplicationRecord
 end
