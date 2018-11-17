@@ -17,7 +17,7 @@ class CreateAtUserBankTransactions < ActiveRecord::Migration[5.2]
       t.decimal :balance, precision: 16, scale: 2 # null: true
       t.string :currency, null: false
 
-      t.seq :integer, null: false
+      t.integer :seq, null: false
 
       t.references :at_transaction_category, null: false, foreign_key: true
       

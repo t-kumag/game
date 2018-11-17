@@ -2,7 +2,7 @@ class CreateAtUserEmoneyTransactions < ActiveRecord::Migration[5.2]
   def change
     create_table :at_user_emoney_transactions do |t|
 
-      t.references :at_user_emoney_service_account, foreign_key: true
+      t.references :at_user_emoney_service_account, foreign_key: true, index: false
 
       t.date :used_date, null: false # YYYYMMDD
       t.string :used_time  # HHMI
@@ -10,8 +10,8 @@ class CreateAtUserEmoneyTransactions < ActiveRecord::Migration[5.2]
       t.string :branch_desc, null: false # 加盟店名
       t.string :description
 
-      t.decimal :amount_receipt, precision: 16, scale: 2 null: false # チャージ金額
-      t.decimal :amount_payment, precision: 16, scale: 2 null: false # 支払金額
+      t.decimal :amount_receipt, precision: 16, scale: 2, null: false # チャージ金額
+      t.decimal :amount_payment, precision: 16, scale: 2, null: false # 支払金額
 
       t.decimal :balance, precision: 18, scale: 2
 
@@ -93,5 +93,6 @@ class CreateAtUserEmoneyTransactions < ActiveRecord::Migration[5.2]
       
       t.timestamps
     end
+    add_index :at_user_emoney_transactions, :at_user_emoney_service_account_id, :name => 'index_at_user_emoney_tran_on_at_user_emoney_service_account_id'
   end
 end
