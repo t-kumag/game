@@ -1,5 +1,6 @@
 class Entities::AtUserToken < ApplicationRecord
-  belongs_to :at_user
+  belongs_to :at_user, inverse_of: :at_user_tokens
+
 
   def self.create_token(at_user)
     params = {

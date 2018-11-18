@@ -1,25 +1,62 @@
-class AtAPIService
+class Services::AtUserService
   # envに移す
   PWD_SALT = "osdrdev"
   ACCOUNT_NAME_PREFIX = "osdrdev"
 
+  def initialize(user)
+    @user = user
+  end
+
   # ATユーザーの登録
   # ATに登録するid,pwd,mailはサーバーで生成
-  # @param [Date] date 日付
-  # @return [String] 日付を YYYY年MM月DD日 の形式にしたもの
-  # @return [nil] 引数が Date 型以外の場合は nil
+  # @return [String] トークン文字列
   def create_user
-    api_name = "/openuserc001.jct"
-    at_user_id = "#{ACCOUNT_NAME_PREFIX}_#{user_id}"
-    email = "#{ACCOUNT_NAME_PREFIX}-#{user_id}@osdr.dev.co"
-    pwd = Digest::MD5.hexdigest("#{PWD_SALT}#{user_id}") # 保存するのでrandとsaltで良いかも
-    params = {
-      "CHNL_ID" => AtAPIClient::CHNL_ID,
-      "USER_ID" => at_user_id,
-      "USER_PW" => pwd,
-      "EMAIL_ADDR" => email,
-    }
-    return AtAPIClient.new(api_name, params).post
+
+    begin
+      at_user = Entities::AtUser.new(
+        {user_id: @user.id}
+      )
+      # at_user.password = at_user.generate_at_user_password
+      at_user.save!
+      params = {
+        at_user_id: at_user.at_user_id,
+        # at_user_password: at_user.password,
+        # at_user_email: at_user.at_user_email,
+      }
+      requester = AtAPIRequest::AtUser::CreateUser.new(params)
+      res = AtAPIClient.new(requester).request
+      at_user_token = Entities::AtUserToken.new({
+          at_user_id: at_user.id,
+          token: res["TOKEN_KEY"]
+        # token.expires_at = res["EXPI_DT"]
+      })
+      at_user_token.save!
+      at_user.at_user_tokens << at_user_token
+
+    rescue AtAPIStandardError => api_err
+      p api_arr
+    rescue ActiveRecord::RecordInvalid => db_err
+      p db_err
+    rescue => exception
+      p exception
+    end
+
+    return at_user
+  end
+
+  def at_url
+
+    at_user = nil
+
+    if @user&.at_user&.at_user_tokens.blank?
+      at_user = self.create_user
+    else
+      at_user = @user.at_user 
+    end
+
+    # TODO、tokenを含まないurl返す
+    # TODO: 開発用url
+    return "https://atdev.369webcash.com/openlistr001.act?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}"
   end
 
   # トークンを取得、叩くごとにtokenが更新される
@@ -45,7 +82,6 @@ class AtAPIService
     res = AtAPIClient.new(api_name, params).get
 
     # tokenを更新?
-
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
 

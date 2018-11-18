@@ -34,7 +34,7 @@ Rails.application.routes.draw do
         end
       end
     
-      get 'user/at-registerurl', :to => 'users#at_user_create'
+      get 'user/at-url', :to => 'users#at_url'
     
       namespace :family do
         resources :savings_goals, :path => '/goals' do

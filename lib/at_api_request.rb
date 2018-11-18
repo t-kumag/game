@@ -24,14 +24,31 @@ module AtAPIRequest
         @path = "/openuserc001.jct"
         @method = HttpMethod::POST
 
-        # at_user_id = "#{ACCOUNT_NAME_PREFIX}_#{user_id}"
+        at_user_id = "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}"
         # email = "#{ACCOUNT_NAME_PREFIX}-#{user_id}@osdr.dev.co"
         # pwd = Digest::MD5.hexdigest("#{PWD_SALT}#{user_id}") # 保存するのでrandとsaltで良いかも
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
-          "USER_ID" => params[:at_user_id],
+          "USER_ID" => at_user_id,
+          # "USER_PW" => params[:at_user_password],
+          # "EMAIL_ADDR" => params[:at_user_email],
+        }
+      end
+    end
+
+    # params = {
+    #   at_user_id: "",
+    #   at_user_password: "",
+    # }
+    class GetAtUrl < AtAPIRequest::Request
+      def initialize(params)
+        @path = "/opentoknr002.jct"
+        @method = HttpMethod::GET
+        at_user_id = "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}"
+        @params = {
+          "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
+          "USER_ID" => at_user_id,
           "USER_PW" => params[:at_user_password],
-          "EMAIL_ADDR" => params[:at_user_email],
         }
       end
     end
@@ -44,10 +61,11 @@ module AtAPIRequest
       def initialize(params)
         @path = "/opentoknr001.jct"
         @method = HttpMethod::GET
+        at_user_id = "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}"
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
-          "USER_ID" => params[:at_user_id],
-          "USER_PW" => params[:at_user_password],
+          "USER_ID" => at_user_id,
+          # "USER_PW" => params[:at_user_password],
         }
       end
     end

@@ -51,8 +51,10 @@ class AtAPIClient
       end
       validate_http_response_status(response)
     rescue Faraday::Error::TimeoutError => e
+      p e
       raise Timeout, e.message
     rescue Faraday::Error::ClientError => e # ConnectionFailed でもいいが、親クラスである ClientError で全部拾ってしまう
+      p e
       raise ServerError, e.message # 500系と混ざってしまうので、もうちょい情報増やすか例外分けてもいいかも
     end
     return json_from(response.body)
