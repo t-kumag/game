@@ -19,7 +19,7 @@ default: &default
 
 development:
   <<: *default
-  host: localhost
+  host: db
   port: 3306
   database: dev_osdr_db
   username: devusr

@@ -1,7 +1,8 @@
 FROM ruby:2.5.1
 
+ENV LANG ja_JP.UTF-8
 ENV RUBYOPT -EUTF-8
-ENV APP_ROOT /usr/src/osdr
+ENV APP_ROOT /app
 
 WORKDIR $APP_ROOT
 
@@ -27,10 +28,16 @@ RUN \
   rm -rf ~/.gem
 
 COPY . $APP_ROOT
-
 EXPOSE 3000
 
-CMD ["rails","server","-b","0.0.0.0"]
+# CMD ["rails","server","-b","0.0.0.0"]
+
+
+
+
+
+
+
 
 
 
