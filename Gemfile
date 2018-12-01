@@ -81,6 +81,7 @@ gem "faraday"
 group :production, :staging do
   gem 'unicorn'
   gem 'capistrano'
+  
   gem 'capistrano-bundler'
   gem 'capistrano-rails'
   gem 'capistrano-rbenv'
