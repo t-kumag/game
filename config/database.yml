@@ -25,6 +25,14 @@ development:
   username: devusr
   password: pass
 
+staging:
+  <<: *default
+  host: osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
+  port: 3306
+  database: osdrdevdb
+  username: osdrdevuser
+  password: qwermnbv10
+
 #  database: db/development.sqlite3
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -36,9 +44,11 @@ test:
 
 production:
   <<: *default
-  database: db_production
-#  database: db/production.sqlite3
-
+  host: osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
+  port: 3306
+  database: osdrdevdb
+  username: osdrdevuser
+  password: qwermnbv10
 
 
 

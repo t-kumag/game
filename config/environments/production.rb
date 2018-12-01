@@ -11,7 +11,8 @@ Rails.application.configure do
   config.eager_load = true
 
   # Full error reports are disabled and caching is turned on.
-  config.consider_all_requests_local = false
+  # config.consider_all_requests_local = false
+  config.consider_all_requests_local = true
   config.action_controller.perform_caching = true
 
   # Ensures that a master key has been made available in either ENV["RAILS_MASTER_KEY"]
@@ -78,7 +79,8 @@ Rails.application.configure do
 
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
-  config.logger = Logger.new("log/production.log", "daily")
+  # config.logger = Logger.new("log/production.log", "daily")
+  config.logger = Logger.new(STDOUT)
 
   # Use a different logger for distributed setups.
   # require 'syslog/logger'

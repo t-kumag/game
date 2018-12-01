@@ -4,6 +4,9 @@ class Api::V1::User::CardAccountsController < ApplicationController
     end
 
     def summary
+        @response = {
+            amount: 100000
+        }
         render 'summary', formats: 'json', handlers: 'jbuilder'
     end
 end
