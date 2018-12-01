@@ -14,7 +14,7 @@ set :branch, 'develop'
 
 # Default deploy_to directory is /var/www/my_app_name
 # deploy先のディレクトリ
-set :deploy_to, '/app'
+set :deploy_to, '/home/ec2-user/app'
 
 # Default value for :scm is :git
 # set :scm, :git
@@ -30,7 +30,7 @@ set :deploy_to, '/app'
 
 # Default value for :linked_files is []
 # シンボリックリンクをはるファイル。今回はgemのconfigを使用して、production.ymlを共通化。
-set :linked_files, fetch(:linked_files, []).push('config/settings/production.yml')
+# set :linked_files, fetch(:linked_files, []).push('config/settings/production.yml')
 
 # Default value for linked_dirs is []
 # シンボリックリンクをはるフォルダ。
@@ -44,7 +44,7 @@ set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', '
 set :keep_releases, 5
 
 # rubyのバージョン
-set :rbenv_ruby, '2.5.2'
+set :rbenv_ruby, '2.5.1'
 
 namespace :deploy do
   desc 'Restart application'
