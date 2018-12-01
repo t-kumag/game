@@ -5,7 +5,7 @@ lock "~> 3.11.0"
 set :application, 'osidori'
 
 # deployするレポジトリ
-set :repo_url, 'git@github.com:kuboshizuma/protospace.git'
+set :repo_url, 'git@github.com:osidori/osidori_api.git'
 
 # Default branch is :master
 # deployするブランチ。デフォルトはmasterなのでなくても可。
