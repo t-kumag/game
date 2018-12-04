@@ -1,6 +1,6 @@
 # config valid only for current version of Capistrano
-# lock "~> 3.11.0"
-lock "~> 3.4.1"
+lock "~> 3.11.0"
+# lock "~> 3.4.1"
 
 
 # アプリケーション名
@@ -16,7 +16,13 @@ set :branch, 'develop'
 
 # Default deploy_to directory is /var/www/my_app_name
 # deploy先のディレクトリ
+
+
+set :user, 'ec2-user'
 set :deploy_to, '/home/ec2-user/app/osidori_api'
+
+
+set :stage, 'production'
 
 # Default value for :scm is :git
 set :scm, :git

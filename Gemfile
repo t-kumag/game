@@ -86,6 +86,8 @@ group :production, :staging do
   gem 'capistrano-rails'
   gem 'capistrano-rbenv'
   gem 'capistrano3-unicorn'
+  gem 'capistrano3-puma' # pumaを使う場合はこれも必要
+
 end
 
 gem 'sshkit', '1.4.0'
