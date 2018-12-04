@@ -88,6 +88,7 @@ group :production, :staging do
   gem 'capistrano3-unicorn'
 end
 
+gem 'sshkit', '1.4.0'
 
 
 
