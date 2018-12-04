@@ -1,5 +1,7 @@
 # config valid only for current version of Capistrano
-lock "~> 3.11.0"
+# lock "~> 3.11.0"
+lock "~> 3.4.1"
+
 
 # アプリケーション名
 set :application, 'osidori'

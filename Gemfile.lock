@@ -292,6 +292,7 @@ DEPENDENCIES
   rufo
   spring
   spring-watcher-listen (~> 2.0.0)
+  sshkit (= 1.4.0)
   tzinfo-data
   unicorn
   web-console (>= 3.3.0)
