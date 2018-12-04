@@ -78,20 +78,15 @@ gem "doorkeeper"
 # http client
 gem "faraday"
 
-group :production, :staging do
-  gem 'unicorn'
-  gem 'capistrano'
-  
-  gem 'capistrano-bundler'
-  gem 'capistrano-rails'
-  gem 'capistrano-rbenv'
-  gem 'capistrano3-unicorn'
-  gem 'capistrano3-puma' # pumaを使う場合はこれも必要
+gem 'unicorn'
+gem 'capistrano'
 
-end
+gem 'capistrano-bundler'
+gem 'capistrano-rails'
+gem 'capistrano-rbenv'
+gem 'capistrano3-unicorn'
+gem 'capistrano3-puma' # pumaを使う場合はこれも必要
 
-gem 'sshkit', '1.4.0'
-gem 'capistrano-scm-copy'
 
 
 
