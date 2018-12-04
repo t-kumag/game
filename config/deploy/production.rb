@@ -6,7 +6,9 @@
 # server "example.com", user: "deploy", roles: %w{app db web}, my_property: :my_value
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
-server '52.192.52.205', user: 'ec2-user', roles: %w{app} #serverのipとuser名は適宜
+# server '52.192.52.205', user: 'ec2-user', roles: %w{app} #serverのipとuser名は適宜
+server '13.112.252.55', user: 'ec2-user', roles: %w{app} #serverのipとuser名は適宜
+
 set :ssh_options, keys: '~/.ssh/osidori-ec2-tmp.pem.txt' #ssh_keyの名前は適宜
 
 

@@ -14,7 +14,7 @@ set :branch, 'develop'
 
 # Default deploy_to directory is /var/www/my_app_name
 # deploy先のディレクトリ
-set :deploy_to, '/home/ec2-user/app'
+set :deploy_to, '/home/ec2-user/app/osidori_api'
 
 # Default value for :scm is :git
 # set :scm, :git
@@ -38,6 +38,8 @@ set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', '
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
+
+# set :bundle_gemfile,  "/home/ec2-user/app/osidori_api/current/Gemfile"
 
 # Default value for keep_releases is 5
 # 保持するバージョンの個数
