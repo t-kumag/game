@@ -9,7 +9,7 @@ set :pty,             true
 set :use_sudo,        false
 set :stage,           :production
 set :deploy_via,      :remote_cache
-set :deploy_to,       '/app/osidori_api'
+set :deploy_to,       '/home/ec2-user/app/'
 set :puma_bind,       "unix://#{shared_path}/tmp/sockets/puma.sock"
 set :puma_state,      "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid,        "#{shared_path}/tmp/pids/puma.pid"
@@ -22,7 +22,9 @@ set :puma_init_active_record, true
 set :rbenv_type, :system
 set :rbenv_path, '~/.rbenv'
 set :rbenv_ruby, File.read('.ruby-version').strip
+# set :rbenv_prefix, "RBENV_ROOT=#{fetch(:rbenv_path)} RBENV_VERSION=#{fetch(:rbenv_ruby)} #{fetch(:rbenv_path)}/bin/rbenv exec"
 set :rbenv_prefix, "RBENV_ROOT=#{fetch(:rbenv_path)} RBENV_VERSION=#{fetch(:rbenv_ruby)} #{fetch(:rbenv_path)}/bin/rbenv exec"
+
 set :rbenv_map_bins, %w[rake gem bundle ruby rails]
 set :linked_dirs, fetch(:linked_dirs, []).push(
   'log',
