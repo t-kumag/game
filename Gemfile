@@ -88,8 +88,8 @@ group :production, :staging do
   gem 'capistrano3-unicorn'
 end
 
-gem 'sshkit', '1.4.0'
-
+# gem 'sshkit', '1.4.0'
+gem 'capistrano-scm-copy'
 
 
 

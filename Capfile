@@ -3,6 +3,7 @@ require 'capistrano/setup'
 
 # Include default deployment tasks
 require 'capistrano/deploy'
+require 'capistrano/copy'
 require 'capistrano/scm/git'
 install_plugin Capistrano::SCM::Git
 
@@ -28,3 +29,4 @@ require 'capistrano3/unicorn' #追記
 
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined
 Dir.glob('lib/capistrano/tasks/*.task').each { |r| import r }
+
