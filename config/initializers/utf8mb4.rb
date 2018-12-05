@@ -10,7 +10,7 @@ end
 ActiveSupport.on_load :active_record do
   module ActiveRecord::ConnectionAdapters
     class AbstractMysqlAdapter
-      prepend Utf8mb4
+      include Utf8mb4
     end
   end
 end
