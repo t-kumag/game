@@ -1,6 +1,7 @@
 lock '3.11.0'
 
 set :repo_url,        'git@github.com:osidori/osidori_api.git'
+set :branch, "develop"
 set :application,     'osidori'
 set :user,            'ec2-user'
 set :puma_threads,    [4, 16]
@@ -57,7 +58,7 @@ namespace :deploy do
   desc 'Make sure local git is in sync with remote.'
   task :check_revision do
     on roles(:app) do
-      unless `git rev-parse HEAD` == `git rev-parse origin/master`
+      unless `git rev-parse HEAD` == `git rev-parse origin/develop`
       end
     end
   end
