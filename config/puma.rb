@@ -17,7 +17,7 @@ threads threads_count, threads_count
 environment ENV.fetch("RAILS_ENV") { "production" }
 
 # bind "unix://home/ec2-user/app/shared/tmp/sockets/puma.sock"
-bind "unix://tmp/sockets/puma.sock"
+bind "unix:///tmp/sockets/puma.sock"
 
 # _app_path = "#{File.expand_path("../..", __FILE__)}"
 # _app_name = File.basename(_app_path)
