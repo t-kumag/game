@@ -41,7 +41,7 @@ set :linked_files, fetch(:linked_files, []).push(
   'config/secrets.yml',
   '.env'
 )
-set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
+# set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
 
 namespace :puma do
   desc 'Create Directories for Puma Pids and Socket'
@@ -91,6 +91,6 @@ namespace :deploy do
 
   after  :migrate,      :seed
   before :starting,     :check_revision
-  after  :finishing,    :compile_assets
+  # after  :finishing,    :compile_assets
   after  :finishing,    :cleanup
 end
