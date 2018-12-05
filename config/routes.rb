@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  get "/", to: static("index.html")
+  # get "/", to: static("index.html")
   namespace :api, format: 'json'  do
     namespace :v1 do
 
