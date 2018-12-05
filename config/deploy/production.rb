@@ -1,6 +1,7 @@
 set :branch, 'master'
 
 server '13.112.252.55', user: 'ec2-user', roles: %w[web app db]
+set :assets_roles, [:web, :app] 
 
 # set :ssh_options, {
 #     keys: [File.expand_path('~/.ssh/osidori-ec2-tmp.pem.txt')],
