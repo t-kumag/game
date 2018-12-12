@@ -4,6 +4,7 @@ Rails.application.routes.draw do
     namespace :v1 do
 
       use_doorkeeper
+      post 'auth/login', to: 'auth#login'
       namespace :user do
         resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
           resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do

@@ -3,13 +3,14 @@ services:
   app:
     build:
       context: .
-      dockerfile: docker/api/Dockerfile
+      dockerfile: docker/api/development/Dockerfile
     volumes:
       - .:/app:cached
     ports:
       - 3000:3000
     command: bundle exec rails s -p 3000 -b '0.0.0.0'
-    depends_on:
+    # command: bundle exec rails db:migrate RAILS_ENV=development
+    depends_on: 
       - db
   db:
     build:

@@ -17,6 +17,8 @@ RUN apt-get update && \
 COPY Gemfile $APP_ROOT
 COPY Gemfile.lock $APP_ROOT
 
+EXPOSE 3000
+
 RUN \
   echo 'install: --no-document' >> ~/.gemrc && \
   echo 'update: --no-document' >> ~/.gemrc && \
@@ -28,9 +30,9 @@ RUN \
   rm -rf ~/.gem
 
 COPY . $APP_ROOT
-EXPOSE 3000
 
-CMD ["bundle", "exec", "rails", "s", "puma", "-b", "0.0.0.0", "-p", "3000", "-e", "staging"]
+
+CMD ["bundle", "exec", "rails", "s", "puma", "-b", "0.0.0.0", "-p", "3000", "-e", "development"]
 
 # CMD ["rails","server","-b","0.0.0.0"]
 

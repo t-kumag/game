@@ -65,7 +65,11 @@ class ApplicationController < ActionController::Base
     # TODO: とりあえず何が来ても認証される
     puts "======================="
     puts bearer_token
-    @user = Entities::User.create()
+    p Entities::User.all
+    p Entities::User.find_by_token(bearer_token)
+    puts "======================="
+    @current_user = Entities::User.find_by_token(bearer_token)
+    return false if @current_user.nil
     return true
   end
 

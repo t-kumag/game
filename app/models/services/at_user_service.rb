@@ -34,7 +34,7 @@ class Services::AtUserService
       at_user.at_user_tokens << at_user_token
 
     rescue AtAPIStandardError => api_err
-      p api_arr
+      p api_err
     rescue ActiveRecord::RecordInvalid => db_err
       p db_err
     rescue => exception
@@ -56,7 +56,29 @@ class Services::AtUserService
 
     # TODO、tokenを含まないurl返す
     # TODO: 開発用url
-    return "https://atdev.369webcash.com/openlistr001.act?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}"
+    # url = 'https://atdev.369webcash.com/openlistr001.act'
+    url = 'https://atdev.369webcash.com/openadd001.act'
+    return "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}&CallBack=''"    
+  end
+
+  def at_user
+  end
+
+  def sync
+
+    at_user = nil
+    if @user&.at_user&.at_user_tokens.blank?
+      at_user = self.create_user
+    else
+      at_user = @user.at_user 
+    end
+
+    # TODO、tokenを含まないurl返す
+    # TODO: 開発用url
+    # url = 'https://atdev.369webcash.com/openlistr001.act'
+    url = 'https://atdev.369webcash.com/openadd001.act'
+    # https://atdev.369webcash.com/openscrpr001.jct				    
+    return "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}&CallBack=''"    
   end
 
   # トークンを取得、叩くごとにtokenが更新される
