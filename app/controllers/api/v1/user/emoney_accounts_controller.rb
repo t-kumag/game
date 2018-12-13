@@ -1,4 +1,4 @@
-class Api::V1::User::emoney_serviceAccountsController < ApplicationController
+class Api::V1::User::EmoneyAccountsController < ApplicationController
     before_action :authenticate
 
     def index
