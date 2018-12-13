@@ -62,20 +62,14 @@ class ApplicationController < ActionController::Base
   end
 
   def authenticate_token
-    # TODO: とりあえず何が来ても認証される
-    puts "======================="
-    puts bearer_token
-    p Entities::User.all
-    p Entities::User.find_by_token(bearer_token)
-    puts "======================="
     @current_user = Entities::User.find_by_token(bearer_token)
-    return false if @current_user.nil
+    return false if @current_user.nil?
     return true
   end
 
   def render_unauthorized
     # render_errors(:unauthorized, ['invalid token'])
-    obj = { message: 'token invalid' }
+    obj = { meta: {error: 'token invalid' }}    
     render json: obj, status: :unauthorized
   end
 

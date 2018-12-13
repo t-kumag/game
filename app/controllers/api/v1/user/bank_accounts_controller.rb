@@ -1,26 +1,25 @@
 class Api::V1::User::BankAccountsController < ApplicationController
+  before_action :authenticate
+
   def index
-    # user = Entities::User.find(1)
-    # if @current_user
-      
-    @bank_accounts = user.at_user.at_user_bank_accounts
-    # @response = {
-    #   accounts: [
-    #     {
-    #       account_id:   1,
-    #       card_name: "三井住友銀行",
-    #       amount: 11111,
-    #       error: "連携が切れました。"
-    #     },
-    #   ]
-    # }
+    if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
+      @bank_accounts = nil
+    else
+      @bank_accounts = @current_user.at_user.at_user_bank_accounts
+    end    
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
   def summary
-    @response = {
-      amount: 11111,
-    }
+    if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
+      @response = {
+        amount: 0,
+      }
+    else
+      @response = {
+        amount: @current_user.at_user.at_user_bank_accounts.sum{|i| i.amount},
+      }
+    end
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
 

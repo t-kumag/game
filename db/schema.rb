@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_10_013349) do
+ActiveRecord::Schema.define(version: 2018_12_13_014315) do
 
   create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -175,6 +175,7 @@ ActiveRecord::Schema.define(version: 2018_12_10_013349) do
     t.string "at_user_password"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "at_user_id"
     t.index ["user_id"], name: "index_at_users_on_user_id"
   end
 

@@ -9,3 +9,6 @@
 # TODO
 Entities::User.create(:email => "test01@example.com", :crypted_password => "test01", :token => "xxxxxxxxxxx01" )
 Entities::User.create(:email => "test02@example.com", :crypted_password => "test02", :token => "xxxxxxxxxxx02" )
+Entities::User.create(:email => "test03@example.com", :crypted_password => "test03", :token => "xxxxxxxxxxx03" )
+Entities::User.create(:email => "test04@example.com", :crypted_password => "test04", :token => "xxxxxxxxxxx04" )
+Entities::User.create(:email => "test88@example.com", :crypted_password => "test88", :token => "qxxxxxxxxxx88" )

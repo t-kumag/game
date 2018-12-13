@@ -1,13 +1,12 @@
 json.meta do
-    json.error  'sample'
+    json.error ''
 end
 
 json.app do
-    json.account_id: 1
-    json.card_name: '楽天カード'
-    json.amount: 123456
-    json.error: ''
+    json.array!(@card_accounts) do |account|
+        json.account_id account.id
+        json.name account.fnc_nm
+        json.amount account.amount
+        # json.error account[:error]
+    end
 end
-
-# {"tweet": {"text": "テキスト1", "title": "タイトル1"} }
-      

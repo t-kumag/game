@@ -35,9 +35,9 @@ class Entities::AtUser < ApplicationRecord
     return "#{ACCOUNT_NAME_PREFIX}-#{self.id}@osdr.dev.co"
   end
 
-  def at_user_id
-    return "#{ACCOUNT_NAME_PREFIX}_#{self.id}"
-  end
+  # def at_user_id
+  #   return "#{ACCOUNT_NAME_PREFIX}_#{self.id}"
+  # end
 
   private
 

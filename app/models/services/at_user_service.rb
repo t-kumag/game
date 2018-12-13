@@ -11,10 +11,14 @@ class Services::AtUserService
   # ATに登録するid,pwd,mailはサーバーで生成
   # @return [String] トークン文字列
   def create_user
-
     begin
+      require "securerandom"
+      rond_id = SecureRandom.hex
       at_user = Entities::AtUser.new(
-        {user_id: @user.id}
+        {
+          user_id: @user.id,
+          at_user_id: rond_id
+        }
       )
       # at_user.password = at_user.generate_at_user_password
       at_user.save!
@@ -32,7 +36,6 @@ class Services::AtUserService
       })
       at_user_token.save!
       at_user.at_user_tokens << at_user_token
-
     rescue AtAPIStandardError => api_err
       p api_err
     rescue ActiveRecord::RecordInvalid => db_err
@@ -58,7 +61,8 @@ class Services::AtUserService
     # TODO: 開発用url
     # url = 'https://atdev.369webcash.com/openlistr001.act'
     url = 'https://atdev.369webcash.com/openadd001.act'
-    return "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}&CallBack=''"    
+    # return "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}&CallBack=''"
+    return  "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}"
   end
 
   def at_user
