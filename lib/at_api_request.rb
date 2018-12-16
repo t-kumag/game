@@ -96,17 +96,32 @@ module AtAPIRequest
     #   return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
     # end
 
+    class GetAccounts < AtAPIRequest::Request
+      def initialize(params)
+        @path = "/openfincr003.jct"
+        @method = HttpMethod::GET
+
+        # 金融機関区分	FNC_TYPE	半角英	2 			"未入力時 AL 処理
+        # AL : 全て, JD : 電子マネー"
+        # fnc_type = params[:fnc_type] if params.has_key?(:fnc_type) || !params[:fnc_type].blank?
+        @params = {
+          "TOKEN_KEY" => params[:token], 
+          # "FNC_TYPE" => fnc_type,
+        }
+      end
+    end
+
     class GetTransaction < AtAPIRequest::Request
       def initialize(params)
         @path = "/openscher002.jct"
         @method = HttpMethod::GET
-        @params = params
-        # {
-        #   "TOKEN_KEY" => params[:token],
-        #   "FNC_ID" => params[:fnc_id],
-        #   "START_DATE" => params[:start_date],
-        #   "END_DATE" => params[:end_date],
-        # }
+        @params = {
+          "TOKEN_KEY" => params[:token],
+          "FNC_ID" => params[:fnc_id],
+          "START_DATE" => params[:start_date], # ‘YYYYMMDD’
+          "END_DATE" => params[:end_date], # ‘YYYYMMDD’
+        }
+        @params["CONFIRM_TYPE"] = params[:confirm_type] if params.has_key?(:confirm_type) || !params[:confirm_type].blank?
       end
     end
   end

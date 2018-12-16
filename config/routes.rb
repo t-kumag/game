@@ -36,7 +36,8 @@ Rails.application.routes.draw do
       end
     
       get 'user/at-url', :to => 'users#at_url'
-    
+      get 'user/at-sync', :to => 'users#at_sync'
+
       namespace :family do
         resources :savings_goals, :path => '/goals' do
         end

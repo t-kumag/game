@@ -62,38 +62,162 @@ class Services::AtUserService
     # url = 'https://atdev.369webcash.com/openlistr001.act'
     url = 'https://atdev.369webcash.com/openadd001.act'
     # return "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}&CallBack=''"
-    return  "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}"
+    return {
+      url: url,
+      chnl_id: "CHNL_OSIDORI",
+      token_key: at_user.at_user_tokens.first.token
+    }
+    # return  "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}"
   end
 
   def at_user
   end
 
   def sync
+    begin
+      token = @user.at_user.at_user_tokens.first.token
+      params = {
+        token: token,
+      }
+      requester = AtAPIRequest::AtUser::GetAccounts.new(params)
+      res = AtAPIClient.new(requester).request
 
-    at_user = nil
-    if @user&.at_user&.at_user_tokens.blank?
-      at_user = self.create_user
-    else
-      at_user = @user.at_user 
+      # # new
+      src_card_accounts = []
+
+      # # db
+      osidori_fnc_cds = Entities::AtCard.all.map{|i| i.fnc_cd}
+      cards = Entities::AtCard.all.map{|i| {i.fnc_cd => i}}
+      # card_accounts = Entities::AtUserCardAccount.find_by(at_user_id: @user.at_user.id)
+
+      if res.has_key?("CARD_DATA_REC") && !res["CARD_DATA_REC"].blank?
+        res["CARD_DATA_REC"].each do |i|
+
+          card = nil
+          if osidori_fnc_cds.include?(fnc_cd: i["FNC_CD"])
+            card = cards[i["FNC_CD"]]
+          else
+            c = Entities::AtCard.new(fnc_cd: i["FNC_CD"],fnc_nm: i["FNC_NM"])
+            c.save!
+            card = c
+          end
+
+          src_card_accounts << Entities::AtUserCardAccount.new(
+            at_user_id: @user.at_user.id,
+            at_card_id: card.id,
+            share: false,
+            fnc_id: i["FNC_ID"],
+            fnc_cd: i["FNC_CD"],
+            fnc_nm: i["FNC_NM"],
+            corp_yn: i["CORP_YN"],
+            brn_cd: i["BRN_CD"],
+            brn_nm: i["BRN_NM"],
+            acct_no: i["ACCT_NO"],
+            memo: i["MEMO"],
+            use_yn: i["USE_YN"],
+            cert_type: i["CERT_TYPE"],
+            scrap_dtm: Time.parse(i["SCRAP_DTM"]),
+            last_rslt_cd: i["LAST_RSLT_CD"],
+            last_rslt_msg: i["LAST_RSLT_MSG"],
+          )
+          puts "end=============="
+        end
+      end
+      puts "=================="
+      p src_card_accounts
+      Entities::AtUserCardAccount.import(src_card_accounts)
+      
+      #   {
+      #   "CARD_REC_CNT"=>"1", 
+      #   "CARD_DATA_REC"=> [{
+      #     "FNC_ID"=>"c1/cF5hycTeBKgH4X11tYPhoBWZf9Tk1kcHZ2CXuVWn0852YRUnuUvlAOnh4ajEfYrxSKF78DjRujK2VxGsAO5Q==", 
+      #     "CERT_TYPE"=>"1", 
+      #     "BRN_NM"=>"", 
+      #     "BRN_CD"=>"", 
+      #     "ORI_BANK_CD"=>"", 
+      #     "ACCT_NO"=>"", 
+      #     "BANK_CD"=>"31392009", 
+      #     "CORP_YN"=>"N", 
+      #     "USE_YN"=>"Y", 
+      #     "SCRAP_DTM"=>"20181213112317407", 
+      #     "LAST_RSLT_MSG"=>"正常", 
+      #     "LAST_RSLT_CD"=>"0", 
+      #     "BANK_NM"=>"楽天カード", 
+      #     "FNC_CD"=>"31392009", 
+      #     "FNC_NM"=>"楽天カード", 
+      #     "MEMO"=>"", 
+      #     "SV_TYPE"=>"1"}], 
+
+      #   "BANK_REC_CNT"=>"0", 
+      #   "BANK_DATA_REC"=>[], 
+
+      #   "API_REC_CNT"=>"0", 
+      #   "API_DATA_REC"=>[], 
+
+      #   "INSURANCE_REC_CNT"=>"0", 
+      #   "INSURANCE_DATA_REC"=>[], 
+
+      #   "TRAF_REC_CNT"=>"0", 
+      #   "TRAF_DATA_REC"=>[], 
+
+      #   "POINT_REC_CNT"=>"0", 
+      #   "POINT_DATA_REC"=>[], 
+
+      #   "POS_REC_CNT"=>"0", 
+      #   "POS_DATA_REC"=>[], 
+
+      #   "INVC_REC_CNT"=>"0", 
+      #   "INVC_DATA_REC"=>[], 
+
+      #   "SHOP_REC_CNT"=>"0", 
+      #   "SHOP_DATA_REC"=>[]
+
+      #   "STOCK_REC_CNT"=>"0", 
+      #   "STOCK_DATA_REC"=>[], 
+
+      #   "ETC_REC_CNT"=>"0", 
+      #   "ETC_DATA_REC"=>[], 
+
+      #   "TEL_REC_CNT"=>"0", 
+      #   "TEL_DATA_REC"=>[], 
+
+      #   "DEBIT_REC_CNT"=>nil, 
+      #   "DEBIT_DATA_REC"=>nil, 
+
+      #   "COMMON_HEAD"=>{"MESSAGE"=>"", "CODE"=>"", "ERROR"=>false}, 
+      #   "RSLT_CD"=>"00000000", 
+      #   "RSLT_MSG"=>"正常", 
+
+      # }
+
+
+      # at_user_token = Entities::AtUserToken.new({
+      #     at_user_id: at_user.id,
+      #     token: res["TOKEN_KEY"]
+      #   # token.expires_at = res["EXPI_DT"]
+      # })
+      # at_user_token.save!
+      # at_user.at_user_tokens << at_user_token
+    rescue AtAPIStandardError => api_err
+      p api_err
+    rescue ActiveRecord::RecordInvalid => db_err
+      p db_err
+    rescue => exception
+      p exception
     end
 
-    # TODO、tokenを含まないurl返す
-    # TODO: 開発用url
-    # url = 'https://atdev.369webcash.com/openlistr001.act'
-    url = 'https://atdev.369webcash.com/openadd001.act'
-    # https://atdev.369webcash.com/openscrpr001.jct				    
-    return "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}&CallBack=''"    
+
   end
 
   # トークンを取得、叩くごとにtokenが更新される
-  def token
+  def token    
     api_name = "/opentoknr001.jct"
     params = {
       "CHNL_ID" => AtAPIClient::CHNL_ID,
       "USER_ID" => at_user_id,
       "USER_PW" => pwd,
     }
-    res = AtAPIClient.new(api_name, params).get
+    # res = AtAPIClient.new(api_name, params).get
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
 
@@ -101,11 +225,12 @@ class Services::AtUserService
   def token_disabled?
     api_name = "/opentoknr002.jct"
     params = {
-      "CHNL_ID" => AtAPIClient::CHNL_ID,
+      # "CHNL_ID" => AtAPIClient::CHNL_ID,
+      "CHNL_ID" => "CHNL_OSIDORI",
       "USER_ID" => at_user_id,
       "TOKEN_KEY" => token,
     }
-    res = AtAPIClient.new(api_name, params).get
+    res = AtAPIClient.new(api_name, params).get 
 
     # tokenを更新?
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
@@ -113,11 +238,15 @@ class Services::AtUserService
 
   # 金融データ登録情報照会
   def accounts
+
     api_name = "/openfincr003.jct"
+    
     params = {
-      "TOKEN_KEY" => token,
+      # "TOKEN_KEY" => token,
+      "TOKEN_KEY" => @user.at_user.at_user_token.token
     }
     res = AtAPIClient.new(api_name, params).get
+    res p
 
     # tokenを更新?
     # {
