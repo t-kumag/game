@@ -61,10 +61,9 @@ module AtAPIRequest
       def initialize(params)
         @path = "/opentoknr001.jct"
         @method = HttpMethod::GET
-        at_user_id = "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}"
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
-          "USER_ID" => at_user_id,
+          "USER_ID" => params[:at_user_id],
           # "USER_PW" => params[:at_user_password],
         }
       end
@@ -78,7 +77,7 @@ module AtAPIRequest
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
           "USER_ID" => params[:at_user_id],
-          "TOKEN_KEY" => params[:at_user_token],
+          "TOKEN_KEY" => params[:token],
         }
       end
     end
@@ -111,7 +110,7 @@ module AtAPIRequest
       end
     end
 
-    class GetTransaction < AtAPIRequest::Request
+    class GetTransactions < AtAPIRequest::Request
       def initialize(params)
         @path = "/openscher002.jct"
         @method = HttpMethod::GET
@@ -124,5 +123,27 @@ module AtAPIRequest
         @params["CONFIRM_TYPE"] = params[:confirm_type] if params.has_key?(:confirm_type) || !params[:confirm_type].blank?
       end
     end
+
+    class ExecScraping < AtAPIRequest::Request
+      def initialize(params)
+        @path = "/openscrpr001.jct"
+        @method = HttpMethod::POST
+        @params = {
+          # トークン値	TOKEN_KEY
+          # 金融ID	FNC_ID
+          # 照会開始日	STARTDATE
+          # 照会終了日	ENDDATE
+          # 追加認証回答	RESPONSE
+          # 要求番号	SS_SYS_NO
+          # 一連番号	TR_SEQ
+          # 追加認証タイプ	QUERYTYPE
+          "TOKEN_KEY" => params[:token],
+          "FNC_ID" => params[:fnc_id],
+        }
+      end
+    end
+
+
+    				
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_16_114231) do
+ActiveRecord::Schema.define(version: 2018_12_17_134937) do
 
   create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -102,6 +102,7 @@ ActiveRecord::Schema.define(version: 2018_12_16_114231) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["at_card_id"], name: "index_at_user_card_accounts_on_at_card_id"
+    t.index ["at_user_id", "fnc_cd"], name: "at_user_card_accounts_at_user_id_fnc_cd", unique: true
     t.index ["at_user_id"], name: "index_at_user_card_accounts_on_at_user_id"
   end
 

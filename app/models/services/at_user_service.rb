@@ -59,15 +59,12 @@ class Services::AtUserService
 
     # TODO、tokenを含まないurl返す
     # TODO: 開発用url
-    # url = 'https://atdev.369webcash.com/openlistr001.act'
     url = 'https://atdev.369webcash.com/openadd001.act'
-    # return "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}&CallBack=''"
     return {
       url: url,
       chnl_id: "CHNL_OSIDORI",
       token_key: at_user.at_user_tokens.first.token
     }
-    # return  "#{url}?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=#{at_user.at_user_tokens.first.token}"
   end
 
   def at_user
@@ -75,6 +72,7 @@ class Services::AtUserService
 
   def sync
     begin
+
       token = @user.at_user.at_user_tokens.first.token
       params = {
         token: token,
@@ -88,7 +86,6 @@ class Services::AtUserService
       # # db
       osidori_fnc_cds = Entities::AtCard.all.map{|i| i.fnc_cd}
       cards = Entities::AtCard.all.map{|i| {i.fnc_cd => i}}
-      # card_accounts = Entities::AtUserCardAccount.find_by(at_user_id: @user.at_user.id)
 
       if res.has_key?("CARD_DATA_REC") && !res["CARD_DATA_REC"].blank?
         res["CARD_DATA_REC"].each do |i|
@@ -120,89 +117,54 @@ class Services::AtUserService
             last_rslt_cd: i["LAST_RSLT_CD"],
             last_rslt_msg: i["LAST_RSLT_MSG"],
           )
-          puts "end=============="
         end
       end
-      puts "=================="
-      p src_card_accounts
-      Entities::AtUserCardAccount.import(src_card_accounts)
-      
-      #   {
-      #   "CARD_REC_CNT"=>"1", 
-      #   "CARD_DATA_REC"=> [{
-      #     "FNC_ID"=>"c1/cF5hycTeBKgH4X11tYPhoBWZf9Tk1kcHZ2CXuVWn0852YRUnuUvlAOnh4ajEfYrxSKF78DjRujK2VxGsAO5Q==", 
-      #     "CERT_TYPE"=>"1", 
-      #     "BRN_NM"=>"", 
-      #     "BRN_CD"=>"", 
-      #     "ORI_BANK_CD"=>"", 
-      #     "ACCT_NO"=>"", 
-      #     "BANK_CD"=>"31392009", 
-      #     "CORP_YN"=>"N", 
-      #     "USE_YN"=>"Y", 
-      #     "SCRAP_DTM"=>"20181213112317407", 
-      #     "LAST_RSLT_MSG"=>"正常", 
-      #     "LAST_RSLT_CD"=>"0", 
-      #     "BANK_NM"=>"楽天カード", 
-      #     "FNC_CD"=>"31392009", 
-      #     "FNC_NM"=>"楽天カード", 
-      #     "MEMO"=>"", 
-      #     "SV_TYPE"=>"1"}], 
+      columns = [:fnc_id, :fnc_cd, :fnc_nm, :corp_yn, :brn_cd, :brn_nm, :acct_no, :memo, :use_yn, :cert_type, :scrap_dtm, :last_rslt_cd, :last_rslt_msg]
+      Entities::AtUserCardAccount.import src_card_accounts, :on_duplicate_key_update => columns, :validate => false
 
-      #   "BANK_REC_CNT"=>"0", 
-      #   "BANK_DATA_REC"=>[], 
-
-      #   "API_REC_CNT"=>"0", 
-      #   "API_DATA_REC"=>[], 
-
-      #   "INSURANCE_REC_CNT"=>"0", 
-      #   "INSURANCE_DATA_REC"=>[], 
-
-      #   "TRAF_REC_CNT"=>"0", 
-      #   "TRAF_DATA_REC"=>[], 
-
-      #   "POINT_REC_CNT"=>"0", 
-      #   "POINT_DATA_REC"=>[], 
-
-      #   "POS_REC_CNT"=>"0", 
-      #   "POS_DATA_REC"=>[], 
-
-      #   "INVC_REC_CNT"=>"0", 
-      #   "INVC_DATA_REC"=>[], 
-
-      #   "SHOP_REC_CNT"=>"0", 
-      #   "SHOP_DATA_REC"=>[]
-
-      #   "STOCK_REC_CNT"=>"0", 
-      #   "STOCK_DATA_REC"=>[], 
-
-      #   "ETC_REC_CNT"=>"0", 
-      #   "ETC_DATA_REC"=>[], 
-
-      #   "TEL_REC_CNT"=>"0", 
-      #   "TEL_DATA_REC"=>[], 
-
-      #   "DEBIT_REC_CNT"=>nil, 
-      #   "DEBIT_DATA_REC"=>nil, 
-
-      #   "COMMON_HEAD"=>{"MESSAGE"=>"", "CODE"=>"", "ERROR"=>false}, 
-      #   "RSLT_CD"=>"00000000", 
-      #   "RSLT_MSG"=>"正常", 
-
-      # }
+      #### ======================
 
 
-      # at_user_token = Entities::AtUserToken.new({
-      #     at_user_id: at_user.id,
-      #     token: res["TOKEN_KEY"]
-      #   # token.expires_at = res["EXPI_DT"]
-      # })
-      # at_user_token.save!
-      # at_user.at_user_tokens << at_user_token
+      start_date = Time.now.ago(60.days).strftime("%Y%m%d")
+      end_date = Time.now.strftime("%Y%m%d")
+      Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).each do |a|
+        token = @user.at_user.at_user_tokens.first.token
+
+        # params = {
+        #   token: token,
+        #   fnc_id: a.fnc_id,
+        # }
+        # requester = AtAPIRequest::AtUser::ExecScraping.new(params)
+        # res = AtAPIClient.new(requester).request
+
+        params = {
+          token: token,
+          fnc_id: a.fnc_id,
+          start_date: start_date,
+          end_date: end_date,
+        }
+        # クレジットカードの場合のみ利用します。
+        # C : 確定
+        # U : 確定+未確定
+        # DEFAULT 'C'"
+        params[:confirm_type] = 'C'
+        requester = AtAPIRequest::AtUser::GetTransactions.new(params)
+        res = AtAPIClient.new(requester).request
+
+        puts "======================="
+        p res
+        
+        
+      end
+
     rescue AtAPIStandardError => api_err
+      p "api_err===================="
       p api_err
     rescue ActiveRecord::RecordInvalid => db_err
+      p "db_err===================="
       p db_err
     rescue => exception
+      p "exception===================="
       p exception
     end
 
@@ -210,30 +172,58 @@ class Services::AtUserService
   end
 
   # トークンを取得、叩くごとにtokenが更新される
-  def token    
-    api_name = "/opentoknr001.jct"
-    params = {
-      "CHNL_ID" => AtAPIClient::CHNL_ID,
-      "USER_ID" => at_user_id,
-      "USER_PW" => pwd,
-    }
-    # res = AtAPIClient.new(api_name, params).get
-    return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
+  def token
+
+    begin
+      params = {
+        at_user_id: @user.at_user.id
+      }
+      requester = AtAPIRequest::AtUser::GetToken.new(params)
+      res = AtAPIClient.new(requester).request
+
+      token = res["TOKEN_KEY"]
+      at_user_token = Entities::AtUserToken.new({
+          at_user_id: @user.at_user.id,
+          token: token
+      })
+      at_user_token.save!
+    rescue AtAPIStandardError => api_err
+      p "api_err===================="
+      p api_err
+    rescue ActiveRecord::RecordInvalid => db_err
+      p "db_err===================="
+      p db_err
+    rescue => exception
+      p "exception===================="
+      p exception
+    end
+
+    return token
   end
 
   # 有効な場合は有効期限が延長される
   def token_disabled?
-    api_name = "/opentoknr002.jct"
-    params = {
-      # "CHNL_ID" => AtAPIClient::CHNL_ID,
-      "CHNL_ID" => "CHNL_OSIDORI",
-      "USER_ID" => at_user_id,
-      "TOKEN_KEY" => token,
-    }
-    res = AtAPIClient.new(api_name, params).get 
-
-    # tokenを更新?
-    return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
+    begin
+      params = {
+        # "CHNL_ID" => AtAPIClient::CHNL_ID,
+        at_user_id: @user.at_user.id,
+        token: @user.at_user.at_user_tokens.first.token,
+      }
+      requester = AtAPIRequest::AtUser::GetTokenStatus.new(params)
+      res = AtAPIClient.new(requester).request
+      status = res["STATUS"]
+      if status == "0"
+        return true 
+      else
+        return false
+      end
+    rescue AtAPIStandardError => api_err
+      p "api_err===================="
+      p api_err
+    rescue => exception
+      p "exception===================="
+      p exception
+    end
   end
 
   # 金融データ登録情報照会
