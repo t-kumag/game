@@ -120,6 +120,8 @@ module AtAPIRequest
           "START_DATE" => params[:start_date], # ‘YYYYMMDD’
           "END_DATE" => params[:end_date], # ‘YYYYMMDD’
         }
+        @params["ROW_SIZE"] = 2000
+        @params["ROW_SIZE"] = params[:row_size] if params.has_key?(:row_size) || !params[:row_size].blank?
         @params["CONFIRM_TYPE"] = params[:confirm_type] if params.has_key?(:confirm_type) || !params[:confirm_type].blank?
       end
     end

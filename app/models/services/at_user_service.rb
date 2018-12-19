@@ -1,3 +1,5 @@
+require 'nkf'
+
 class Services::AtUserService
   # envに移す
   PWD_SALT = "osdrdev"
@@ -68,11 +70,13 @@ class Services::AtUserService
   end
 
   def at_user
+
   end
 
   def sync
     begin
-
+      #### card #############
+      # card_accounts
       token = @user.at_user.at_user_tokens.first.token
       params = {
         token: token,
@@ -80,10 +84,10 @@ class Services::AtUserService
       requester = AtAPIRequest::AtUser::GetAccounts.new(params)
       res = AtAPIClient.new(requester).request
 
-      # # new
+      ## new
       src_card_accounts = []
 
-      # # db
+      ## db
       osidori_fnc_cds = Entities::AtCard.all.map{|i| i.fnc_cd}
       cards = Entities::AtCard.all.map{|i| {i.fnc_cd => i}}
 
@@ -94,9 +98,9 @@ class Services::AtUserService
           if osidori_fnc_cds.include?(fnc_cd: i["FNC_CD"])
             card = cards[i["FNC_CD"]]
           else
-            c = Entities::AtCard.new(fnc_cd: i["FNC_CD"],fnc_nm: i["FNC_NM"])
-            c.save!
-            card = c
+            src_card = Entities::AtCard.new(fnc_cd: i["FNC_CD"],fnc_nm: i["FNC_NM"])
+            src_card.save!
+            card = src_card
           end
 
           src_card_accounts << Entities::AtUserCardAccount.new(
@@ -122,28 +126,18 @@ class Services::AtUserService
       columns = [:fnc_id, :fnc_cd, :fnc_nm, :corp_yn, :brn_cd, :brn_nm, :acct_no, :memo, :use_yn, :cert_type, :scrap_dtm, :last_rslt_cd, :last_rslt_msg]
       Entities::AtUserCardAccount.import src_card_accounts, :on_duplicate_key_update => columns, :validate => false
 
-      #### ======================
-
-
+      # TODO: 期間指定
       start_date = Time.now.ago(60.days).strftime("%Y%m%d")
       end_date = Time.now.strftime("%Y%m%d")
       Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).each do |a|
-        token = @user.at_user.at_user_tokens.first.token
-
-        # params = {
-        #   token: token,
-        #   fnc_id: a.fnc_id,
-        # }
-        # requester = AtAPIRequest::AtUser::ExecScraping.new(params)
-        # res = AtAPIClient.new(requester).request
-
+ 
         params = {
           token: token,
           fnc_id: a.fnc_id,
           start_date: start_date,
-          end_date: end_date,
+          end_date: end_date,          
         }
-        # クレジットカードの場合のみ利用します。
+        # [confirm_type]クレジットカードの場合のみ利用します。
         # C : 確定
         # U : 確定+未確定
         # DEFAULT 'C'"
@@ -151,10 +145,42 @@ class Services::AtUserService
         requester = AtAPIRequest::AtUser::GetTransactions.new(params)
         res = AtAPIClient.new(requester).request
 
-        puts "======================="
-        p res
-        
-        
+        src_card_trans = []
+        if res.has_key?("CARD_REC") && !res["CARD_REC"].blank?
+          res["CARD_REC"].each do |i|
+
+            # TODO: category
+            # i["CATEGORY_ID"]
+            # i["CATEGORY_NAME1"]
+            # i["CATEGORY_NAME2"]
+
+            # カナ 半角 => 全角
+            branch_desc = NKF::nkf( '-WwXm0', i["BRANCH_DESC"])
+            
+            # 利用日
+            used_date = nil
+            used_date = DateTime.parse(i["USED_DATE"]).to_date if res.has_key?("USED_DATE") && !res["USED_DATE"].blank?
+            src_card_trans << Entities::AtUserCardTransaction.new(
+              at_user_card_account_id: a.id,
+              used_date: used_date, # 利用日時 YYYYMMDD? 2018-12-12
+              branch_desc: branch_desc, # 加盟店名
+              amount: i["AMOUNT"], # 利用額
+              payment_amount: i["PAYMENT_AMOUNT"], # 支払金額
+              trade_gubun: i["TRADE_GUBUN"], # 支払方法 1回払い
+              etc_desc: i["ETC_DESC"], # 備考
+              clm_ym: i["CLM_YM"], # 決済月 "YYYYMM? 2019-01
+              crdt_setl_dt: i["CRDT_SETL_DT"], # 決済日 DD 27
+              seq: i["SEQ"],
+              card_no: i["CARD_NO"], # マスクされている下4桁のみ保持
+              confirm_type: i["CONFIRM_TYPE"], # 明細が確定しているか、未確定なのかを確認します。C:確定
+              # at_transaction_category_id: ,            
+            )
+          end
+        end
+        p src_card_trans
+        columns = [:used_date ,:branch_desc, :amount, :payment_amount, :trade_gubun, :etc_desc, :clm_ym, :crdt_setl_dt, :seq, :card_no, :confirm_type]
+        Entities::AtUserCardTransaction.import src_card_trans, :on_duplicate_key_update => columns, :validate => false
+          
       end
 
     rescue AtAPIStandardError => api_err
@@ -167,8 +193,6 @@ class Services::AtUserService
       p "exception===================="
       p exception
     end
-
-
   end
 
   # トークンを取得、叩くごとにtokenが更新される

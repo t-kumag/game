@@ -3,8 +3,7 @@ class CreateAtUserCardTransactions < ActiveRecord::Migration[5.2]
     create_table :at_user_card_transactions do |t|
 
       t.references :at_user_card_account, foreign_key: true
-
-      t.datetime :used_date, null: false # YYYYMMDDHHMISS
+      t.date :used_date, null: false # YYYYMMDDHHMISS
 
       t.string :branch_desc, null: false # 加盟店名
 

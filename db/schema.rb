@@ -10,11 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_12_17_134937) do
+ActiveRecord::Schema.define(version: 2018_12_18_194132) do
 
   create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "fnc_cd"
+    t.string "fnc_nm"
   end
 
   create_table "at_cards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -27,6 +29,8 @@ ActiveRecord::Schema.define(version: 2018_12_17_134937) do
   create_table "at_emoney_services", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "fnc_cd"
+    t.string "fnc_nm"
   end
 
   create_table "at_transaction_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -59,6 +63,7 @@ ActiveRecord::Schema.define(version: 2018_12_17_134937) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["at_bank_id"], name: "index_at_user_bank_accounts_on_at_bank_id"
+    t.index ["at_user_id", "fnc_cd"], name: "at_user_bank_accounts_at_user_id_fnc_cd", unique: true
     t.index ["at_user_id"], name: "index_at_user_bank_accounts_on_at_user_id"
   end
 
@@ -78,7 +83,9 @@ ActiveRecord::Schema.define(version: 2018_12_17_134937) do
     t.bigint "at_transaction_category_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "confirm_type"
     t.index ["at_transaction_category_id"], name: "index_at_user_bank_transactions_on_at_transaction_category_id"
+    t.index ["at_user_bank_account_id", "seq"], name: "at_user_bank_transactions_at_user_bank_account_id_seq", unique: true
     t.index ["at_user_bank_account_id"], name: "index_at_user_bank_transactions_on_at_user_bank_account_id"
   end
 
@@ -121,7 +128,9 @@ ActiveRecord::Schema.define(version: 2018_12_17_134937) do
     t.bigint "at_transaction_category_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "confirm_type"
     t.index ["at_transaction_category_id"], name: "index_at_user_card_transactions_on_at_transaction_category_id"
+    t.index ["at_user_card_account_id", "seq"], name: "at_user_card_transactions_at_user_card_account_id_seq", unique: true
     t.index ["at_user_card_account_id"], name: "index_at_user_card_transactions_on_at_user_card_account_id"
   end
 
@@ -144,6 +153,7 @@ ActiveRecord::Schema.define(version: 2018_12_17_134937) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["at_emoney_service_id"], name: "index_at_user_emoney_service_accounts_on_at_emoney_service_id"
+    t.index ["at_user_id", "fnc_cd"], name: "at_user_emoney_service_accounts_at_user_id_fnc_cd", unique: true
     t.index ["at_user_id"], name: "index_at_user_emoney_service_accounts_on_at_user_id"
   end
 
@@ -160,7 +170,9 @@ ActiveRecord::Schema.define(version: 2018_12_17_134937) do
     t.bigint "at_transaction_category_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "confirm_type"
     t.index ["at_transaction_category_id"], name: "index_at_user_emoney_transactions_on_at_transaction_category_id"
+    t.index ["at_user_emoney_service_account_id", "seq"], name: "at_user_emoney_transactions_at_user_emoney_account_id_seq", unique: true
     t.index ["at_user_emoney_service_account_id"], name: "index_at_user_emoney_tran_on_at_user_emoney_service_account_id"
   end
 
