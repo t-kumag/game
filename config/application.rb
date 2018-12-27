@@ -31,6 +31,7 @@ module Osdr
     config.generators.system_tests = nil
 
     # 追加
+    config.i18n.available_locales = [:en, :ja]
     config.i18n.default_locale = :ja
     config.time_zone = "Tokyo"
     config.active_record.default_timezone = :local #DBのタイムゾーンを変更

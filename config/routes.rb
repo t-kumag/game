@@ -1,9 +1,11 @@
 Rails.application.routes.draw do
+  scope 'api/v1' do
+    use_doorkeeper
+  end
+
   # get "/", to: static("index.html")
   namespace :api, format: 'json'  do
     namespace :v1 do
-
-      use_doorkeeper
       post 'auth/login', to: 'auth#login'
       namespace :user do
         resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
