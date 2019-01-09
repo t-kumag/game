@@ -34,12 +34,13 @@ class ApplicationController < ActionController::Base
   def render_404(e = nil)
     logger.info "Rendering 404 with exception: #{e.message}" if e
 
-    if request.xhr?
     render json: { error: '404 error' }, status: 404 and return
-    else
-    format = params[:format] == :json ? :json : :html
-    render template: 'errors/error_404', formats: format, status: 404, layout: 'application', content_type: 'text/html'
-    end
+    # if request.xhr?
+    # render json: { error: '404 error' }, status: 404 and return
+    # else
+    # format = params[:format] == :json ? :json : :html
+    # render template: 'errors/error_404', formats: format, status: 404, layout: 'application', content_type: 'text/html'
+    # end
   end
 
   def render_500(e = nil)
@@ -48,12 +49,13 @@ class ApplicationController < ActionController::Base
     #Airbrake.notify(e) if e # Airbrake/Errbitを使う場合はこちら
 
     logger.info "Rendering 500 with exception: #{e.message}" if e
-    if request.xhr?
-      render json: { error: '500 error' }, status: 500 and return
-    else
-      format = params[:format] == :json ? :json : :html
-      render template: 'errors/error_500', formats: format, status: 500, layout: 'application', content_type: 'text/html'
-    end
+    render json: { error: '500 error' }, status: 500 and return
+    # if request.xhr?
+    #   render json: { error: '500 error' }, status: 500 and return
+    # else
+    #   format = params[:format] == :json ? :json : :html
+    #   render template: 'errors/error_500', formats: format, status: 500, layout: 'application', content_type: 'text/html'
+    # end
   end
 
   private
