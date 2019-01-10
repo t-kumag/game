@@ -8,7 +8,7 @@ Doorkeeper.configure do
     # Put your resource owner authentication logic here.
     # Example implementation:
 
-    Entities::User.find_by_id(session[:user_id]) || redirect_to(new_user_session_url)
+    Entities::User.find_by_id(session[:user_id]) || redirect_to(api_v1_auth_login_path)
   end
 
   # Using Resource Owner Password Credentials flow
