@@ -322,8 +322,8 @@ class Services::AtUserService
             # CATEGORY_NAME1	カテゴリー大分類
             # CATEGORY_NAME2	カテゴリー小分類
 
-            # カナ 半角 => 全角
-            branch_desc = NKF::nkf( '-WwXm0', i["BRANCH_DESC"])
+            # # カナ 半角 => 全角
+            # branch_desc = NKF::nkf( '-WwXm0', i["BRANCH_DESC"])
             
             # 利用日時
             # YYYYMMDDHHMISS
@@ -332,35 +332,24 @@ class Services::AtUserService
             src_card_trans << Entities::AtUserCardTransaction.new(
               at_user_card_account_id: a.id,
               trade_dtm: trade_dtm, # 利用日時 YYYYMMDDHHMISS
-            # AMOUNT_RECEIPT	入金額
-            # AMOUNT_PAYMENT	出金額
-            # BALANCE	取引後残高
-            # CURRENCY	通貨コード
-            # DESCRIPTION1	摘要1
-            # DESCRIPTION2	摘要2
-            # DESCRIPTION3	摘要3
-            # DESCRIPTION4	摘要4
-            # DESCRIPTION5	摘要5
-            # SEQ	一連番号
 
- 
-              branch_desc: branch_desc, # 加盟店名
-              amount: i["AMOUNT"], # 利用額
-              payment_amount: i["PAYMENT_AMOUNT"], # 支払金額
-              trade_gubun: i["TRADE_GUBUN"], # 支払方法 1回払い
-              etc_desc: i["ETC_DESC"], # 備考
-              clm_ym: i["CLM_YM"], # 決済月 "YYYYMM? 2019-01
-              crdt_setl_dt: i["CRDT_SETL_DT"], # 決済日 DD 27
-              seq: i["SEQ"],
-              card_no: i["CARD_NO"], # マスクされている下4桁のみ保持
-              confirm_type: i["CONFIRM_TYPE"], # 明細が確定しているか、未確定なのかを確認します。C:確定
+              amount_receipt: i["AMOUNT_RECEIPT"], # AMOUNT_RECEIPT	入金額
+              amount_payment: i["AMOUNT_PAYMENT"], # AMOUNT_PAYMENT	出金額
+              balance: i["BALANCE"], # BALANCE	取引後残高
+              currency: i["CURRENCY"], # CURRENCY	通貨コード
+              description1: i["DESCRIPTION1"], # DESCRIPTION1	摘要1
+              description2: i["DESCRIPTION2"], # DESCRIPTION2	摘要2
+              description3: i["DESCRIPTION3"], # DESCRIPTION3	摘要3
+              description4: i["DESCRIPTION4"], # DESCRIPTION4	摘要4
+              description5: i["DESCRIPTION5"], # DESCRIPTION5	摘要5
+              seq: i["SEQ"], # SEQ	一連番号
               # at_transaction_category_id: ,            
             )
           end
         end
-        p src_card_trans
-        columns = [:used_date ,:branch_desc, :amount, :payment_amount, :trade_gubun, :etc_desc, :clm_ym, :crdt_setl_dt, :seq, :card_no, :confirm_type]
-        Entities::AtUserCardTransaction.import src_card_trans, :on_duplicate_key_update => columns, :validate => false
+        p src_bank_trans
+        columns = [:trade_dtm ,:amount_receipt, :amount_payment, :balance, :currency, :description1, :description2, :description3, :description4, :description5, :seq]
+        Entities::AtUserBankTransaction.import src_bank_trans, :on_duplicate_key_update => columns, :validate => false
           
       end
 
@@ -376,6 +365,74 @@ class Services::AtUserService
     end
   end
   
+  def sync_emoney_transaction
+    begin
+      # TODO: 期間指定
+      start_date = Time.now.ago(60.days).strftime("%Y%m%d")
+      end_date = Time.now.strftime("%Y%m%d")
+      Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.at_user.id).each do |a|
+        params = {
+          token: token,
+          fnc_id: a.fnc_id,
+          start_date: start_date,
+          end_date: end_date,          
+        }
+        requester = AtAPIRequest::AtUser::GetTransactions.new()
+        res = AtAPIClient.new(requester).request
+
+        src_emoney_trans = []
+        if res.has_key?("ETC_REC") && !res["ETC_REC"].blank?
+          res["ETC_REC"].each do |i|
+
+            # TODO: category
+            # i["CATEGORY_ID"]
+            # i["CATEGORY_NAME1"]
+            # i["CATEGORY_NAME2"]
+
+            # CATEGORY_ID	カテゴリーコード
+            # CATEGORY_NAME1	カテゴリー大分類
+            # CATEGORY_NAME2	カテゴリー小分類
+
+            # # カナ 半角 => 全角
+            # branch_desc = NKF::nkf( '-WwXm0', i["BRANCH_DESC"])
+            
+            # 利用日時
+            # YYYYMMDDHHMISS
+            # 利用日
+            used_date = nil
+            used_date = DateTime.parse(i["USED_DATE"]).to_date if res.has_key?("USED_DATE") && !res["USED_DATE"].blank?
+            src_emoney_trans << Entities::AtUserEmoneyTransaction.new(
+              at_user_emoney_service_account_id: a.id,
+              used_date: used_date, # 利用日時 YYYYMMDDHHMISS
+              used_time: i["USED_TIME"], # 利用日時 YYYYMMDDHHMISS
+              amount_receipt: i["AMOUNT_RECEIPT"], # AMOUNT_RECEIPT	入金額
+              amount_payment: i["AMOUNT_PAYMENT"], # AMOUNT_PAYMENT	出金額
+              description: i["DESCRIPTION"], # DESCRIPTION1	摘要1
+              balance: i["BALANCE"], # BALANCE	取引後残高
+              seq: i["SEQ"], # SEQ	一連番号
+              # at_transaction_category_id: ,            
+            )
+          end
+        end
+        p src_emoney_trans
+        columns = [:used_date, :used_time, :amount_receipt, :amount_payment, :balance, :description, :seq]
+        Entities::AtUserEmoneyTransaction.import src_emoney_trans, :on_duplicate_key_update => columns, :validate => false
+          
+      end
+
+    rescue AtAPIStandardError => api_err
+      p "api_err===================="
+      p api_err
+    rescue ActiveRecord::RecordInvalid => db_err
+      p "db_err===================="
+      p db_err
+    rescue => exception
+      p "exception===================="
+      p exception
+    end
+  end
+  
+
 
   # トークンを取得、叩くごとにtokenが更新される
   def token
