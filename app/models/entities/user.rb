@@ -1,6 +1,21 @@
 class Entities::User < ApplicationRecord
   has_one :at_user
 
+  has_many :access_grants, class_name: "Doorkeeper::AccessGrant",
+          foreign_key: :resource_owner_id,
+          dependent: :delete_all # or :destroy if you need callbacks
+  has_many :access_tokens, class_name: "Doorkeeper::AccessToken",
+          foreign_key: :resource_owner_id,
+          dependent: :delete_all # or :destroy if you need callbacks
+
+  def self.authenticate!(username, password)
+      params = {
+        email: username,
+        crypted_password: Digest::MD5.hexdigest(password)
+      }
+      return self.find_by(params)
+  end
+
 #   def create_at_user
 #     begin
 #       at_user = AtUser.new(
