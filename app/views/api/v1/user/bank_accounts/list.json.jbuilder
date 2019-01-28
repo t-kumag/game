@@ -3,10 +3,10 @@ json.meta do
 end
 
 json.app do
-  json.array!(@bank_accounts) do |account|
-    json.account_id account.id
-    json.name account.fnc_nm
-    json.amount account.balance
+  json.array!(@responses) do |r|
+    json.account_id r[:id]
+    json.name r[:fnc_nm]
+    json.amount r[:balance]
     # json.error account[:error]
   end
 end

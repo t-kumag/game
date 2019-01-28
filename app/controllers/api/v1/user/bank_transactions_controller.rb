@@ -1,18 +1,23 @@
 class Api::V1::User::BankTransactionsController < ApplicationController
     before_action :authenticate
-    def index
-        id = params[:bank_account_id]
 
-        p @current_user&.at_user&.at_user_bank_accounts.find(id)
-        # if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
-        #     @bank_accounts = nil
-        #   else
-        #     @bank_accounts = @current_user.at_user.at_user_bank_accounts
-        # end
+    def index
+        ba = Entities::AtUserBankAcccount.first(params[:bank_account_id])
+        # TODO paging
+        @transactions = ba.at_user_bank_transactions
         render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
     def show
+        transaction = Entities::AtUserBankTransactions.first(params[:id])
+        @response = {
+            amount: transaction.amount,
+            category: transaction.at_transaction_category_id,
+            used_date: transaction.trade_date,
+            payment_type: 'bank', # TODO enumにする
+            used_store: transaction.description1,
+            group: '',
+        }
         render 'show', formats: 'json', handlers: 'jbuilder'
     end
 

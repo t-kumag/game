@@ -74,10 +74,16 @@ class Services::AtUserService
   end
 
   def sync
+    Services::AtUserService::Sync.new(@user).sync
+  end
 
+  def aa_sync
+    
     begin
       ## accounts ##############
-      token = user.at_user.at_user_tokens.first.token
+      puts "sync  start ==============="
+
+      token = @user.at_user.at_user_tokens.first.token
       params = {
         token: token,
       }
@@ -85,6 +91,8 @@ class Services::AtUserService
       res = AtAPIClient.new(requester).request
 
       #### card ########
+      puts "sync card start ==============="
+
       ## db
       card_fnc_cds = Entities::AtCard.all.map{|i| i.fnc_cd}
       cards = Entities::AtCard.all.map{|i| {i.fnc_cd => i}}
@@ -127,6 +135,8 @@ class Services::AtUserService
       Entities::AtUserCardAccount.import src_card_accounts, :on_duplicate_key_update => columns, :validate => false
 
       #### bank ########
+      puts "sync bank start ==============="
+
       ## db
       bank_fnc_cds = Entities::AtBank.all.map{|i| i.fnc_cd}
       banks = Entities::AtBank.all.map{|i| {i.fnc_cd => i}}
@@ -170,12 +180,14 @@ class Services::AtUserService
       Entities::AtUserBankAccount.import src_bank_accounts, :on_duplicate_key_update => columns, :validate => false
 
       #### emoney ########
+      puts "sync emoney start ==============="
+
       ## db
       emoney_fnc_cds = Entities::AtEmoneyService.all.map{|i| i.fnc_cd}
       emoneys = Entities::AtEmoneyService.all.map{|i| {i.fnc_cd => i}}
 
       ## account tracker上のデータ
-      src_enmoney_accounts = []
+      src_emoney_accounts = []
       if res.has_key?("ETC_DATA_REC") && !res["ETC_DATA_REC"].blank?
         res["ETC_DATA_REC"].each do |i|
 
@@ -206,10 +218,16 @@ class Services::AtUserService
         end
       end
       columns = [:fnc_id, :fnc_cd, :fnc_nm, :corp_yn, :memo, :use_yn, :cert_type, :scrap_dtm, :last_rslt_cd, :last_rslt_msg]
-      Entities::AtUserEmoneyAccount.import src_emoney_accounts, :on_duplicate_key_update => columns, :validate => false
+      Entities::AtUserEmoneyServiceAccount.import src_emoney_accounts, :on_duplicate_key_update => columns, :validate => false
+
+      puts "sync sync_card_transaction start ==============="
 
       sync_card_transaction
+
+      puts "sync sync_bank_transaction start ==============="
       sync_bank_transaction
+
+      puts "sync sync_emoney_transaction start ==============="
       sync_emoney_transaction
 
     rescue AtAPIStandardError => api_err
@@ -227,9 +245,12 @@ class Services::AtUserService
   def sync_card_transaction
     begin
       # TODO: 期間指定
+      puts "sync sync_card_transaction start ==============="
       start_date = Time.now.ago(60.days).strftime("%Y%m%d")
       end_date = Time.now.strftime("%Y%m%d")
+      token = @user.at_user.at_user_tokens.first.token
       Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).each do |a|
+        puts "sync sync_card_transaction start 1==============="
         params = {
           token: token,
           fnc_id: a.fnc_id,
@@ -240,9 +261,13 @@ class Services::AtUserService
         # C : 確定
         # U : 確定+未確定
         # DEFAULT 'C'"
-        params[:confirm_type] = 'C'
+        params[:confirm_type] = 'U'
+        puts "sync sync_card_transaction start 2==============="
         requester = AtAPIRequest::AtUser::GetTransactions.new(params)
         res = AtAPIClient.new(requester).request
+        puts "sync sync_card_transaction start 3==============="
+        p res
+
 
         src_card_trans = []
         if res.has_key?("CARD_REC") && !res["CARD_REC"].blank?
@@ -299,6 +324,7 @@ class Services::AtUserService
       # TODO: 期間指定
       start_date = Time.now.ago(60.days).strftime("%Y%m%d")
       end_date = Time.now.strftime("%Y%m%d")
+      token = @user.at_user.at_user_tokens.first.token
       Entities::AtUserBankAccount.where(at_user_id: @user.at_user.id).each do |a|
         params = {
           token: token,
@@ -370,6 +396,8 @@ class Services::AtUserService
       # TODO: 期間指定
       start_date = Time.now.ago(60.days).strftime("%Y%m%d")
       end_date = Time.now.strftime("%Y%m%d")
+      token = @user.at_user.at_user_tokens.first.token
+      p "sync_emoney_transaction ===================="
       Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.at_user.id).each do |a|
         params = {
           token: token,
@@ -377,8 +405,10 @@ class Services::AtUserService
           start_date: start_date,
           end_date: end_date,          
         }
-        requester = AtAPIRequest::AtUser::GetTransactions.new()
+        p "sync_emoney_transaction1 ===================="
+        requester = AtAPIRequest::AtUser::GetTransactions.new(params)
         res = AtAPIClient.new(requester).request
+        p "sync_emoney_transaction2 ===================="
 
         src_emoney_trans = []
         if res.has_key?("ETC_REC") && !res["ETC_REC"].blank?

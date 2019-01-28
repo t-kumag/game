@@ -3,5 +3,5 @@ json.meta do
 end
 
 json.app do
-  json.amount @response[:amount]
+  json.current_month_payment @response[:amount]
 end

@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   namespace :api, format: 'json'  do
     namespace :v1 do
 
-      use_doorkeeper
+      # use_doorkeeper
       post 'auth/login', to: 'auth#login'
       namespace :user do
         resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
@@ -29,12 +29,12 @@ Rails.application.routes.draw do
           get 'summary', :to => 'pl#summary'
           get 'transactions', :to => 'pl#transactions'
         end
-    
-        resources :user_manually_created_transactions, :only => [:index, :show, :create, :update] do
-    
-        end
       end
     
+      resources :user_manually_created_transactions, :only => [:index, :show, :create, :update] do        
+      end
+
+      get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'
       get 'user/at-sync', :to => 'users#at_sync'
 
