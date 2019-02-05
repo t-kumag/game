@@ -7,7 +7,6 @@ class Api::V1::User::CardAccountsController < ApplicationController
       else
         @responses = []
         @current_user.at_user.at_user_card_accounts.each do |ca|
-          puts ca.fnc_nm
           @responses << {
             id: ca.id,
             name: ca.fnc_nm,

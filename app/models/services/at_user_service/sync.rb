@@ -51,65 +51,23 @@ class Services::AtUserService::Sync
         accounts << account
       end
     end
-    account_entity.import accounts, :on_duplicate_key_update => data_column.map{|k,v| return k }, :validate => false
+    account_entity.import accounts, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
   end
 
-  def sync_transaction
+  def sync_transaction(rec_key, financier_account_type_key, account_entity, transaction_entity, data_column, confirm_type=nil)
+
     begin
-      puts "sync sync_card_transaction start ==============="
+      puts "sync transaction start ==============="
+      # TODO 日付をどこまで遡るかまともに考える
       start_date = Time.now.ago(60.days).strftime("%Y%m%d")
       end_date = Time.now.strftime("%Y%m%d")
       token = @user.at_user.at_user_tokens.first.token
-      
-      rec_key
-      financier_type_key
-      financier_entity
-      account_entity
-      transaction_entity
-      data_column ={
-        used_date: {col: "USED_DATE"},
-        branch_desc: {col: "BRANCH_DESC"},
-        amount: {col: "AMOUNT"},
-        payment_amount: {col: "PAYMENT_AMOUNT"},
-        trade_gubun: {col: "TRADE_GUBUN"},
-        etc_desc: {col: "ETC_DESC"},
-        clm_ym: {col: "CLM_YM"},
-        crdt_setl_dt: {col: "CRDT_SETL_DT"},
-        seq: {col: "SEQ"},
-        card_no: {col: "CARD_NO"},
-        confirm_type: {col: "CONFIRM_TYPE"},
-      }
 
-      amount: i["AMOUNT"], # 利用額
-      payment_amount: i["PAYMENT_AMOUNT"], # 支払金額
-      trade_gubun: i["TRADE_GUBUN"], # 支払方法 1回払い
-      etc_desc: i["ETC_DESC"], # 備考
-      clm_ym: i["CLM_YM"], # 決済月 "YYYYMM? 2019-01
-      crdt_setl_dt: i["CRDT_SETL_DT"], # 決済日 DD 27
-      seq: i["SEQ"],
-      card_no: i["CARD_NO"], # マスクされている下4桁のみ保持
-      confirm_type: i["CONFIRM_TYPE"], # 明細が確定しているか、未確定なのかを確認します。C:確定
+      # db  
+      category_map = Entities::AtTransactionCategories.all.map{|i| [i.at_category_id, i]}.to_h
 
-      # CARD_REC	"クレジットカード取引内訳
-      # 反復部"	
-      # USED_DATE	利用日時	半角数
-      # BRANCH_DESC	加盟店名	全角・半角英数字
-      # AMOUNT	利用金額	半角数記
-      # PAYMENT_AMOUNT	支払金額	半角数記
-      # TRADE_GUBUN	支払方法	全角・半角英数字
-      # ETC_DESC	備考	全角・半角英数字
-      # CLM_YM	決済月	半角数
-      # CONFIRM_TYPE	確定区分	半角英
-      # SEQ	一連番号	半角数
-      # CRDT_SETL_DT	決済日	半角数
-      # CARD_NO	カード番号	半角数記号
-
-      # CATEGORY_ID	カテゴリーコード	半角英数
-      # CATEGORY_NAME1	カテゴリー大分類	全角・半角英数字
-      # CATEGORY_NAME2	カテゴリー小分類	全角・半角英数字
-
+      ## account tracker上のデータ
       account_entity.where(at_user_id: @user.at_user.id).each do |a|
-        puts "sync sync_card_transaction start 1==============="
 
         params = {
           token: token,
@@ -117,57 +75,55 @@ class Services::AtUserService::Sync
           start_date: start_date,
           end_date: end_date,          
         }
-
-        # [confirm_type]クレジットカードの場合のみ利用します。
+        # [confirm_type]クレジットカードの場合のみ利用
         # C : 確定
         # U : 確定+未確定
         # DEFAULT 'C'"
-        params[:confirm_type] = 'U'
-        puts "sync sync_card_transaction start 2==============="
+        !confirm_type.blank? && params[:confirm_type] = confirm_type
+
         requester = AtAPIRequest::AtUser::GetTransactions.new(params)
         res = AtAPIClient.new(requester).request
-        puts "sync sync_card_transaction start 3==============="
+
         p res
-
-
-        src_card_trans = []
-        if res.has_key?("CARD_REC") && !res["CARD_REC"].blank?
-          res["CARD_REC"].each do |i|
+        src_trans = []
+        if res.has_key?(rec_key) && !res[rec_key].blank?
+          res[rec_key].each do |i|
 
             # TODO: category
-            # i["CATEGORY_ID"]
-            # i["CATEGORY_NAME1"]
-            # i["CATEGORY_NAME2"]
+            category_id = nil
+            at_category_id = i["CATEGORY_ID"]
+            category_name1 = i["CATEGORY_NAME1"]
+            category_name2 = i["CATEGORY_NAME2"]
+            if category_map.has_key?(at_category_id)
+              category_id = category_map[at_category_id].id
+            else
+              ec = Entities::AtTransactionCategories.new(
+                at_category_id: at_category_id,
+                category_name1: category_name1,
+                category_name2: category_name2)
+              ec.save!
+              category_map[ec.id] = ec
+              category_id = ec.id
+            end
 
-            # # カナ 半角 => 全角
-            # branch_desc = NKF::nkf( '-WwXm0', i["BRANCH_DESC"])
-            
-            # 利用日
-            used_date = nil
-            used_date = DateTime.parse(i["USED_DATE"]).to_date if res.has_key?("USED_DATE") && !res["USED_DATE"].blank?
-            src_card_trans << Entities::AtUserCardTransaction.new(
-              at_user_card_account_id: a.id,
-              used_date: used_date, # 利用日時 YYYYMMDD? 2018-12-12
-              branch_desc: branch_desc, # 加盟店名
-              amount: i["AMOUNT"], # 利用額
-              payment_amount: i["PAYMENT_AMOUNT"], # 支払金額
-              trade_gubun: i["TRADE_GUBUN"], # 支払方法 1回払い
-              etc_desc: i["ETC_DESC"], # 備考
-              clm_ym: i["CLM_YM"], # 決済月 "YYYYMM? 2019-01
-              crdt_setl_dt: i["CRDT_SETL_DT"], # 決済日 DD 27
-              seq: i["SEQ"],
-              card_no: i["CARD_NO"], # マスクされている下4桁のみ保持
-              confirm_type: i["CONFIRM_TYPE"], # 明細が確定しているか、未確定なのかを確認します。C:確定
-              # at_transaction_category_id: ,            
+            tran = transaction_entity.new(
+              # TODO
+              # share: false
             )
+            tran[financier_account_type_key] = a.id # at_user_card_account_idとか
+            tran[:at_transaction_category_id] = category_id
+            data_column.each do |k, v|
+              if v[:opt].blank?
+                tran[k] = i[v[:col]]
+              elsif  v[:opt] == "time_parse"
+                tran[k] = Time.parse(i[v[:col]])
+              end
+            end
+            src_trans << tran
           end
         end
-
-        columns = [:used_date ,:branch_desc, :amount, :payment_amount, :trade_gubun, :etc_desc, :clm_ym, :crdt_setl_dt, :seq, :card_no, :confirm_type]
-        Entities::AtUserCardTransaction.import src_card_trans, :on_duplicate_key_update => columns, :validate => false
-          
+        transaction_entity.import src_trans, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
       end
-
     rescue AtAPIStandardError => api_err
       p "api_err===================="
       p api_err
@@ -177,12 +133,12 @@ class Services::AtUserService::Sync
     rescue => exception
       p "exception===================="
       p exception
+      p exception.backtrace
     end
   end
 
   def sync
     begin
-      ## accounts ##############
       get_accounts_from_at
 
       sync_account(
@@ -249,167 +205,63 @@ class Services::AtUserService::Sync
         }
       )
 
-      # puts "sync sync_card_transaction start ==============="
+      sync_transaction(
+        "CARD_REC",
+        "at_user_card_account_id",
+        Entities::AtUserCardAccount,
+        Entities::AtUserCardTransaction,
+        {
+          branch_desc: {col: "BRANCH_DESC" },
+          used_date: {col: "USED_DATE", opt: "time_parse"  },
+          amount: {col: "AMOUNT" },
+          payment_amount: {col: "PAYMENT_AMOUNT" },
+          trade_gubun: {col: "TRADE_GUBUN" },
+          etc_desc: {col: "ETC_DESC" },
+          clm_ym: {col: "CLM_YM" },
+          crdt_setl_dt: {col: "CRDT_SETL_DT" },
+          seq: {col: "SEQ" },
+          card_no: {col: "CARD_NO" },
+          confirm_type: {col: "CONFIRM_TYPE" },
+        },
+        'U' # U: 未確定含む
+      )
 
-      # sync_card_transaction
-
-      # puts "sync sync_bank_transaction start ==============="
-      # sync_bank_transaction
-
-      # puts "sync sync_emoney_transaction start ==============="
-      # sync_emoney_transaction
-
-    rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
-    rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
-    rescue => exception
-      p "exception===================="
-      p exception
-    end
-  end
-
-
-
-
-  def sync_card_transaction
-    begin
-      # TODO: 期間指定
-      puts "sync sync_card_transaction start ==============="
-      start_date = Time.now.ago(60.days).strftime("%Y%m%d")
-      end_date = Time.now.strftime("%Y%m%d")
-      token = @user.at_user.at_user_tokens.first.token
-      Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).each do |a|
-        puts "sync sync_card_transaction start 1==============="
-        params = {
-          token: token,
-          fnc_id: a.fnc_id,
-          start_date: start_date,
-          end_date: end_date,          
+      sync_transaction(
+        "BANK_REC",
+        "at_user_bank_account_id",
+        Entities::AtUserBankAccount,
+        Entities::AtUserBankTransaction,
+        {
+          # TODO date => dtmに変える
+          trade_date: {col: "TRADE_DTM", opt: "time_parse"  },
+          amount_receipt: {col: "AMOUNT_RECEIPT" },
+          amount_payment: {col: "AMOUNT_PAYMENT" },
+          balance: {col: "BALANCE" },
+          currency: {col: "CURRENCY" },
+          description1: {col: "DESCRIPTION1" },
+          description2: {col: "DESCRIPTION2" },
+          description3: {col: "DESCRIPTION3" },
+          description4: {col: "DESCRIPTION4" },
+          description5: {col: "DESCRIPTION5" },
+          seq: {col: "SEQ" },
         }
-        # [confirm_type]クレジットカードの場合のみ利用します。
-        # C : 確定
-        # U : 確定+未確定
-        # DEFAULT 'C'"
-        params[:confirm_type] = 'U'
-        puts "sync sync_card_transaction start 2==============="
-        requester = AtAPIRequest::AtUser::GetTransactions.new(params)
-        res = AtAPIClient.new(requester).request
-        puts "sync sync_card_transaction start 3==============="
-        p res
+      )
 
-
-        src_card_trans = []
-        if res.has_key?("CARD_REC") && !res["CARD_REC"].blank?
-          res["CARD_REC"].each do |i|
-
-            # TODO: category
-            # i["CATEGORY_ID"]
-            # i["CATEGORY_NAME1"]
-            # i["CATEGORY_NAME2"]
-
-            # カナ 半角 => 全角
-            branch_desc = NKF::nkf( '-WwXm0', i["BRANCH_DESC"])
-            
-            # 利用日
-            used_date = nil
-            used_date = DateTime.parse(i["USED_DATE"]).to_date if res.has_key?("USED_DATE") && !res["USED_DATE"].blank?
-            src_card_trans << Entities::AtUserCardTransaction.new(
-              at_user_card_account_id: a.id,
-              used_date: used_date, # 利用日時 YYYYMMDD? 2018-12-12
-              branch_desc: branch_desc, # 加盟店名
-              amount: i["AMOUNT"], # 利用額
-              payment_amount: i["PAYMENT_AMOUNT"], # 支払金額
-              trade_gubun: i["TRADE_GUBUN"], # 支払方法 1回払い
-              etc_desc: i["ETC_DESC"], # 備考
-              clm_ym: i["CLM_YM"], # 決済月 "YYYYMM? 2019-01
-              crdt_setl_dt: i["CRDT_SETL_DT"], # 決済日 DD 27
-              seq: i["SEQ"],
-              card_no: i["CARD_NO"], # マスクされている下4桁のみ保持
-              confirm_type: i["CONFIRM_TYPE"], # 明細が確定しているか、未確定なのかを確認します。C:確定
-              # at_transaction_category_id: ,            
-            )
-          end
-        end
-        p src_card_trans
-        columns = [:used_date ,:branch_desc, :amount, :payment_amount, :trade_gubun, :etc_desc, :clm_ym, :crdt_setl_dt, :seq, :card_no, :confirm_type]
-        Entities::AtUserCardTransaction.import src_card_trans, :on_duplicate_key_update => columns, :validate => false
-          
-      end
-
-    rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
-    rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
-    rescue => exception
-      p "exception===================="
-      p exception
-    end
-  end
-
-  def sync_bank_transaction
-    begin
-      # TODO: 期間指定
-      start_date = Time.now.ago(60.days).strftime("%Y%m%d")
-      end_date = Time.now.strftime("%Y%m%d")
-      token = @user.at_user.at_user_tokens.first.token
-      Entities::AtUserBankAccount.where(at_user_id: @user.at_user.id).each do |a|
-        params = {
-          token: token,
-          fnc_id: a.fnc_id,
-          start_date: start_date,
-          end_date: end_date,          
+      sync_transaction(
+        "ETC_REC",
+        "at_user_emoney_service_account_id",
+        Entities::AtUserEmoneyServiceAccount,
+        Entities::AtUserEmoneyTransaction,
+        {
+          used_date: {col: "USED_DATE", opt: "time_parse"  },
+          used_time: {col: "USED_TIME" },
+          description: {col: "DESCRIPTION" },
+          amount_receipt: {col: "AMOUNT_RECEIPT" },
+          amount_payment: {col: "AMOUNT_PAYMENT" },
+          balance: {col: "BALANCE" },
+          seq: {col: "SEQ" },
         }
-        requester = AtAPIRequest::AtUser::GetTransactions.new()
-        res = AtAPIClient.new(requester).request
-
-        src_bank_trans = []
-        if res.has_key?("BANK_REC") && !res["BANK_REC"].blank?
-          res["BANK_REC"].each do |i|
-
-            # TODO: category
-            # i["CATEGORY_ID"]
-            # i["CATEGORY_NAME1"]
-            # i["CATEGORY_NAME2"]
-
-            # CATEGORY_ID	カテゴリーコード
-            # CATEGORY_NAME1	カテゴリー大分類
-            # CATEGORY_NAME2	カテゴリー小分類
-
-            # # カナ 半角 => 全角
-            # branch_desc = NKF::nkf( '-WwXm0', i["BRANCH_DESC"])
-            
-            # 利用日時
-            # YYYYMMDDHHMISS
-            trade_dtm = nil
-            trade_dtm = DateTime.parse(i["TRADE_DTM"]) if res.has_key?("TRADE_DTM") && !res["TRADE_DTM"].blank?
-            src_card_trans << Entities::AtUserCardTransaction.new(
-              at_user_card_account_id: a.id,
-              trade_dtm: trade_dtm, # 利用日時 YYYYMMDDHHMISS
-
-              amount_receipt: i["AMOUNT_RECEIPT"], # AMOUNT_RECEIPT	入金額
-              amount_payment: i["AMOUNT_PAYMENT"], # AMOUNT_PAYMENT	出金額
-              balance: i["BALANCE"], # BALANCE	取引後残高
-              currency: i["CURRENCY"], # CURRENCY	通貨コード
-              description1: i["DESCRIPTION1"], # DESCRIPTION1	摘要1
-              description2: i["DESCRIPTION2"], # DESCRIPTION2	摘要2
-              description3: i["DESCRIPTION3"], # DESCRIPTION3	摘要3
-              description4: i["DESCRIPTION4"], # DESCRIPTION4	摘要4
-              description5: i["DESCRIPTION5"], # DESCRIPTION5	摘要5
-              seq: i["SEQ"], # SEQ	一連番号
-              # at_transaction_category_id: ,            
-            )
-          end
-        end
-        p src_bank_trans
-        columns = [:trade_dtm ,:amount_receipt, :amount_payment, :balance, :currency, :description1, :description2, :description3, :description4, :description5, :seq]
-        Entities::AtUserBankTransaction.import src_bank_trans, :on_duplicate_key_update => columns, :validate => false
-          
-      end
+      )
 
     rescue AtAPIStandardError => api_err
       p "api_err===================="
@@ -420,79 +272,9 @@ class Services::AtUserService::Sync
     rescue => exception
       p "exception===================="
       p exception
+      puts exception.backtrace.join("\n")
+      # p exception.backtrace
     end
   end
   
-  def sync_emoney_transaction
-    begin
-      # TODO: 期間指定
-      start_date = Time.now.ago(60.days).strftime("%Y%m%d")
-      end_date = Time.now.strftime("%Y%m%d")
-      token = @user.at_user.at_user_tokens.first.token
-      p "sync_emoney_transaction ===================="
-      Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.at_user.id).each do |a|
-        params = {
-          token: token,
-          fnc_id: a.fnc_id,
-          start_date: start_date,
-          end_date: end_date,          
-        }
-        p "sync_emoney_transaction1 ===================="
-        requester = AtAPIRequest::AtUser::GetTransactions.new(params)
-        res = AtAPIClient.new(requester).request
-        p "sync_emoney_transaction2 ===================="
-
-        src_emoney_trans = []
-        if res.has_key?("ETC_REC") && !res["ETC_REC"].blank?
-          res["ETC_REC"].each do |i|
-
-            # TODO: category
-            # i["CATEGORY_ID"]
-            # i["CATEGORY_NAME1"]
-            # i["CATEGORY_NAME2"]
-
-            # CATEGORY_ID	カテゴリーコード
-            # CATEGORY_NAME1	カテゴリー大分類
-            # CATEGORY_NAME2	カテゴリー小分類
-
-            # # カナ 半角 => 全角
-            # branch_desc = NKF::nkf( '-WwXm0', i["BRANCH_DESC"])
-            
-            # 利用日時
-            # YYYYMMDDHHMISS
-            # 利用日
-            used_date = nil
-            used_date = DateTime.parse(i["USED_DATE"]).to_date if res.has_key?("USED_DATE") && !res["USED_DATE"].blank?
-            src_emoney_trans << Entities::AtUserEmoneyTransaction.new(
-              at_user_emoney_service_account_id: a.id,
-              used_date: used_date, # 利用日時 YYYYMMDDHHMISS
-              used_time: i["USED_TIME"], # 利用日時 YYYYMMDDHHMISS
-              amount_receipt: i["AMOUNT_RECEIPT"], # AMOUNT_RECEIPT	入金額
-              amount_payment: i["AMOUNT_PAYMENT"], # AMOUNT_PAYMENT	出金額
-              description: i["DESCRIPTION"], # DESCRIPTION1	摘要1
-              balance: i["BALANCE"], # BALANCE	取引後残高
-              seq: i["SEQ"], # SEQ	一連番号
-              # at_transaction_category_id: ,            
-            )
-          end
-        end
-        p src_emoney_trans
-        columns = [:used_date, :used_time, :amount_receipt, :amount_payment, :balance, :description, :seq]
-        Entities::AtUserEmoneyTransaction.import src_emoney_trans, :on_duplicate_key_update => columns, :validate => false
-          
-      end
-
-    rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
-    rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
-    rescue => exception
-      p "exception===================="
-      p exception
-    end
-  end
-  
-
 end

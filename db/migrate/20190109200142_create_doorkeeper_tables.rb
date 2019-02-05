@@ -1,6 +1,6 @@
 class CreateDoorkeeperTables < ActiveRecord::Migration[5.2]
   def change
-    create_table :oauth_access_tokens do |t|
+    # create_table :oauth_access_tokens do |t|
       t.references :resource_owner, index: true
       t.integer  :application_id
 

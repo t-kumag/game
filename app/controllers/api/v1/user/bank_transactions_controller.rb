@@ -2,9 +2,8 @@ class Api::V1::User::BankTransactionsController < ApplicationController
     before_action :authenticate
 
     def index
-        ba = Entities::AtUserBankAcccount.first(params[:bank_account_id])
-        # TODO paging
-        @transactions = ba.at_user_bank_transactions
+        a = Entities::AtUserBankAccount.find(params[:bank_account_id])
+        @transactions = a.at_user_bank_transactions.order(id: "DESC")
         render 'list', formats: 'json', handlers: 'jbuilder'
     end
 

@@ -22,5 +22,5 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
     #   end
     #   render 'summary', formats: 'json', handlers: 'jbuilder'
     # end
-      
+
 end

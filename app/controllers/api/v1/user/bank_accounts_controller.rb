@@ -3,10 +3,18 @@ class Api::V1::User::BankAccountsController < ApplicationController
 
   def index
     if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
-      @bank_accounts = nil
+      @responses = []
     else
-      @bank_accounts = @current_user.at_user.at_user_bank_accounts
-    end    
+      @responses = []
+      @current_user.at_user.at_user_bank_accounts.each do |a|
+        @responses << {
+          id: a.id,
+          name: a.fnc_nm,
+          amount: 0
+          # a.at_user_bank_transactions.last.balance
+        }
+      end
+    end
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
@@ -17,7 +25,7 @@ class Api::V1::User::BankAccountsController < ApplicationController
       }
     else
       @response = {
-        amount: @current_user.at_user.at_user_bank_accounts.sum{|i| i.amount},
+        amount: @current_user.at_user.at_user_bank_accounts.sum{|i| i.balance},
       }
     end
     render 'summary', formats: 'json', handlers: 'jbuilder'

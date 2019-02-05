@@ -1,10 +1,10 @@
 Rails.application.routes.draw do
-  scope 'api/v1' do
-    use_doorkeeper do
-      # enable only :token controller
-      skip_controllers :authorizations, :token_info, :applications, :authorized_applications
-    end
-  end
+  # scope 'api/v1' do
+  #   use_doorkeeper do
+  #     # enable only :token controller
+  #     skip_controllers :authorizations, :token_info, :applications, :authorized_applications
+  #   end
+  # end
 
   # get "/", to: static("index.html")
   namespace :api, format: 'json'  do

@@ -1,5 +1,5 @@
 class Entities::AtUserBankTransaction < ApplicationRecord
-  belongs_to :at_card_account
+  belongs_to :at_bank_account
 
   def amount
     if self.amount_receipt != nil 
