@@ -1,9 +1,9 @@
 class Api::V1::User::CardTransactionsController < ApplicationController
-
+    before_action :authenticate
+    
     def index
-        ba = Entities::AtUserCardAcccount.first(params[:card_account_id])
-        # TODO paging
-        @transactions = ba.at_user_card_transactions
+        a = Entities::AtUserCardAccount.find(params[:card_account_id])
+        @transactions = a.at_user_card_transactions.order(id: "DESC")
         render 'list', formats: 'json', handlers: 'jbuilder'
     end
 

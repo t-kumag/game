@@ -30,13 +30,13 @@ Rails.application.routes.draw do
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
         get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
     
-        namespace :pl do
-          get 'summary', :to => 'pl#summary'
-          get 'transactions', :to => 'pl#transactions'
+        get 'pl-summaries', :to => 'pl#summaries'
+        get 'pl-categories', :to => 'pl#categories'
+        get 'transactions', :to => 'transactions#index'
+         
+        resources :user_manually_created_transactions, :only => [:index, :show, :create, :update] do        
         end
-      end
-    
-      resources :user_manually_created_transactions, :only => [:index, :show, :create, :update] do        
+
       end
 
       get 'invite-url', :to => 'groups#invite_url'

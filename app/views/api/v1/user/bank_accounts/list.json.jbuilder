@@ -7,7 +7,6 @@ json.app do
       json.account_id r[:id]
       json.name r[:name]
       json.amount r[:amount]
-  
-    # json.error account[:error]
+      json.error ""
   end
 end

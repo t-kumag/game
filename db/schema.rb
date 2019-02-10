@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_04_082235) do
+ActiveRecord::Schema.define(version: 2019_02_09_164151) do
 
   create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -251,13 +251,13 @@ ActiveRecord::Schema.define(version: 2019_02_04_082235) do
   create_table "user_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "log_user_id"
     t.integer "group_id"
-    t.string "owner"
     t.integer "at_user_bank_transaction_id"
     t.integer "at_user_card_transaction_id"
     t.integer "at_user_emoney_transaction_id"
     t.integer "user_manually_created_transaction_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_share"
   end
 
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|

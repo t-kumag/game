@@ -9,6 +9,7 @@ json.app do
   json.payment_type  @response.payment_type
   json.used_store @response.used_store
   json.group  @response.group
+  
 # ・メモ
 # 　・表示項目
 # 　　　・入力対象者　：　自分、パートナー

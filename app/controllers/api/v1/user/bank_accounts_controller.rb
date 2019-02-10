@@ -10,8 +10,7 @@ class Api::V1::User::BankAccountsController < ApplicationController
         @responses << {
           id: a.id,
           name: a.fnc_nm,
-          amount: 0
-          # a.at_user_bank_transactions.last.balance
+          amount: a.balance
         }
       end
     end

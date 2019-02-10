@@ -54,7 +54,7 @@ class Services::AtUserService::Sync
     account_entity.import accounts, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
   end
 
-  def sync_transaction(rec_key, financier_account_type_key, account_entity, transaction_entity, data_column, confirm_type=nil)
+  def sync_transaction(rec_key, financier_account_type_key, account_entity, transaction_entity, data_column, has_balance=false, confirm_type=nil)
 
     begin
       puts "sync transaction start ==============="
@@ -85,6 +85,12 @@ class Services::AtUserService::Sync
         res = AtAPIClient.new(requester).request
 
         p res
+
+        if has_balance && res.has_key?('BALANCE') && !res['BALANCE'].blank?
+          a.balance = res['BALANCE']
+          a.save!
+        end
+
         src_trans = []
         if res.has_key?(rec_key) && !res[rec_key].blank?
           res[rec_key].each do |i|
@@ -223,6 +229,7 @@ class Services::AtUserService::Sync
           card_no: {col: "CARD_NO" },
           confirm_type: {col: "CONFIRM_TYPE" },
         },
+        false, # has_balance
         'U' # U: 未確定含む
       )
 
@@ -244,7 +251,8 @@ class Services::AtUserService::Sync
           description4: {col: "DESCRIPTION4" },
           description5: {col: "DESCRIPTION5" },
           seq: {col: "SEQ" },
-        }
+        },
+        true # has_balance
       )
 
       sync_transaction(
@@ -260,7 +268,8 @@ class Services::AtUserService::Sync
           amount_payment: {col: "AMOUNT_PAYMENT" },
           balance: {col: "BALANCE" },
           seq: {col: "SEQ" },
-        }
+        },
+        true # has_balance
       )
 
     rescue AtAPIStandardError => api_err
