@@ -11,11 +11,8 @@ class Api::V1::GroupsController < ApplicationController
 
   def create
     if @current_user.groups.empty?
-      @group = Entities::Group.create()
-      @group.save!
-      @userGroup = Entities::UserGroup.create(user_id: @current_user.id, group_id: @group.id)
-      @userGroup.save!
-      @groups = Entities::Group.where(user_id: @current_user.id)
+      @current_user.groups.create!
+      @groups = @current_user.groups
     else
       @groups = @current_user.groups
     end
