@@ -52,6 +52,9 @@ Rails.application.routes.draw do
       # groups/:id/goals/:id/settings/:id/
     
       end
+      resources :groups, except: [:new, :edit] do
+        resources :goals, except: [:new, :edit]
+      end
     end
   end
 
