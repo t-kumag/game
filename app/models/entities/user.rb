@@ -2,7 +2,7 @@ class Entities::User < ApplicationRecord
   has_one :at_user
   
   has_many :user_groups, dependent: :destroy
-  has_many :groups, through: :user_groups
+  has_many :groups, -> { distinct }, through: :user_groups
 
   
   has_many :access_grants, class_name: "Doorkeeper::AccessGrant",

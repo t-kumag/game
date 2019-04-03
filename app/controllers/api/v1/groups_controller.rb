@@ -10,7 +10,11 @@ class Api::V1::GroupsController < ApplicationController
   end
 
   def create
-    if @current_user.groups.empty?
+    if params[:user_id] && params[:group_id]
+      @current_user.user_groups.build(user_group_params).save!
+      @with_group_user = Entities::User.find(params[:user_id]).user_groups.build(user_group_params).save!
+      @groups = @current_user.groups
+    elsif @current_user.groups.empty?
       @current_user.groups.create!
       @groups = @current_user.groups
     else
@@ -23,5 +27,9 @@ class Api::V1::GroupsController < ApplicationController
   end
 
   def destroy
+  end
+  
+  def user_group_params
+    params.permit(:group_id, :user_id)
   end
 end
