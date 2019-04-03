@@ -1,5 +1,6 @@
 json.meta do
-  json.error  'sample'
+  #エラー時ハンドリングあってるかわからないので、あとからちゃんとやる。
+  json.error @error if @error
 end
 
 json.app do
