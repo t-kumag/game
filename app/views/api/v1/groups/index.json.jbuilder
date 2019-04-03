@@ -1,9 +1,9 @@
 json.meta do
-  json.error  'sample'
+  json.error @error if @error
 end
 
 json.app do
-  json.goals do
+  json.groups do
     json.array! @groups
   end
 end

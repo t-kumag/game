@@ -1,6 +1,10 @@
 class Entities::User < ApplicationRecord
   has_one :at_user
-  has_one :group
+  
+  has_many :user_groups, dependent: :destroy
+  has_many :groups, through: :user_groups
+
+  
   has_many :access_grants, class_name: "Doorkeeper::AccessGrant",
           foreign_key: :resource_owner_id,
           dependent: :delete_all # or :destroy if you need callbacks
