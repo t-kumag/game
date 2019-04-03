@@ -29,6 +29,7 @@ class Api::V1::GroupsController < ApplicationController
   def destroy
   end
   
+  private
   def user_group_params
     params.permit(:group_id, :user_id)
   end
