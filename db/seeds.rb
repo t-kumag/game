@@ -15,8 +15,6 @@ Entities::User.create(:email => "test88@example.com", :crypted_password => "test
 
 
 # BudgetQuestion
-Entities::BudgetQuestion.create(question_type: 1)
-Entities::BudgetQuestion.create(question_type: 1)
-Entities::BudgetQuestion.create(question_type: 1)
-Entities::BudgetQuestion.create(question_type: 1)
-Entities::BudgetQuestion.create(question_type: 2)
+5.times do
+  Entities::BudgetQuestion.create()
+end

@@ -29,9 +29,6 @@ class Api::V1::BudgetQuestionsController < ApplicationController
           end
         end
       end
-    rescue AtAPIStandardError => api_err
-      p api_err
-      render(json: {}, status: 400) && return
     rescue ActiveRecord::RecordInvalid => db_err
       p db_err
       render(json: {}, status: 400) && return
