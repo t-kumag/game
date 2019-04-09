@@ -1,22 +1,44 @@
 class Api::V1::BudgetQuestionsController < ApplicationController
   before_action :authenticate
 
+  # POST /api/v1/budget-questions
+  # {
+  #    "budget_questions":[
+  #       {
+  #          "budget_question_id":1,
+  #          "step":1
+  #       },
+  #       {
+  #          "budget_question_id":2,
+  #          "step":2
+  #       }
+  #    ]
+  # }
   def create
-    # TODO バリデーション
-    # TODO transaction
-    if params[:budget_questions].present?
-      Entities::UserBudgetQuestion.transaction do
-        params[:budget_questions].each do |param|
-          Entities::UserBudgetQuestion.create(
+    # TODO: バリデーション
+    # TODO 例外処理と共通化
+    begin
+      if params[:budget_questions].present?
+        Entities::UserBudgetQuestion.new.transaction do
+          params[:budget_questions].each do |budget_question|
+            Entities::UserBudgetQuestion.new(
               user_id: @current_user.id,
-              budget_question_id: param[:budget_question_id],
-              step: param[:step]
-          )
+              budget_question_id: budget_question[:budget_question_id],
+              step: budget_question[:step]
+            ).save
+          end
         end
       end
-      # TODO 例外処理など
+    rescue AtAPIStandardError => api_err
+      p api_err
+      render(json: {}, status: 400) && return
+    rescue ActiveRecord::RecordInvalid => db_err
+      p db_err
+      render(json: {}, status: 400) && return
+    rescue => exception
+      p exception
+      render(json: {}, status: 400) && return
     end
     render json: {}, status: 200
   end
-
 end
