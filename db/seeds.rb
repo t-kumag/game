@@ -12,3 +12,9 @@ Entities::User.create(:email => "test02@example.com", :crypted_password => "test
 Entities::User.create(:email => "test03@example.com", :crypted_password => "test03", :token => "xxxxxxxxxxx03" )
 Entities::User.create(:email => "test04@example.com", :crypted_password => "test04", :token => "xxxxxxxxxxx04" )
 Entities::User.create(:email => "test88@example.com", :crypted_password => "test88", :token => "qxxxxxxxxxx88" )
+
+
+# BudgetQuestion
+5.times do
+  Entities::BudgetQuestion.create()
+end
