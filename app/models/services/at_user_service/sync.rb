@@ -64,7 +64,7 @@ class Services::AtUserService::Sync
       token = @user.at_user.at_user_tokens.first.token
 
       # db  
-      category_map = Entities::AtTransactionCategories.all.map{|i| [i.at_category_id, i]}.to_h
+      category_map = Entities::AtTransactionCategory.all.map{|i| [i.at_category_id, i]}.to_h
 
       ## account tracker上のデータ
       account_entity.where(at_user_id: @user.at_user.id).each do |a|
@@ -103,7 +103,7 @@ class Services::AtUserService::Sync
             if category_map.has_key?(at_category_id)
               category_id = category_map[at_category_id].id
             else
-              ec = Entities::AtTransactionCategories.new(
+              ec = Entities::AtTransactionCategory.new(
                 at_category_id: at_category_id,
                 category_name1: category_name1,
                 category_name2: category_name2)
