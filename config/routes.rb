@@ -25,7 +25,12 @@ Rails.application.routes.draw do
           resources :emoney_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
-    
+
+        resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
+          resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
+          end
+        end
+
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
         get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
@@ -34,8 +39,7 @@ Rails.application.routes.draw do
         get 'pl-categories', :to => 'pl#categories'
         get 'transactions', :to => 'transactions#index'
          
-        resources :user_manually_created_transactions, :only => [:index, :show, :create, :update] do        
-        end
+        resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
 
       end
 
