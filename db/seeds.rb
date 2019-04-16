@@ -17,10 +17,14 @@ Entities::User.create(email: 'test88@example.com', crypted_password: 'test88', t
 2.times do
   Entities::Group.create
 end
-
 # at_transaction_categories
 Entities::AtTransactionCategory.create(at_category_id: 1, category_name1: '食費', category_name2: 'サンプル')
 
 # payment_method
 Entities::PaymentMethod.create(name: '口座')
 Entities::PaymentMethod.create(name: 'クレジットカード')
+
+# BudgetQuestion
+5.times do
+  Entities::BudgetQuestion.create
+end

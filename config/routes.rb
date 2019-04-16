@@ -56,6 +56,8 @@ Rails.application.routes.draw do
       # groups/:id/goals/:id/settings/:id/
     
       end
+
+      resources :budget_questions, path: '/budget-questions', only: [:create]
     end
   end
 
