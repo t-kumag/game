@@ -1,5 +1,18 @@
 class Api::V1::AuthController < ApplicationController
   def login
-    @user = Entities::User.find(:first, :conditions => { :email => prams[:email], :crypted_password => params[:crypted_password] })
+    puts "login=-====================="
+    @user = Entities::User.find_by({email: params[:email]})
+    if @user && @user.authenticate(params[:password])
+      @user.reset_token
+      @user.save!
+      render 'login', formats: 'json', handlers: 'jbuilder'
+    else
+      render json: {}, status: :unauthorized
+    end  
   end
+
+  def authenticate_email
+    
+  end
+
 end

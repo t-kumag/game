@@ -188,6 +188,53 @@ class Services::AtUserService
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
 
+  def exec_scraping
+    puts "scraping=========="
+
+    begin
+      token = @user.at_user.at_user_tokens.first.token
+
+      fnc_ids = []
+      fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
+      fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
+      fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+
+      fnc_ids.each do |fnc_id|
+        params = {
+          token: token,
+          fnc_id: fnc_id
+        }
+        requester = AtAPIRequest::AtUser::ExecScraping.new(params)
+        res = AtAPIClient.new(requester).request
+      end
+
+    rescue AtAPIStandardError => api_err
+      p "api_err===================="
+      p api_err
+    rescue ActiveRecord::RecordInvalid => db_err
+      p "db_err===================="
+      p db_err
+    rescue => exception
+      p "exception===================="
+      p exception
+    end
+
+
+    
+    # api_name = "/openscher002.jct"
+    # params = {
+    #   "TOKEN_KEY" => token,
+    #   "FNC_ID" => fnc_id,
+    #   "START_DATE" => start_date,
+    #   "END_DATE" => end_date,
+    # }
+    # res = AtAPIClient.new(api_name, params).get
+
+    # return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
+  end
+
+
+
   # ## openuserr003
   # ## トークン及びユーザーIDから、ユーザーの状態を照会します
   # https://atdev.369webcash.com/openuserr003.jct?CHNL_ID=CHNL_OSIDORI&USER_ID=osdr_dev_0001

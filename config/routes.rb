@@ -42,6 +42,10 @@ Rails.application.routes.draw do
         resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
 
       end
+      
+      resources :users, :only => [:create] do
+      end
+
 
       get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'

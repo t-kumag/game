@@ -18,6 +18,7 @@ RUN apk update && \
       libxslt-dev \
       mysql-client \
       mysql-dev \
+      mysql \
       ruby-dev \
       yaml-dev \
       zlib-dev && \
@@ -27,6 +28,7 @@ RUN apk update && \
       openssh \
       mysql-client \
       mysql-dev \
+      mysql \
       ruby-json \
       tzdata \
       yaml && \
