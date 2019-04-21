@@ -16,7 +16,7 @@ class Services::AtUserService
     begin
       require "securerandom"
       rond_id = SecureRandom.hex
-      at_user = AtUser.new(
+      at_user = Entities::AtUser.new(
         {
           user_id: @user.id,
           at_user_id: rond_id
@@ -31,7 +31,7 @@ class Services::AtUserService
       }
       requester = AtAPIRequest::AtUser::CreateUser.new(params)
       res = AtAPIClient.new(requester).request
-      at_user_token = AtUserToken.new({
+      at_user_token = Entities::AtUserToken.new({
           at_user_id: at_user.id,
           token: res["TOKEN_KEY"]
         # token.expires_at = res["EXPI_DT"]
@@ -54,14 +54,22 @@ class Services::AtUserService
     at_user = nil
 
     if @user&.at_user&.at_user_tokens.blank?
+      puts "self.create_user ================="
       at_user = self.create_user
+      p at_user
     else
+      puts " @user.at_user ================="
       at_user = @user.at_user 
+      p at_user
     end
 
     # TODO、tokenを含まないurl返す
     # TODO: 開発用url
     url = 'https://atdev.369webcash.com/openadd001.act'
+
+    puts "tokens========"
+    p at_user.at_user_tokens.first.token
+
     return {
       url: url,
       chnl_id: "CHNL_OSIDORI",
@@ -192,8 +200,10 @@ class Services::AtUserService
     puts "scraping=========="
 
     begin
+      puts "scraping==========1"
       token = @user.at_user.at_user_tokens.first.token
-
+      puts "scraping=========2"
+      
       fnc_ids = []
       fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
       fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}

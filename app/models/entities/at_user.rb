@@ -23,7 +23,7 @@ class Entities::AtUser < ApplicationRecord
 
   def self.create_at_user(user)
     begin
-      at_user = AtUser.new(
+      at_user = self.new(
         {user_id: user.id}
       )
       at_user.password = at_user.generate_at_user_password

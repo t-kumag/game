@@ -20,6 +20,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_sync
+    p @current_user
+
     puts "at_scraping==========1"
     Services::AtUserService.new(@current_user).exec_scraping
     puts "at_sync=========="

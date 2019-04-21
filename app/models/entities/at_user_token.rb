@@ -22,7 +22,7 @@ class Entities::AtUserToken < ApplicationRecord
     requester = AtAPIRequest::AtUser::GetToken.new(params)
     begin
       res = AtAPIClient.new(requester).request
-      at_user_token = AtUserToken.new({
+      at_user_token = self.new({
         at_user_id: at_user.id,
         token: res["TOKEN_KEY"],
         expires_at: res["EXPI_DT"], # TODO
@@ -36,7 +36,7 @@ class Entities::AtUserToken < ApplicationRecord
   end
 
   def refresh
-    at_user = AtUser.find(at_user_id)
+    at_user = Entities::AtUser.find(at_user_id)
     params = {
       at_user_id: at_user.at_user_id,
       at_user_password: at_user.at_user_password,
