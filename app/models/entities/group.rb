@@ -8,4 +8,5 @@
 #
 
 class Entities::Group < ApplicationRecord
+  has_many :participate_groups
 end

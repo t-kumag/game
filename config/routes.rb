@@ -43,6 +43,14 @@ Rails.application.routes.draw do
 
       end
       
+      resources :pairing_requests, :path => '/pairing-requests', :only => [] do
+        collection do
+          get :generate_pairing_token
+          post :receive_pairing_request
+          post :confirm_pairing_request
+        end
+      end
+
       resources :users, :only => [:create] do
       end
 

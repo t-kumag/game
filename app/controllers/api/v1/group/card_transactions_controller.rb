@@ -2,13 +2,13 @@ class Api::V1::User::CardTransactionsController < ApplicationController
     before_action :authenticate
     
     def index
-        a = Entities::AtUserCardAccount.find(params[:card_account_id])
+        a = AtUserCardAccount.find(params[:card_account_id])
         @transactions = a.at_user_card_transactions.order(id: "DESC")
         render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
     def show
-        transaction = Entities::AtUserCardTransactions.first(params[:id])
+        transaction = AtUserCardTransactions.first(params[:id])
         @response = {
             amount: transaction.amount,
             category: transaction.at_transaction_category_id,

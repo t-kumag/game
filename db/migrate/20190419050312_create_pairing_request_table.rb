@@ -4,6 +4,7 @@ class CreatePairingRequestTable < ActiveRecord::Migration[5.2]
       t.references :from_user
       t.references :to_user
       t.references :group, foreign_key: true
+      t.string :token
       t.integer :status
       t.timestamps
     end

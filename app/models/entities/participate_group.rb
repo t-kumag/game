@@ -10,6 +10,6 @@
 #
 
 class Entities::ParticipateGroup < ApplicationRecord
+  belongs_to :users
   belongs_to :group
-  belongs_to :user
 end

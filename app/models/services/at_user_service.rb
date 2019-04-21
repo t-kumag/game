@@ -16,7 +16,7 @@ class Services::AtUserService
     begin
       require "securerandom"
       rond_id = SecureRandom.hex
-      at_user = Entities::AtUser.new(
+      at_user = AtUser.new(
         {
           user_id: @user.id,
           at_user_id: rond_id
@@ -31,7 +31,7 @@ class Services::AtUserService
       }
       requester = AtAPIRequest::AtUser::CreateUser.new(params)
       res = AtAPIClient.new(requester).request
-      at_user_token = Entities::AtUserToken.new({
+      at_user_token = AtUserToken.new({
           at_user_id: at_user.id,
           token: res["TOKEN_KEY"]
         # token.expires_at = res["EXPI_DT"]
@@ -88,7 +88,7 @@ class Services::AtUserService
       res = AtAPIClient.new(requester).request
 
       token = res["TOKEN_KEY"]
-      at_user_token = Entities::AtUserToken.new({
+      at_user_token = AtUserToken.new({
           at_user_id: @user.at_user.id,
           token: token
       })

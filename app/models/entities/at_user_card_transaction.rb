@@ -22,6 +22,7 @@
 
 class Entities::AtUserCardTransaction < ApplicationRecord
   belongs_to :at_card_account
+  has_one :user_distributed_transaction
 
   def date
     self.used_date

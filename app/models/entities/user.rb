@@ -23,6 +23,8 @@ class Entities::User < ApplicationRecord
   has_many :access_tokens, class_name: "Doorkeeper::AccessToken",
           foreign_key: :resource_owner_id,
           dependent: :delete_all # or :destroy if you need callbacks
+  has_one :participate_group
+  has_one :group, through: :participate_group
 
   def reset_token
     self.token = generate_token

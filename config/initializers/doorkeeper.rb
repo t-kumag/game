@@ -8,12 +8,12 @@ Doorkeeper.configure do
     # Put your resource owner authentication logic here.
     # Example implementation:
 
-    Entities::User.find_by_id(session[:user_id]) || redirect_to(api_v1_auth_login_path)
+    User.find_by_id(session[:user_id]) || redirect_to(api_v1_auth_login_path)
   end
 
   # Using Resource Owner Password Credentials flow
   resource_owner_from_credentials do |routes|
-    Entities::User.authenticate!(params[:username], params[:password])
+    User.authenticate!(params[:username], params[:password])
   end
 
   # If you didn't skip applications controller from Doorkeeper routes in your application routes.rb

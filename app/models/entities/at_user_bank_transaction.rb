@@ -23,6 +23,7 @@
 
 class Entities::AtUserBankTransaction < ApplicationRecord
   belongs_to :at_bank_account
+  has_one :user_distributed_transaction
 
   def amount
     if self.amount_receipt != 0 

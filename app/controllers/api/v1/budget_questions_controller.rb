@@ -19,9 +19,9 @@ class Api::V1::BudgetQuestionsController < ApplicationController
     # TODO 例外処理と共通化
     begin
       if params[:budget_questions].present?
-        Entities::UserBudgetQuestion.new.transaction do
+        UserBudgetQuestion.new.transaction do
           params[:budget_questions].each do |budget_question|
-            Entities::UserBudgetQuestion.new(
+            UserBudgetQuestion.new(
               user_id: @current_user.id,
               budget_question_id: budget_question[:budget_question_id],
               step: budget_question[:step]

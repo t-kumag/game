@@ -17,5 +17,47 @@
 
 class Entities::UserDistributedTransaction < ApplicationRecord
   belongs_to :user_manually_created_transaction
+  belongs_to :at_user_card_transaction
+  belongs_to :at_user_bank_transaction
+  belongs_to :at_user_emoney_transaction
+
+  def user_pl
+
+    share = params[:share]
+
+    from = Time.zone.today.beginning_of_month
+    to = Time.zone.today.end_of_month
+
+    u = self.left_joins(:user_manually_created_transaction).
+    left_joins(:at_user_card_transaction).
+    left_joins(:at_user_bank_transaction).
+    left_joins(:at_user_emoney_transaction).
+    where(user_distributed_transaction: { used_date: from..to, user_id: @current_user.id, share: share})
+
+    #  user_id                              :bigint(8)
+#  group_id                             :bigint(8)
+#  share                                :boolean
+
+    # UserDistributedTransaction.left_joins(:user_manually_created_transaction).left_joins(:at_user_card_transaction).left_joins(:at_user_bank_transaction).left_joins(:at_user_emoney_transaction).where(user_distributed_transaction: { id: nil })
+  end
+
+  def group_pl
+    share = params[:share]
+
+    from = Time.zone.today.beginning_of_month
+    to = Time.zone.today.end_of_month
+
+    u = self.left_joins(:user_manually_created_transaction).
+    left_joins(:at_user_card_transaction).
+    left_joins(:at_user_bank_transaction).
+    left_joins(:at_user_emoney_transaction).
+    where(user_distributed_transaction: { used_date: from..to, group_id: @current_user.group.id, share: share})
+
+    #  user_id                              :bigint(8)
+#  group_id                             :bigint(8)
+#  share                                :boolean
+
+    # UserDistributedTransaction.left_joins(:user_manually_created_transaction).left_joins(:at_user_card_transaction).left_joins(:at_user_bank_transaction).left_joins(:at_user_emoney_transaction).where(user_distributed_transaction: { id: nil })
+  end
 
 end

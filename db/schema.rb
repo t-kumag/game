@@ -230,6 +230,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.bigint "from_user_id"
     t.bigint "to_user_id"
     t.bigint "group_id"
+    t.string "token"
     t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

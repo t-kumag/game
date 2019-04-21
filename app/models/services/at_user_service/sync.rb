@@ -150,8 +150,8 @@ class Services::AtUserService::Sync
       sync_account(
         "CARD_DATA_REC",
         "at_card_id",         
-        Entities::AtCard,
-        Entities::AtUserCardAccount,
+        AtCard,
+        AtUserCardAccount,
         {
           fnc_id: {col: "FNC_ID" },
           fnc_cd: {col: "FNC_CD" },
@@ -172,8 +172,8 @@ class Services::AtUserService::Sync
       sync_account(
         "BANK_DATA_REC",
         "at_bank_id",
-        Entities::AtBank,
-        Entities::AtUserBankAccount,
+        AtBank,
+        AtUserBankAccount,
         {
           fnc_id: {col: "FNC_ID" },
           fnc_cd: {col: "FNC_CD" },
@@ -195,8 +195,8 @@ class Services::AtUserService::Sync
       sync_account(
         "ETC_DATA_REC",
         "at_emoney_service_id",
-        Entities::AtEmoneyService,
-        Entities::AtUserEmoneyServiceAccount,
+        AtEmoneyService,
+        AtUserEmoneyServiceAccount,
         {
           fnc_id: {col: "FNC_ID" },
           fnc_cd: {col: "FNC_CD" },
@@ -214,8 +214,8 @@ class Services::AtUserService::Sync
       sync_transaction(
         "CARD_REC",
         "at_user_card_account_id",
-        Entities::AtUserCardAccount,
-        Entities::AtUserCardTransaction,
+        AtUserCardAccount,
+        AtUserCardTransaction,
         {
           branch_desc: {col: "BRANCH_DESC" },
           used_date: {col: "USED_DATE", opt: "time_parse"  },
@@ -236,8 +236,8 @@ class Services::AtUserService::Sync
       sync_transaction(
         "BANK_REC",
         "at_user_bank_account_id",
-        Entities::AtUserBankAccount,
-        Entities::AtUserBankTransaction,
+        AtUserBankAccount,
+        AtUserBankTransaction,
         {
           # TODO date => dtmに変える
           trade_date: {col: "TRADE_DTM", opt: "time_parse"  },
@@ -258,8 +258,8 @@ class Services::AtUserService::Sync
       sync_transaction(
         "ETC_REC",
         "at_user_emoney_service_account_id",
-        Entities::AtUserEmoneyServiceAccount,
-        Entities::AtUserEmoneyTransaction,
+        AtUserEmoneyServiceAccount,
+        AtUserEmoneyTransaction,
         {
           used_date: {col: "USED_DATE", opt: "time_parse"  },
           used_time: {col: "USED_TIME" },

@@ -5,12 +5,12 @@ class Services::UserDistributedTransactionService
   end
 
   def create_user_manually_created
-    distributed_transaction = Entities::UserDistributedTransaction.new
+    distributed_transaction = UserDistributedTransaction.new
     save_user_manually_created(distributed_transaction)
   end
 
   def update_user_manually_created
-    distributed_transaction = Entities::UserDistributedTransaction.find_or_initialize_by(
+    distributed_transaction = UserDistributedTransaction.find_or_initialize_by(
       user_manually_created_transaction_id: @transaction.id)
     save_user_manually_created(distributed_transaction)
   end

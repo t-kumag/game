@@ -71,8 +71,8 @@ class ApplicationController < ActionController::Base
   # end
 
   def authenticate_token
-    @current_user = User.token_authenticate!(token)
-    @current_user && DateTime.now <= @current_user.token_expire
+    @current_user = Entities::User.token_authenticate!(bearer_token)
+    @current_user && DateTime.now <= @current_user.token_expires_at
   end
 
   def render_unauthorized
