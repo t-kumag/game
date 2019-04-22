@@ -1,7 +1,8 @@
 class Api::V1::AuthController < ApplicationController
   def login
     puts "login=-====================="
-    @user = User.find_by({email: params[:email]})
+    @user = Entities::User.find_by({email: params[:email]})
+
     if @user && @user.authenticate(params[:password])
       @user.reset_token
       @user.save!

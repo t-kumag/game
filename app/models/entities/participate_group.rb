@@ -10,6 +10,7 @@
 #
 
 class Entities::ParticipateGroup < ApplicationRecord
-  belongs_to :users
+  # TODO participate_groupsがinsertされないのでコメント
+  #belongs_to :users
   belongs_to :group
 end

@@ -51,9 +51,7 @@ Rails.application.routes.draw do
         end
       end
 
-      resources :users, :only => [:create] do
-      end
-
+      resources :users, only: [:create]
 
       get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'
