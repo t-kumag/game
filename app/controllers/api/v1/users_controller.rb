@@ -1,7 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   before_action :authenticate, only: [:at_url, :at_sync]
   def sign_up_params
-    params.require(:user).permit(:email, :password)
+    params.permit(:email, :password)
   end
 
   def create
