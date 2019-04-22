@@ -96,7 +96,7 @@ class Services::AtUserService
       res = AtAPIClient.new(requester).request
 
       token = res["TOKEN_KEY"]
-      at_user_token = AtUserToken.new({
+      at_user_token = Entities::AtUserToken.new({
           at_user_id: @user.at_user.id,
           token: token
       })
