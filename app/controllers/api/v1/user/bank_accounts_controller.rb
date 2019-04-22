@@ -2,10 +2,12 @@ class Api::V1::User::BankAccountsController < ApplicationController
   before_action :authenticate
 
   def index
+    share = false || params[:share]
     if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
       @responses = []
     else
       @responses = []
+
       @current_user.at_user.at_user_bank_accounts.each do |a|
         @responses << {
           id: a.id,
@@ -20,7 +22,6 @@ class Api::V1::User::BankAccountsController < ApplicationController
   def summary
     share = false || params[:share]
     if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
-      puts "bank summary --------1"
       @response = {
         amount: 0,
       }

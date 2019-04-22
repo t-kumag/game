@@ -2,11 +2,19 @@ class Api::V1::User::CardAccountsController < ApplicationController
     before_action :authenticate
 
     def index
+      share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
         @responses = []
       else
         @responses = []
-        @current_user.at_user.at_user_card_accounts.each do |ca|
+
+        accounts = if share
+          @current_user.at_user.at_user_card_accounts
+        else
+          @current_user.at_user.at_user_card_accounts.where(at_user_card_accounts: {share: false})
+        end
+
+        accounts.each do |ca|
           @responses << {
             id: ca.id,
             name: ca.fnc_nm,
@@ -18,6 +26,7 @@ class Api::V1::User::CardAccountsController < ApplicationController
     end
   
     def summary
+      share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
         @response = {
           amount: 0,
@@ -25,9 +34,9 @@ class Api::V1::User::CardAccountsController < ApplicationController
       else
         amount = if share
           # shareを含む場合
-          @current_user.at_user.at_user_card_accounts.sum{|i| i.current_month_payment},
+          @current_user.at_user.at_user_card_accounts.sum{|i| i.current_month_payment}
         else
-          @current_user.at_user.at_user_card_accounts.where(at_user_card_accounts: {share: false}).sum{|i| i.current_month_payment},
+          @current_user.at_user.at_user_card_accounts.where(at_user_card_accounts: {share: false}).sum{|i| i.current_month_payment}
         end
         @response = {
           amount: amount
