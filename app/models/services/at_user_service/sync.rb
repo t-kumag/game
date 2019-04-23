@@ -96,8 +96,7 @@ class Services::AtUserService::Sync
           res[rec_key].each do |i|
 
             #TODO: ATからdecimalで返ってくるようになればこの処理は不要
-            i["BALANCE"] = i["BALANCE"].to_d
-
+            i["BALANCE"] = i["BALANCE"].present? ? i["BALANCE"].to_d : 0
 
             # TODO: category
             category_id = nil
