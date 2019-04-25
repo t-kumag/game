@@ -25,6 +25,7 @@ class Entities::User < ApplicationRecord
           dependent: :delete_all # or :destroy if you need callbacks
   has_one :participate_group
   has_one :group, through: :participate_group
+  has_one :user_profile
 
   def reset_token
     self.token = generate_token

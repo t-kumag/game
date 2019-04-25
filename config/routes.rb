@@ -40,6 +40,7 @@ Rails.application.routes.draw do
         get 'transactions', :to => 'transactions#index'
          
         resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
+        resources :profiles, only: [:create]
 
       end
       
@@ -60,7 +61,7 @@ Rails.application.routes.draw do
       namespace :family do
         resources :savings_goals, :path => '/goals' do
         end
-      # groups/:id/goals/:id/summary
+      # groups/:id/goals/:id/summarygenerate_pairing_token
       # groups/:id/goals/:id/settings
       # groups/:id/goals/:id/savings-amounts
       # groups/:id/goals/:id/settings/:id/
