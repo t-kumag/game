@@ -18,7 +18,7 @@ class Services::PlService
       WHERE
         udt.user_id = #{@user.id}
       AND 
-        udt.share = #{share}
+        udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
@@ -44,7 +44,7 @@ class Services::PlService
       WHERE
         udt.user_id = #{@user.id}
       AND 
-        udt.share = #{share}
+        udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
@@ -71,7 +71,7 @@ class Services::PlService
       WHERE
         udt.user_id = #{@user.id}
       AND 
-        udt.share = #{share}
+        udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
@@ -84,34 +84,51 @@ class Services::PlService
   end
 
   def pl_category_summery(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
-    pl_category_summeries = []
     pl_bank = bank_category_summary(share, from, to)
-    pl_category_summery = merge_category_summery(pl_bank, pl_category_summeries)
-  #   pl_card = Services::PlService.new(@user.id).card_category_summary(share, from, to)
-  #   pl_category_summery = merge_summery(pl_card, pl_category_summery)
-  #   pl_emoney = Services::PlService.new(@user.id).emoney_category_summary(share, from, to)
-  #   merge_summery(pl_emoney, pl_category_summery)
+
+    puts pl_bank
+
+    pl_card = card_category_summary(share, from, to)
+
+    puts pl_card
+
+    pl_emoney = emoney_category_summary(share, from, to)
+
+    puts pl_emoney
+
+    merge_category_summery(pl_emoney, merge_category_summery(pl_card, pl_bank))
   end
 
   def pl_summery(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
 
   end
 
-  # TODO 集計が複雑になったのでもう少しSQLでがんばったほうがいいかも
-  def merge_category_summery(pl_categories, pl_category_summeries)
-    i = 0
-    unless pl_categories.blank?
-      pl_categories.each do |pl_category|
-        pl_category_summeries.each do |key, pl_category_summery|
-          if pl_category_summery[:at_transaction_category_id].has_key? && pl_category[:at_transaction_category_id] == pl_category_summery[:at_transaction_category_id]
-            pl_category_summeries[key][:amount_receipt] += pl_category[:amount_receipt]
-          else
-            pl_category_summeries[i][:amount_receipt] = pl_category[:amount_receipt]
-          end
-          i += 1
+  def merge_category_summery(pl, before_summeries)
+    after_summeries = before_summeries.dup
+    unless pl.blank? && after_summeries.blank?
+      pl.each do |v|
+        next if v['at_transaction_category_id'].blank?
+        summery = after_summeries.select {|category_summery|
+          next if category_summery.blank? || category_summery['at_transaction_category_id'].blank?
+          category_summery['at_transaction_category_id'] == v['at_transaction_category_id']
+        }.first
+        v['amount_receipt'] ||= 0
+        v['amount_payment'] ||= 0
+        if summery.blank?
+          after_summeries << v
+        else
+          summery['amount_receipt'] ||= 0
+          summery['amount_payment'] ||= 0
+          after_summeries[v['at_transaction_category_id']] = {
+            at_transaction_category_id: v['at_transaction_category_id'],
+            amount_receipt: v['amount_receipt'] + summery['amount_receipt'],
+            amount_payment: v['amount_payment'] + summery['amount_payment']
+          }.stringify_keys
         end
       end
-      pl_category_summeries
     end
+    after_summeries.compact! unless after_summeries.blank?
+    after_summeries
   end
+
 end

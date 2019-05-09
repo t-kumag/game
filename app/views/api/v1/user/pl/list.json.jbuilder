@@ -1,23 +1,10 @@
-json.meta do
-  json.error  'sample'
-end
+json.error  'sample'
 
 json.app do
-  
-  json.spending do
-    json.array!(@response[:spending_categories]) do |r|
-      json.category_id r[:category_id]
-      json.name r[:name]
-      json.amount r[:amount]
-    end
+  json.array!(@response) do |r|
+    json.category_id r['at_transaction_category_id']
+    json.name '食費' #TODO　カテゴリー名
+    json.income_amount r['amount_receipt'].to_f
+    json.expense_amount r['amount_payment'].to_f
   end
-
-  json.income do
-    json.array!(@response[:income_categories]) do |r|
-      json.category_id r[:category_id]
-      json.name r[:name]
-      json.amount r[:amount]
-    end
-  end
-
 end
