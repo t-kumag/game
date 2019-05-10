@@ -34,3 +34,4 @@
 /vendor
 
 db/schema.rb
+.idea
