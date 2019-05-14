@@ -1,24 +1,8 @@
-class Api::V1::Group::BankAccountsController < ApplicationController
+class Api::V1::Group::BsController < ApplicationController
   before_action :authenticate
 
-  def index
-    share = false || params[:share]
-    if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
-      @responses = []
-    else
-      @responses = []
-
-      @current_user.at_user.at_user_bank_accounts.each do |a|
-        @responses << {
-            id: a.id,
-            name: a.fnc_nm,
-            amount: a.balance
-        }
-      end
-    end
-    render 'list', formats: 'json', handlers: 'jbuilder'
-  end
-
+  # TODO groupとして取得するデータの仕様を決める必要がある
+  # TODO いまは口座のbalanceだけ足している。目標金額など他の項目も足す 20190513
   def summary
     share = false || params[:share]
     if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
@@ -39,6 +23,4 @@ class Api::V1::Group::BankAccountsController < ApplicationController
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
 
-
 end
-

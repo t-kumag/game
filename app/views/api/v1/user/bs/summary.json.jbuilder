@@ -1,4 +1,4 @@
-json.error  ''
+#json.error  'sample'
 
 json.app do
   json.amount @response[:amount].to_f

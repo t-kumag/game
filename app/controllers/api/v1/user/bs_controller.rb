@@ -1,4 +1,4 @@
-class Api::V1::User::BSController < ApplicationController
+class Api::V1::User::BsController < ApplicationController
   before_action :authenticate
 
   # TODO いまは口座のbalanceだけ足している。目標金額など他の項目も足す 20190513
@@ -23,4 +23,3 @@ class Api::V1::User::BSController < ApplicationController
   end
 
 end
-

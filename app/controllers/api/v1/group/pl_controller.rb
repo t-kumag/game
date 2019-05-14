@@ -1,28 +1,15 @@
-class Api::V1::User::PlController < ApplicationController
+class Api::V1::Group::PlController < ApplicationController
   before_action :authenticate
 
-  def summaries
-    @response = {
-      income_amount: 1000,
-      spending_amount: -1000
-    }
+  def summary
+    share = params[:share] == "true" ? [1] : [0,1]
+    @response = Services::PlService.new(@current_user,true).pl_summery(share, params[:from])
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
 
   def categories
-    @response = {
-      spending_categories: [
-        {
-        category_id: 1,
-        name: '食費',
-        amount: 100000
-      }],
-      income_categories: [{
-        category_id: 5,
-        name: '収入',
-        amount: 200000
-      }]
-    }
+    share = params[:share] == "true" ? [1] : [0,1]
+    @response = Services::PlService.new(@current_user,true).pl_category_summery(share, params[:from])
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 end

@@ -28,9 +28,9 @@ Rails.application.routes.draw do
           end
         end
 
-        # get 'card-accounts-summary', :to => 'card_accounts#summary'
-        # get 'bank-accounts-summary', :to => 'bank_accounts#summary'
-        # get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
+        get 'card-accounts-summary', :to => 'card_accounts#summary'
+        get 'bank-accounts-summary', :to => 'bank_accounts#summary'
+        get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
 
         get 'pl-summary', :to => 'pl#summary'
         get 'bs-summary', :to => 'bs#summary'
@@ -57,6 +57,10 @@ Rails.application.routes.draw do
           resources :emoney_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
+
+        get 'card-accounts-summary', :to => 'card_accounts#summary'
+        get 'bank-accounts-summary', :to => 'bank_accounts#summary'
+        get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
 
         get 'pl-summary', :to => 'pl#summary'
         get 'bs-summary', :to => 'bs#summary'

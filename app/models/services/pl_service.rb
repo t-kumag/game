@@ -1,7 +1,8 @@
 # TODO 目標単位でも集計できるようにする
 class Services::PlService
-  def initialize(user)
+  def initialize(user, with_group=false)
     @user = user
+    @with_group = with_group
   end
 
   def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
@@ -30,6 +31,7 @@ class Services::PlService
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
+      #{sql_and_group}
       GROUP BY 
         aubt.at_transaction_category_id
     EOS
@@ -62,6 +64,7 @@ class Services::PlService
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
+      #{sql_and_group}
       GROUP BY 
         auct.at_transaction_category_id
     EOS
@@ -95,11 +98,21 @@ class Services::PlService
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
+      #{sql_and_group}
       GROUP BY 
         auet.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
+  end
+
+  def sql_and_group
+    if @with_group && @user.group_id > 1
+      <<-EOS
+      AND
+        udt.group_id = #{@user.group_id}
+      EOS
+    end
   end
 
   def pl_category_summery(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)

@@ -1,4 +1,4 @@
-class Api::V1::User::BankTransactionsController < ApplicationController
+class Api::V1::Group::BankTransactionsController < ApplicationController
     before_action :authenticate
 
     def index
