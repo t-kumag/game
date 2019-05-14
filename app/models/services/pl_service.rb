@@ -1,3 +1,4 @@
+# TODO 目標単位でも集計できるようにする
 class Services::PlService
   def initialize(user)
     @user = user
@@ -8,13 +9,19 @@ class Services::PlService
       SELECT
         aubt.at_transaction_category_id,
         sum(aubt.amount_receipt) as amount_receipt,
-        sum(aubt.amount_payment) as amount_payment
+        sum(aubt.amount_payment) as amount_payment,
+        atc.category_name1,
+        atc.category_name2
       FROM
         user_distributed_transactions as udt
       LEFT OUTER JOIN 
         at_user_bank_transactions as aubt
       ON
         aubt.id = udt.at_user_bank_transaction_id
+      LEFT OUTER JOIN
+        at_transaction_categories as atc
+      ON
+        aubt.at_transaction_category_id = atc.id
       WHERE
         udt.user_id = #{@user.id}
       AND 
@@ -34,13 +41,19 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         auct.at_transaction_category_id,
-        sum(auct.amount) as amount_payment
+        sum(auct.amount) as amount_payment,
+        atc.category_name1,
+        atc.category_name2
       FROM
         user_distributed_transactions as udt
       LEFT OUTER JOIN 
         at_user_card_transactions as auct
       ON
         auct.id = udt.at_user_card_transaction_id
+      LEFT OUTER JOIN
+        at_transaction_categories as atc
+      ON
+        auct.at_transaction_category_id = atc.id
       WHERE
         udt.user_id = #{@user.id}
       AND 
@@ -61,13 +74,19 @@ class Services::PlService
       SELECT
         auet.at_transaction_category_id,
         sum(auet.amount_receipt) as amount_receipt,
-        sum(auet.amount_payment) as amount_payment
+        sum(auet.amount_payment) as amount_payment,
+        atc.category_name1,
+        atc.category_name2
       FROM
         user_distributed_transactions as udt
        LEFT OUTER JOIN 
         at_user_emoney_transactions as auet
       ON
         auet.id = udt.at_user_emoney_transaction_id
+      LEFT OUTER JOIN
+        at_transaction_categories as atc
+      ON
+        auet.at_transaction_category_id = atc.id
       WHERE
         udt.user_id = #{@user.id}
       AND 
@@ -100,7 +119,18 @@ class Services::PlService
   end
 
   def pl_summery(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
-
+    pl_category_summery = pl_category_summery(share, from, to)
+    pl_summeries = {
+        income_amount: 0,
+        expense_amount: 0
+    }
+    pl_category_summery.each do |summery|
+      summery['amount_receipt'] ||= 0
+      summery['amount_payment'] ||= 0
+      pl_summeries[:income_amount] += summery['amount_receipt']
+      pl_summeries[:expense_amount] += summery['amount_payment']
+    end
+    pl_summeries
   end
 
   def merge_category_summery(pl, before_summeries)

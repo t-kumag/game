@@ -10,6 +10,8 @@ Rails.application.routes.draw do
   namespace :api, format: 'json'  do
     namespace :v1 do
       post 'auth/login', to: 'auth#login'
+
+      # 個人用
       namespace :user do
         resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
           resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
@@ -26,23 +28,41 @@ Rails.application.routes.draw do
           end
         end
 
-        resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
-          resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
-          end
-        end
+        # get 'card-accounts-summary', :to => 'card_accounts#summary'
+        # get 'bank-accounts-summary', :to => 'bank_accounts#summary'
+        # get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
 
-        get 'card-accounts-summary', :to => 'card_accounts#summary'
-        get 'bank-accounts-summary', :to => 'bank_accounts#summary'
-        get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
-    
-        get 'pl-summaries', :to => 'pl#summaries'
+        get 'pl-summary', :to => 'pl#summary'
+        get 'bs-summary', :to => 'bs#summary'
         get 'pl-categories', :to => 'pl#categories'
         get 'transactions', :to => 'transactions#index'
          
         resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
         resources :profiles, only: [:create]
-
       end
+
+      # 共有用
+      namespace :group do
+        resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
+          resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
+          end
+        end
+
+        resources :card_accounts, :path => '/card-accounts', :only => [:index] do
+          resources :card_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
+          end
+        end
+
+        resources :emoney_accounts, :path => '/emoney-accounts', :only => [:index] do
+          resources :emoney_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
+          end
+        end
+
+        get 'pl-summary', :to => 'pl#summary'
+        get 'bs-summary', :to => 'bs#summary'
+        get 'pl-categories', :to => 'pl#categories'
+      end
+
       
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
         collection do

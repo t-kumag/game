@@ -32,6 +32,7 @@ RUN apk update && \
       ruby-json \
       tzdata \
       yaml && \
+    apk add less && \
     bundle install -j4 && \
     apk del .build-dependencies
 
@@ -39,4 +40,4 @@ ADD . $ROOT_PATH
 
 EXPOSE 3000
 
-CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma.rb"]
+CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma/production.rb"]

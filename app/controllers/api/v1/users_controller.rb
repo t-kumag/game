@@ -26,6 +26,12 @@ class Api::V1::UsersController < ApplicationController
     Services::AtUserService.new(@current_user).exec_scraping
     puts "at_sync=========="
     Services::AtUserService.new(@current_user).sync
+
+    # TODO 仮り実装 user_distributed_transactionsに同期
+    # TODO 手動振り分けの同期が未対応
+    puts "user_distributed_transactions sync=========="
+    Services::UserDistributedTransactionService.new(@current_user).sync
+
     obj = {}
     render json: obj, status: 200
   end

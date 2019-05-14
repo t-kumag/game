@@ -1,11 +1,9 @@
 class Api::V1::User::PlController < ApplicationController
   before_action :authenticate
 
-  def summaries
-    @response = {
-      income_amount: 1000,
-      spending_amount: -1000
-    }
+  def summary
+    share = params[:share] == "true" ? [1] : [0,1]
+    @response = Services::PlService.new(Entities::User.find(@current_user.id)).pl_summery(share, params[:from])
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
 

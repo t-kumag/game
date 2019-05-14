@@ -7,7 +7,7 @@ json.app do
       json.transaction_id r[:id]
       json.date r[:date]
       json.name r[:name]
-      json.amount r[:amount]
+      json.amount r[:amount].to_f
       json.error ""
   end
 end

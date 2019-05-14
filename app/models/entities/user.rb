@@ -46,4 +46,8 @@ class Entities::User < ApplicationRecord
     return Digest::SHA256.hexdigest(self.id.to_s + time.to_s + salt)
   end
 
+  def group_id
+    self.participate_group.group_id
+  end
+
 end
