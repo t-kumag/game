@@ -13,7 +13,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = create_user_manually_created
-        Services::UserDistributedTransactionService.new(@current_user, transaction).create_user_manually_created
+        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created
       end
 
     rescue => exception
@@ -28,7 +28,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = update_user_manually_created
-        Services::UserDistributedTransactionService.new(@current_user, transaction).update_user_manually_created
+        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).update_user_manually_created
       end
 
     rescue => exception

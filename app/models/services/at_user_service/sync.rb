@@ -95,6 +95,9 @@ class Services::AtUserService::Sync
         if res.has_key?(rec_key) && !res[rec_key].blank?
           res[rec_key].each do |i|
 
+            #TODO: ATからdecimalで返ってくるようになればこの処理は不要
+            i["BALANCE"] = i["BALANCE"].present? ? i["BALANCE"].to_d : 0
+
             # TODO: category
             category_id = nil
             at_category_id = i["CATEGORY_ID"]

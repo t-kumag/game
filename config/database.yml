@@ -22,8 +22,8 @@ development:
   host: <%= ENV.fetch("DB_HOST", 'localhost') %> # osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
   port: <%= ENV.fetch("DB_PORT", '3306') %>
   database: <%= ENV.fetch("DB_NAME", 'dev_osdr_db') %> # osdrdevdb
-  username: <%= ENV.fetch("DB_USER", 'devusr') %> # osdrdevuser
-  password: <%= ENV.fetch("DB_PWD", 'pass') %> # qwermnbv10
+  username: <%= ENV.fetch("DB_USER", 'root') %> # osdrdevuser
+  password: <%= ENV.fetch("DB_PWD", '') %> # qwermnbv10
 
 staging:
   <<: *default

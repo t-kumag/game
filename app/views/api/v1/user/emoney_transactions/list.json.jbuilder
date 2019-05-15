@@ -1,6 +1,4 @@
-json.meta do
-  json.error  'sample'
-end
+#json.error  'sample'
 
 json.app do
   json.array!(@transactions) do |transaction|

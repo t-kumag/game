@@ -9,8 +9,6 @@ WORKDIR $APP_ROOT
 RUN apt-get update && \
     apt-get install -y nodejs \ 
                        mysql-client \
-                       postgresql-client \ 
-                       sqlite3 \
                        --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 

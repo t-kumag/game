@@ -63,15 +63,21 @@ class ApplicationController < ActionController::Base
     authenticate_token || render_unauthorized
   end
 
+  # def token_authenticate    
+  #   authenticate_or_request_with_http_token do |token, options|
+  #     @user = User.token_authenticate!(token)
+  #     @user && DateTime.now <= @user.token_expire
+  #   end
+  # end
+
   def authenticate_token
-    @current_user = Entities::User.find_by_token(bearer_token)
-    return false if @current_user.nil?
-    return true
+    @current_user = Entities::User.token_authenticate!(bearer_token)
+    @current_user && DateTime.now <= @current_user.token_expires_at
   end
 
   def render_unauthorized
     # render_errors(:unauthorized, ['invalid token'])
-    obj = { meta: {error: 'token invalid' }}    
+    obj = {}    
     render json: obj, status: :unauthorized
   end
 
