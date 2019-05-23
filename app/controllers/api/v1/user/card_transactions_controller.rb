@@ -1,7 +1,7 @@
 class Api::V1::User::CardTransactionsController < ApplicationController
     before_action :authenticate
     # TODO(fujiura): before_action で対象口座へのアクセス権があるかチェックする
-    # TODO(fujiura): bank_account_id, transaction_id に対応するデータがないときの処理
+    # TODO(fujiura): card_account_id, transaction_id に対応するデータがないときの処理
     
     def index
         card = Entities::AtUserCardAccount.find(params[:card_account_id])
@@ -29,6 +29,13 @@ class Api::V1::User::CardTransactionsController < ApplicationController
     end
 
     def update
+        transaction = Entities::AtUserCardTransaction.find params[:id]
+	distributed = Entities::UserDistributedTransaction.find_by at_user_card_transaction_id: transaction.id
+	distributed.at_transaction_category_id = params[:at_transaction_category_id]
+	distributed.used_location = params[:used_location]
+	distributed.share = params[:is_shared]
+	distributed.save!
+	# TODO(fujiura): 何を返すべき？
         render 'update', formats: 'json', handlers: 'jbuilder'
     end
 
