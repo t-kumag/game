@@ -1,13 +1,14 @@
-#json.error  'sample'
-
+json.errors []
 json.app do
-  json.amount @response.amount
-  json.category @response.category
-  json.used_date @response.use_date
-  json.payment_type  @response.payment_type
-  json.used_store @response.used_store
-  json.group  @response.group
-  
+  json.amount @response[:amount]
+  json.used_date @response[:used_date]
+  json.used_location @response[:used_location]
+  json.payment_name @response[:payment_name]
+  json.is_shared @response[:is_shared]
+  json.at_transaction_category_id @response[:at_transaction_category_id]
+  json.category_name1 @response[:category_name1]
+  json.category_name2 @response[:category_name2]
+
 # ・メモ
 # 　・表示項目
 # 　　　・入力対象者　：　自分、パートナー
@@ -20,6 +21,4 @@ json.app do
 # ・保存
 # 　・保存をタップすることで、データが更新され、明細画面は閉じられる
 end
-
-# {"tweet": {"text": "テキスト1", "title": "タイトル1"} }
 
