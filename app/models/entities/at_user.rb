@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: at_users
+#
+#  id         :bigint(8)        not null, primary key
+#  user_id    :bigint(8)
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  at_user_id :string(255)
+#
+
 require "securerandom"
 
 class Entities::AtUser < ApplicationRecord
@@ -12,7 +23,7 @@ class Entities::AtUser < ApplicationRecord
 
   def self.create_at_user(user)
     begin
-      at_user = AtUser.new(
+      at_user = self.new(
         {user_id: user.id}
       )
       at_user.password = at_user.generate_at_user_password

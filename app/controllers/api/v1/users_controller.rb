@@ -1,5 +1,18 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate
+  before_action :authenticate, only: [:at_url, :at_sync]
+  def sign_up_params
+    params.permit(:email, :password)
+  end
+
+  def create
+    @user = Entities::User.new()
+    @user.email = sign_up_params[:email]
+    @user.password = sign_up_params[:password]
+    @user.email_authenticated = false
+    @user.reset_token
+    @user.save!
+    render 'create', formats: 'json', handlers: 'jbuilder', status: 200
+  end
 
   def at_url
     @response = Services::AtUserService.new(@current_user).at_url
@@ -7,8 +20,18 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_sync
+    p @current_user
+
+    puts "at_scraping==========1"
+    Services::AtUserService.new(@current_user).exec_scraping
     puts "at_sync=========="
     Services::AtUserService.new(@current_user).sync
+
+    # TODO 仮り実装 user_distributed_transactionsに同期
+    # TODO 手動振り分けの同期が未対応
+    puts "user_distributed_transactions sync=========="
+    Services::UserDistributedTransactionService.new(@current_user).sync
+
     obj = {}
     render json: obj, status: 200
   end

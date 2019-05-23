@@ -1,6 +1,25 @@
+# == Schema Information
+#
+# Table name: at_user_emoney_transactions
+#
+#  id                                :bigint(8)        not null, primary key
+#  at_user_emoney_service_account_id :bigint(8)
+#  used_date                         :date             not null
+#  used_time                         :string(255)
+#  description                       :string(255)
+#  amount_receipt                    :decimal(16, 2)   not null
+#  amount_payment                    :decimal(16, 2)   not null
+#  balance                           :decimal(18, 2)
+#  seq                               :integer          not null
+#  at_transaction_category_id        :bigint(8)        not null
+#  created_at                        :datetime         not null
+#  updated_at                        :datetime         not null
+#  confirm_type                      :string(255)
+#
+
 class Entities::AtUserEmoneyTransaction < ApplicationRecord
   belongs_to :at_emoney_service_account
-
+  has_one :user_distributed_transaction
 
   def amount
     if self.amount_receipt != 0

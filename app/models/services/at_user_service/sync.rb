@@ -94,22 +94,14 @@ class Services::AtUserService::Sync
         src_trans = []
         if res.has_key?(rec_key) && !res[rec_key].blank?
           res[rec_key].each do |i|
+            #TODO: ATからdecimalで返ってくるようになればこの処理は不要
+            i["BALANCE"] = i["BALANCE"].present? ? i["BALANCE"].to_d : 0
 
-            # TODO: category
-            category_id = nil
             at_category_id = i["CATEGORY_ID"]
-            category_name1 = i["CATEGORY_NAME1"]
-            category_name2 = i["CATEGORY_NAME2"]
             if category_map.has_key?(at_category_id)
-              category_id = category_map[at_category_id].id
+              at_transaction_category_id = category_map[at_category_id].id
             else
-              ec = Entities::AtTransactionCategory.new(
-                at_category_id: at_category_id,
-                category_name1: category_name1,
-                category_name2: category_name2)
-              ec.save!
-              category_map[ec.id] = ec
-              category_id = ec.id
+              at_transaction_category_id = 1 #未分類
             end
 
             tran = transaction_entity.new(
@@ -117,7 +109,7 @@ class Services::AtUserService::Sync
               # share: false
             )
             tran[financier_account_type_key] = a.id # at_user_card_account_idとか
-            tran[:at_transaction_category_id] = category_id
+            tran[:at_transaction_category_id] = at_transaction_category_id
             data_column.each do |k, v|
               if v[:opt].blank?
                 tran[k] = i[v[:col]]
