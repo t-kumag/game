@@ -1,11 +1,12 @@
 #json.error  'sample'
 
+json.errors []
 json.app do
-  json.array!(@responses) do |r|
-      json.transaction_id r[:id]
-      json.date r[:date]
-      json.name r[:name]
-      json.amount r[:amount].to_f
-      json.error ""
+  json.array!(@response) do |r|
+      json.amount r[:amount]
+      json.used_date r[:used_date]
+      json.used_location r[:used_location]
+      json.type r[:type]
+      json.transaction_id r[:transaction_id]
   end
 end
