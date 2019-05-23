@@ -32,6 +32,12 @@ class Entities::User < ApplicationRecord
     self.token_expires_at = DateTime.now + 30
   end
 
+  def clear_token
+    self.token = nil
+    self.token_expires_at = nil
+    self.save!
+  end
+
   def self.token_authenticate!(token)
     params = {
       token: token
