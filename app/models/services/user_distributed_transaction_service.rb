@@ -22,11 +22,14 @@ class Services::UserDistributedTransactionService
           user_id: @user.id,
           share: account.share,
           used_date: transaction.trade_date,
+          used_location: transaction.description1,
+          amount: transaction.amount,
+	  at_transaction_category_id: transaction.at_transaction_category_id,
           at_user_bank_transaction_id: transaction.id
         )
       end
       Entities::UserDistributedTransaction.import save_list,
-                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_bank_transaction_id],
+                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_bank_transaction_id, :amount, :at_transaction_category_id, :used_location],
                                                   :validate => false
     end
   end
@@ -40,11 +43,14 @@ class Services::UserDistributedTransactionService
             user_id: @user.id,
             share: account.share,
             used_date: transaction.used_date,
+            used_location: transaction.branch_desc,
+            amount: transaction.amount,
+	    at_transaction_category_id: transaction.at_transaction_category_id,
             at_user_card_transaction_id: transaction.id
         )
       end
       Entities::UserDistributedTransaction.import save_list,
-                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_card_transaction_id],
+                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_card_transaction_id, :amount, :at_transaction_category_id, :used_location],
                                                   :validate => false
     end
   end
@@ -58,11 +64,14 @@ class Services::UserDistributedTransactionService
             user_id: @user.id,
             share: account.share,
             used_date: transaction.used_date,
+            used_location: transaction.description,
+            amount: transaction.amount,
+	    at_transaction_category_id: transaction.at_transaction_category_id,
             at_user_emoney_transaction_id: transaction.id
         )
       end
       Entities::UserDistributedTransaction.import save_list,
-                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_emoney_transaction_id],
+                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_emoney_transaction_id, :amount, :at_transaction_category_id, :used_location],
                                                   :validate => false
     end
   end
