@@ -174,4 +174,36 @@ class Services::PlService
     after_summeries
   end
 
+  def pl_grouped_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+    # PL を大項目ごとに集計し直すため、大項目の一覧を取得
+    grouped_categories = Entities::AtGroupedCategory.all.map { |category|
+      {
+        id: category.id,
+        name: category.category_name,
+      }
+    }
+    summary = []
+    # 小項目ごとの PL 集計結果から、大項目ごとに再集計を行う
+    pl_category_summery(share, from, to).each { |item|
+      # category_name1　が有効なら
+      matched_category = grouped_categories.find { |category| category[:name] === item['category_name1'] }
+      if (matched_category.present?)
+          index = summary.index{ |s| s['at_transaction_category_id'] === matched_category[:id] }
+          if (index.nil?)
+            summary << {
+              'at_transaction_category_id' => matched_category[:id],
+              'category_name1' => matched_category[:name],
+              'category_name2' => nil,
+              'amount_receipt' => 0,
+              'amount_payment' => 0,
+            } 
+            index = summary.size - 1
+          end
+        summary[index]['amount_receipt'] += item['amount_receipt']
+        summary[index]['amount_payment'] += item['amount_payment']
+      end
+    }
+    summary.sort { |a, b| a['at_transaction_category_id'] <=> b['at_transaction_category_id'] }
+  end
+
 end
