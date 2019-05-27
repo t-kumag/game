@@ -41,8 +41,8 @@ class Api::V1::User::TransactionsController < ApplicationController
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
-	transaction_id: t.at_user_bank_transaction_id || t.at_user_card_transaction_id || t.at_user_emoney_transaction_id,
-	type: type(t)
+        transaction_id: t.at_user_bank_transaction_id || t.at_user_card_transaction_id || t.at_user_emoney_transaction_id,
+        type: type(t)
       }
     }
     response
