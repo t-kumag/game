@@ -1,14 +1,32 @@
 #TODO 1日1回のバッチ処理かsidekiqなどの並列処理で使用する
 class Services::UserDistributedTransactionService
-  def initialize(user)
+  def initialize(user, target = 'all')
     @user = user
+    @target = target
   end
 
   # TODO 同じような処理を切り出すか、後の仕様で分けておいたほうが複雑にならないか検討してリファクタする
   def sync
-    sync_at_user_bank_transactions
-    sync_at_user_card_transactions
-    sync_at_user_emoney_transactions
+
+    begin
+      case @target
+      when 'bank'
+        puts "sync to user_distributed_transactions bank========== "
+        sync_at_user_bank_transactions
+      when 'card'
+        puts "sync to user_distributed_transactions card========== "
+        sync_at_user_card_transactions
+      when 'emoney'
+        puts "sync to user_distributed_transactions emoney========== "
+        sync_at_user_emoney_transactions
+      else
+        puts "sync to user_distributed_transactions all========== "
+        sync_at_user_bank_transactions
+        sync_at_user_card_transactions
+        sync_at_user_emoney_transactions
+      end
+    end
+
   end
 
   private

@@ -5,8 +5,9 @@ class Services::AtUserService
   PWD_SALT = "osdrdev"
   ACCOUNT_NAME_PREFIX = "osdrdev"
 
-  def initialize(user)
+  def initialize(user, target = 'all')
     @user = user
+    @target = target
   end
 
   # ATユーザーの登録
@@ -198,16 +199,31 @@ class Services::AtUserService
 
   def exec_scraping
     puts "scraping=========="
+    puts @target
 
     begin
       puts "scraping==========1"
       token = @user.at_user.at_user_tokens.first.token
       puts "scraping=========2"
-      
+
       fnc_ids = []
-      fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
-      fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
-      fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+
+      case @target
+      when 'bank'
+        puts "scraping bank=========="
+        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
+      when 'card'
+        puts "scraping card=========="
+        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
+      when 'emoney'
+        puts "scraping emoney=========="
+        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+      else
+        puts "scraping all=========="
+        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
+        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
+        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+      end
 
       fnc_ids.each do |fnc_id|
         params = {
