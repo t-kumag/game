@@ -7,7 +7,7 @@ class Services::AtUserService
 
   def initialize(user, target = 'all')
     @user = user
-    @target = target
+    @target = target.blank? ? 'all' : target
   end
 
   # ATユーザーの登録

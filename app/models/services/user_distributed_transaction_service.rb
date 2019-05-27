@@ -2,7 +2,7 @@
 class Services::UserDistributedTransactionService
   def initialize(user, target = 'all')
     @user = user
-    @target = target
+    @target = target.blank? ? 'all' : target
   end
 
   # TODO 同じような処理を切り出すか、後の仕様で分けておいたほうが複雑にならないか検討してリファクタする
