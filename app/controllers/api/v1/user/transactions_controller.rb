@@ -4,10 +4,15 @@ class Api::V1::User::TransactionsController < ApplicationController
   def index
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # 指定がなければ当月の月初から月末までのデータを取得
-    from = params[:from] ? Time.parse(params[:from]).beginning_of_day : Time.zone.today.beginning_of_month.beginnig_of_day
+    from = params[:from] ? Time.parse(params[:from]).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
     to = params[:to] ? Time.parse(params[:to]).end_of_day : Time.zone.today.end_of_month.end_of_day
 
-    @transactions = Entities::UserDistributedTransaction.where(user_id: @current_user.id, at_transaction_category_id: params[:category_id], used_date: from..to)
+    # カテゴリーIDが指定されていればそれで抽出、されていなければ全件抽出
+    if params[:category_id].present?
+      @transactions = Entities::UserDistributedTransaction.where(user_id: @current_user.id, at_transaction_category_id: params[:category_id], used_date: from..to)
+    else
+      @transactions = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: from..to)
+    end
     @response = generate_response_from_transactions(@transactions)
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
@@ -20,7 +25,7 @@ class Api::V1::User::TransactionsController < ApplicationController
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # 指定がなければ当月の月初から月末までのデータを取得
-    from = params[:from] ? Time.parse(params[:from]).beginning_of_day : Time.zone.today.beginning_of_month.beginnig_of_day
+    from = params[:from] ? Time.parse(params[:from]).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
     to = params[:to] ? Time.parse(params[:to]).end_of_day : Time.zone.today.end_of_month.end_of_day
 
     @transactions = Entities::UserDistributedTransaction.where(user_id: @current_user.id, at_transaction_category_id: ids, used_date: from..to)
