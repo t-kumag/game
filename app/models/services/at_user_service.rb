@@ -208,6 +208,9 @@ class Services::AtUserService
 
       fnc_ids = []
 
+      # TODO リファクタリング
+      # 負荷対応ため個別に分岐
+      # 証券、保険などが増えると分岐が長くなるので渡されたmodelに対して処理を行うような作りに変える
       case @target
       when 'bank'
         puts "scraping bank=========="
