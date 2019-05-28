@@ -1,4 +1,5 @@
 class Api::V1::AuthController < ApplicationController
+  before_action :authenticate, except: :login
   def login
     puts "login=-====================="
     @user = Entities::User.find_by({email: params[:email]})
@@ -14,6 +15,12 @@ class Api::V1::AuthController < ApplicationController
 
   def authenticate_email
     
+  end
+
+  def logout
+    @current_user.clear_token
+    @current_user = nil
+    render json: {}, status: 200
   end
 
 end
