@@ -18,7 +18,6 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def logout
-    session.delete(:user_id)
     @current_user.clear_token
     @current_user = nil
     render json: {}, status: 200
