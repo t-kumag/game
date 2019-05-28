@@ -8,32 +8,32 @@ class Services::PlService
   def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
       SELECT
-        aubt.at_transaction_category_id,
+        udt.at_transaction_category_id,
         sum(aubt.amount_receipt) as amount_receipt,
         sum(aubt.amount_payment) as amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
         user_distributed_transactions as udt
-      LEFT OUTER JOIN 
+      INNER JOIN
         at_user_bank_transactions as aubt
       ON
         aubt.id = udt.at_user_bank_transaction_id
-      LEFT OUTER JOIN
+      INNER JOIN
         at_transaction_categories as atc
       ON
-        aubt.at_transaction_category_id = atc.id
+        udt.at_transaction_category_id = atc.id
       WHERE
         udt.user_id = #{@user.id}
-      AND 
+      AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
       #{sql_and_group}
-      GROUP BY 
-        aubt.at_transaction_category_id
+      GROUP BY
+        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -42,31 +42,31 @@ class Services::PlService
   def card_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
       SELECT
-        auct.at_transaction_category_id,
+        udt.at_transaction_category_id,
         sum(auct.amount) as amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
         user_distributed_transactions as udt
-      LEFT OUTER JOIN 
+      INNER JOIN
         at_user_card_transactions as auct
       ON
         auct.id = udt.at_user_card_transaction_id
-      LEFT OUTER JOIN
+      INNER JOIN
         at_transaction_categories as atc
       ON
-        auct.at_transaction_category_id = atc.id
+        udt.at_transaction_category_id = atc.id
       WHERE
         udt.user_id = #{@user.id}
-      AND 
+      AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
       #{sql_and_group}
-      GROUP BY 
-        auct.at_transaction_category_id
+      GROUP BY
+        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -75,32 +75,32 @@ class Services::PlService
   def emoney_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
       SELECT
-        auet.at_transaction_category_id,
+        udt.at_transaction_category_id,
         sum(auet.amount_receipt) as amount_receipt,
         sum(auet.amount_payment) as amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
         user_distributed_transactions as udt
-       LEFT OUTER JOIN 
+      INNER JOIN
         at_user_emoney_transactions as auet
       ON
         auet.id = udt.at_user_emoney_transaction_id
-      LEFT OUTER JOIN
+      INNER JOIN
         at_transaction_categories as atc
       ON
-        auet.at_transaction_category_id = atc.id
+        udt.at_transaction_category_id = atc.id
       WHERE
         udt.user_id = #{@user.id}
-      AND 
+      AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
       #{sql_and_group}
-      GROUP BY 
-        auet.at_transaction_category_id
+      GROUP BY
+        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -115,23 +115,23 @@ class Services::PlService
     end
   end
 
-  def pl_category_summery(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
-    pl_bank = bank_category_summary(share, from, to)
+  def pl_category_summery(share, from, to)
+    from = from || Time.zone.today.beginning_of_month
+    to = to || Time.zone.today.end_of_month
 
-    puts pl_bank
+    pl_bank = bank_category_summary(share, from, to)
 
     pl_card = card_category_summary(share, from, to)
 
-    puts pl_card
-
     pl_emoney = emoney_category_summary(share, from, to)
-
-    puts pl_emoney
 
     merge_category_summery(pl_emoney, merge_category_summery(pl_card, pl_bank))
   end
 
   def pl_summery(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+    from = from || Time.zone.today.beginning_of_month
+    to = to || Time.zone.today.end_of_month
+
     pl_category_summery = pl_category_summery(share, from, to)
     pl_summeries = {
         income_amount: 0,
@@ -151,19 +151,26 @@ class Services::PlService
     unless pl.blank? && after_summeries.blank?
       pl.each do |v|
         next if v['at_transaction_category_id'].blank?
+        # after_summeries から同カテゴリのアイテムを抽出
         summery = after_summeries.select {|category_summery|
           next if category_summery.blank? || category_summery['at_transaction_category_id'].blank?
           category_summery['at_transaction_category_id'] == v['at_transaction_category_id']
         }.first
         v['amount_receipt'] ||= 0
         v['amount_payment'] ||= 0
+
+        # after_summeries に同カテゴリのアイテムがなければ即 INSERT し、あれば額のみ足し込み
         if summery.blank?
           after_summeries << v
         else
+          idx = after_summeries.find_index(summery)
+          v['amount_receipt'] ||= 0
           summery['amount_receipt'] ||= 0
           summery['amount_payment'] ||= 0
-          after_summeries[v['at_transaction_category_id']] = {
+          after_summeries[idx] = {
             at_transaction_category_id: v['at_transaction_category_id'],
+            category_name1: v['category_name1'],
+            category_name2: v['category_name2'],
             amount_receipt: v['amount_receipt'] + summery['amount_receipt'],
             amount_payment: v['amount_payment'] + summery['amount_payment']
           }.stringify_keys
@@ -171,10 +178,14 @@ class Services::PlService
       end
     end
     after_summeries.compact! unless after_summeries.blank?
+
     after_summeries
   end
 
-  def pl_grouped_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def pl_grouped_category_summary(share, from, to)
+    from = from || Time.zone.today.beginning_of_month
+    to = to || Time.zone.today.end_of_month
+
     # PL を大項目ごとに集計し直すため、大項目の一覧を取得
     grouped_categories = Entities::AtGroupedCategory.all.map { |category|
       {
@@ -196,7 +207,7 @@ class Services::PlService
               'category_name2' => nil,
               'amount_receipt' => 0,
               'amount_payment' => 0,
-            } 
+            }
             index = summary.size - 1
           end
         summary[index]['amount_receipt'] += item['amount_receipt']
