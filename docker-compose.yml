@@ -14,6 +14,7 @@ services:
       - DB_NAME=dev_osdr_db
       - DB_USER=devusr
       - DB_PWD=pass
+      - TZ=Asia/Tokyo
 
     # production
     #command:  bundle exec rake db:create RAILS_ENV=production
@@ -37,10 +38,12 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: pwd
       MYSQL_USER: devusr
-      MYSQL_PASSWORD: passtoken_expires_at
+      MYSQL_PASSWORD: pass
       MYSQL_DATABASE: dev_osdr_db
+      TZ: "Asia/Tokyo"
     ports:
       - 3307:3306
     volumes:
       - ./tmp/db/mysql_data:/var/lib/mysql # データの永続化
       - ./docker/db/sql:/docker-entrypoint-initdb.d # 初期データ投入
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --innodb-use-native-aio=0
