@@ -1,6 +1,6 @@
 # set lets
 $worker  = 2
-$timeout = 30
+$timeout = 60
 $app_dir = "/home/ec2-user/app/osidori_api/current" #自分のアプリケーション名、currentがつくことに注意。
 $listen  = File.expand_path 'tmp/sockets/unicorn.sock', $app_dir
 $pid     = File.expand_path 'tmp/pids/unicorn.pid', $app_dir

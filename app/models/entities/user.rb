@@ -27,6 +27,8 @@ class Entities::User < ApplicationRecord
   has_one :group, through: :participate_group
   has_one :user_profile
 
+  enum rank: { free: 0, premium: 1 }
+
   def reset_token
     self.token = generate_token
     self.token_expires_at = DateTime.now + 30
@@ -40,7 +42,7 @@ class Entities::User < ApplicationRecord
   end
 
   def generate_token
-    # TODO
+    # TODO　envなどから参照する
     salt = "sjdhp2wys5ga4a2ks"
     time = DateTime.now
     return Digest::SHA256.hexdigest(self.id.to_s + time.to_s + salt)

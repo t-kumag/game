@@ -1,6 +1,9 @@
 class Api::V1::User::CardAccountsController < ApplicationController
     before_action :authenticate
 
+    # TODO 口座登録後に登録するものがあるか確認
+    # TODO 現状はsync処理のみ
+
     def index
       share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
@@ -24,7 +27,8 @@ class Api::V1::User::CardAccountsController < ApplicationController
       end
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
-  
+
+    # TODO 今月の引き落としを計算
     def summary
       share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
