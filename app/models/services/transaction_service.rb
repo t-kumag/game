@@ -1,12 +1,12 @@
 class Services::TransactionService
-  def initialize(user_id, from, to, id)
+  def initialize(user_id, from, to, category_id)
     @user_id = user_id
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # from/to の指定がなければ当月の月初から月末までのデータを取得
     @from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
     @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
-    @id = id
+    @category_id = category_id
   end
 
   def type(transaction)
@@ -40,14 +40,14 @@ class Services::TransactionService
     response
   end
 
-  def list(ids = @id)
+  def list(ids = @category_id)
     transactions = fetch_transactions(@from, @to, ids)
     generate_response_from_transactions transactions
   end
 
   def grouped
-    if @id.present?
-      grouped_category = Entities::AtGroupedCategory.find_by_id @id
+    if @category_id.present?
+      grouped_category = Entities::AtGroupedCategory.find_by_id @category_id
       if (grouped_category.present?)
         categories_in_group = Entities::AtTransactionCategory.where category_name1: grouped_category.category_name
         ids = categories_in_group.pluck(:id)
