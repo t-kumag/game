@@ -16,7 +16,6 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
   def update
     @response = Services::AtEmoneyTransactionService.new.update(params[:id], params[:at_transaction_category_id], params[:used_location], params[:is_shared])
 
-
     # TODO(fujiura): 何を返すべき？
     render 'update', formats: 'json', handlers: 'jbuilder'
   end
