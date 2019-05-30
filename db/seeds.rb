@@ -177,3 +177,10 @@ Entities::PaymentMethod.create(name: 'クレジットカード')
 5.times do
   Entities::BudgetQuestion.create
 end
+
+
+# GoalType
+Entities::GoalType.create(name: '住宅購入/頭金', img_url: 'test.png')
+Entities::GoalType.create(name: '結婚/旅行', img_url: 'test.png')
+
+
