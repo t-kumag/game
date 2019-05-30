@@ -20,6 +20,7 @@ class Services::UserManuallyCreatedTransactionService
   end
 
   def save_user_manually_created(distributed_transaction)
+    #TODO(fujiura): user_distributed_transactions にカラムが増えた際に、それらのカラムも必要があれば同期する
     distributed_transaction.update_attributes(
       user_id: @transaction.user_id,
       group_id: @transaction.group_id,
