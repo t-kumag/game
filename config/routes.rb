@@ -36,7 +36,9 @@ Rails.application.routes.draw do
         get 'pl-summary', :to => 'pl#summary'
         get 'bs-summary', :to => 'bs#summary'
         get 'pl-categories', :to => 'pl#categories'
+        get 'pl-grouped-categories', :to => 'pl#grouped_categories'
         get 'transactions', :to => 'transactions#index'
+        get 'grouped-transactions', :to => 'transactions#grouped_transactions'
          
         resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
         resources :profiles, only: [:create]
@@ -66,6 +68,9 @@ Rails.application.routes.draw do
         get 'pl-summary', :to => 'pl#summary'
         get 'bs-summary', :to => 'bs#summary'
         get 'pl-categories', :to => 'pl#categories'
+        get 'pl-grouped-categories', :to => 'pl#grouped_categories'
+        get 'transactions', :to => 'transactions#index'
+        get 'grouped-transactions', :to => 'transactions#grouped_transactions'
       end
 
       

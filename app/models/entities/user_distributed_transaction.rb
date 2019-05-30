@@ -13,6 +13,9 @@
 #  user_manually_created_transaction_id :bigint(8)
 #  created_at                           :datetime         not null
 #  updated_at                           :datetime         not null
+#  used_location                        :string(255)
+#  amount                               :integer
+#  at_transaction_category_id           :bigint(8)
 #
 
 class Entities::UserDistributedTransaction < ApplicationRecord
