@@ -1,27 +1,23 @@
 class Api::V1::User::BankTransactionsController < ApplicationController
-    before_action :authenticate
+  before_action :authenticate
+  # TODO(fujiura): before_action で対象口座へのアクセス権があるかチェックする
+  # TODO(fujiura): bank_account_id, transaction_id に対応するデータがないときの処理
 
-    def index
-        a = Entities::AtUserBankAccount.find(params[:bank_account_id])
-        @transactions = a.at_user_bank_transactions.order(id: "DESC")
-        render 'list', formats: 'json', handlers: 'jbuilder'
-    end
+  def index
+    @transactions = Services::AtBankTransactionService.new.list(params[:bank_account_id])
+    render 'list', formats: 'json', handlers: 'jbuilder'
+  end
 
-    def show
-        transaction = Entities::AtUserBankTransactions.first(params[:id])
-        @response = {
-            amount: transaction.amount,
-            category: transaction.at_transaction_category_id,
-            used_date: transaction.trade_date,
-            payment_type: 'bank', # TODO enumにする
-            used_store: transaction.description1,
-            group: '',
-        }
-        render 'show', formats: 'json', handlers: 'jbuilder'
-    end
+  def show
+    @response = Services::AtBankTransactionService.new.detail(params[:id], params[:bank_account_id])
+    render 'show', formats: 'json', handlers: 'jbuilder'
+  end
 
-    def update
-        render 'update', formats: 'json', handlers: 'jbuilder'
-    end
+  def update
+    @response = Services::AtBankTransactionService.new.update(params[:id], params[:at_transaction_category_id], params[:used_location], params[:is_shared])
+
+    # TODO(fujiura): 何を返すべき？
+    render 'update', formats: 'json', handlers: 'jbuilder'
+  end
 
 end

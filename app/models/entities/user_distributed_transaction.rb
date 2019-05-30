@@ -13,13 +13,16 @@
 #  user_manually_created_transaction_id :bigint(8)
 #  created_at                           :datetime         not null
 #  updated_at                           :datetime         not null
+#  used_location                        :string(255)
+#  amount                               :integer
+#  at_transaction_category_id           :bigint(8)
 #
 
 class Entities::UserDistributedTransaction < ApplicationRecord
-  belongs_to :user_manually_created_transaction
-  belongs_to :at_user_card_transaction
-  belongs_to :at_user_bank_transaction
-  belongs_to :at_user_emoney_transaction
+  belongs_to :user_manually_created_transaction, optional: true
+  belongs_to :at_user_card_transaction, optional: true
+  belongs_to :at_user_bank_transaction, optional: true
+  belongs_to :at_user_emoney_transaction, optional: true
 
   def user_pl
 

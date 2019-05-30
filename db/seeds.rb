@@ -177,3 +177,25 @@ Entities::PaymentMethod.create(name: 'クレジットカード')
 5.times do
   Entities::BudgetQuestion.create
 end
+
+# at_groupted_categories
+Entities::AtGroupedCategory.create(id:1, category_name: '未分類');
+Entities::AtGroupedCategory.create(id:2, category_name: '食費');
+Entities::AtGroupedCategory.create(id:3, category_name: '交際');
+Entities::AtGroupedCategory.create(id:4, category_name: '日用品');
+Entities::AtGroupedCategory.create(id:5, category_name: '医療');
+Entities::AtGroupedCategory.create(id:6, category_name: '趣味・娯楽');
+Entities::AtGroupedCategory.create(id:7, category_name: '交通');
+Entities::AtGroupedCategory.create(id:8, category_name: '教育');
+Entities::AtGroupedCategory.create(id:9, category_name: '住宅・オフィス');
+Entities::AtGroupedCategory.create(id:10, category_name: '通信費・送料');
+Entities::AtGroupedCategory.create(id:11, category_name: '車');
+Entities::AtGroupedCategory.create(id:12, category_name: '年金・保険料');
+Entities::AtGroupedCategory.create(id:13, category_name: '水道光熱');
+Entities::AtGroupedCategory.create(id:14, category_name: '税金');
+Entities::AtGroupedCategory.create(id:15, category_name: '投資');
+Entities::AtGroupedCategory.create(id:16, category_name: '返済');
+Entities::AtGroupedCategory.create(id:17, category_name: '入金');
+Entities::AtGroupedCategory.create(id:18, category_name: '出金');
+Entities::AtGroupedCategory.create(id:19, category_name: '手数料');
+
