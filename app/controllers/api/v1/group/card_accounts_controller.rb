@@ -25,6 +25,7 @@ class Api::V1::Group::CardAccountsController < ApplicationController
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
+    # TODO 今月の引き落としを計算 shareされているもの
     def summary
       share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?

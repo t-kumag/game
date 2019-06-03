@@ -30,9 +30,17 @@ class Entities::User < ApplicationRecord
   has_secure_password validations: true
   validates :email, presence: true, uniqueness: true
 
+  enum rank: { free: 0, premium: 1 }
+
   def reset_token
     self.token = generate_token
     self.token_expires_at = DateTime.now + 30
+  end
+
+  def clear_token
+    self.token = nil
+    self.token_expires_at = nil
+    self.save!
   end
 
   def self.token_authenticate!(token)
@@ -43,7 +51,7 @@ class Entities::User < ApplicationRecord
   end
 
   def generate_token
-    # TODO
+    # TODO　envなどから参照する
     salt = "sjdhp2wys5ga4a2ks"
     time = DateTime.now
     return Digest::SHA256.hexdigest(self.id.to_s + time.to_s + salt)

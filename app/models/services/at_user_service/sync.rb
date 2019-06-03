@@ -115,6 +115,8 @@ class Services::AtUserService::Sync
                 tran[k] = i[v[:col]]
               elsif  v[:opt] == "time_parse"
                 tran[k] = Time.parse(i[v[:col]])
+              elsif  v[:opt] == "time_parse_with_00:00:00"
+                tran[k] = Time.parse(i[v[:col]] + 'T00:00:00+0900')
               end
             end
             src_trans << tran
@@ -210,7 +212,7 @@ class Services::AtUserService::Sync
         Entities::AtUserCardTransaction,
         {
           branch_desc: {col: "BRANCH_DESC" },
-          used_date: {col: "USED_DATE", opt: "time_parse"  },
+          used_date: {col: "USED_DATE", opt: "time_parse_with_00:00:00"  },
           amount: {col: "AMOUNT" },
           payment_amount: {col: "PAYMENT_AMOUNT" },
           trade_gubun: {col: "TRADE_GUBUN" },
@@ -253,7 +255,7 @@ class Services::AtUserService::Sync
         Entities::AtUserEmoneyServiceAccount,
         Entities::AtUserEmoneyTransaction,
         {
-          used_date: {col: "USED_DATE", opt: "time_parse"  },
+          used_date: {col: "USED_DATE", opt: "time_parse_with_00:00:00"  },
           used_time: {col: "USED_TIME" },
           description: {col: "DESCRIPTION" },
           amount_receipt: {col: "AMOUNT_RECEIPT" },

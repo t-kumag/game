@@ -19,6 +19,7 @@ class Api::V1::Group::BankAccountsController < ApplicationController
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
+  # TODO 目標金額の足しこみが必要
   def summary
     share = false || params[:share]
     if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
