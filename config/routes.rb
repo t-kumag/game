@@ -29,6 +29,8 @@ Rails.application.routes.draw do
           end
         end
 
+        resources :goals, path:'/goals'
+
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
         get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
@@ -61,6 +63,9 @@ Rails.application.routes.draw do
           end
         end
 
+        # TODO goal_settingsの更新
+        resources :goals, path:'/goals'
+
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
         get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
@@ -87,16 +92,6 @@ Rails.application.routes.draw do
       get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'
       get 'user/at-sync', :to => 'users#at_sync'
-
-      namespace :family do
-        resources :savings_goals, :path => '/goals' do
-        end
-      # groups/:id/goals/:id/summarygenerate_pairing_token
-      # groups/:id/goals/:id/settings
-      # groups/:id/goals/:id/savings-amounts
-      # groups/:id/goals/:id/settings/:id/
-    
-      end
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
     end

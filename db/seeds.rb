@@ -178,6 +178,11 @@ Entities::PaymentMethod.create(name: 'クレジットカード')
   Entities::BudgetQuestion.create
 end
 
+
+# GoalType
+Entities::GoalType.create(name: '住宅購入/頭金', img_url: 'test.png')
+Entities::GoalType.create(name: '結婚/旅行', img_url: 'test.png')
+
 # at_groupted_categories
 Entities::AtGroupedCategory.create(id:1, category_name: '未分類');
 Entities::AtGroupedCategory.create(id:2, category_name: '食費');

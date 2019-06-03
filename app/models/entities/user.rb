@@ -13,10 +13,11 @@
 #
 
 class Entities::User < ApplicationRecord
-  has_secure_password validations: true
-  validates :email, presence: true, uniqueness: true
 
   has_one :at_user
+  
+  has_many :user_groups, dependent: :destroy
+  has_many :groups, -> { distinct }, through: :user_groups
   has_many :access_grants, class_name: "Doorkeeper::AccessGrant",
           foreign_key: :resource_owner_id,
           dependent: :delete_all # or :destroy if you need callbacks
@@ -26,6 +27,8 @@ class Entities::User < ApplicationRecord
   has_one :participate_group
   has_one :group, through: :participate_group
   has_one :user_profile
+  has_secure_password validations: true
+  validates :email, presence: true, uniqueness: true
 
   enum rank: { free: 0, premium: 1 }
 
