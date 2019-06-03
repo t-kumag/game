@@ -9,7 +9,7 @@ class Api::V1::User::BankTransactionsController < ApplicationController
   end
 
   def show
-    @response = Services::AtBankTransactionService.new.detail(params[:id], params[:bank_account_id])
+    @response = Services::AtBankTransactionService.new.detail(params[:bank_account_id], params[:id],)
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 

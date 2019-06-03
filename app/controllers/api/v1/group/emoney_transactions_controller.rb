@@ -8,7 +8,7 @@ class Api::V1::Group::EmoneyTransactionsController < ApplicationController
   end
 
   def show
-    @response = Services::AtEmoneyTransactionService.new.detail(params[:id], params[:emoney_account_id])
+    @response = Services::AtEmoneyTransactionService.new.detail(params[:emoney_account_id], params[:id])
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 

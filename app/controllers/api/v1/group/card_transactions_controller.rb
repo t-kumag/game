@@ -8,7 +8,7 @@ class Api::V1::Group::CardTransactionsController < ApplicationController
   end
 
   def show
-    @response = Services::AtCardTransactionService.new.detail(params[:id], params[:card_account_id])
+    @response = Services::AtCardTransactionService.new.detail(params[:card_account_id], params[:id])
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
