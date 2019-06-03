@@ -21,10 +21,8 @@ class Api::V1::Group::GoalsController < ApplicationController
     begin
       goal_type = Entities::GoalType.find(goal_params[:goal_type_id]) unless goal_params[:goal_type_id].nil?
       Entities::Goal.new.transaction do
-        if goal_type
-          goal_params[:name] = goal_type[:name]
-          goal_params[:img_url] = goal_type[:img_url]
-        end
+        goal_params[:name] = goal_type[:name] if goal_params[:name].blank?
+        goal_params[:img_url] = goal_type[:img_url] if goal_params[:img_url].blank?
         goal = Entities::Goal.create!(goal_params)
         goal.goal_settings.create!(get_goal_setting_params)
       end
@@ -37,6 +35,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     render(json: {}, status: 200)
   end
 
+  # TODO 目標編集の仕様確認。内容によって修正対応
   def update
     begin
       Entities::Goal.new.transaction do
