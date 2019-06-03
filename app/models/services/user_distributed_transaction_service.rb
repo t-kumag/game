@@ -50,7 +50,7 @@ class Services::UserDistributedTransactionService
         )
       end
       Entities::UserDistributedTransaction.import save_list,
-                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_bank_transaction_id, :amount],
+                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_bank_transaction_id, :used_location, :amount, :at_transaction_category_id],
                                                   :validate => false
     end
   end
@@ -71,7 +71,7 @@ class Services::UserDistributedTransactionService
         )
       end
       Entities::UserDistributedTransaction.import save_list,
-                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_card_transaction_id, :amount],
+                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_card_transaction_id, :used_location, :amount, :at_transaction_category_id],
                                                   :validate => false
     end
   end
@@ -92,7 +92,7 @@ class Services::UserDistributedTransactionService
         )
       end
       Entities::UserDistributedTransaction.import save_list,
-                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_emoney_transaction_id, :amount],
+                                                  :on_duplicate_key_update => [:user_id, :share, :used_date, :at_user_emoney_transaction_id, :used_location, :amount, :at_transaction_category_id],
                                                   :validate => false
     end
   end
