@@ -23,8 +23,6 @@ class Services::UserManuallyCreatedTransactionService
     #TODO(fujiura): user_distributed_transactions にカラムが増えた際に、それらのカラムも必要があれば同期する
     distributed_transaction.update_attributes(
       user_id: @transaction.user_id,
-      group_id: @transaction.group_id,
-      share: @transaction.share,
       used_date: @transaction.used_date,
       at_user_bank_transaction_id: nil,
       at_user_card_transaction_id: nil,

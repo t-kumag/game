@@ -62,8 +62,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
   def create_user_manually_created
     save_params = params.permit(
-      :group_id,
-      :share,
       :at_transaction_category_id,
       :payment_method_id,
       :used_date,
@@ -79,8 +77,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   def update_user_manually_created
     save_params = params.permit(
       :id,
-      :group_id,
-      :share,
       :at_transaction_category_id,
       :payment_method_id,
       :used_date,
