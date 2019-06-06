@@ -22,11 +22,12 @@ class Services::AtCardTransactionService
     }
   end
 
-  def update(transaction_id, category_id, used_location, is_shared)
+  def update(transaction_id, category_id, used_location, is_shared, group_id)
     transaction = Entities::AtUserCardTransaction.find transaction_id
     distributed = Entities::UserDistributedTransaction.find_by at_user_card_transaction_id: transaction.id
     distributed.at_transaction_category_id = category_id
     distributed.used_location = used_location
+    distributed.group_id = group_id
     distributed.share = is_shared
     distributed.save!
   end
