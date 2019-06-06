@@ -1,4 +1,4 @@
-class Api::V1::Timeline::NoticesController < ApplicationController
+class Api::V1::NoticesController < ApplicationController
   before_action :authenticate, except: :login
 
   def create

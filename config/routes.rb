@@ -12,9 +12,7 @@ Rails.application.routes.draw do
       post 'auth/login', to: 'auth#login'
       delete 'auth/logout', to: 'auth#logout'
 
-      namespace :timeline do
-        resources :notices, :path => '/notices', :only => [:index, :create, :show] do
-        end
+      resources :notices, :path => '/notices', :only => [:index, :create, :show] do
       end
 
       # 個人用
