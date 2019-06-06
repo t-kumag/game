@@ -7,10 +7,13 @@ Rails.application.routes.draw do
   # end
 
   # get "/", to: static("index.html")
-  namespace :api, format: 'json'  do
+  namespace :api, format: 'json' do
     namespace :v1 do
       post 'auth/login', to: 'auth#login'
       delete 'auth/logout', to: 'auth#logout'
+
+      resources :notices, :path => '/notices', :only => [:index, :create, :show] do
+      end
 
       # 個人用
       namespace :user do
@@ -18,18 +21,18 @@ Rails.application.routes.draw do
           resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
-    
+
         resources :card_accounts, :path => '/card-accounts', :only => [:index] do
           resources :card_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
-    
+
         resources :emoney_accounts, :path => '/emoney-accounts', :only => [:index] do
           resources :emoney_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
 
-        resources :goals, path:'/goals'
+        resources :goals, path: '/goals'
 
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
@@ -41,7 +44,7 @@ Rails.application.routes.draw do
         get 'pl-grouped-categories', :to => 'pl#grouped_categories'
         get 'transactions', :to => 'transactions#index'
         get 'grouped-transactions', :to => 'transactions#grouped_transactions'
-         
+
         resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
         resources :profiles, only: [:create]
       end
@@ -64,7 +67,7 @@ Rails.application.routes.draw do
         end
 
         # TODO goal_settingsの更新
-        resources :goals, path:'/goals'
+        resources :goals, path: '/goals'
 
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
@@ -78,7 +81,7 @@ Rails.application.routes.draw do
         get 'grouped-transactions', :to => 'transactions#grouped_transactions'
       end
 
-      
+
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
         collection do
           get :generate_pairing_token
