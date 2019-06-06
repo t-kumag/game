@@ -57,26 +57,26 @@ module AtAPIRequest
     #   at_user_id: "",
     #   at_user_password: "",
     # }
-    class GetToken
+    class GetToken < AtAPIRequest::Request
       def initialize(params)
         @path = "/opentoknr001.jct"
         @method = HttpMethod::GET
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
-          "USER_ID" => params[:at_user_id],
+          "USER_ID" => "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}",
           # "USER_PW" => params[:at_user_password],
         }
       end
     end
 
     # 有効な場合は有効期限が延長される
-    class GetTokenStatus
+    class GetTokenStatus < AtAPIRequest::Request
       def initialize(params)
         @path = "/opentoknr002.jct"
         @method = HttpMethod::GET
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
-          "USER_ID" => params[:at_user_id],
+          "USER_ID" => "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}",
           "TOKEN_KEY" => params[:token],
         }
       end

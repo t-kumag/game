@@ -92,6 +92,7 @@ Rails.application.routes.draw do
       get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'
       get 'user/at-sync', :to => 'users#at_sync'
+      get 'user/at-token', :to => 'users#at_token'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
     end
