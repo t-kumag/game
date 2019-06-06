@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate, only: [:at_url, :at_sync]
+  before_action :authenticate, only: [:at_url, :at_sync, :at_token]
   def sign_up_params
     params.permit(:email, :password)
   end
@@ -32,6 +32,11 @@ class Api::V1::UsersController < ApplicationController
 
     obj = {}
     render json: obj, status: 200
+  end
+
+  def at_token
+    @response = Services::AtUserService.new(@current_user).token
+    render 'at_token', formats: 'json', handlers: 'jbuilder'
   end
 
 end
