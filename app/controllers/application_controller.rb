@@ -6,12 +6,14 @@ class ApplicationController < ActionController::Base
   # before_filter :set_api_version
 
   # 例外ハンドル
-  # unless Rails.env.development?
+  unless Rails.env.development?
   #     rescue_from ActiveRecord::RecordNotFound, with: :render_404
+        rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
+        rescue_from AtAPIStandardError, with: :render_at_api_error
   #     rescue_from ActionController::RoutingError, with: :render_404
   #     rescue_from ActionView::MissingTemplate, with: :render_404
   #     rescue_from Exception, with: :render_500
-  # end
+  end
 
   # def set_api_version
   #     @api_version = request.path_info[5,2]
@@ -19,6 +21,21 @@ class ApplicationController < ActionController::Base
 
   def routing_error
     raise ActionController::RoutingError.new(params[:path])
+  end
+
+  def render_record_invalid(e = nil)
+    @errors = []
+    resource_name = e.record.class.to_s.split("::").last
+    e.record.errors.details.each{ |key, detail|
+      detail.each { |value|
+        @errors << {
+          resource: resource_name,
+          field: key,
+          code: value[:error],
+        }
+      }
+    }
+    render 'api/v1/errors/record_invalid', formats: 'json', handlers: 'jbuilder'
   end
 
   # def append_info_to_payload(payload)
