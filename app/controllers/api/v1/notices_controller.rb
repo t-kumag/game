@@ -29,7 +29,7 @@ class Api::V1::NoticesController < ApplicationController
 
   def show
     @notice = Entities::Notice.find_by(params[:id])
-    render 'show', formats: 'html'
+    render 'show', formats: 'html', handlers: 'jbuilder'
   end
 
   def index

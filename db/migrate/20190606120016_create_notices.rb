@@ -4,6 +4,7 @@ class CreateNotices < ActiveRecord::Migration[5.2]
       t.string :title, null: false
       t.date :date, null: false
       t.string :description, null: false
+      t.string :url, null: false
       t.timestamps
     end
   end

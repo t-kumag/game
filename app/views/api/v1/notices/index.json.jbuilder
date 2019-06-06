@@ -7,6 +7,6 @@ json.notices do
     json.id n[:id]
     json.title n[:title]
     json.date n[:date]
-    json.url "https://beta2.osidori-dev.com/api/v1/timeline/notices/" + n[:id].to_s
+    json.url n[:url]
   end
 end
