@@ -8,8 +8,8 @@ class ApplicationController < ActionController::Base
   # 例外ハンドル
   unless Rails.env.development?
   #     rescue_from ActiveRecord::RecordNotFound, with: :render_404
-        rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
-        rescue_from AtAPIStandardError, with: :render_at_api_error
+      rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
+      rescue_from AtAPIStandardError, with: :render_at_api_error
   #     rescue_from ActionController::RoutingError, with: :render_404
   #     rescue_from ActionView::MissingTemplate, with: :render_404
   #     rescue_from Exception, with: :render_500
@@ -35,7 +35,7 @@ class ApplicationController < ActionController::Base
         }
       }
     }
-    render 'api/v1/errors/record_invalid', formats: 'json', handlers: 'jbuilder'
+    render 'api/v1/errors/record_invalid', formats: 'json', handlers: 'jbuilder', status: 400 and return
   end
 
   def render_at_api_error(e = nil)
@@ -45,7 +45,7 @@ class ApplicationController < ActionController::Base
         message: e.message,
       }
     ]
-    render 'api/v1/errors/at_api_error', formats: 'json', handlers: 'jbuilder'
+    render 'api/v1/errors/at_api_error', formats: 'json', handlers: 'jbuilder', status: 200 and return
   end
 
 
