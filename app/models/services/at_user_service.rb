@@ -141,8 +141,6 @@ class Services::AtUserService
 
   # 金融データ登録情報照会
   def accounts
-
-    begin
     api_name = "/openfincr003.jct"
     
     params = {
