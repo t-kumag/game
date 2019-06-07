@@ -38,6 +38,17 @@ class ApplicationController < ActionController::Base
     render 'api/v1/errors/record_invalid', formats: 'json', handlers: 'jbuilder'
   end
 
+  def render_at_api_error(e = nil)
+    @errors = [
+      {
+        code: e.code,
+        message: e.message,
+      }
+    ]
+    render 'api/v1/errors/at_api_error', formats: 'json', handlers: 'jbuilder'
+  end
+
+
   # def append_info_to_payload(payload)
   #   super
   #   payload[:user_id] = current_user.try(:id).try(:presence)

@@ -40,9 +40,9 @@ class Services::AtUserService
       at_user_token.save!
       at_user.at_user_tokens << at_user_token
     rescue AtAPIStandardError => api_err
-      p api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
-      p db_err
+      raise db_err
     rescue => exception
       p exception
     end
@@ -103,11 +103,9 @@ class Services::AtUserService
       })
       at_user_token.save!
     rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
+      raise db_err
     rescue => exception
       p "exception===================="
       p exception
@@ -133,8 +131,9 @@ class Services::AtUserService
         return false
       end
     rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
+      raise api_err
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
     rescue => exception
       p "exception===================="
       p exception
@@ -144,6 +143,7 @@ class Services::AtUserService
   # 金融データ登録情報照会
   def accounts
 
+    begin
     api_name = "/openfincr003.jct"
     
     params = {
@@ -236,13 +236,10 @@ class Services::AtUserService
         requester = AtAPIRequest::AtUser::ExecScraping.new(params)
         res = AtAPIClient.new(requester).request
       end
-
     rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
+      raise db_err
     rescue => exception
       p "exception===================="
       p exception
