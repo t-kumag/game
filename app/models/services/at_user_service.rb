@@ -8,6 +8,7 @@ class Services::AtUserService
   def initialize(user, target = 'all')
     @user = user
     @target = target.blank? ? 'all' : target
+    token
   end
 
   # ATユーザーの登録
@@ -88,20 +89,19 @@ class Services::AtUserService
 
   # トークンを取得、叩くごとにtokenが更新される
   def token
-
+    p "token===================="
     begin
       params = {
-        at_user_id: @user.at_user.id
+          at_user_id: @user.at_user.at_user_id
       }
       requester = AtAPIRequest::AtUser::GetToken.new(params)
       res = AtAPIClient.new(requester).request
-
-      token = res["TOKEN_KEY"]
-      at_user_token = Entities::AtUserToken.new({
-          at_user_id: @user.at_user.id,
-          token: token
-      })
-      at_user_token.save!
+      p res
+      params = {
+          token: res["TOKEN_KEY"],
+          expires_at: res["EXPI_DT"]
+      }
+      Entities::AtUserToken.first.update!(params)
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
@@ -110,8 +110,7 @@ class Services::AtUserService
       p "exception===================="
       p exception
     end
-
-    return token
+    params
   end
 
   # 有効な場合は有効期限が延長される
