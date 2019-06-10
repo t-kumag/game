@@ -5,13 +5,27 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def create
+
     @user = Entities::User.new()
     @user.email = sign_up_params[:email]
     @user.password = sign_up_params[:password]
     @user.email_authenticated = false
     @user.reset_token
     @user.save!
+    MailDelivery.user_registration(@user).deliver
+
     render 'create', formats: 'json', handlers: 'jbuilder', status: 200
+
+  end
+
+  def activate
+    user = Entities::User.where(token: params[:token]).first
+    return render_forbidden if user.blank?
+    user.reset_token
+    user.email_authenticated = true
+    user.save!
+    @response =  user
+    render 'activate', formats: 'json', handlers: 'jbuilder', status: 200
   end
 
   def at_url

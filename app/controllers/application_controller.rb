@@ -87,8 +87,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
   def authenticate
     authenticate_token || render_unauthorized
+    activated?
   end
 
   # def token_authenticate    
@@ -98,9 +100,18 @@ class ApplicationController < ActionController::Base
   #   end
   # end
 
+  def activated?
+    return if @current_user.email_authenticated
+    render_forbidden
+  end
+
   def authenticate_token
     @current_user = Entities::User.token_authenticate!(bearer_token)
     @current_user && DateTime.now <= @current_user.token_expires_at
+  end
+
+  def render_forbidden
+    render json: {}, status: :forbidden
   end
 
   def render_unauthorized

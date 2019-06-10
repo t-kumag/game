@@ -96,6 +96,7 @@ Rails.application.routes.draw do
       get 'user/at-url', :to => 'users#at_url'
       get 'user/at-sync', :to => 'users#at_sync'
       get 'user/at-token', :to => 'users#at_token'
+      get 'user/activate', :to => 'users#activate'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
     end
