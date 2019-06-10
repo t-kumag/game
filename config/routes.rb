@@ -14,6 +14,8 @@ Rails.application.routes.draw do
 
       resources :notices, :path => '/notices', :only => [:index, :create, :show] do
       end
+      resources :activities, :path => '/activities', :only => [:index] do
+      end
 
       # 個人用
       namespace :user do
