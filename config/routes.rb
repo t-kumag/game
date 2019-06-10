@@ -12,7 +12,7 @@ Rails.application.routes.draw do
       post 'auth/login', to: 'auth#login'
       delete 'auth/logout', to: 'auth#logout'
 
-      resources :notices, :path => '/notices', :only => [:index, :create, :show] do
+      resources :notices, :path => '/notices', :only => [:index, :create] do
       end
 
       # 個人用
