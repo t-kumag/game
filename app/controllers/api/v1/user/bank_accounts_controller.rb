@@ -42,5 +42,14 @@ class Api::V1::User::BankAccountsController < ApplicationController
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
 
+  def destroy
+    at_user_bank_account_id = params[:id].to_i
+    if @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id).include?(at_user_bank_account_id)
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_id)
+      Entities::AtUserBankAccount.find(params[:id]).destroy
+    end
+    render json: {}, status: 200
+  end
+
 end
 
