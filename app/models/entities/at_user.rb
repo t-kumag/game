@@ -37,7 +37,9 @@ class Entities::AtUser < ApplicationRecord
       res = AtAPIClient.new(requester).request
       return at_user
     rescue AtAPIStandardError => api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
     rescue => exception
     end
   end
