@@ -24,6 +24,7 @@
 #
 
 class Entities::AtUserCardAccount < ApplicationRecord
+  acts_as_paranoid # 論理削除
   belongs_to :at_user
   belongs_to :at_card
   has_many :at_user_card_transactions
