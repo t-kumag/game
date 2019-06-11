@@ -91,6 +91,8 @@ gem 'capistrano3-puma' # pumaを使う場合はこれも必要
 gem 'activerecord-import'
 gem 'kaminari'
 
+# paranoia 論理削除
+gem 'paranoia'
 
 
 

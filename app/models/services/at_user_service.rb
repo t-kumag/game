@@ -180,6 +180,20 @@ class Services::AtUserService
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
 
+  def delete_account(model, id)
+    begin
+      account = model.find(id)
+      params = {}
+      if account
+        params[:token] = @user.at_user.token
+        params[:fnc_id] = account.fnc_id
+        request  = AtAPIRequest::AtUser::DeleteAccount.new(params)
+        AtAPIClient.new(request).request
+      end
+      model.find(id).destroy
+    end
+  end
+
   # ATサービスのDBに保存されている取引明細を照会します
   def transactions
     api_name = "/openscher002.jct"
