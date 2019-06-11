@@ -87,6 +87,7 @@ Rails.application.routes.draw do
           get :generate_pairing_token
           post :receive_pairing_request
           post :confirm_pairing_request
+          post :cancel_pairing
         end
       end
 
