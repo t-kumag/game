@@ -53,7 +53,6 @@ class Api::V1::User::CardAccountsController < ApplicationController
       account_id = params[:id].to_i
       if @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id).include?(account_id)
         Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, account_id)
-        Entities::AtUserCardAccount.find(params[:id]).destroy
       end
       render json: {}, status: 200
     end

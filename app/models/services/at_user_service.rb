@@ -192,6 +192,7 @@ class Services::AtUserService
         request  = AtAPIRequest::AtUser::DeleteAccount.new(params)
         AtAPIClient.new(request).request
       end
+      model.find(id).destroy
     end
   end
 
