@@ -145,7 +145,17 @@ module AtAPIRequest
       end
     end
 
+    # 金融機関削除
+    class DeleteAccount < AtAPIRequest::Request
+      def initialize(params)
+        @path = "/openfincd001.jct"
+        @method = HttpMethod::GET
+        @params = {
+            "TOKEN_KEY" => params[:token],
+            "FNC_ID" => params[:fnc_id]
+        }
+      end
+    end
 
-    				
   end
 end

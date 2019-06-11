@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: 'from@example.com'
-  layout 'mailer'
+  #TODO 正式なものがきまったら差し替える
+  default from: 'info@osidori.co'
 end
