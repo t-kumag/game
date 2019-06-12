@@ -47,13 +47,15 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)
         account = Entities::AtUserEmoneyServiceAccount.find account_id
         account.update!(get_account_params)
+        render json: {}, status: 200
+      else
+        render json: {errors: [{code: "forbidden"}]}, status: 200
       end
-      render json: {}, status: 200
     end
 
     def get_account_params
       {
-        group_id: params[:group_id] || @current_user.group_id,
+        group_id: @current_user.group_id,
         share: params[:share],
       }
     end
