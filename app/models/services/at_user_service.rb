@@ -41,9 +41,9 @@ class Services::AtUserService
       at_user_token.save!
       at_user.at_user_tokens << at_user_token
     rescue AtAPIStandardError => api_err
-      p api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
-      p db_err
+      raise db_err
     rescue => exception
       p exception
     end
@@ -103,11 +103,9 @@ class Services::AtUserService
       }
       Entities::AtUserToken.first.update!(params)
     rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
+      raise db_err
     rescue => exception
       p "exception===================="
       p exception
@@ -132,8 +130,9 @@ class Services::AtUserService
         return false
       end
     rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
+      raise api_err
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
     rescue => exception
       p "exception===================="
       p exception
@@ -142,7 +141,6 @@ class Services::AtUserService
 
   # 金融データ登録情報照会
   def accounts
-
     api_name = "/openfincr003.jct"
     
     params = {
@@ -180,6 +178,20 @@ class Services::AtUserService
     # "API_DATA_REC":null,"INSURANCE_REC_CNT":"0","TRAF_REC_CNT":"0","SHOP_REC_CNT":"0","POINT_REC_CNT":"0","INSURANCE_DATA_REC":[],"STOCK_DATA_REC":[],"RSLT_CD":"00000000","ETC_REC_CNT":"0","ETC_DATA_REC":[],"TEL_DATA_REC":[],"POINT_DATA_REC":[],"TEL_REC_CNT":"0","CARD_REC_CNT":"1","BANK_DATA_REC":[],"RSLT_MSG":"正常","DEBIT_REC_CNT":null,"STOCK_REC_CNT":"0","DEBIT_DATA_REC":null,"TRAF_DATA_REC":[],"SHOP_DATA_REC":[]}
 
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
+  end
+
+  def delete_account(model, id)
+    begin
+      account = model.find(id)
+      params = {}
+      if account
+        params[:token] = @user.at_user.token
+        params[:fnc_id] = account.fnc_id
+        request  = AtAPIRequest::AtUser::DeleteAccount.new(params)
+        AtAPIClient.new(request).request
+      end
+      model.find(id).destroy
+    end
   end
 
   # ATサービスのDBに保存されている取引明細を照会します
@@ -235,13 +247,10 @@ class Services::AtUserService
         requester = AtAPIRequest::AtUser::ExecScraping.new(params)
         res = AtAPIClient.new(requester).request
       end
-
     rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
+      raise db_err
     rescue => exception
       p "exception===================="
       p exception

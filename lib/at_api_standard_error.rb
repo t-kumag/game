@@ -35,6 +35,7 @@ class AtAPIStandardError < StandardError
 
   def initialize(error_code, message)
     @code = error_code
+    @message = message
     super("[#{error_code}] - #{message}")
   end
 
@@ -49,4 +50,6 @@ class AtAPIStandardError < StandardError
   def self.error_message(error_code)
     self::ERRORS[error_code]
   end  
+
+  attr_reader :code, :message
 end

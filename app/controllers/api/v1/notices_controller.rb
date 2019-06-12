@@ -7,13 +7,13 @@ class Api::V1::NoticesController < ApplicationController
     begin
       if params[:title].present? &&
           params[:date].present? &&
-          params[:description].present?
+          params[:url].present?
 
         Entities::Notice.new.transaction do
           Entities::Notice.new(
               title: params[:title],
               date: params[:date],
-              description: params[:description],
+              url: params[:url],
           ).save!
         end
       end
@@ -27,13 +27,8 @@ class Api::V1::NoticesController < ApplicationController
     render json: {}, status: 200
   end
 
-  def show
-    @notice = Entities::Notice.find_by(params[:id])
-    render 'show', formats: 'html', handlers: 'jbuilder'
-  end
-
   def index
-    @notices = Entities::Notice.all
+    @notices = Entities::Notice.all.order(created_at: "DESC")
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
 

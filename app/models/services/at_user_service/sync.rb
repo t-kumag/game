@@ -125,11 +125,9 @@ class Services::AtUserService::Sync
         transaction_entity.import src_trans, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
       end
     rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
+      raise db_err
     rescue => exception
       p "exception===================="
       p exception
@@ -267,11 +265,9 @@ class Services::AtUserService::Sync
       )
 
     rescue AtAPIStandardError => api_err
-      p "api_err===================="
-      p api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
-      p "db_err===================="
-      p db_err
+      raise db_err
     rescue => exception
       p "exception===================="
       p exception

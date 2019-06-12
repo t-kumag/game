@@ -12,24 +12,24 @@ Rails.application.routes.draw do
       post 'auth/login', to: 'auth#login'
       delete 'auth/logout', to: 'auth#logout'
 
-      resources :notices, :path => '/notices', :only => [:index, :create, :show] do
+      resources :notices, :path => '/notices', :only => [:index, :create] do
       end
       resources :activities, :path => '/activities', :only => [:index] do
       end
 
       # 個人用
       namespace :user do
-        resources :bank_accounts, :path => '/bank-accounts', :only => [:index] do
+        resources :bank_accounts, :path => '/bank-accounts', :only => [:index, :destroy] do
           resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
 
-        resources :card_accounts, :path => '/card-accounts', :only => [:index] do
+        resources :card_accounts, :path => '/card-accounts', :only => [:index, :destroy] do
           resources :card_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
 
-        resources :emoney_accounts, :path => '/emoney-accounts', :only => [:index] do
+        resources :emoney_accounts, :path => '/emoney-accounts', :only => [:index, :destroy] do
           resources :emoney_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
@@ -98,6 +98,7 @@ Rails.application.routes.draw do
       get 'user/at-url', :to => 'users#at_url'
       get 'user/at-sync', :to => 'users#at_sync'
       get 'user/at-token', :to => 'users#at_token'
+      get 'user/activate', :to => 'users#activate'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
     end
