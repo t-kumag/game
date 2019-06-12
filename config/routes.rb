@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
       resources :notices, :path => '/notices', :only => [:index, :create, :show] do
       end
-      resources :activities, :path => '/activities', :only => [:index] do
+      resources :activities, :path => '/activities', :only => [:index, :create] do
       end
 
       # 個人用

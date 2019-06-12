@@ -13,6 +13,10 @@
 ActiveRecord::Schema.define(version: 2019_06_10_100000) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "partner_user_id"
+    t.string "activity_type", null: false
+    t.date "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -277,6 +281,7 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
     t.string "title", null: false
     t.date "date", null: false
     t.string "description", null: false
+    t.string "url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -320,14 +325,6 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
 
   create_table "payment_methods", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "timeline_notices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.string "title", null: false
-    t.date "date", null: false
-    t.string "description", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
