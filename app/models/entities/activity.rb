@@ -1,7 +1,7 @@
 class Entities::Activity < ApplicationRecord
 
   #個人支出(銀行)
-  def self.add_bank_outcome_individual(date, user_id, count)
+  def self.add_bank_outcome_individual(date, user_id, count = 1)
     self.new(
         user_id: user_id,
         date: date,
@@ -11,7 +11,7 @@ class Entities::Activity < ApplicationRecord
   end
 
   #個人支出(カード)
-  def self.add_card_outcome_individual(date, user_id, count)
+  def self.add_card_outcome_individual(date, user_id, count = 1)
     self.new.transaction do
       self.new(
           user_id: user_id,
@@ -23,7 +23,7 @@ class Entities::Activity < ApplicationRecord
   end
 
   #個人支出(電子マネー)
-  def self.add_emoney_outcome_individual(date, user_id, count)
+  def self.add_emoney_outcome_individual(date, user_id, count = 1)
     self.new.transaction do
       self.new(
           user_id: user_id,
@@ -35,7 +35,7 @@ class Entities::Activity < ApplicationRecord
   end
 
   #夫婦支出(銀行)
-  def self.add_bank_outcome_partner(date, user_id, partner_user_id, count)
+  def self.add_bank_outcome_partner(date, user_id, partner_user_id, count = 1)
     self.new.transaction do
       self.new(
           user_id: user_id,
@@ -48,7 +48,7 @@ class Entities::Activity < ApplicationRecord
   end
 
   #夫婦支出(カード)
-  def self.add_card_outcome_partner(date, user_id, partner_user_id, count)
+  def self.add_card_outcome_partner(date, user_id, partner_user_id, count = 1)
     self.new.transaction do
       self.new(
           user_id: user_id,
@@ -61,7 +61,7 @@ class Entities::Activity < ApplicationRecord
   end
 
   #夫婦支出(電子マネー)
-  def self.add_emoney_outcome_partner(date, user_id, partner_user_id, count)
+  def self.add_emoney_outcome_partner(date, user_id, partner_user_id, count = 1)
     self.new.transaction do
       self.new(
           user_id: user_id,
