@@ -1,67 +1,73 @@
 class Entities::Activity < ApplicationRecord
 
   #個人支出(銀行)
-  def self.add_bank_outcome_individual(date, user_id)
+  def self.add_bank_outcome_individual(date, user_id, count)
     self.new(
         user_id: user_id,
         date: date,
+        count: count,
         activity_type: :individual_bank_outcome,
     ).save!
   end
 
   #個人支出(カード)
-  def self.add_card_outcome_individual(date, user_id)
+  def self.add_card_outcome_individual(date, user_id, count)
     self.new.transaction do
       self.new(
           user_id: user_id,
           date: date,
+          count: count,
           activity_type: :individual_card_outcome,
       ).save!
     end
   end
 
   #個人支出(電子マネー)
-  def self.add_emoney_outcome_individual(date, user_id)
+  def self.add_emoney_outcome_individual(date, user_id, count)
     self.new.transaction do
       self.new(
           user_id: user_id,
           date: date,
+          count: count,
           activity_type: :individual_emoney_outcome,
       ).save!
     end
   end
 
   #夫婦支出(銀行)
-  def self.add_bank_outcome_partner(date, user_id, partner_user_id)
+  def self.add_bank_outcome_partner(date, user_id, partner_user_id, count)
     self.new.transaction do
       self.new(
           user_id: user_id,
           partner_user_id: partner_user_id,
           date: date,
+          count: count,
           activity_type: :partner_bank_outcome,
       ).save!
     end
   end
 
   #夫婦支出(カード)
-  def self.add_card_outcome_partner(date, user_id, partner_user_id)
+  def self.add_card_outcome_partner(date, user_id, partner_user_id, count)
     self.new.transaction do
       self.new(
           user_id: user_id,
           partner_user_id: partner_user_id,
           date: date,
+          count: count,
           activity_type: :partner_card_outcome,
       ).save!
     end
   end
 
   #夫婦支出(電子マネー)
-  def self.add_emoney_outcome_partner(date, user_id, partner_user_id)
+  def self.add_emoney_outcome_partner(date, user_id, partner_user_id, count)
     self.new.transaction do
       self.new(
           user_id: user_id,
           partner_user_id: partner_user_id,
           date: date,
+          count: count,
           activity_type: :partner_emoney_outcome,
       ).save!
     end
@@ -81,51 +87,37 @@ class Entities::Activity < ApplicationRecord
     # TODO:　　→　明細詳細画面遷移
     # TODO:・目標の設定
 
-    daysMap = {}
+    @result = []
     own_activities = where(user_id: own_user_id).or(where(partner_user_id: own_user_id)).order(created_at: "DESC")
     own_activities.each {|a|
       dayStr = a.created_at.strftime('%Y-%m-%d')
-      unless daysMap[dayStr]
-        daysMap[dayStr] = [a]
-      else
-        daysMap[dayStr].push(a)
+      message = ""
+      case a.activity_type
+      when "individual_bank_outcome"
+        #message = "銀行口座の支出が" + a.count.to_s + "件あります。"
+        message = "銀行口座の支出があります。"
+      when "individual_card_outcome"
+        #message = "クレジットカードの支出が" + a.count.to_s + "件あります。"
+        message = "クレジットカードの支出があります。"
+      when "individual_emoney_outcome"
+        #message = "電子マネーの支出が" + a.count.to_s + "件あります。"
+        message = "電子マネーの支出があります。"
+      when "partner_bank_outcome"
+        #message = "夫婦の銀行口座の支出が" + a.count.to_s + "件あります。"
+        message = "夫婦の銀行口座の支出があります。"
+      when "partner_card_outcome"
+        #message = "夫婦のクレジットカードの支出が" + a.count.to_s + "件あります。"
+        message = "夫婦のクレジットカードの支出があります。"
+      when "partner_emoney_outcome"
+        #message = "夫婦の電子マネーの支出が" + a.count.to_s + "件あります。"
+        message = "夫婦の電子マネーの支出があります。"
       end
+      @result.push({
+                       "day": dayStr,
+                       "type": a.activity_type,
+                       "message": message})
     }
-    @result = []
-
-    daysMap.each {|key, value|
-      out_b_count = 0
-      out_c_count = 0
-      out_e_count = 0
-      out_p_b_count = 0
-      out_p_c_count = 0
-      out_p_e_count = 0
-      value.each {|t|
-        case
-        when :individual_bank_outcome
-          out_b_count += 1
-        when :individual_card_outcome
-          out_c_count += 1
-        when :individual_emoney_outcome
-          out_c_count += 1
-        when :partner_bank_outcome
-          out_p_b_count += 1
-        when :partner_card_outcome
-          out_p_c_count += 1
-        when :partner_emoney_outcome
-          out_p_e_count += 1
-        end
-      }
-      @result.push({"day": key, "type": :individual_bank_outcome, "count": out_b_count}) if out_b_count > 0
-      @result.push({"day": key, "type": :individual_card_outcome, "count": out_c_count}) if out_c_count > 0
-      @result.push({"day": key, "type": :individual_emoney_outcome, "count": out_e_count}) if out_e_count > 0
-      @result.push({"day": key, "type": :partner_bank_outcome, "count": out_p_b_count}) if out_p_b_count > 0
-      @result.push({"day": key, "type": :partner_card_outcome, "count": out_p_c_count}) if out_p_c_count > 0
-      @result.push({"day": key, "type": :partner_emoney_outcome, "count": out_p_e_count}) if out_p_e_count > 0
-    }
-
-    pp @result
-
+    @result
   end
 
 end

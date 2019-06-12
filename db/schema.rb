@@ -15,6 +15,7 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "partner_user_id"
+    t.integer "count", null: false
     t.string "activity_type", null: false
     t.date "date", null: false
     t.datetime "created_at", null: false
