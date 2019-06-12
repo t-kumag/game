@@ -35,11 +35,11 @@ class Entities::Activity < ApplicationRecord
   end
 
   #夫婦支出(銀行)
-  def self.add_bank_outcome_partner(date, user_id, partner_user_id, count = 1)
+  def self.add_bank_outcome_partner(date, user_id, group_id, count = 1)
     self.new.transaction do
       self.new(
           user_id: user_id,
-          partner_user_id: partner_user_id,
+          group_id: group_id,
           date: date,
           count: count,
           activity_type: :partner_bank_outcome,
@@ -48,11 +48,11 @@ class Entities::Activity < ApplicationRecord
   end
 
   #夫婦支出(カード)
-  def self.add_card_outcome_partner(date, user_id, partner_user_id, count = 1)
+  def self.add_card_outcome_partner(date, user_id, group_id, count = 1)
     self.new.transaction do
       self.new(
           user_id: user_id,
-          partner_user_id: partner_user_id,
+          group_id: group_id,
           date: date,
           count: count,
           activity_type: :partner_card_outcome,
@@ -61,11 +61,11 @@ class Entities::Activity < ApplicationRecord
   end
 
   #夫婦支出(電子マネー)
-  def self.add_emoney_outcome_partner(date, user_id, partner_user_id, count = 1)
+  def self.add_emoney_outcome_partner(date, user_id, group_id, count = 1)
     self.new.transaction do
       self.new(
           user_id: user_id,
-          partner_user_id: partner_user_id,
+          group_id: group_id,
           date: date,
           count: count,
           activity_type: :partner_emoney_outcome,
@@ -88,7 +88,7 @@ class Entities::Activity < ApplicationRecord
     # TODO:・目標の設定
 
     @result = []
-    own_activities = where(user_id: own_user_id).or(where(partner_user_id: own_user_id)).order(created_at: "DESC")
+    own_activities = where(user_id: own_user_id).order(created_at: "DESC")
     own_activities.each {|a|
       dayStr = a.created_at.strftime('%Y-%m-%d')
       message = ""
