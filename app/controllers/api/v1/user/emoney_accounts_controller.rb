@@ -49,7 +49,8 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
         account.update!(get_account_params)
         render json: {}, status: 200
       else
-        render json: {errors: [{code: "forbidden"}]}, status: 200
+        # TODO(fujiura): code の検討と、エラー処理共通化
+        render json: {errors: [{code: "message sample fobidden"}]}, status: 200
       end
     end
 
