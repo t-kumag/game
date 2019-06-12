@@ -50,8 +50,11 @@ class Api::V1::User::CardAccountsController < ApplicationController
     end
 
     def update
-      account = Entities::AtUserCardAccount.find params[:id]
-      account.update!(get_account_params)
+      account_id = params[:id].to_i
+      if @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id).include?(account_id)
+        account = Entities::AtUserCardAccount.find account_id
+        account.update!(get_account_params)
+      end
       render json: {}, status: 200
     end
 
