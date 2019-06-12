@@ -2,23 +2,17 @@ class Api::V1::User::BsController < ApplicationController
   before_action :authenticate
 
   def summary
-    share = false || params[:share]
-    if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
-      @response = {
-          amount: 0,
-      }
-    else
-      amount = if share
-                 # shareを含む場合
-                 @current_user.at_user.at_user_bank_accounts.sum{|i| i.balance}
-               else
-                 @current_user.at_user.at_user_bank_accounts.where(at_user_bank_accounts: {share: false}).sum{|i| i.balance}
-               end
-      goal_amount = Services::GoalService.new(@current_user).goal_amount
-      @response = {
-          amount: amount - goal_amount
-      }
+    amount = 0
+    goal_amount = 0
+
+    at_bank_accounts = @current_user.try(:at_user).try(:at_user_bank_accounts).where(at_user_bank_accounts: {share: false})
+    if at_bank_accounts
+      amount = at_bank_accounts.sum{|i| i.balance}
+      goal_amount = Services::GoalService.new(@current_user).goal_amount(at_bank_accounts.pluck(:id))
     end
+    @response = {
+        amount: amount - goal_amount
+    }
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
 
