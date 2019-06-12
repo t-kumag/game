@@ -37,7 +37,9 @@ class Entities::AtUser < ApplicationRecord
       res = AtAPIClient.new(requester).request
       return at_user
     rescue AtAPIStandardError => api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
     rescue => exception
     end
   end
@@ -50,9 +52,14 @@ class Entities::AtUser < ApplicationRecord
   #   return "#{ACCOUNT_NAME_PREFIX}_#{self.id}"
   # end
 
+  def token
+    self.at_user_tokens.first.token
+  end
+
   private
 
   def generate_at_user_password
     return Digest::MD5.hexdigest("#{Time.new.to_i.to_s}#{SecureRandom.hex}")
   end
+
 end

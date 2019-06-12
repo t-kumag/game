@@ -10,30 +10,46 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_19_050312) do
+ActiveRecord::Schema.define(version: 2019_06_10_100000) do
 
-  create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "partner_user_id"
+    t.integer "count", null: false
+    t.string "activity_type", null: false
+    t.date "date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "fnc_cd"
     t.string "fnc_nm"
   end
 
-  create_table "at_cards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_cards", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "fnc_cd"
     t.string "fnc_nm"
   end
 
-  create_table "at_emoney_services", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_emoney_services", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "fnc_cd"
     t.string "fnc_nm"
   end
 
-  create_table "at_transaction_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_grouped_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "category_name"
+  end
+
+  create_table "at_transaction_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "at_category_id", null: false
@@ -41,7 +57,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.string "category_name2"
   end
 
-  create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_bank_id"
     t.decimal "balance", precision: 18, scale: 2
@@ -67,7 +83,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["at_user_id"], name: "index_at_user_bank_accounts_on_at_user_id"
   end
 
-  create_table "at_user_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_user_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_bank_account_id", null: false
     t.datetime "trade_date", null: false
     t.string "description1", null: false
@@ -89,7 +105,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["at_user_bank_account_id"], name: "index_at_user_bank_transactions_on_at_user_bank_account_id"
   end
 
-  create_table "at_user_card_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_user_card_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_card_id"
     t.boolean "share"
@@ -113,9 +129,9 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["at_user_id"], name: "index_at_user_card_accounts_on_at_user_id"
   end
 
-  create_table "at_user_card_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_user_card_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_card_account_id"
-    t.date "used_date", null: false
+    t.datetime "used_date", null: false
     t.string "branch_desc", null: false
     t.decimal "amount", precision: 16, scale: 2, null: false
     t.decimal "payment_amount", precision: 16, scale: 2, null: false
@@ -134,7 +150,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["at_user_card_account_id"], name: "index_at_user_card_transactions_on_at_user_card_account_id"
   end
 
-  create_table "at_user_emoney_service_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_user_emoney_service_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_emoney_service_id"
     t.decimal "balance", precision: 18, scale: 2
@@ -157,9 +173,9 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["at_user_id"], name: "index_at_user_emoney_service_accounts_on_at_user_id"
   end
 
-  create_table "at_user_emoney_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_user_emoney_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_emoney_service_account_id"
-    t.date "used_date", null: false
+    t.datetime "used_date", null: false
     t.string "used_time"
     t.string "description"
     t.decimal "amount_receipt", precision: 16, scale: 2, null: false
@@ -175,7 +191,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["at_user_emoney_service_account_id"], name: "index_at_user_emoney_tran_on_at_user_emoney_service_account_id"
   end
 
-  create_table "at_user_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_user_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.string "token"
     t.timestamp "expires_at"
@@ -184,7 +200,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["at_user_id"], name: "index_at_user_tokens_on_at_user_id"
   end
 
-  create_table "at_users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "at_users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -192,12 +208,12 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["user_id"], name: "index_at_users_on_user_id"
   end
 
-  create_table "budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "email_authentication_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "email_authentication_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.string "token", null: false
     t.date "expires_at", null: false
     t.bigint "users_id", null: false
@@ -206,12 +222,72 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["users_id"], name: "index_email_authentication_tokens_on_users_id"
   end
 
-  create_table "groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "goal_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "goal_id"
+    t.bigint "at_user_bank_account_id"
+    t.integer "add_amount"
+    t.integer "monthly_amount"
+    t.integer "first_amount"
+    t.integer "before_current_amount"
+    t.integer "after_current_amount"
+    t.integer "before_goal_amount"
+    t.integer "after_goal_amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_bank_account_id"], name: "index_goal_logs_on_at_user_bank_account_id"
+    t.index ["goal_id"], name: "index_goal_logs_on_goal_id"
+  end
+
+  create_table "goal_settings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "goal_id"
+    t.bigint "at_user_bank_account_id"
+    t.integer "monthly_amount"
+    t.integer "first_amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_bank_account_id"], name: "index_goal_settings_on_at_user_bank_account_id"
+    t.index ["goal_id"], name: "index_goal_settings_on_goal_id"
+  end
+
+  create_table "goal_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.string "img_url"
+    t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "oauth_access_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "goals", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "group_id"
+    t.bigint "user_id"
+    t.bigint "goal_type_id"
+    t.string "name"
+    t.string "img_url"
+    t.date "start_date"
+    t.date "end_date"
+    t.integer "goal_amount"
+    t.integer "current_amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["goal_type_id"], name: "index_goals_on_goal_type_id"
+    t.index ["group_id"], name: "index_goals_on_group_id"
+    t.index ["user_id"], name: "index_goals_on_user_id"
+  end
+
+  create_table "groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "notices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.string "title", null: false
+    t.date "date", null: false
+    t.string "url", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "url"
+  end
+
+  create_table "oauth_access_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "resource_owner_id"
     t.integer "application_id"
     t.string "token", null: false
@@ -226,7 +302,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["token"], name: "index_oauth_access_tokens_on_token", unique: true
   end
 
-  create_table "pairing_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "pairing_requests", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "from_user_id"
     t.bigint "to_user_id"
     t.bigint "group_id"
@@ -239,7 +315,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["to_user_id"], name: "index_pairing_requests_on_to_user_id"
   end
 
-  create_table "participate_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "participate_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "group_id"
     t.bigint "user_id"
     t.datetime "created_at", null: false
@@ -248,13 +324,13 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["user_id"], name: "index_participate_groups_on_user_id"
   end
 
-  create_table "payment_methods", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "payment_methods", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "user_budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "user_budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "budget_question_id"
     t.integer "step", null: false
@@ -264,28 +340,35 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.index ["user_id"], name: "index_user_budget_questions_on_user_id"
   end
 
-  create_table "user_distributed_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "user_distributed_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "group_id"
     t.boolean "share"
-    t.date "used_date", null: false
+    t.datetime "used_date", null: false
     t.bigint "at_user_bank_transaction_id"
     t.bigint "at_user_card_transaction_id"
     t.bigint "at_user_emoney_transaction_id"
     t.bigint "user_manually_created_transaction_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "used_location"
+    t.integer "amount"
+    t.bigint "at_transaction_category_id"
+    t.index ["at_transaction_category_id"], name: "index_u_d_t_on_at_transaction_category_id"
     t.index ["at_user_bank_transaction_id"], name: "index_u_d_t_on_at_user_bank_transaction_id"
     t.index ["at_user_card_transaction_id"], name: "index_u_d_t_on_at_user_card_transaction_id"
     t.index ["at_user_emoney_transaction_id"], name: "index_u_d_t_on_at_user_emoney_transaction_id"
     t.index ["group_id"], name: "index_user_distributed_transactions_on_group_id"
+    t.index ["user_id", "at_user_bank_transaction_id"], name: "index_u_d_t_on_user_id_and_at_user_bank_transaction_id", unique: true
+    t.index ["user_id", "at_user_card_transaction_id"], name: "index_u_d_t_on_user_id_and_at_user_card_transaction_id", unique: true
+    t.index ["user_id", "at_user_emoney_transaction_id"], name: "index_u_d_t_on_user_id_and_at_user_emoney_transaction_id", unique: true
+    t.index ["user_id", "user_manually_created_transaction_id"], name: "index_u_d_t_on_user_id_and_user_manually_created_transaction_id", unique: true
     t.index ["user_id"], name: "index_user_distributed_transactions_on_user_id"
     t.index ["user_manually_created_transaction_id"], name: "index_u_d_t_on_user_manually_created_transaction_id"
   end
 
-  create_table "user_manually_created_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "user_manually_created_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
-    t.bigint "group_id"
     t.bigint "at_transaction_category_id"
     t.bigint "payment_method_id"
     t.date "used_date", null: false
@@ -295,12 +378,21 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["at_transaction_category_id"], name: "index_u_m_c_t_on_at_transaction_category_id"
-    t.index ["group_id"], name: "index_user_manually_created_transactions_on_group_id"
     t.index ["payment_method_id"], name: "index_u_m_c_t_on_payment_method_id"
     t.index ["user_id"], name: "index_user_manually_created_transactions_on_user_id"
   end
 
-  create_table "user_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "user_profiles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.date "birthday"
+    t.integer "gender"
+    t.integer "has_child"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_profiles_on_user_id"
+  end
+
+  create_table "user_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "log_user_id"
     t.integer "group_id"
     t.integer "at_user_bank_transaction_id"
@@ -312,7 +404,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.boolean "is_share"
   end
 
-  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "email"
@@ -320,6 +412,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
     t.string "password_digest"
     t.boolean "email_authenticated", default: false
     t.datetime "token_expires_at"
+    t.integer "rank", default: 0
   end
 
   add_foreign_key "at_user_bank_accounts", "at_banks"
@@ -337,6 +430,13 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
   add_foreign_key "at_user_tokens", "at_users"
   add_foreign_key "at_users", "users"
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
+  add_foreign_key "goal_logs", "at_user_bank_accounts"
+  add_foreign_key "goal_logs", "goals"
+  add_foreign_key "goal_settings", "at_user_bank_accounts"
+  add_foreign_key "goal_settings", "goals"
+  add_foreign_key "goals", "goal_types"
+  add_foreign_key "goals", "groups"
+  add_foreign_key "goals", "users"
   add_foreign_key "pairing_requests", "groups"
   add_foreign_key "pairing_requests", "users", column: "from_user_id"
   add_foreign_key "pairing_requests", "users", column: "to_user_id"
@@ -344,6 +444,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
   add_foreign_key "participate_groups", "users"
   add_foreign_key "user_budget_questions", "budget_questions"
   add_foreign_key "user_budget_questions", "users"
+  add_foreign_key "user_distributed_transactions", "at_transaction_categories"
   add_foreign_key "user_distributed_transactions", "at_user_bank_transactions"
   add_foreign_key "user_distributed_transactions", "at_user_card_transactions"
   add_foreign_key "user_distributed_transactions", "at_user_emoney_transactions"
@@ -351,7 +452,7 @@ ActiveRecord::Schema.define(version: 2019_04_19_050312) do
   add_foreign_key "user_distributed_transactions", "user_manually_created_transactions"
   add_foreign_key "user_distributed_transactions", "users"
   add_foreign_key "user_manually_created_transactions", "at_transaction_categories"
-  add_foreign_key "user_manually_created_transactions", "groups"
   add_foreign_key "user_manually_created_transactions", "payment_methods"
   add_foreign_key "user_manually_created_transactions", "users"
+  add_foreign_key "user_profiles", "users"
 end

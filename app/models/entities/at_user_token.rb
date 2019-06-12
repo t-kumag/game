@@ -30,7 +30,9 @@ class Entities::AtUserToken < ApplicationRecord
       at_user_token.save!
       return at_user_token
     rescue AtAPIStandardError => api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
     rescue => exception
     end
   end
@@ -48,7 +50,9 @@ class Entities::AtUserToken < ApplicationRecord
       self.expires_at = res["EXPI_DT"], # TODO
       self.save!
     rescue AtAPIStandardError => api_err
+      raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
     rescue => exception
     end
   end
@@ -75,7 +79,9 @@ class Entities::AtUserToken < ApplicationRecord
             return true
           end
         rescue AtAPIStandardError => api_err
+          raise api_err
         rescue ActiveRecord::RecordInvalid => db_err
+          raise db_err
         rescue => exception
         end
       end

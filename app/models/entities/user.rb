@@ -28,7 +28,13 @@ class Entities::User < ApplicationRecord
   has_one :group, through: :participate_group
   has_one :user_profile
   has_secure_password validations: true
-  validates :email, presence: true, uniqueness: true
+
+  # email はメールアドレスとしての整合性と、仕様上の最大長をチェックする
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+  validates :email, presence: true,
+                    uniqueness: true, 
+                    format: { with: VALID_EMAIL_REGEX }, 
+                    length: { maximum: 256}
 
   enum rank: { free: 0, premium: 1 }
 

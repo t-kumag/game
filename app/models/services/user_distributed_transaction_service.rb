@@ -45,7 +45,7 @@ class Services::UserDistributedTransactionService
           used_date: transaction.trade_date,
           used_location: transaction.description1,
           amount: transaction.amount,
-	  at_transaction_category_id: transaction.at_transaction_category_id,
+          at_transaction_category_id: transaction.at_transaction_category_id,
           at_user_bank_transaction_id: transaction.id
         )
       end
@@ -66,7 +66,7 @@ class Services::UserDistributedTransactionService
             used_date: transaction.used_date,
             used_location: transaction.branch_desc,
             amount: transaction.amount,
-	    at_transaction_category_id: transaction.at_transaction_category_id,
+            at_transaction_category_id: transaction.at_transaction_category_id,
             at_user_card_transaction_id: transaction.id
         )
       end
@@ -87,7 +87,7 @@ class Services::UserDistributedTransactionService
             used_date: transaction.used_date,
             used_location: transaction.description,
             amount: transaction.amount,
-	    at_transaction_category_id: transaction.at_transaction_category_id,
+            at_transaction_category_id: transaction.at_transaction_category_id,
             at_user_emoney_transaction_id: transaction.id
         )
       end
