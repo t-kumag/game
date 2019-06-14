@@ -10,7 +10,7 @@ namespace :accumulation do
         goal_setting = at_user_bank_account.goal_settings.last
 
         if check_balance(at_user_bank_account, goal_setting) && check_goal_ammount(goal)
-          Services::GoalLogService.new.create_log(goal,goal_setting)
+          Services::GoalService.new.update_current_amount(goal,goal_setting)
         end
       rescue => exception
         #TODO: エラー処理については固定したフォーマットを考える
