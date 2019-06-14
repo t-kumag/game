@@ -11,4 +11,8 @@ class Services::GoalService
     amount
   end
 
+  def get_goal_user
+    return Entities::Goal.find_by(user_id: @user.id)
+  end
+
 end
