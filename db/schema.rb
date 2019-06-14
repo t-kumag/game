@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_10_100000) do
+ActiveRecord::Schema.define(version: 2019_06_14_013325) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.integer "partner_user_id"
+    t.integer "group_id"
     t.integer "count", null: false
     t.string "activity_type", null: false
     t.date "date", null: false
@@ -78,9 +78,13 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
     t.string "last_rslt_msg"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "group_id"
     t.index ["at_bank_id"], name: "index_at_user_bank_accounts_on_at_bank_id"
     t.index ["at_user_id", "fnc_cd"], name: "at_user_bank_accounts_at_user_id_fnc_cd", unique: true
     t.index ["at_user_id"], name: "index_at_user_bank_accounts_on_at_user_id"
+    t.index ["deleted_at"], name: "index_at_user_bank_accounts_on_deleted_at"
+    t.index ["group_id"], name: "index_at_user_bank_accounts_on_group_id"
   end
 
   create_table "at_user_bank_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -124,9 +128,13 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
     t.string "last_rslt_msg"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "group_id"
     t.index ["at_card_id"], name: "index_at_user_card_accounts_on_at_card_id"
     t.index ["at_user_id", "fnc_cd"], name: "at_user_card_accounts_at_user_id_fnc_cd", unique: true
     t.index ["at_user_id"], name: "index_at_user_card_accounts_on_at_user_id"
+    t.index ["deleted_at"], name: "index_at_user_card_accounts_on_deleted_at"
+    t.index ["group_id"], name: "index_at_user_card_accounts_on_group_id"
   end
 
   create_table "at_user_card_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -168,9 +176,13 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
     t.string "last_rslt_msg"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.bigint "group_id"
     t.index ["at_emoney_service_id"], name: "index_at_user_emoney_service_accounts_on_at_emoney_service_id"
     t.index ["at_user_id", "fnc_cd"], name: "at_user_emoney_service_accounts_at_user_id_fnc_cd", unique: true
     t.index ["at_user_id"], name: "index_at_user_emoney_service_accounts_on_at_user_id"
+    t.index ["deleted_at"], name: "index_at_user_emoney_service_accounts_on_deleted_at"
+    t.index ["group_id"], name: "index_at_user_emoney_service_accounts_on_group_id"
   end
 
   create_table "at_user_emoney_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -284,7 +296,6 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
     t.string "url", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "url"
   end
 
   create_table "oauth_access_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -365,6 +376,14 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
     t.index ["user_id", "user_manually_created_transaction_id"], name: "index_u_d_t_on_user_id_and_user_manually_created_transaction_id", unique: true
     t.index ["user_id"], name: "index_user_distributed_transactions_on_user_id"
     t.index ["user_manually_created_transaction_id"], name: "index_u_d_t_on_user_manually_created_transaction_id"
+  end
+
+  create_table "user_icons", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "img_url", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_icons_on_user_id"
   end
 
   create_table "user_manually_created_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -451,6 +470,7 @@ ActiveRecord::Schema.define(version: 2019_06_10_100000) do
   add_foreign_key "user_distributed_transactions", "groups"
   add_foreign_key "user_distributed_transactions", "user_manually_created_transactions"
   add_foreign_key "user_distributed_transactions", "users"
+  add_foreign_key "user_icons", "users"
   add_foreign_key "user_manually_created_transactions", "at_transaction_categories"
   add_foreign_key "user_manually_created_transactions", "payment_methods"
   add_foreign_key "user_manually_created_transactions", "users"

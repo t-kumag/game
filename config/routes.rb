@@ -36,6 +36,10 @@ Rails.application.routes.draw do
 
         resources :goals, path: '/goals'
 
+        get 'icon', to: 'icon#index'
+        post 'icon', to: 'icon#create'
+        put 'icon', to: 'icon#update'
+
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
         get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
