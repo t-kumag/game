@@ -16,9 +16,8 @@ class Services::GoalService
   end
 
   def update_current_amount(goal, goal_setting)
-    goal =  Entities::Goal.find_by(user_id: user.id)
-    goal.current_amount = goal.current_amount + goal_setting.monthly_amount
     create_goal_user_log(goal, goal_setting)
+    goal.current_amount = goal.current_amount + goal_setting.monthly_amount
     goal.save!
   end
 
