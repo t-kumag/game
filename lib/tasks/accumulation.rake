@@ -6,10 +6,10 @@ namespace :accumulation do
 
       begin
         goal = Services::GoalService.new(user).get_goal_user
-        at_user_bank_account = Services::UserBankAccountsService.new.get_user_bank_balance(user)
+        at_user_bank_account = Services::UserBankAccountsService.new.get_balance(user)
         goal_setting = at_user_bank_account.goal_settings.last
 
-        if check_balance(at_user_bank_account, goal_setting) && check_goal_ammount(goal)
+        if check_balance(at_user_bank_account, goal_setting) && check_goal_amount(goal)
           Services::GoalService.new(user).update_current_amount(goal, goal_setting)
         end
       rescue => exception
@@ -21,14 +21,13 @@ namespace :accumulation do
   private
   def check_balance(at_user_bank_account, goal_setting)
     if at_user_bank_account.balance >= goal_setting.monthly_amount
-      #もしOKだったらuser_accounts_serviceのbalanceをupdateをする
-      return true
+      return Services::UserBankAccountsService.new.minus_balance(at_user_bank_account, goal_setting)
     end
 
     return false
   end
 
-  def check_goal_ammount(goal)
+  def check_goal_amount(goal)
     if goal.goal_amount >= goal.current_amount
       return true
     end
