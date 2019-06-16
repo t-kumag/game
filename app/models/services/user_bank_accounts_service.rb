@@ -12,8 +12,7 @@ class Services::UserBankAccountsService
     end
 
     def minus_balance(at_user_bank_account, goal_setting)
-      at_user_bank_account = Entities::AtUserBankAccount.find_by(at_user_id: at_user_bank_account.id)
       at_user_bank_account.balance = at_user_bank_account.balance - goal_setting.monthly_amount
-      return at_user_bank_account.save
+      return at_user_bank_account.save!
     end
 end

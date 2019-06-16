@@ -10,6 +10,7 @@ namespace :accumulation do
         goal_setting = at_user_bank_account.goal_settings.last
 
         if check_balance(at_user_bank_account, goal_setting) && check_goal_amount(goal)
+          Services::UserBankAccountsService.new.minus_balance(at_user_bank_account, goal_setting)
           Services::GoalService.new(user).update_current_amount(goal, goal_setting)
         end
       rescue ActiveRecord::RecordInvalid => db_err
@@ -23,7 +24,7 @@ namespace :accumulation do
   private
   def check_balance(at_user_bank_account, goal_setting)
     if at_user_bank_account.balance >= goal_setting.monthly_amount
-      return Services::UserBankAccountsService.new.minus_balance(at_user_bank_account, goal_setting)
+      return true
     end
     # ここはAPIエラーを投げる?
     return false

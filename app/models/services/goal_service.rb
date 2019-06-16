@@ -32,8 +32,8 @@ class Services::GoalService
         first_amount: goal_setting.first_amount,
         before_current_amount: goal.current_amount,
         after_current_amount: goal.current_amount + goal_setting.monthly_amount,
-        before_goal_amount: goal.goal_amount,
-        after_goal_amount: goal.goal_amount,
+        add_date: DateTime.now,
+        goal_amount: goal.goal_amount
         )
   end
 
