@@ -85,6 +85,9 @@ Rails.application.routes.draw do
         get 'pl-grouped-categories', :to => 'pl#grouped_categories'
         get 'transactions', :to => 'transactions#index'
         get 'grouped-transactions', :to => 'transactions#grouped_transactions'
+
+        get 'goal-graph/:id', :to => 'goals#graph'
+
       end
 
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
