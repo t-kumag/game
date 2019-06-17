@@ -14,7 +14,7 @@ class Services::GoalGraphService
     elsif @span == 'all'
       goal_logs = @goal.goal_logs
     end
-    {} unless goal_logs
+    return {} unless goal_logs
     format = format(goal_logs)
     aggregate(format, goal_logs)
   end
@@ -51,10 +51,12 @@ class Services::GoalGraphService
     keys = goal_logs.pluck(:add_date).uniq.sort
     keys.each do |k|
       result.store(
-        k.strftime('%Y-%m-%d'),
-        'goal_amount' => 0,
-        'amount' => 0,
-        'progress' => 0
+          k.strftime('%Y-%m-%d'),
+          {
+              'goal_amount' => 0,
+              'amount' => 0,
+              'progress' => 0
+          }
       )
     end
     result
@@ -69,8 +71,8 @@ class Services::GoalGraphService
     end
 
     # progress
-    format.each do |f|
-      f[1]['progress'] = monthly_progress(f[1]['amount'], f[1]['goal_amount'])
+    format.each do |_, f|
+      f['progress'] = monthly_progress(f['amount'], f['goal_amount'])
     end
 
     format

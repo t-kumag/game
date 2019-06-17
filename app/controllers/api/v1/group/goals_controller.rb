@@ -26,7 +26,8 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal = Entities::Goal.create!(goal_params)
         goal.goal_settings.create!(get_goal_setting_params)
       end
-
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
     rescue => exception
       p exception
       render(json: {}, status: 400) && return
