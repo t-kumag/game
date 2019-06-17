@@ -157,13 +157,9 @@ class Services::PlService
       '1799', # その他出金（電子マネーへのチャージ銀行側出金）
     ]
     ignore_at_transaction_category_ids = Entities::AtTransactionCategory.where(at_category_id: ignore_at_category_ids).pluck(:id)
-    Rails.logger.debug ignore_at_transaction_category_ids 
     transactions.reject do |t|
       ignore_at_transaction_category_ids.include? t['at_transaction_category_id']
     end
-  end
-
-  def ignore_category?(category_id)
   end
 
   def merge_category_summery(pl, before_summeries)
