@@ -83,7 +83,6 @@ Rails.application.routes.draw do
         get 'grouped-transactions', :to => 'transactions#grouped_transactions'
       end
 
-
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
         collection do
           get :generate_pairing_token
@@ -91,6 +90,7 @@ Rails.application.routes.draw do
           post :confirm_pairing_request
         end
       end
+      delete 'pairing-requests', :to => 'pairing_requests#destroy'
 
       resources :users, only: [:create]
 
