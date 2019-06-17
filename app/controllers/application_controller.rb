@@ -89,7 +89,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate
     authenticate_token || render_unauthorized
-    activated?
+    #activated?
   end
 
   # def token_authenticate

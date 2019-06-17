@@ -14,8 +14,7 @@ class Api::V1::User::IconController < ApplicationController
 
       end
     rescue ActiveRecord::RecordInvalid => db_err
-      p db_err
-      render(json: {}, status: 400) && return
+      raise db_err
     rescue => exception
       p exception
       render(json: {}, status: 400) && return
@@ -24,7 +23,7 @@ class Api::V1::User::IconController < ApplicationController
   end
 
   def update
-    @icon = Entities::UserIcon.find_by(user_id: @current_user.id)
+    @icon = @current_user.user_icon
     begin
       if @icon.present? &&
           params[:img_url]

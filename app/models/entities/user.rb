@@ -15,7 +15,8 @@
 class Entities::User < ApplicationRecord
 
   has_one :at_user
-  
+  has_one :user_icon
+
   has_many :user_groups, dependent: :destroy
   has_many :groups, -> { distinct }, through: :user_groups
   has_many :access_grants, class_name: "Doorkeeper::AccessGrant",
@@ -53,7 +54,7 @@ class Entities::User < ApplicationRecord
     params = {
       token: token
     } 
-    self.find_by(params)    
+    self.find_by(params)
   end
 
   def generate_token
