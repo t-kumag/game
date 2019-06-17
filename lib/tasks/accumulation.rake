@@ -16,7 +16,6 @@ namespace :accumulation do
       rescue ActiveRecord::RecordInvalid => db_err
         raise db_err
       rescue => exception
-        p exception
         #TODO: エラー処理については固定したフォーマットを考える
       end
     end
@@ -27,7 +26,7 @@ namespace :accumulation do
 
     balance_minus_purpose = at_user_bank_account.balance - goal.current_amount
 
-    # (銀行口座の残高 - 積み立て済み金額 ) < 月額貯金額
+    # (銀行口座の残高 - 積み立て済み金額 ) > 月額貯金額
     if balance_minus_purpose > goal_setting.monthly_amount
       return true
     end
