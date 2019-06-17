@@ -126,8 +126,8 @@ class Services::PlService
 
     #　P/L の計算から指定カテゴリを排除する
     pl_bank = remove_duplicated_transaction(pl_bank)
-    pl_bank = remove_duplicated_transaction(pl_bank)
-    pl_bank = remove_duplicated_transaction(pl_bank)
+    pl_card = remove_duplicated_transaction(pl_card)
+    pl_emoney = remove_duplicated_transaction(pl_emoney)
 
     merge_category_summery(pl_emoney, merge_category_summery(pl_card, pl_bank))
   end
