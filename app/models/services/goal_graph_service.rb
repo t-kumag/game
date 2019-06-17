@@ -6,7 +6,7 @@ class Services::GoalGraphService
   end
 
   # 各月の達成値 月の入金額 / 月の目標金額
-  def do
+  def call
     goal_logs = {}
     return {} if @span.blank?
     if @span.to_i > 0

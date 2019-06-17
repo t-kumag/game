@@ -60,7 +60,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def graph
     return render_404 if params[:id].blank?
-    @responses = Services::GoalGraphService.new(@current_user, Entities::Goal.find(params[:id]), params[:span]).do
+    @responses = Services::GoalGraphService.new(@current_user, Entities::Goal.find(params[:id]), params[:span]).call
     render 'graph', formats: 'json', handlers: 'jbuilder'
   end
 
