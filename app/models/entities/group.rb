@@ -9,7 +9,6 @@
 
 class Entities::Group < ApplicationRecord
 
-  accepts_nested_attributes_for :user_groups
   has_many :goals
   has_many :participate_groups
 
