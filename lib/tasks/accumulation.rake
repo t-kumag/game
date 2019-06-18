@@ -5,7 +5,7 @@ namespace :accumulation do
     Entities::User.find_each do |user|
 
       begin
-        goal = Services::GoalService.new(user).get_goal_user
+        goal = Services::GoalService.new(user).get_goal_user(user.participate_group.group_id)
         at_user_bank_account = Services::UserBankAccountsService.new.get_balance(user)
 
         at_user_bank_account.goal_settings.all.each do |goal_setting|

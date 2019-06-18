@@ -11,8 +11,8 @@ class Services::GoalService
     amount
   end
 
-  def get_goal_user
-    return Entities::Goal.find_by(user_id: @user.id)
+  def get_goal_user(group_id)
+    return Entities::Goal.find_by(user_id: @user.id, group_id: group_id)
   end
 
   def update_current_amount(goal, goal_setting)
