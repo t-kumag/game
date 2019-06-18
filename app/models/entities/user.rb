@@ -8,16 +8,14 @@
 #  email               :string(255)
 #  token               :string(255)
 #  password_digest     :string(255)
-#  email_authenticated :boolean          default(FALSE)
+#  email_authenticated :boolean          default(FALSE)a
 #  token_expires_at    :datetime
 #
 
 class Entities::User < ApplicationRecord
 
   has_one :at_user
-  
-  has_many :user_groups, dependent: :destroy
-  has_many :groups, -> { distinct }, through: :user_groups
+
   has_many :access_grants, class_name: "Doorkeeper::AccessGrant",
           foreign_key: :resource_owner_id,
           dependent: :delete_all # or :destroy if you need callbacks
