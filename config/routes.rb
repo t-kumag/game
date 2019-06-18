@@ -101,12 +101,12 @@ Rails.application.routes.draw do
 
       resources :users, only: [:create]
 
-      post 'user/confirm', to: 'users#confirm'
       get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'
       get 'user/at-sync', :to => 'users#at_sync'
       get 'user/at-token', :to => 'users#at_token'
       get 'user/activate', :to => 'users#activate'
+      post 'user/confirm', to: 'users#confirm'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
     end
