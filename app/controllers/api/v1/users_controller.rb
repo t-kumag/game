@@ -17,10 +17,11 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def confirm
+
+    obj = {}
     @user = Entities::User.where(email: params[:email]).first
 
     unless @user.email_authenticated
-      obj = {}
       @user.reset_token
       @user.save!
       MailDelivery.user_registration(@user).deliver
