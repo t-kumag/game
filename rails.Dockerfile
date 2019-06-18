@@ -31,6 +31,7 @@ RUN apk update && \
       mysql \
       ruby-json \
       tzdata \
+      curl \
       yaml && \
     apk add less && \
     bundle install -j4 && \

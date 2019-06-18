@@ -24,14 +24,13 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id = #{@user.id}
+        #{sql_user_or_group}
       AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      #{sql_and_group}
       GROUP BY
         udt.at_transaction_category_id
     EOS
@@ -57,14 +56,13 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id = #{@user.id}
+        #{sql_user_or_group}
       AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      #{sql_and_group}
       GROUP BY
         udt.at_transaction_category_id
     EOS
@@ -91,14 +89,13 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id = #{@user.id}
+        #{sql_user_or_group}
       AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      #{sql_and_group}
       GROUP BY
         udt.at_transaction_category_id
     EOS
@@ -106,11 +103,46 @@ class Services::PlService
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def sql_and_group
-    if @with_group && @user.group_id > 1
-      <<-EOS
+  def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+    sql = <<-EOS
+      SELECT
+        udt.at_transaction_category_id,
+        sum(umct.amount) as amount_payment,
+        atc.category_name1,
+        atc.category_name2
+      FROM
+        user_distributed_transactions as udt
+      INNER JOIN
+        user_manually_created_transactions as umct
+      ON
+        umct.id = udt.user_manually_created_transaction_id
+      INNER JOIN
+        at_transaction_categories as atc
+      ON
+        udt.at_transaction_category_id = atc.id
+      WHERE
+        #{sql_user_or_group}
       AND
+        udt.share in (#{share.join(',')})
+      AND
+        udt.used_date >= "#{from}"
+      AND
+        udt.used_date <= "#{to}"
+      GROUP BY
+        udt.at_transaction_category_id
+    EOS
+
+    ActiveRecord::Base.connection.select_all(sql).to_hash
+  end
+
+  def sql_user_or_group
+    if @with_group && @user.group_id.size > 1
+      <<-EOS
         udt.group_id = #{@user.group_id}
+      EOS
+    else
+      <<-EOS
+        udt.user_id = #{@user.id}
       EOS
     end
   end
@@ -129,7 +161,8 @@ class Services::PlService
     pl_card = remove_duplicated_transaction(pl_card)
     pl_emoney = remove_duplicated_transaction(pl_emoney)
 
-    merge_category_summery(pl_emoney, merge_category_summery(pl_card, pl_bank))
+    pl_user_manually_created = user_manually_created_category_summary(share, from, to)
+    merge_category_summery(pl_user_manually_created, merge_category_summery(pl_emoney, merge_category_summery(pl_card, pl_bank)))
   end
 
   def pl_summery(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)

@@ -42,6 +42,25 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
       render 'summary', formats: 'json', handlers: 'jbuilder'
     end
 
+    def update
+      account_id = params[:id].to_i
+      if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)
+        account = Entities::AtUserEmoneyServiceAccount.find account_id
+        account.update!(get_account_params)
+        render json: {}, status: 200
+      else
+        # TODO(fujiura): code の検討と、エラー処理共通化
+        render json: {errors: [{code: "message sample fobidden"}]}, status: 200
+      end
+    end
+
+    def get_account_params
+      {
+        group_id: @current_user.group_id,
+        share: params[:share],
+      }
+    end
+
     def destroy
       account_id = params[:id].to_i
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)

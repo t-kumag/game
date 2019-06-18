@@ -56,8 +56,8 @@ class Services::AtUserService
     at_user = nil
 
     if @user&.at_user&.at_user_tokens.blank?
-      puts "self.create_user ================="
-      at_user = self.create_user
+      puts "create_user ================="
+      at_user = create_user
       p at_user
     else
       puts " @user.at_user ================="

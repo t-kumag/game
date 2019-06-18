@@ -10,6 +10,8 @@
 #
 
 class Entities::ParticipateGroup < ApplicationRecord
+  acts_as_paranoid
+
   # TODO participate_groupsがinsertされないのでコメント
   #belongs_to :users
   belongs_to :group
