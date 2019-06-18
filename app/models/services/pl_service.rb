@@ -151,14 +151,17 @@ class Services::PlService
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
 
+    # P/L 用の明細を取得
     pl_bank = bank_category_summary(share, from, to)
-
     pl_card = card_category_summary(share, from, to)
-
     pl_emoney = emoney_category_summary(share, from, to)
 
-    pl_user_manually_created = user_manually_created_category_summary(share, from, to)
+    #　P/L の計算から指定カテゴリを排除する
+    pl_bank = remove_duplicated_transaction(pl_bank)
+    pl_card = remove_duplicated_transaction(pl_card)
+    pl_emoney = remove_duplicated_transaction(pl_emoney)
 
+    pl_user_manually_created = user_manually_created_category_summary(share, from, to)
     merge_category_summery(pl_user_manually_created, merge_category_summery(pl_emoney, merge_category_summery(pl_card, pl_bank)))
   end
 
@@ -178,6 +181,18 @@ class Services::PlService
       pl_summeries[:expense_amount] += summery['amount_payment']
     end
     pl_summeries
+  end
+
+  def remove_duplicated_transaction(transactions)
+    ignore_at_category_ids = [
+      '1581', # カード返済（クレジットカード引き落とし）
+      '1699', # その他入金（電子マネーへのチャージ電子マネー側入金）
+      '1799', # その他出金（電子マネーへのチャージ銀行側出金）
+    ]
+    ignore_at_transaction_category_ids = Entities::AtTransactionCategory.where(at_category_id: ignore_at_category_ids).pluck(:id)
+    transactions.reject do |t|
+      ignore_at_transaction_category_ids.include? t['at_transaction_category_id']
+    end
   end
 
   def merge_category_summery(pl, before_summeries)
