@@ -17,7 +17,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def confirm
-
     obj = {}
     @user = Entities::User.where(email: params[:email]).first
 
@@ -30,7 +29,6 @@ class Api::V1::UsersController < ApplicationController
     else
       render json: obj, status: :bad_request
     end
-
   end
 
   def activate
