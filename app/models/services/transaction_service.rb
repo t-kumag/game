@@ -13,6 +13,7 @@ class Services::TransactionService
     return "bank" unless transaction.at_user_bank_transaction_id.nil?
     return "card" unless transaction.at_user_card_transaction_id.nil?
     return "emoney" unless transaction.at_user_emoney_transaction_id.nil?
+    return "manually_created" unless transaction.user_manually_created_transaction_id.nil?
   end
 
   def fetch_transactions(from, to, ids)
@@ -33,7 +34,7 @@ class Services::TransactionService
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
-        transaction_id: t.at_user_bank_transaction_id || t.at_user_card_transaction_id || t.at_user_emoney_transaction_id,
+        transaction_id: t.at_user_bank_transaction_id || t.at_user_card_transaction_id || t.at_user_emoney_transaction_id || t.user_manually_created_transaction_id,
         type: type(t)
       }
     }
