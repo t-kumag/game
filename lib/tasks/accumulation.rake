@@ -24,10 +24,10 @@ namespace :accumulation do
   private
   def check_balance(at_user_bank_account, goal_setting, goal)
 
-    balance_minus_purpose = at_user_bank_account.balance - goal.current_amount
+    balance_minus_goal = at_user_bank_account.balance - goal.current_amount
 
     # (銀行口座の残高 - 積み立て済み金額 ) > 月額貯金額
-    if balance_minus_purpose > goal_setting.monthly_amount
+    if balance_minus_goal > goal_setting.monthly_amount
       return true
     end
     # ここはAPIエラーを投げる?

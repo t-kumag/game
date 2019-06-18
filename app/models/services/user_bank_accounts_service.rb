@@ -8,7 +8,7 @@ class Services::UserBankAccountsService
     #end
 
     def get_balance(user)
-      return Entities::AtUserBankAccount.find_by(at_user_id: user.id)
+      Entities::AtUserBankAccount.find_by(at_user_id: user.id)
     end
 
 end

@@ -8,7 +8,7 @@
 #  email               :string(255)
 #  token               :string(255)
 #  password_digest     :string(255)
-#  email_authenticated :boolean          default(FALSE)a
+#  email_authenticated :boolean          default(FALSE)
 #  token_expires_at    :datetime
 #
 
