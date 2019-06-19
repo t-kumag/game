@@ -24,14 +24,13 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id = #{@user.id}
+        #{sql_user_or_group}
       AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      #{sql_and_group}
       GROUP BY
         udt.at_transaction_category_id
     EOS
@@ -57,14 +56,13 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id = #{@user.id}
+        #{sql_user_or_group}
       AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      #{sql_and_group}
       GROUP BY
         udt.at_transaction_category_id
     EOS
@@ -91,14 +89,13 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id = #{@user.id}
+        #{sql_user_or_group}
       AND
         udt.share in (#{share.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      #{sql_and_group}
       GROUP BY
         udt.at_transaction_category_id
     EOS
@@ -106,80 +103,132 @@ class Services::PlService
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def sql_and_group
-    if @with_group && @user.group_id > 1
-      <<-EOS
+  def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+    sql = <<-EOS
+      SELECT
+        udt.at_transaction_category_id,
+        sum(umct.amount) as amount_payment,
+        atc.category_name1,
+        atc.category_name2
+      FROM
+        user_distributed_transactions as udt
+      INNER JOIN
+        user_manually_created_transactions as umct
+      ON
+        umct.id = udt.user_manually_created_transaction_id
+      INNER JOIN
+        at_transaction_categories as atc
+      ON
+        udt.at_transaction_category_id = atc.id
+      WHERE
+        #{sql_user_or_group}
       AND
+        udt.share in (#{share.join(',')})
+      AND
+        udt.used_date >= "#{from}"
+      AND
+        udt.used_date <= "#{to}"
+      GROUP BY
+        udt.at_transaction_category_id
+    EOS
+
+    ActiveRecord::Base.connection.select_all(sql).to_hash
+  end
+
+  def sql_user_or_group
+    if @with_group && @user.group_id.size > 1
+      <<-EOS
         udt.group_id = #{@user.group_id}
+      EOS
+    else
+      <<-EOS
+        udt.user_id = #{@user.id}
       EOS
     end
   end
 
-  def pl_category_summery(share, from, to)
+  def pl_category_summary(share, from, to)
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
 
+    # P/L 用の明細を取得
     pl_bank = bank_category_summary(share, from, to)
-
     pl_card = card_category_summary(share, from, to)
-
     pl_emoney = emoney_category_summary(share, from, to)
 
-    merge_category_summery(pl_emoney, merge_category_summery(pl_card, pl_bank))
+    #　P/L の計算から指定カテゴリを排除する
+    pl_bank = remove_duplicated_transaction(pl_bank)
+    pl_card = remove_duplicated_transaction(pl_card)
+    pl_emoney = remove_duplicated_transaction(pl_emoney)
+
+    pl_user_manually_created = user_manually_created_category_summary(share, from, to)
+    merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
   end
 
-  def pl_summery(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def pl_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
 
-    pl_category_summery = pl_category_summery(share, from, to)
-    pl_summeries = {
+    pl_category_summary = pl_category_summary(share, from, to)
+    pl_summaries = {
         income_amount: 0,
         expense_amount: 0
     }
-    pl_category_summery.each do |summery|
-      summery['amount_receipt'] ||= 0
-      summery['amount_payment'] ||= 0
-      pl_summeries[:income_amount] += summery['amount_receipt']
-      pl_summeries[:expense_amount] += summery['amount_payment']
+    pl_category_summary.each do |summary|
+      summary['amount_receipt'] ||= 0
+      summary['amount_payment'] ||= 0
+      pl_summaries[:income_amount] += summary['amount_receipt']
+      pl_summaries[:expense_amount] += summary['amount_payment']
     end
-    pl_summeries
+    pl_summaries
   end
 
-  def merge_category_summery(pl, before_summeries)
-    after_summeries = before_summeries.dup
-    unless pl.blank? && after_summeries.blank?
+  def remove_duplicated_transaction(transactions)
+    ignore_at_category_ids = [
+      '1581', # カード返済（クレジットカード引き落とし）
+      '1699', # その他入金（電子マネーへのチャージ電子マネー側入金）
+      '1799', # その他出金（電子マネーへのチャージ銀行側出金）
+    ]
+    ignore_at_transaction_category_ids = Entities::AtTransactionCategory.where(at_category_id: ignore_at_category_ids).pluck(:id)
+    transactions.reject do |t|
+      ignore_at_transaction_category_ids.include? t['at_transaction_category_id']
+    end
+  end
+
+  def merge_category_summary(pl, before_summaries)
+    after_summaries = before_summaries.dup
+    unless pl.blank? && after_summaries.blank?
       pl.each do |v|
         next if v['at_transaction_category_id'].blank?
-        # after_summeries から同カテゴリのアイテムを抽出
-        summery = after_summeries.select {|category_summery|
-          next if category_summery.blank? || category_summery['at_transaction_category_id'].blank?
-          category_summery['at_transaction_category_id'] == v['at_transaction_category_id']
+        # after_summaries から同カテゴリのアイテムを抽出
+        summary = after_summaries.select {|category_summary|
+          next if category_summary.blank? || category_summary['at_transaction_category_id'].blank?
+          category_summary['at_transaction_category_id'] == v['at_transaction_category_id']
         }.first
         v['amount_receipt'] ||= 0
         v['amount_payment'] ||= 0
 
-        # after_summeries に同カテゴリのアイテムがなければ即 INSERT し、あれば額のみ足し込み
-        if summery.blank?
-          after_summeries << v
+        # after_summaries に同カテゴリのアイテムがなければ即 INSERT し、あれば額のみ足し込み
+        if summary.blank?
+          after_summaries << v
         else
-          idx = after_summeries.find_index(summery)
+          idx = after_summaries.find_index(summary)
           v['amount_receipt'] ||= 0
-          summery['amount_receipt'] ||= 0
-          summery['amount_payment'] ||= 0
-          after_summeries[idx] = {
+          summary['amount_receipt'] ||= 0
+          summary['amount_payment'] ||= 0
+          after_summaries[idx] = {
             at_transaction_category_id: v['at_transaction_category_id'],
             category_name1: v['category_name1'],
             category_name2: v['category_name2'],
-            amount_receipt: v['amount_receipt'] + summery['amount_receipt'],
-            amount_payment: v['amount_payment'] + summery['amount_payment']
+            amount_receipt: v['amount_receipt'] + summary['amount_receipt'],
+            amount_payment: v['amount_payment'] + summary['amount_payment']
           }.stringify_keys
         end
       end
     end
-    after_summeries.compact! unless after_summeries.blank?
+    after_summaries.compact! unless after_summaries.blank?
 
-    after_summeries
+    after_summaries
   end
 
   def pl_grouped_category_summary(share, from, to)
@@ -195,7 +244,7 @@ class Services::PlService
     }
     summary = []
     # 小項目ごとの PL 集計結果から、大項目ごとに再集計を行う
-    pl_category_summery(share, from, to).each { |item|
+    pl_category_summary(share, from, to).each { |item|
       # category_name1　が有効なら
       matched_category = grouped_categories.find { |category| category[:name] === item['category_name1'] }
       if (matched_category.present?)
