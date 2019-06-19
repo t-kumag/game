@@ -101,7 +101,7 @@ class Services::AtUserService
           token: res["TOKEN_KEY"],
           expires_at: res["EXPI_DT"]
       }
-      Entities::AtUserToken.first.update!(params)
+      @user.at_user.at_user_tokens.first.update!(params)
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
