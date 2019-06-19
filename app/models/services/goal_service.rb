@@ -11,4 +11,31 @@ class Services::GoalService
     amount
   end
 
+  def get_goal_user(group_id)
+    Entities::Goal.find_by(user_id: @user.id, group_id: group_id)
+  end
+
+  def update_current_amount(goal, goal_setting)
+    create_goal_user_log(goal, goal_setting)
+    goal.current_amount = goal.current_amount + goal_setting.monthly_amount
+    goal.save!
+  end
+
+  private
+
+  def create_goal_user_log(goal, goal_setting)
+    goal.goal_logs.create!(
+        goal_id: goal_setting.goal_id,
+        at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
+        add_amount: 0,
+        monthly_amount: goal_setting.monthly_amount,
+        first_amount: goal_setting.first_amount,
+        before_current_amount: goal.current_amount,
+        after_current_amount: goal.current_amount + goal_setting.monthly_amount,
+        add_date: DateTime.now,
+        goal_amount: goal.goal_amount
+        )
+  end
+
+
 end

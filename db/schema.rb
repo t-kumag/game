@@ -242,10 +242,10 @@ ActiveRecord::Schema.define(version: 2019_06_14_013325) do
     t.integer "first_amount"
     t.integer "before_current_amount"
     t.integer "after_current_amount"
-    t.integer "before_goal_amount"
-    t.integer "after_goal_amount"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "goal_amount"
+    t.datetime "add_date"
     t.index ["at_user_bank_account_id"], name: "index_goal_logs_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_logs_on_goal_id"
   end
