@@ -1,4 +1,4 @@
-# TODO 遷移図にあわせてグループ目標だけ
+# TODO: 遷移図にあわせてグループ目標だけ
 # TODO 画像のimg_urlのフォーマットや仕様を決める
 # TODO バッチ処理 current_amountへの加算タイミング
 # TODO 紐付け口座の変更処理
@@ -26,16 +26,17 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal = Entities::Goal.create!(goal_params)
         goal.goal_settings.create!(get_goal_setting_params)
       end
-
-      rescue => exception
-        p exception
-        render(json: {}, status: 400) && return
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
+    rescue => exception
+      p exception
+      render(json: {}, status: 400) && return
     end
 
     render(json: {}, status: 200)
   end
 
-  # TODO 目標編集の仕様確認。内容によって修正対応
+  # TODO: 目標編集の仕様確認。内容によって修正対応
   def update
     begin
       Entities::Goal.new.transaction do
@@ -52,9 +53,15 @@ class Api::V1::Group::GoalsController < ApplicationController
     render(json: {}, status: 200)
   end
 
-  #TODO 要件確認して論理削除にする
+  # TODO: 要件確認して論理削除にする
   def destroy
     Entities::Goal.find(params[:id]).destroy
+  end
+
+  def graph
+    return render_404 if params[:id].blank?
+    @responses = Services::GoalGraphService.new(@current_user, Entities::Goal.find(params[:id]), params[:span]).call
+    render 'graph', formats: 'json', handlers: 'jbuilder'
   end
 
   private
@@ -69,13 +76,13 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def get_goal_params
     params.require(:goals).permit(
-        :group_id,
-        :name,
-        :img_url,
-        :goal_type_id,
-        :start_date,
-        :end_date,
-        :goal_amount
+      :group_id,
+      :name,
+      :img_url,
+      :goal_type_id,
+      :start_date,
+      :end_date,
+      :goal_amount
     ).merge(user_id: @current_user.id, current_amount: 0)
   end
 end

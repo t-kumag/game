@@ -36,6 +36,10 @@ Rails.application.routes.draw do
 
         resources :goals, path: '/goals'
 
+        get 'icon', to: 'icon#index'
+        post 'icon', to: 'icon#create'
+        put 'icon', to: 'icon#update'
+
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
         get 'emoney-accounts-summary', :to => 'emoney_accounts#summary'
@@ -81,8 +85,10 @@ Rails.application.routes.draw do
         get 'pl-grouped-categories', :to => 'pl#grouped_categories'
         get 'transactions', :to => 'transactions#index'
         get 'grouped-transactions', :to => 'transactions#grouped_transactions'
-      end
 
+        get 'goal-graph/:id', :to => 'goals#graph'
+
+      end
 
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
         collection do
@@ -91,6 +97,7 @@ Rails.application.routes.draw do
           post :confirm_pairing_request
         end
       end
+      delete 'pairing-requests', :to => 'pairing_requests#destroy'
 
       resources :users, only: [:create]
 

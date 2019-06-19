@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_12_020548) do
+ActiveRecord::Schema.define(version: 2019_06_14_013325) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -378,6 +378,14 @@ ActiveRecord::Schema.define(version: 2019_06_12_020548) do
     t.index ["user_manually_created_transaction_id"], name: "index_u_d_t_on_user_manually_created_transaction_id"
   end
 
+  create_table "user_icons", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "img_url", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_icons_on_user_id"
+  end
+
   create_table "user_manually_created_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "at_transaction_category_id"
@@ -462,6 +470,7 @@ ActiveRecord::Schema.define(version: 2019_06_12_020548) do
   add_foreign_key "user_distributed_transactions", "groups"
   add_foreign_key "user_distributed_transactions", "user_manually_created_transactions"
   add_foreign_key "user_distributed_transactions", "users"
+  add_foreign_key "user_icons", "users"
   add_foreign_key "user_manually_created_transactions", "at_transaction_categories"
   add_foreign_key "user_manually_created_transactions", "payment_methods"
   add_foreign_key "user_manually_created_transactions", "users"

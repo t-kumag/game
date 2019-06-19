@@ -16,6 +16,7 @@ class Entities::User < ApplicationRecord
 
   has_one :at_user
 
+  has_one :user_icon
   has_many :access_grants, class_name: "Doorkeeper::AccessGrant",
           foreign_key: :resource_owner_id,
           dependent: :delete_all # or :destroy if you need callbacks
@@ -51,7 +52,7 @@ class Entities::User < ApplicationRecord
     params = {
       token: token
     } 
-    self.find_by(params)    
+    self.find_by(params)
   end
 
   def generate_token

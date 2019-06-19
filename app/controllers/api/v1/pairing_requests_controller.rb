@@ -58,4 +58,9 @@ class Api::V1::PairingRequestsController < ApplicationController
     # render 'receive_pairing_request', formats: 'json', handlers: 'jbuilder', status: 200
   end
 
+  def destroy
+    Services::ParingService.new(@current_user).cancel
+    render json: {}, status: 200
+  end
+
 end
