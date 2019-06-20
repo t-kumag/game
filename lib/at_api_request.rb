@@ -53,10 +53,6 @@ module AtAPIRequest
       end
     end
 
-    # params = {
-    #   at_user_id: "",
-    #   at_user_password: "",
-    # }
     class GetToken < AtAPIRequest::Request
       def initialize(params)
         @path = "/opentoknr001.jct"
@@ -65,6 +61,16 @@ module AtAPIRequest
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
           "USER_ID" => "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}",
           # "USER_PW" => params[:at_user_password],
+        }
+      end
+    end
+
+    class DeleteToken < AtAPIRequest::Request
+      def initialize(params)
+        @path = "/opentoknd001.jct"
+        @method = HttpMethod::GET
+        @params = {
+            "TOKEN_KEY" => params[:token]
         }
       end
     end
