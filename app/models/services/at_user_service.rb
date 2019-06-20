@@ -103,7 +103,11 @@ class Services::AtUserService
       p "current token===================="
       p res
 
-      if res.has_key?("TOKEN_KEY")
+      if res.has_key?("EXPI_DT") && res["EXPI_DT"].present?
+        params = {
+            at_user_id: @user.at_user.id,
+            token: res["TOKEN_KEY"]
+        }
         # tokenを削除する
         requester = AtAPIRequest::AtUser::DeleteToken.new(params)
         res = AtAPIClient.new(requester).request
