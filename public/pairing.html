@@ -1,0 +1,41 @@
+<html>
+<script type="text/javascript">
+
+//カスタムURLスキーム
+// var custom_pairing_url = 'osidori://pairing?token='; 
+var custom_pairing_url = 'https://www.osidori.co/?token='; 
+
+// AppStoreでのosidoriアプリURL
+// var app_store_url = 'xxxxxxxxxxxxxxxxxxxx'; 
+var app_store_url = 'https://www.google.com/';
+
+// token が正しく取れなかった場合の処理は必要か?
+// var token = getParam('token') ? getParam('token') : "エラー用のトークン値でも入れる？";
+// token == null
+
+// カスタムURLに飛ばす(GETメソッド)
+location.href = `${custom_pairing_url}${getParam('token')}`
+
+// アプリを起動処理で未インストールだった場合のタイマー処理
+var _timerId = setTimeout(function() {
+    // AppStoreのosidoriアプリURLに飛ばす
+    location.href = app_store_url;
+}, 500); 
+
+/**
+ * Get the URL parameter value
+ *
+ * @param  name {string} パラメータのキー文字列
+ * @return  url {url} 対象のURL文字列（任意）
+ */
+function getParam(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+</script>
+</html>
