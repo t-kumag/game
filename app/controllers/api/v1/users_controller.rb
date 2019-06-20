@@ -16,6 +16,21 @@ class Api::V1::UsersController < ApplicationController
     render 'create', formats: 'json', handlers: 'jbuilder', status: 200
   end
 
+  def resend
+    obj = {}
+    user = Entities::User.where(email: params[:email]).first
+
+    unless user.email_authenticated
+      user.reset_token
+      user.save!
+      MailDelivery.user_registration(user).deliver
+
+      render json: obj, status: 200
+    else
+      render json: obj, status: :bad_request
+    end
+  end
+
   def activate
     user = Entities::User.where(token: params[:token]).first
     return render_forbidden if user.blank?
