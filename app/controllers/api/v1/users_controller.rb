@@ -16,14 +16,14 @@ class Api::V1::UsersController < ApplicationController
     render 'create', formats: 'json', handlers: 'jbuilder', status: 200
   end
 
-  def confirm
+  def resend
     obj = {}
-    @user = Entities::User.where(email: params[:email]).first
+    user = Entities::User.where(email: params[:email]).first
 
-    unless @user.email_authenticated
-      @user.reset_token
-      @user.save!
-      MailDelivery.user_registration(@user).deliver
+    unless user.email_authenticated
+      user.reset_token
+      user.save!
+      MailDelivery.user_registration(user).deliver
 
       render json: obj, status: 200
     else

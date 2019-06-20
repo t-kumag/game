@@ -106,7 +106,7 @@ Rails.application.routes.draw do
       get 'user/at-sync', :to => 'users#at_sync'
       get 'user/at-token', :to => 'users#at_token'
       get 'user/activate', :to => 'users#activate'
-      post 'user/confirm', to: 'users#confirm'
+      post 'user/resend', to: 'users#resend'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
     end
