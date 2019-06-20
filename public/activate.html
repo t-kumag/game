@@ -2,20 +2,19 @@
 <script type="text/javascript">
 
 //カスタムURLスキーム
-var custom_activate_url = 'osidori://activate?token='; 
+let custom_activate_url = 'osidori://activate?token='; 
 
-// AppStoreでのosidoriアプリURL
-var app_store_url = 'https://www.osidori.co/?token=';
+// @TODO AppStoreでのosidoriアプリURLが確定したら更新
+let app_store_url = 'https://www.osidori.co/?token=';
 
-// token が正しく取れなかった場合の処理は必要か
-// var token = getParam('token') ? getParam('token') : "エラー用のトークン値でも入れる？";
-// token == null
+// token が正しく取れなかった場合、空文字
+let token = getParam('token') ? getParam('token') : "";
 
 // カスタムURLに飛ばす(GETメソッド)
-location.href = `${custom_activate_url}${getParam('token')}`
+location.href = `${custom_activate_url}${token}`
 
 // アプリを起動処理で未インストールだった場合のタイマー処理
-var _timerId = setTimeout(function() {
+let timerId = setTimeout(function() {
     // AppStoreのosidoriアプリURLに飛ばす
     location.href = app_store_url;
 }, 500); 
@@ -29,7 +28,7 @@ var _timerId = setTimeout(function() {
 function getParam(name, url) {
     if (!url) url = window.location.href;
     name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+    let regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
         results = regex.exec(url);
     if (!results) return null;
     if (!results[2]) return '';
