@@ -88,14 +88,36 @@ class Services::AtUserService
   end
 
   # トークンを取得、叩くごとにtokenが更新される
+  # TODO: ミロクにtokenの仕様を確認中（一時的な対応）
   def token
-    p "token===================="
     begin
+      return {} unless @user.try(:at_user).try(:at_user_tokens)
+
+      params = {
+        at_user_id: @user.at_user.id,
+        token: @user.at_user.at_user_tokens.first.token
+      }
+      # 有効なtokenを取得する
+      requester = AtAPIRequest::AtUser::GetTokenStatus.new(params)
+      res = AtAPIClient.new(requester).request
+      p "current token===================="
+      p res
+
+      if res.has_key?("TOKEN_KEY")
+        # tokenを削除する
+        requester = AtAPIRequest::AtUser::DeleteToken.new(params)
+        res = AtAPIClient.new(requester).request
+        p "delete token===================="
+        p res
+      end
+
+      # tokenを取得する
       params = {
           at_user_id: @user.at_user.at_user_id
       }
       requester = AtAPIRequest::AtUser::GetToken.new(params)
       res = AtAPIClient.new(requester).request
+      p "new token===================="
       p res
       params = {
           token: res["TOKEN_KEY"],
