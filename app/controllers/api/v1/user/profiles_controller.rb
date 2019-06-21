@@ -3,7 +3,6 @@ class Api::V1::User::ProfilesController < ApplicationController
 
   def create
     begin
-      logger.debug "create !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
       Entities::UserProfile.new(user_profile_params).save!
     rescue ActiveRecord::RecordInvalid => db_err
       p db_err
@@ -17,7 +16,6 @@ class Api::V1::User::ProfilesController < ApplicationController
 
   def update
     begin
-      logger.debug "update !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
       @current_user.user_profile.update!(get_profile_params)
     rescue ActiveRecord::RecordInvalid => db_err
       p db_err
@@ -30,7 +28,6 @@ class Api::V1::User::ProfilesController < ApplicationController
   end
 
   def index
-    logger.debug "index !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     @profile = @current_user.user_profile
     if @profile.present? 
       render 'index', formats: 'json', handlers: 'jbuilder'
@@ -53,12 +50,12 @@ class Api::V1::User::ProfilesController < ApplicationController
   end
 
   def get_profile_params
-    {
-      gender: params[:gender],
-      birthday: params[:birthday],
-      has_child: params[:has_child],
-      push: params[:push],
-    }
+    params.permit(
+        :gender,
+        :birthday,
+        :has_child,
+        :push
+    )
   end
 end
 
