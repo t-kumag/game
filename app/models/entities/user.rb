@@ -13,16 +13,15 @@
 #
 
 class Entities::User < ApplicationRecord
-
   has_one :at_user
 
   has_one :user_icon
-  has_many :access_grants, class_name: "Doorkeeper::AccessGrant",
-          foreign_key: :resource_owner_id,
-          dependent: :delete_all # or :destroy if you need callbacks
-  has_many :access_tokens, class_name: "Doorkeeper::AccessToken",
-          foreign_key: :resource_owner_id,
-          dependent: :delete_all # or :destroy if you need callbacks
+  has_many :access_grants, class_name: 'Doorkeeper::AccessGrant',
+                           foreign_key: :resource_owner_id,
+                           dependent: :delete_all # or :destroy if you need callbacks
+  has_many :access_tokens, class_name: 'Doorkeeper::AccessToken',
+                           foreign_key: :resource_owner_id,
+                           dependent: :delete_all # or :destroy if you need callbacks
   has_one :participate_group
   has_one :group, through: :participate_group
   has_one :user_profile
@@ -31,9 +30,9 @@ class Entities::User < ApplicationRecord
   # email はメールアドレスとしての整合性と、仕様上の最大長をチェックする
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   validates :email, presence: true,
-                    uniqueness: true, 
-                    format: { with: VALID_EMAIL_REGEX }, 
-                    length: { maximum: 256}
+                    uniqueness: true,
+                    format: { with: VALID_EMAIL_REGEX },
+                    length: { maximum: 256 }
 
   enum rank: { free: 0, premium: 1 }
 
@@ -45,25 +44,26 @@ class Entities::User < ApplicationRecord
   def clear_token
     self.token = nil
     self.token_expires_at = nil
-    self.save!
+    save!
   end
 
   def self.token_authenticate!(token)
     params = {
       token: token
-    } 
-    self.find_by(params)
+    }
+    find_by(params)
   end
 
   def generate_token
     # TODO　envなどから参照する
-    salt = "sjdhp2wys5ga4a2ks"
+    salt = 'sjdhp2wys5ga4a2ks'
     time = DateTime.now
-    return Digest::SHA256.hexdigest(self.id.to_s + time.to_s + salt)
+    Digest::SHA256.hexdigest(id.to_s + time.to_s + salt)
   end
 
-  def group_id
-    self.participate_group.group_id
-  end
+  delegate :group_id, to: :participate_group
 
+  def self.temporary_user(email)
+    find_by(email: email, email_authenticated: 0)
+  end
 end
