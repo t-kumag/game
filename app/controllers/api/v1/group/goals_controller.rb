@@ -64,6 +64,42 @@ class Api::V1::Group::GoalsController < ApplicationController
     render 'graph', formats: 'json', handlers: 'jbuilder'
   end
 
+  def add_money
+    # 目標レコードの取得
+    goal = Entities::Goal.find(params[:id])
+    # ①指定された目標の目標設定から紐づく口座を抽出
+    at_user_bank_account = Entities::AtUserBankAccounts.find(goal.goal_setting.at_user_bank_account_id)
+    begin
+      # ②口座の残高が追加入金額より多ければ下記処理を行う
+      if params[:add_amount] < at_user_bank_account.balance
+        # ③目標（goal）のcurrent_amount に追加入金額を足す
+        add_amount = params[:add_amount]
+        before_current_amount = goal.current_amount
+        after_current_amount = goal.current_amount + add_amount
+        goal.current_amount += add_amount
+        goal.save!
+        # ④goal_logs を create し、
+        goal.goal_logs.create!(
+          goal_id: goal.id,
+          at_user_bank_account_id:  goal.goal_setting.at_user_bank_account_id,
+          # add_amoutに追加入金額、
+          add_amount: add_amount,
+          # before_amountに追加入金 ＊前＊ の額
+          before_current_amount: before_current_amount,
+          # after_amountに追加入金 ＊後＊ の額
+          after_current_amount: after_current_amount
+        )
+      else
+        render json: {errors: [{code:"", message: "minus balance"}]}, status: 422
+      end
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
+    end
+
+    render(json: {}, status: 200)
+  end
+
+
   private
 
   def get_goal_setting_params
