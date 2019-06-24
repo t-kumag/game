@@ -73,8 +73,8 @@ Rails.application.routes.draw do
         end
 
         # TODO goal_settingsの更新
+        post 'goals/:id/add_money', :to => 'goals#add_money'
         resources :goals, path: '/goals'
-        post 'goals/:id/add_money', path: 'goals#add_money'
 
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'

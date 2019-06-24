@@ -66,9 +66,13 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def add_money
     # 目標レコードの取得
+    current_user_banks = @current_user.at_user.at_user_bank_accounts.pluck(:at_bank_id)
     goal = Entities::Goal.find(params[:id])
+    goal_setting = Entities::Goal.find(params[:id]).goal_settings.find_by(at_user_bank_account_id: current_user_banks)
+
     # ①指定された目標の目標設定から紐づく口座を抽出
-    at_user_bank_account = Entities::AtUserBankAccounts.find(goal.goal_setting.at_user_bank_account_id)
+    at_user_bank_account = @current_user.at_user.at_user_bank_accounts.find(goal_setting.at_user_bank_account_id)
+
     begin
       # ②口座の残高が追加入金額より多ければ下記処理を行う
       if params[:add_amount] < at_user_bank_account.balance
@@ -81,7 +85,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         # ④goal_logs を create し、
         goal.goal_logs.create!(
           goal_id: goal.id,
-          at_user_bank_account_id:  goal.goal_setting.at_user_bank_account_id,
+          at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
           # add_amoutに追加入金額、
           add_amount: add_amount,
           # before_amountに追加入金 ＊前＊ の額
@@ -94,6 +98,9 @@ class Api::V1::Group::GoalsController < ApplicationController
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
+    rescue => exception
+      logger.debug exception
+      render(json: {}, status: 400) && return
     end
 
     render(json: {}, status: 200)
