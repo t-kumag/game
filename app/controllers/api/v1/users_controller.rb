@@ -41,6 +41,18 @@ class Api::V1::UsersController < ApplicationController
     render 'activate', formats: 'json', handlers: 'jbuilder', status: 200
   end
 
+  def change_password_request
+    obj = {}
+    user = Entities::User.where(email: params[:email]).first
+
+    if user.present?
+      MailDelivery.user_change_password_request(@user).deliver
+      render json: obj, status: 200
+    else
+      render json: obj, status: :bad_request
+    end
+  end
+
   def at_url
     @response = Services::AtUserService.new(@current_user).at_url
     render 'at_url', formats: 'json', handlers: 'jbuilder'
