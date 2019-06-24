@@ -1,5 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   before_action :authenticate, only: [:at_url, :at_sync, :at_token]
+  before_action :check_temporary_user, only: [:create]
+
   def sign_up_params
     params.permit(:email, :password)
   end

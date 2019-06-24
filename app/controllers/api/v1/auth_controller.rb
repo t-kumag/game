@@ -1,8 +1,9 @@
 class Api::V1::AuthController < ApplicationController
   before_action :authenticate, except: :login
+  before_action :check_temporary_user, only: [:login]
+
   def login
-    puts "login=-====================="
-    @user = Entities::User.find_by({email: params[:email]})
+    @user = Entities::User.find_by(email: params[:email])
 
     if @user && @user.authenticate(params[:password])
       @user.reset_token
@@ -10,11 +11,10 @@ class Api::V1::AuthController < ApplicationController
       render 'login', formats: 'json', handlers: 'jbuilder'
     else
       render json: {}, status: :unauthorized
-    end  
+    end
   end
 
   def authenticate_email
-    
   end
 
   def logout
@@ -22,5 +22,4 @@ class Api::V1::AuthController < ApplicationController
     @current_user = nil
     render json: {}, status: 200
   end
-
 end
