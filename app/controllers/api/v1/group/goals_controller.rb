@@ -69,11 +69,11 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal = Entities::Goal.find(params[:id])
     goal_setting = goal.goal_settings.find_by(at_user_bank_account_id: current_user_banks)
     if current_user_banks.present? && goal.present? && goal_setting.present? && params[:add_amount].present?
-      @responses = Services::GoalService.new(@current_user).add_money(goal, goal_setting, params[:add_amount])
+      @response = Services::GoalService.new(@current_user).add_money(goal, goal_setting, params[:add_amount])
     else
       render(json: {}, status: 400) && return
     end
-    render(json: @responses[:json] , status: @responses[:status])
+    render(json: @response["json"] , status: @response["status"])
   end
 
 
