@@ -41,4 +41,5 @@ ADD . $ROOT_PATH
 
 EXPOSE 3000
 
-CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma/production.rb"]
+# CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma/production.rb"]
+CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma/development.rb"]
