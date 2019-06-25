@@ -39,13 +39,8 @@ class Api::V1::User::ProfilesController < ApplicationController
   private
 
   def user_profile_params
-    params.permit(
-        :gender,
-        :birthday,
-        :has_child,
-        :push
-    ).merge(
-        user_id: @current_user.id
+    get_profile_params.merge(
+      user_id: @current_user.id
     )
   end
 
