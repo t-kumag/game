@@ -52,7 +52,9 @@ Rails.application.routes.draw do
         get 'grouped-transactions', :to => 'transactions#grouped_transactions'
 
         resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
-        resources :profiles, only: [:create]
+
+        resources :profiles, only: [:show, :create, :update]
+
       end
 
       # 共有用
