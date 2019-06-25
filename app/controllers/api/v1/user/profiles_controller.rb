@@ -27,12 +27,12 @@ class Api::V1::User::ProfilesController < ApplicationController
     render json: {}, status: 200
   end
 
-  def index
+  def show
     @profile = @current_user.user_profile
     if @profile.present? 
       render 'index', formats: 'json', handlers: 'jbuilder'
     else
-      render json: {errors: [{code: "message sample fobidden"}]}, status: 200  
+      render json: {}, status: 200
     end  
   end
 
