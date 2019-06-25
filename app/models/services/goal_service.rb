@@ -25,7 +25,7 @@ class Services::GoalService
     res = {}
     begin
         at_user_bank_account = @user.at_user.at_user_bank_accounts.find(goal_setting.at_user_bank_account_id)
-        return res["json"] = {}, res["status"] = 400 unless at_user_bank_account.present?
+        return { json: {}, status: 400 } unless at_user_bank_account.present?
 
         if add_amount < at_user_bank_account.balance
           ActiveRecord::Base.transaction do
@@ -42,9 +42,9 @@ class Services::GoalService
               after_current_amount: after_current_amount
             )
           end
-          res["json"] = {}, res["status"] = 200
+          res = { json: {}, status: 200 }
         else
-          res["json"] = {errors: [{code:"", message:"minus balance"}]}, res["status"] = 422
+          res = { json: {errors: [{code:"", message:"minus balance"}]}, status: 422 }
         end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err

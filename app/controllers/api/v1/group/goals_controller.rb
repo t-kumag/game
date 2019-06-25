@@ -73,7 +73,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     else
       render(json: {}, status: 400) && return
     end
-    render(json: @response["json"] , status: @response["status"])
+    render(json: @response[:json] , status: @response[:status])
   end
 
 
