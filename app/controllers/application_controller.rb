@@ -88,7 +88,7 @@ class ApplicationController < ActionController::Base
   private
 
   def authenticate
-    authenticate_token || render_unauthorized
+    return render_unauthorized unless authenticate_token
     activated?
   end
 
@@ -100,7 +100,7 @@ class ApplicationController < ActionController::Base
   # end
 
   def activated?
-    return if @current_user.email_authenticated
+    return if @current_user.try(:email_authenticated)
     render_forbidden
   end
 
