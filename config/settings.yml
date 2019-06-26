@@ -1,0 +1,38 @@
+defaults: &defaults
+  api_url: https://beta2.osidori-dev.com
+  at_url: https://atdev.369webcash.com
+  at_pwd_salt: osdrdev
+  at_chnl_id: CHNL_OSIDORI
+  at_account_name_prefix: osdrdev
+
+test:
+  <<: *defaults
+  api_url: https://beta2.osidori-dev.com
+  at_url: https://atdev.369webcash.com
+  at_pwd_salt: osdrdev
+  at_chnl_id: CHNL_OSIDORI
+  at_account_name_prefix: osdrdev
+
+development:
+  <<: *defaults
+  api_url: https://beta2.osidori-dev.com
+  at_url: https://atdev.369webcash.com
+  at_pwd_salt: osdrdev
+  at_chnl_id: CHNL_OSIDORI
+  at_account_name_prefix: osdrdev
+
+staging:
+  <<: *defaults
+  api_url: https://stg-api.osidori-dev.com
+  at_url: https://atstaging.369webcash.com
+  at_pwd_salt: osdrstaging
+  at_chnl_id: CHNL_OSIDORI
+  at_account_name_prefix: osdrstaging
+
+production:
+  <<: *defaults
+  api_url: https://api-osidori.com
+  at_url: https://at.369webcash.com
+  at_pwd_salt: osdr
+  at_chnl_id: CHNL_OSIDORI
+  at_account_name_prefix: osdr

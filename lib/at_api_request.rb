@@ -5,12 +5,16 @@ module AtAPIRequest
   end
 
   class Request
-    # envに移す
-    PWD_SALT = "osdrdev".freeze
-    ACCOUNT_NAME_PREFIX = "osdrdev".freeze
-    CHNL_ID = "CHNL_OSIDORI".freeze
-    URL = "https://atdev.369webcash.com".freeze
+    PWD_SALT = Settings.at_pwd_salt
+    ACCOUNT_NAME_PREFIX = Settings.at_account_name_prefix
+    CHNL_ID = Settings.at_chnl_id
+    URL = Settings.at_url
     attr_reader :path, :params, :url, :method
+
+    Rails.logger.info("PWD_SALT: #{PWD_SALT}")
+    Rails.logger.info("ACCOUNT_NAME_PREFIX: #{ACCOUNT_NAME_PREFIX}")
+    Rails.logger.info("CHNL_ID: #{CHNL_ID}")
+    Rails.logger.info("URL: #{URL}")
 
     def url
       URL

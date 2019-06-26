@@ -239,6 +239,7 @@ GEM
     ruby-progressbar (1.10.0)
     ruby_dep (1.5.0)
     rufo (0.5.0)
+    settingslogic (2.0.9)
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-watcher-listen (2.0.1)
@@ -309,6 +310,7 @@ DEPENDENCIES
   rspec-rails
   rubocop
   rufo
+  settingslogic
   spring
   spring-watcher-listen (~> 2.0.0)
   tzinfo-data

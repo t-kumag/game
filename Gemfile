@@ -94,5 +94,6 @@ gem 'kaminari'
 # paranoia 論理削除
 gem 'paranoia'
 
-
+# settingslogic 定数を一元管理
+gem 'settingslogic'
 

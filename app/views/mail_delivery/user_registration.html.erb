@@ -2,7 +2,7 @@
 <p>OsidOriへようこそ！</p>
 <p>下記URLをクリックすることでメールアドレスの認証が完了します。</p>
 
-<p><a href="osidori://activate?token=<%= @token %>">osidori://activate?token=<%= @token %></a></p>
+<p><a href="<%= Settings.api_url %>/activate.html?token=<%= @token %>"><%= Settings.api_url %>/activate.html?token=<%= @token %></a></p>
 
 <p>（注）<br>
 このメールは、登録メールアドレス宛に自動的にお送りしています。ご登録された覚えのない場合はお手数ですが以下お問い合わせ先までご連絡ください。
