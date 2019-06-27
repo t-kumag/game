@@ -250,19 +250,25 @@ class Services::AtUserService
       # 証券、保険などが増えると分岐が長くなるので渡されたmodelに対して処理を行うような作りに変える
       case @target
       when 'bank'
+        update_error_date(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
         puts "scraping bank=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
+        fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
       when 'card'
+        update_error_date(@user.at_user.at_user_bank_accounts, Entities::AtUserCardAccount)
         puts "scraping card=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
+        fnc_ids + get_fnc_ids(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
       when 'emoney'
+        update_error_date(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
         puts "scraping emoney=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+        fnc_ids + get_fnc_ids(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
       else
+        update_error_date(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
+        update_error_date(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
+        update_error_date(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
         puts "scraping all=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
-        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
-        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+        fnc_ids + get_fnc_ids(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
+        fnc_ids + get_fnc_ids(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
+        fnc_ids + get_fnc_ids(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
       end
 
       fnc_ids.each do |fnc_id|
@@ -272,6 +278,15 @@ class Services::AtUserService
         }
         requester = AtAPIRequest::AtUser::ExecScraping.new(params)
         res = AtAPIClient.new(requester).request
+        # ＠TODO　↓↓実装
+        # ③スクレイピングの実行（openscrpr001）レスポンスの↓で追加認証要求判定する
+        # 結果区分　TRAN_TYPE　半角
+        # 1 : 追加認証要求
+        # 2 : スクレイピング完了
+        # a.　追加認証要求ありの場合
+        # →　追加認証の実行（openscrpr001）
+        # b.　追加認証要求なしの場合
+        # →　at_sync実行
       end
     rescue AtAPIStandardError => api_err
       raise api_err
@@ -297,6 +312,59 @@ class Services::AtUserService
   end
 
 
+  def update_error_date(at_user_accounts, account_entity)
+    accounts = []
+    at_user_accounts.each do |account|
+      # 最終スクレイピング結果をlast_rslt_cd判定
+      # a.　E : エラーの場合、erro_dateをDateTime.nowで更新
+      if account.last_rslt_cd == "E"
+        account.error_date = DateTime.now
+      # b.　0 : 正常の場合、erro_dateをnilで、error_countを0で更新
+      elsif a.last_rslt_cd == "0"
+        account.error_date = nil
+        account.error_count = 0
+      end
+      accounts << account
+    end
+    account_entity.import accounts, on_duplicate_key_update: [:error_date, :error_count], validate: false
+  end
+
+
+  def update_error_count(at_user_accounts, account_entity)
+    accounts = []
+    at_user_accounts.each do |account|
+      # error_countインクリメント処理
+      account.error_count += 1
+      accounts << account
+    end
+    account_entity.import accounts, on_duplicate_key_update: [:error_count], validate: false
+  end
+
+
+  def get_fnc_ids(at_user_accounts, account_entity)
+    error_counts = []
+    fnc_ids = at_user_accounts.map{|account| 
+      # ②erro_dateとエラーカウント判定（error_date、error_count）
+      # a.　error_date判定（24時間経過）
+      if (DateTime.now - account.error_date).numerator > 0
+        # →スクレイピング実行（openscrpr001）
+        account.fnc_id
+      # b.　error_date判定（24時間未経過）、error_count判定（スクレイピングエラー解消リクエスト回数3未満）
+      elsif (DateTime.now - account.error_date).numerator < 0 && error_count < 3
+      # →スクレイピング実行（openscrpr001）
+        # error_countをインクリメントする配列作成
+        error_counts << account
+        account.fnc_id
+      # c.　error_date判定、can_ scrape_flag判定ともに偽
+      else
+      # →スクレイピングしない  
+      end
+    }.compact
+    # error_countのインクリメント関数
+    update_error_count(error_counts, account_entity)
+
+    fnc_ids
+  end
 
   # ## openuserr003
   # ## トークン及びユーザーIDから、ユーザーの状態を照会します
