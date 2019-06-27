@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_26_133811) do
+ActiveRecord::Schema.define(version: 2019_06_27_143827) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -54,6 +54,13 @@ ActiveRecord::Schema.define(version: 2019_06_26_133811) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "category_name"
+  end
+
+  create_table "at_sync_transaction_latest_date_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.date "last_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "at_transaction_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -287,6 +294,8 @@ ActiveRecord::Schema.define(version: 2019_06_26_133811) do
     t.integer "current_amount"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_goals_on_deleted_at"
     t.index ["goal_type_id"], name: "index_goals_on_goal_type_id"
     t.index ["group_id"], name: "index_goals_on_group_id"
     t.index ["user_id"], name: "index_goals_on_user_id"
@@ -338,6 +347,8 @@ ActiveRecord::Schema.define(version: 2019_06_26_133811) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_participate_groups_on_deleted_at"
     t.index ["group_id"], name: "index_participate_groups_on_group_id"
     t.index ["user_id"], name: "index_participate_groups_on_user_id"
   end
@@ -415,6 +426,7 @@ ActiveRecord::Schema.define(version: 2019_06_26_133811) do
     t.integer "has_child"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "push"
     t.index ["user_id"], name: "index_user_profiles_on_user_id"
   end
 
