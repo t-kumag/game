@@ -122,14 +122,15 @@ class Services::AtUserService::Sync
             end
             src_trans << tran
 
-            activity = Services::ActivityService.new.list(rec_key, i, a)
+            activity = Services::ActivityService.new.list(rec_key, tran, a)
             check_duplicate_activity = Services::ActivityService.new.check_activity_duplication(rec_key, activities, activity)
             last_sync_date = Services::AtSyncTransactionLatestDateLogService.new.get_activity_sync_latest_one(rec_key, a)
 
-            if (last_sync_date > activity[:date]) && check_duplicate_activity
+            if last_sync_date.nil? && check_duplicate_activity
+              activities << activity
+            elsif last_sync_date.present? && (last_sync_date < activity[:date]) && check_duplicate_activity
               activities << activity
             end
-
           end
         end
         transaction_entity.import src_trans, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false

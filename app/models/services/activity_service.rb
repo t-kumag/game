@@ -2,7 +2,7 @@ require 'nkf'
 
 class Services::ActivityService
 
-  def list(rec_key, res_data, account)
+  def list(rec_key, tran, account)
 
     activity = Entities::Activity.new
     activity[:count] = 0
@@ -12,16 +12,13 @@ class Services::ActivityService
 
     activity_data_column.each do |k, v|
       if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
-        activity[:date] = res_data[v[:col]]
+        activity[:date] = tran[k]
       elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
-        activity[:activity_type] = (res_data[v[:col]].to_i == 0) ? v[:income] : v[:outcome]
+        activity[:activity_type] = (tran[k].to_i == 0) ? v[:income] : v[:outcome]
       end
     end
 
     activity
-  end
-  def check_last_sync_date(rec_key, user)
-
   end
 
   def check_activity_duplication(rec_key, activities, activity)
@@ -46,9 +43,9 @@ class Services::ActivityService
 
     activity_data_column.each do |k, v|
       if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
-        src_insert[:date] = activity[:date] == activities[old_act][v[:date]]
+        src_insert[:date] = activity[:date] == activities[old_act][:date]
       elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
-        src_insert[:activity] = activity[:activity_type] == activities[old_act][:col]
+        src_insert[:activity] = activity[:activity_type] == activities[old_act][:activity_type]
       end
     end
     ((src_insert[:date] == true) && (src_insert[:activity] == true)) ? false : true

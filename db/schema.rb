@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_27_143827) do
+ActiveRecord::Schema.define(version: 2019_06_28_112134) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "group_id"
     t.integer "count", null: false
     t.string "activity_type", null: false
-    t.date "date", null: false
+    t.datetime "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
