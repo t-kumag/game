@@ -53,7 +53,9 @@ Rails.application.routes.draw do
 
         resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
 
-        resources :profiles, only: [:show, :create, :update]
+        resources :profiles, only: [:create]
+        get 'profiles', :to => 'profiles#show'
+        put 'profiles', :to => 'profiles#update'
 
       end
 
