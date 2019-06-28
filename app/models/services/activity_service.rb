@@ -1,6 +1,6 @@
 class Services::ActivityService
 
-  def list(rec_key, tran, account)
+  def set_activity_list(rec_key, tran, account)
 
     activity = Entities::Activity.new
     activity[:count] = 0
@@ -24,8 +24,8 @@ class Services::ActivityService
     old_act_latest_two = activities.present? && (activities.length - 2 >= 0) ? (activities.length - 2) : -1
     activity_data_column = get_activity_data_column(rec_key)
 
-    old_one = old_acts(old_act_latest_one, activity, activities, activity_data_column)
-    old_two = old_acts(old_act_latest_two, activity, activities, activity_data_column)
+    old_one = duplicate_old_act(old_act_latest_one, activity, activities, activity_data_column)
+    old_two = duplicate_old_act(old_act_latest_two, activity, activities, activity_data_column)
 
     (old_one && old_two) ? true : false
 
@@ -37,7 +37,7 @@ class Services::ActivityService
 
   private
 
-  def old_acts(old_act, activity, activities, activity_data_column)
+  def duplicate_old_act(old_act, activity, activities, activity_data_column)
 
     return true if old_act < 0
 

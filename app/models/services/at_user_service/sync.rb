@@ -122,7 +122,7 @@ class Services::AtUserService::Sync
             end
             src_trans << tran
 
-            activity = Services::ActivityService.new.list(rec_key, tran, a)
+            activity = Services::ActivityService.new.set_activity_list(rec_key, tran, a)
             check_duplicate_activity = Services::ActivityService.new.check_activity_duplication(rec_key, activities, activity)
             last_sync_date = Services::AtSyncTransactionLatestDateLogService.new.get_activity_sync_latest_one(rec_key, a)
 
