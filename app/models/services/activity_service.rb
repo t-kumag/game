@@ -77,7 +77,6 @@ class Services::ActivityService
   def get_bank_activity_data_column
     {
         trade_date: {col: "TRADE_DTM" },
-        # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
         amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_bank_income', outcome: 'individual_bank_outcome'},
     }
   end
@@ -85,7 +84,6 @@ class Services::ActivityService
   def get_emoney_activity_data_column
     {
         used_date: {col: "USED_DATE" },
-        # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
         amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_emoney_income', outcome: 'individual_emoney_outcome'},
     }
   end
