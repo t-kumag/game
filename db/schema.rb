@@ -22,13 +22,6 @@ ActiveRecord::Schema.define(version: 2019_06_27_143827) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "activities_sync_dates", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.date "date", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -58,7 +51,8 @@ ActiveRecord::Schema.define(version: 2019_06_27_143827) do
 
   create_table "at_sync_transaction_latest_date_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.date "last_date", null: false
+    t.string "rec_key", null: false
+    t.datetime "last_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

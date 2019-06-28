@@ -14,16 +14,19 @@ class Services::ActivityService
       if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
         activity[:date] = res_data[v[:col]]
       elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
-        activity[:activity_type] = (res_data[v[:col]] == 0) ? v[:income] : v[:outcome]
+        activity[:activity_type] = (res_data[v[:col]].to_i == 0) ? v[:income] : v[:outcome]
       end
     end
 
     activity
   end
+  def check_last_sync_date(rec_key, user)
 
-  def duplicate_activity_check(rec_key, activities, activity)
-    old_act_latest_one = ( activities.length -1 >= 0) ? (activities.length -1) : -1
-    old_act_latest_two = ( activities.length -2 >= 0) ? (activities.length -2) : -1
+  end
+
+  def check_activity_duplication(rec_key, activities, activity)
+    old_act_latest_one = activities.present? && (activities.length - 1 >= 0) ? (activities.length - 1) : -1
+    old_act_latest_two = activities.present? && (activities.length - 2 >= 0) ? (activities.length - 2) : -1
     activity_data_column = get_activity_data_column(rec_key)
 
     old_one = old_acts(old_act_latest_one, activity, activities, activity_data_column)
@@ -37,7 +40,7 @@ class Services::ActivityService
 
   def old_acts(old_act, activity, activities, activity_data_column)
 
-    true if old_act < 0
+    return true if old_act < 0
 
     src_insert = {date: false, activity: false}
 
@@ -74,7 +77,7 @@ class Services::ActivityService
     {
         trade_date: {col: "TRADE_DTM" },
         # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
-        amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_bank_outcome', outcome: 'individual_bank_outcome'},
+        amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_bank_income', outcome: 'individual_bank_outcome'},
     }
   end
 

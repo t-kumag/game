@@ -123,17 +123,18 @@ class Services::AtUserService::Sync
             src_trans << tran
 
             activity = Services::ActivityService.new.list(rec_key, i, a)
-            duplicate_activity_check = Services::ActivityService.new.duplicate_activity_check(rec_key, activities, activity)
+            check_duplicate_activity = Services::ActivityService.new.check_activity_duplication(rec_key, activities, activity)
+            last_sync_date = Services::AtSyncTransactionLatestDateLogService.new.get_activity_sync_latest_one(rec_key, a)
 
-            if duplicate_activity_check
+            if (last_sync_date > activity[:date]) && check_duplicate_activity
               activities << activity
             end
 
           end
-          binding.pry
         end
         transaction_entity.import src_trans, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
         Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
+        Services::AtSyncTransactionLatestDateLogService.new.activity_sync_log(rec_key, a)
       end
     rescue AtAPIStandardError => api_err
       raise api_err
@@ -274,9 +275,6 @@ class Services::AtUserService::Sync
         },
         true # has_balance
       )
-
-      Entities::ActivitySyncDate
-
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
