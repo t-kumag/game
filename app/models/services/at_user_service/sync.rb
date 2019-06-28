@@ -134,7 +134,7 @@ class Services::AtUserService::Sync
           end
         end
         transaction_entity.import src_trans, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
-        Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
+        Services::ActivityService.new.save_activities(activities)
         Services::AtSyncTransactionLatestDateLogService.new.activity_sync_log(rec_key, a)
       end
     rescue AtAPIStandardError => api_err

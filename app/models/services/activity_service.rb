@@ -33,6 +33,10 @@ class Services::ActivityService
 
   end
 
+  def save_activities(activities)
+    Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
+  end
+
   private
 
   def old_acts(old_act, activity, activities, activity_data_column)
