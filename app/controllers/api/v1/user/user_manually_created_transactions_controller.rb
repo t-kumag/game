@@ -71,11 +71,15 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     ).merge(
       user_id: @current_user.id
     )
+
+    p @current_user
+    Services::ActivityService.new.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
     Entities::UserManuallyCreatedTransaction.create!(save_params)
+
   end
 
   def update_user_manually_created
-    save_params = params.permit(
+    save_params = params.require(:user_manually_created_transaction).permit(
       :id,
       :at_transaction_category_id,
       :payment_method_id,
@@ -86,7 +90,9 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     ).merge(
       user_id: @current_user.id
     )
-    Entities::UserManuallyCreatedTransaction.find(params[:id]).update!(save_params)
-    Entities::UserManuallyCreatedTransaction.find(params[:id])
+
+    Services::ActivityService.new.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
+    Entities::UserManuallyCreatedTransaction.find(save_params[:id]).update!(save_params)
+    Entities::UserManuallyCreatedTransaction.find(save_params[:id])
   end
 end

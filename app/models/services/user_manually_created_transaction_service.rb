@@ -4,6 +4,10 @@ class Services::UserManuallyCreatedTransactionService
     @transaction = transaction
   end
 
+  def create(save_params)
+    Entities::UserManuallyCreatedTransaction.create!(save_params)
+  end
+
   def create_user_manually_created
     distributed_transaction = Entities::UserDistributedTransaction.new
     save_user_manually_created(distributed_transaction)

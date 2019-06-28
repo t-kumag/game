@@ -1,5 +1,10 @@
 class Services::ActivityService
 
+
+  def save_activities(activities)
+    Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
+  end
+
   def set_activity_list(rec_key, tran, account)
 
     activity = Entities::Activity.new
@@ -31,8 +36,13 @@ class Services::ActivityService
 
   end
 
-  def save_activities(activities)
-    Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
+  def create_user_manually_activity(user, save_params, activity_type)
+    Entities::Activity.find_or_create_by(date: save_params[:used_date], activity_type: activity_type) do |activity|
+      activity.user_id = user.id
+      activity.count = 0
+      activity.activity_type = activity_type
+      activity.date = save_params[:used_date]
+    end
   end
 
   private
