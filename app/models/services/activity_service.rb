@@ -1,5 +1,3 @@
-require 'nkf'
-
 class Services::ActivityService
 
   def list(rec_key, tran, account)
