@@ -88,7 +88,7 @@ class ApplicationController < ActionController::Base
   private
 
   def authenticate
-    authenticate_token || render_unauthorized
+    return render_unauthorized unless authenticate_token
     activated?
   end
 
@@ -100,7 +100,7 @@ class ApplicationController < ActionController::Base
   # end
 
   def activated?
-    return if @current_user.email_authenticated
+    return if @current_user.try(:email_authenticated)
     render_forbidden
   end
 
@@ -127,5 +127,12 @@ class ApplicationController < ActionController::Base
 
   def json_request?
     request.format.json?
+  end
+
+  def check_temporary_user
+    @response = Entities::User.temporary_user(params[:email])
+    if @response.present?
+      render 'api/v1/errors/temporary_registration', formats: 'json', handlers: 'jbuilder', status: 422
+    end
   end
 end
