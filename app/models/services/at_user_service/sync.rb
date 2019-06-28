@@ -54,7 +54,7 @@ class Services::AtUserService::Sync
     account_entity.import accounts, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
   end
 
-  def sync_transaction(rec_key, financier_account_type_key, account_entity, transaction_entity, data_column, activity_data_column, has_balance=false, confirm_type=nil)
+  def sync_transaction(rec_key, financier_account_type_key, account_entity, transaction_entity, data_column, has_balance=false, confirm_type=nil)
 
     begin
       puts "sync transaction start ==============="
@@ -122,24 +122,13 @@ class Services::AtUserService::Sync
             end
             src_trans << tran
 
-            activity = Entities::Activity.new
-            activity[:count] = 0
-            activity[:user_id] = a[:at_user_id]
-            activity[:group_id] = a[:group_id]
-            activity_data_column.each do |k, v|
-              if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
-                activity[:date] = i[v[:col]]
-              elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
-                activity[:activity_type] = (i[v[:col]] == 0) ? v[:income] : v[:outcome]
-              end
-            end
-            activities << activity
+            activity = Services::ActivityService.new.list(rec_key, i, a)
+            duplicate_activity_check = Services::ActivityService.new.duplicate_activity_check(rec_key, activities, activity)
 
-            #if check_activity(activities, activity, activity_data_column)
-            #end
-            #array_num = activities.length
-            #if array_num > 1 &&
-            #end
+            if duplicate_activity_check
+              activities << activity
+            end
+
           end
           binding.pry
         end
@@ -243,11 +232,6 @@ class Services::AtUserService::Sync
           card_no: {col: "CARD_NO" },
           confirm_type: {col: "CONFIRM_TYPE" },
         },
-        {
-            used_date: {col: "USED_DATE" },
-            # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
-            payment_amount: {col: "PAYMENT_AMOUNT", income: 'individual_card_outcome', outcome: 'individual_card_outcome'},
-        },
         false, # has_balance
         'U' # U: 未確定含む
       )
@@ -271,11 +255,6 @@ class Services::AtUserService::Sync
           description5: {col: "DESCRIPTION5" },
           seq: {col: "SEQ" },
         },
-        {
-            trade_date: {col: "TRADE_DTM" },
-            # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
-            amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_bank_outcome', outcome: 'individual_bank_outcome'},
-        },
         true # has_balance
       )
 
@@ -292,11 +271,6 @@ class Services::AtUserService::Sync
           amount_payment: {col: "AMOUNT_PAYMENT" },
           balance: {col: "BALANCE" },
           seq: {col: "SEQ" },
-        },
-        {
-            used_date: {col: "USED_DATE" },
-            # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
-            amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_emoney_income', outcome: 'individual_emoney_outcome'},
         },
         true # has_balance
       )
