@@ -254,7 +254,7 @@ class Services::AtUserService
         puts "scraping bank=========="
         fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
       when 'card'
-        update_error_date(@user.at_user.at_user_bank_accounts, Entities::AtUserCardAccount)
+        update_error_date(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
         puts "scraping card=========="
         fnc_ids + get_fnc_ids(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
       when 'emoney'
