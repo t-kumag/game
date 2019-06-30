@@ -61,14 +61,16 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def change_password
+    obj = {}
     user = Entities::User.where(token: params[:token]).first
     password = change_password_params[:password]
     password_confirm = change_password_params[:password_confirm]
 
     if user.present? && (password == password_confirm)
       user.password = change_password_params[:password]
+      user.reset_token
       user.save!
-      render json: 'login', status: 200
+      render json: obj, status: 200
     else
       render json: {}, status: :unauthorized
     end
