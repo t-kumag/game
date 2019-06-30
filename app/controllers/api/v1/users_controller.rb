@@ -6,6 +6,10 @@ class Api::V1::UsersController < ApplicationController
     params.permit(:email, :password)
   end
 
+  def change_password_params
+    params.permit(:password, :password_confirm)
+  end
+
   def create
     @user = Entities::User.new
     @user.email = sign_up_params[:email]
@@ -48,10 +52,25 @@ class Api::V1::UsersController < ApplicationController
     user = Entities::User.where(email: params[:email]).first
 
     if user.present?
-      MailDelivery.user_change_password_request(@user).deliver
+      MailDelivery.user_change_password_request(user).deliver
+      user.change_password_reset_token
       render json: obj, status: 200
     else
       render json: obj, status: :bad_request
+    end
+  end
+
+  def change_password
+    user = Entities::User.where(token: params[:token]).first
+    password = change_password_params[:password]
+    password_confirm = change_password_params[:password_confirm]
+
+    if user.present? && (password == password_confirm)
+      user.password = change_password_params[:password]
+      user.save!
+      render json: 'login', status: 200
+    else
+      render json: {}, status: :unauthorized
     end
   end
 

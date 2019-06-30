@@ -109,6 +109,8 @@ Rails.application.routes.draw do
       get 'user/at-token', :to => 'users#at_token'
       get 'user/activate', :to => 'users#activate'
       post 'user/resend', to: 'users#resend'
+      post 'user/change_password_request', to: 'users#change_password_request'
+      post 'user/change_password', to: 'users#change_password'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
     end
