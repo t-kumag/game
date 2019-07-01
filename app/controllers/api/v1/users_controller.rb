@@ -2,13 +2,6 @@ class Api::V1::UsersController < ApplicationController
   before_action :authenticate, only: [:at_url, :at_sync, :at_token]
   before_action :check_temporary_user, only: [:create]
 
-  def sign_up_params
-    params.permit(:email, :password)
-  end
-
-  def change_password_params
-    params.permit(:password, :password_confirm)
-  end
 
   def create
     @user = Entities::User.new
@@ -48,31 +41,30 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def change_password_request
-    obj = {}
     user = Entities::User.where(email: params[:email]).first
 
     if user.present?
       MailDelivery.user_change_password_request(user).deliver
       user.change_password_reset_token
-      render json: obj, status: 200
+      user.save!
+      render json: {}, status: 200
     else
-      render json: obj, status: :bad_request
+      render json: {}, status: :bad_request
     end
   end
 
   def change_password
-    obj = {}
-    user = Entities::User.where(token: params[:token]).first
+    current_user = Entities::User.token_authenticate!(params[:token])
     password = change_password_params[:password]
     password_confirm = change_password_params[:password_confirm]
 
-    if user.present? && (password == password_confirm)
-      user.password = change_password_params[:password]
-      user.reset_token
-      user.save!
-      render json: obj, status: 200
+    if current_user.present? && DateTime.now <= current_user.token_expires_at && (password == password_confirm)
+      current_user.password = change_password_params[:password]
+      current_user.reset_token
+      current_user.save!
+      render json: {}, status: 200
     else
-      render json: {}, status: :unauthorized
+      render json: {}, status: :bad_request
     end
   end
 
@@ -98,5 +90,14 @@ class Api::V1::UsersController < ApplicationController
   def at_token
     @response = Services::AtUserService.new(@current_user).token
     render 'at_token', formats: 'json', handlers: 'jbuilder'
+  end
+
+  private
+  def sign_up_params
+    params.permit(:email, :password)
+  end
+
+  def change_password_params
+    params.permit(:password, :password_confirm)
   end
 end
