@@ -44,9 +44,9 @@ class Api::V1::UsersController < ApplicationController
     user = Entities::User.where(email: params[:email]).first
 
     if user.present?
-      MailDelivery.user_change_password_request(user).deliver
       user.change_password_reset_token
       user.save!
+      MailDelivery.user_change_password_request(user).deliver
       render json: {}, status: 200
     else
       render json: {}, status: :bad_request
