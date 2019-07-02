@@ -47,6 +47,7 @@ class Api::V1::UsersController < ApplicationController
       user.change_password_reset_token
       user.save!
       MailDelivery.user_change_password_request(user).deliver
+
       render json: {}, status: 200
     else
       render json: {}, status: :bad_request
@@ -55,16 +56,19 @@ class Api::V1::UsersController < ApplicationController
 
   def change_password
     current_user = Entities::User.token_authenticate!(params[:token])
-    password = change_password_params[:password]
-    password_confirm = change_password_params[:password_confirm]
+    change_status = false
 
-    if current_user.present? && DateTime.now <= current_user.token_expires_at && (password == password_confirm)
+    if change_password_params[:password].present? && change_password_params[:password_confirm].present?
+      change_status = change_password_params[:password] == change_password_params[:password_confirm]
+    end
+
+    if current_user.present? && DateTime.now <= current_user.token_expires_at && change_status
       current_user.password = change_password_params[:password]
       current_user.reset_token
       current_user.save!
       render json: {}, status: 200
     else
-      render json: {}, status: :bad_request
+      render json: {}, status: :unprocessable_entity
     end
   end
 
