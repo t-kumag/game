@@ -90,7 +90,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
 
-    Services::ActivityService.new.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
+    Services::ActivityService.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
     Entities::UserManuallyCreatedTransaction.find(save_params[:id]).update!(save_params)
     Entities::UserManuallyCreatedTransaction.find(save_params[:id])
   end

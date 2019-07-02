@@ -52,7 +52,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
   create_table "at_sync_transaction_latest_date_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "rec_key", null: false
-    t.datetime "last_date", null: false
+    t.datetime "latest_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

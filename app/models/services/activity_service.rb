@@ -36,7 +36,7 @@ class Services::ActivityService
 
   end
 
-  def create_user_manually_activity(user, save_params, activity_type)
+  def self.create_user_manually_activity(user, save_params, activity_type)
     Entities::Activity.find_or_create_by(date: save_params[:used_date], activity_type: activity_type) do |activity|
       activity.user_id = user.id
       activity.count = 0
