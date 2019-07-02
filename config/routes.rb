@@ -92,6 +92,7 @@ Rails.application.routes.draw do
 
         get 'goal-graph/:id', :to => 'goals#graph'
 
+        get 'profiles', :to => 'profiles#show'
       end
 
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
