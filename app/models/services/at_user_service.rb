@@ -235,9 +235,9 @@ class Services::AtUserService
   end
 
   def reset_all_account_error
-    reset_entity_error(@user.at_user_bank_accounts, Entities::AtUserBankAccount);
-    reset_entity_error(@user.at_user_card_accounts, Entities::AtUserCardAccount);
-    reset_entity_error(@user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);
+    reset_entity_error(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount);
+    reset_entity_error(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount);
+    reset_entity_error(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);
   end
 
   def reset_entity_error(accounts, entity)
@@ -245,7 +245,7 @@ class Services::AtUserService
   end
 
   def reset_account_error(account)
-    if (account.error_date.present? && account.error_date + 1.days <= DateTime.now) 
+    if (account.error_date.present? && account.error_date + 1.days <= DateTime.now)
       account.error_date = nil
       account.error_count = 0
     end
@@ -253,9 +253,9 @@ class Services::AtUserService
   end
 
   def get_skip_fnc_ids
-    get_accounts_skip_fnc_ids(@user.at_user_bank_accounts) + 
-    get_accounts_skip_fnc_ids(@user.at_user_card_accounts) + 
-    get_accounts_skip_fnc_ids(@user.at_user_emoney_service_accounts)
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_emoney_service_accounts)
   end
 
   def get_accounts_skip_fnc_ids(accounts)
@@ -282,34 +282,34 @@ class Services::AtUserService
       case @target
       when 'bank'
         puts "scraping bank=========="
-        fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
+        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}	
       when 'card'
         puts "scraping card=========="
-        fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
+        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
       when 'emoney'
         puts "scraping emoney=========="
-        fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
+        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}	
       else
         puts "scraping all=========="
-        fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
-        fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
-        fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
+        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}	
+        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
+        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}	
       end
 
       skip_ids = []
       case @target
       when 'bank'
-        reset_entity_error(@user.at_user_bank_accounts, Entities::AtUserBankAccount);
-        skip_ids = get_accounts_skip_fnc_ids(@user.at_user_bank_accounts)
+        reset_entity_error(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount);
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts)
       when 'card'
-        reset_entity_error(@user.at_user_card_accounts, Entities::AtUserCardAccount);
-        skip_ids = get_accounts_skip_fnc_ids(@user.at_user_card_accounts)
+        reset_entity_error(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount);
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts)
       when 'emoney'
-        reset_entity_error(@user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);    
-        skip_ids = get_accounts_skip_fnc_ids(@user.at_user_emoney_service_accounts)    
+        reset_entity_error(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);    
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_emoney_service_accounts)    
       else
         reset_all_account_error
-        skip_ids = get_skip_fnc_ids  
+        skip_ids = get_skip_fnc_ids
       end
 
       fnc_ids.each do |fnc_id|
