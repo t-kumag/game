@@ -18,24 +18,27 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
     end
 
     def summary
-      # TODO 引き落とし総額
+      # TODO: 家族の引き落とし総額について確認する。そもそも必要なのかどうかも含めて。
+      # TODO: 実装は/user/emoney-accounts-summaryとほぼ同じになる予定
+      # TODO: group_idが考慮されていない
 
-      # share = false || params[:share]
-      # if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
-      #   @response = {
-      #       amount: 0,
-      #   }
-      # else
-      #   amount = if share
-      #              # shareを含む場合
-      #              @current_user.at_user.at_user_emoney_service_accounts.sum{|i| i.current_month_payment}
-      #            else
-      #              @current_user.at_user.at_user_emoney_service_accounts.where(at_user_card_accounts: {share: false}).sum{|i| i.current_month_payment}
-      #            end
-      #   @response = {
-      #       amount: amount
-      #   }
-      # end
+      share = false || params[:share]
+      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
+        @response = {
+            amount: 0,
+        }
+      else
+        amount = if share
+                   # shareを含む場合
+                   @current_user.at_user.at_user_emoney_service_accounts.sum{|i| i.current_month_payment}
+                 else
+                   @current_user.at_user.at_user_emoney_service_accounts.where(at_user_emoney_service_accounts: {share: false}).sum{|i| i.current_month_payment}
+                 end
+        @response = {
+            amount: amount
+        }
+      end
+
       render 'summary', formats: 'json', handlers: 'jbuilder'
     end
 

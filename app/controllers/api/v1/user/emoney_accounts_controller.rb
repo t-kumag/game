@@ -30,10 +30,8 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
         amount = if share
                    # shareを含む場合
                    @current_user.at_user.at_user_emoney_service_accounts.sum{|i| i.current_month_payment}
-
-
                  else
-                   @current_user.at_user.at_user_emoney_service_accounts.where(at_user_card_accounts: {share: false}).sum{|i| i.current_month_payment}
+                   @current_user.at_user.at_user_emoney_service_accounts.where(at_user_emoney_service_accounts: {share: false}).sum{|i| i.current_month_payment}
                  end
         @response = {
           amount: amount

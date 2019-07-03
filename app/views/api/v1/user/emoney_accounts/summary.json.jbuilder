@@ -1,3 +1,3 @@
 json.app do
-  json.amount @response[:amount].to_f
+  json.amount @response[:amount]
 end
