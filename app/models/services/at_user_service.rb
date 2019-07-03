@@ -307,7 +307,7 @@ class Services::AtUserService
     accounts = []
     at_user_accounts.each do |account|
       if account.last_rslt_cd == "E"
-        account.error_date = DateTime.now
+        account.error_date = DateTime.now if account.error_date.blank?
       elsif account.last_rslt_cd == "0"
         account.error_date = nil
         account.error_count = 0
@@ -334,7 +334,7 @@ class Services::AtUserService
       next account.fnc_id unless account.error_date
       if account.error_date + 1.days < DateTime.now
         account.fnc_id
-      elsif account.error_date + 1.days > DateTime.now && account.error_count < 3
+      elsif account.error_date + 1.days > DateTime.now && account.error_count < 2
         error_counts << account
         account.fnc_id
       else
