@@ -3,7 +3,7 @@ class Api::V1::User::IconController < ApplicationController
 
   def create
     if @current_user.user_icon.present?
-      render(json: { errors: { code: '', mesasge: "すでにアイコン画像が登録されています。" } }, status: 422) && return
+      render(json: { errors: { code: '', mesasge: "icon is registered." } }, status: 422) && return
     end
 
     begin
@@ -32,7 +32,7 @@ class Api::V1::User::IconController < ApplicationController
       @icon.save!
       render json: {}
     else
-      render json: { errors: { code: '', mesasge: "アイコン画像が登録されていません。" } }, status: 422
+      render json: { errors: { code: '', mesasge: "icon not found." } }, status: 422
     end
   end
 
@@ -41,7 +41,7 @@ class Api::V1::User::IconController < ApplicationController
     if @icon.present?
       render 'index', formats: 'json', handlers: 'jbuilder'
     else
-      render json: { errors: { code: '', mesasge: "アイコン画像が登録されていません。" } }, status: 422
+      render json: { errors: { code: '', mesasge: "icon not found." } }, status: 422
     end
   end
 end
