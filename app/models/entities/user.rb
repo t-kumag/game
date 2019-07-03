@@ -61,9 +61,16 @@ class Entities::User < ApplicationRecord
     Digest::SHA256.hexdigest(id.to_s + time.to_s + salt)
   end
 
-  delegate :group_id, to: :participate_group
+  delegate :group_id, to: :participate_group, allow_nil: true
 
   def self.temporary_user(email)
     find_by(email: email, email_authenticated: 0)
+  end
+
+  def partner_user
+    return {} if group_id.blank?
+    participate_group = Entities::ParticipateGroup.where.not(user_id: id).where(group_id: group_id).first
+    return {} if participate_group.blank?
+    Entities::User.find(participate_group.user_id)
   end
 end

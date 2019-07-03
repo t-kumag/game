@@ -7,4 +7,5 @@ json.app do
   json.birthday  @profile.birthday
   json.has_child  @profile.has_child
   json.push  @profile.push
+  json.img_url @icon.img_url if @icon.present?
 end
