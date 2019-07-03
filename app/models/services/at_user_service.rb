@@ -234,6 +234,37 @@ class Services::AtUserService
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
 
+  def reset_all_account_error
+    reset_entity_error(@user.at_user_bank_accounts, Entities::AtUserBankAccount);
+    reset_entity_error(@user.at_user_card_accounts, Entities::AtUserCardAccount);
+    reset_entity_error(@user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);
+  end
+
+  def reset_entity_error(accounts, entity)
+    entity.import accounts.map { |a| reset_account_error(a) }, on_duplicate_key_update: [:error_date, :error_count], validate: false
+  end
+
+  def reset_account_error(account)
+    if (account.error_date.present? && account.error_date + 1.days <= DateTime.now) 
+      account.error_date = nil
+      account.error_count = 0
+    end
+    account
+  end
+
+  def get_skip_fnc_ids
+    get_accounts_skip_fnc_ids(@user.at_user_bank_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user_card_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user_emoney_service_accounts)
+  end
+
+  def get_accounts_skip_fnc_ids(accounts)
+    accounts.map { |a|
+      next a.fnc_id if a.error_date.present? && a.error_date + 1.days > DateTime.now && a.error_count >= 2
+      nil
+    }.compact
+  end
+
   def exec_scraping
     puts "scraping=========="
     puts @target
@@ -250,28 +281,39 @@ class Services::AtUserService
       # 証券、保険などが増えると分岐が長くなるので渡されたmodelに対して処理を行うような作りに変える
       case @target
       when 'bank'
-        update_error_date(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
         puts "scraping bank=========="
         fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
       when 'card'
-        update_error_date(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
         puts "scraping card=========="
         fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
       when 'emoney'
-        update_error_date(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
         puts "scraping emoney=========="
         fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
       else
-        update_error_date(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
-        update_error_date(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
-        update_error_date(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
         puts "scraping all=========="
         fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount)
         fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount)
         fnc_ids = fnc_ids + get_fnc_ids(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount)
       end
 
+      skip_ids = []
+      case @target
+      when 'bank'
+        reset_entity_error(@user.at_user_bank_accounts, Entities::AtUserBankAccount);
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user_bank_accounts)
+      when 'card'
+        reset_entity_error(@user.at_user_card_accounts, Entities::AtUserCardAccount);
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user_card_accounts)
+      when 'emoney'
+        reset_entity_error(@user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);    
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user_emoney_service_accounts)    
+      else
+        reset_all_account_error
+        skip_ids = get_skip_fnc_ids  
+      end
+
       fnc_ids.each do |fnc_id|
+        next if skip_ids.include?(fnc_id)
         params = {
           token: token,
           fnc_id: fnc_id
@@ -300,51 +342,6 @@ class Services::AtUserService
     # res = AtAPIClient.new(api_name, params).get
 
     # return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
-  end
-
-
-  def update_error_date(at_user_accounts, account_entity)
-    accounts = []
-    at_user_accounts.each do |account|
-      if account.last_rslt_cd == "E"
-        account.error_date = DateTime.now if account.error_date.blank?
-      elsif account.last_rslt_cd == "0"
-        account.error_date = nil
-        account.error_count = 0
-      end
-      accounts << account
-    end
-    account_entity.import accounts, on_duplicate_key_update: [:error_date, :error_count], validate: false
-  end
-
-
-  def update_error_count(at_user_accounts, account_entity)
-    accounts = []
-    at_user_accounts.each do |account|
-      account.error_count += 1
-      accounts << account
-    end
-    account_entity.import accounts, on_duplicate_key_update: [:error_count], validate: false
-  end
-
-
-  def get_fnc_ids(at_user_accounts, account_entity)
-    error_counts = []
-    fnc_ids = at_user_accounts.map{|account| 
-      next account.fnc_id unless account.error_date
-      if account.error_date + 1.days < DateTime.now
-        account.fnc_id
-      elsif account.error_date + 1.days > DateTime.now && account.error_count < 2
-        error_counts << account
-        account.fnc_id
-      else
-
-      end
-    }.compact
-    
-    update_error_count(error_counts, account_entity) if error_counts.present?
-    
-    fnc_ids
   end
 
   # ## openuserr003

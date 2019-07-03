@@ -48,6 +48,12 @@ class Services::AtUserService::Sync
             account[k] = Time.parse(i[v[:col]])
           end
         end
+
+        if (account['last_rslt_cd'] === 'E')
+          account['error_date'] = DateTime.now if account['error_date'].blank?
+          account['error_count'] = account['error_count'] + 1
+        end
+
         accounts << account
       end
     end
