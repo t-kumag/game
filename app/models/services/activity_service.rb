@@ -1,11 +1,20 @@
 class Services::ActivityService
 
-
   def save_activities(activities)
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def set_activity_list(rec_key, tran, account)
+  def self.create_user_manually_activity(user, save_params, activity_type)
+    Entities::Activity.find_or_create_by(date: save_params[:used_date], activity_type: activity_type) do |activity|
+      activity.user_id = user.id
+      activity.count = 0
+      activity.activity_type = activity_type
+      activity.date = save_params[:used_date]
+    end
+  end
+
+
+  def self.set_activity_list(rec_key, tran, account)
 
     activity = Entities::Activity.new
     activity[:count] = 0
@@ -24,46 +33,19 @@ class Services::ActivityService
     activity
   end
 
-  def check_activity_duplication(rec_key, activities, activity)
-    old_act_latest_one = activities.present? && (activities.length - 1 >= 0) ? (activities.length - 1) : -1
-    old_act_latest_two = activities.present? && (activities.length - 2 >= 0) ? (activities.length - 2) : -1
+  def self.check_activity_duplication(rec_key, activities, activity)
+
+    latest_one = activities.present? ? activities.last : nil
+    return true if latest_one.nil? ? true : false
+
     activity_data_column = get_activity_data_column(rec_key)
+    duplicate_old_act(latest_one, activity, activity_data_column)
 
-    old_one = duplicate_old_act(old_act_latest_one, activity, activities, activity_data_column)
-    old_two = duplicate_old_act(old_act_latest_two, activity, activities, activity_data_column)
-
-    (old_one && old_two) ? true : false
-
-  end
-
-  def self.create_user_manually_activity(user, save_params, activity_type)
-    Entities::Activity.find_or_create_by(date: save_params[:used_date], activity_type: activity_type) do |activity|
-      activity.user_id = user.id
-      activity.count = 0
-      activity.activity_type = activity_type
-      activity.date = save_params[:used_date]
-    end
   end
 
   private
 
-  def duplicate_old_act(old_act, activity, activities, activity_data_column)
-
-    return true if old_act < 0
-
-    src_insert = {date: false, activity: false}
-
-    activity_data_column.each do |k, v|
-      if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
-        src_insert[:date] = activity[:date] == activities[old_act][:date]
-      elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
-        src_insert[:activity] = activity[:activity_type] == activities[old_act][:activity_type]
-      end
-    end
-    ((src_insert[:date] == true) && (src_insert[:activity] == true)) ? false : true
-  end
-
-  def get_activity_data_column(rec_key)
+  def self.get_activity_data_column(rec_key)
     case rec_key
     when "CARD_REC"
       get_card_activity_data_column
@@ -74,7 +56,23 @@ class Services::ActivityService
     end
   end
 
-  def get_card_activity_data_column
+  def self.duplicate_old_act(latest_one, activity, activity_data_column)
+
+    src_insert = { date: false, activity: false }
+    binding.pry
+
+    activity_data_column.each do |k, v|
+      if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
+        src_insert[:date] = activity[:date] == latest_one[:date]
+      elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
+        src_insert[:activity] = activity[:activity_type] == latest_one[:activity_type]
+      end
+    end
+
+    ((src_insert[:date] == true) && (src_insert[:activity] == true)) ? false : true
+  end
+
+  def self.get_card_activity_data_column
     {
         used_date: {col: "USED_DATE" },
         # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
@@ -82,14 +80,14 @@ class Services::ActivityService
     }
   end
 
-  def get_bank_activity_data_column
+  def self.get_bank_activity_data_column
     {
         trade_date: {col: "TRADE_DTM" },
         amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_bank_income', outcome: 'individual_bank_outcome'},
     }
   end
 
-  def get_emoney_activity_data_column
+  def self.get_emoney_activity_data_column
     {
         used_date: {col: "USED_DATE" },
         amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_emoney_income', outcome: 'individual_emoney_outcome'},
