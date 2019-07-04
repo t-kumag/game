@@ -78,8 +78,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def update_user_manually_created
-    save_params = params.require(:user_manually_created_transaction).permit(
-      :id,
+    save_params = params.permit(
       :at_transaction_category_id,
       :payment_method_id,
       :used_date,
@@ -91,7 +90,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     )
 
     Services::ActivityService.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
-    Entities::UserManuallyCreatedTransaction.find(save_params[:id]).update!(save_params)
-    Entities::UserManuallyCreatedTransaction.find(save_params[:id])
+    Entities::UserManuallyCreatedTransaction.find(params[:id]).update!(save_params)
+    Entities::UserManuallyCreatedTransaction.find(params[:id])
   end
 end
