@@ -1,6 +1,6 @@
 class Services::ActivityService
 
-  def save_activities(activities)
+  def self.save_activities(activities)
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
