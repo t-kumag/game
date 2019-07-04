@@ -58,8 +58,7 @@ class Services::AtUserService::Sync
 
     begin
       puts "sync transaction start ==============="
-      # TODO 日付をどこまで遡るかまともに考える
-      start_date = Time.now.ago(60.days).strftime("%Y%m%d")
+      start_date = Time.now.ago(Settings.at_sync_transaction_max_days.days).strftime("%Y%m%d")
       end_date = Time.now.strftime("%Y%m%d")
       token = @user.at_user.at_user_tokens.first.token
 
