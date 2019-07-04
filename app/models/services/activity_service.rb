@@ -39,8 +39,7 @@ class Services::ActivityService
     return true if latest_one.nil? ? true : false
 
     activity_data_column = get_activity_data_column(rec_key)
-    duplicate_old_act(latest_one, activity, activity_data_column)
-
+    check_duplication_old_act(latest_one, activity, activity_data_column)
   end
 
   private
@@ -56,10 +55,9 @@ class Services::ActivityService
     end
   end
 
-  def self.duplicate_old_act(latest_one, activity, activity_data_column)
+  def self.check_duplication_old_act(latest_one, activity, activity_data_column)
 
     src_insert = { date: false, activity: false }
-    binding.pry
 
     activity_data_column.each do |k, v|
       if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
