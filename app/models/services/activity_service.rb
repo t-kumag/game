@@ -72,23 +72,23 @@ class Services::ActivityService
 
   def self.get_card_activity_data_column
     {
-        used_date: {col: "USED_DATE" },
+        used_date: { col: "USED_DATE" },
         # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
-        payment_amount: {col: "PAYMENT_AMOUNT", income: 'individual_card_outcome', outcome: 'individual_card_outcome'},
+        payment_amount: { col: "PAYMENT_AMOUNT", income: 'individual_card_outcome', outcome: 'individual_card_outcome' },
     }
   end
 
   def self.get_bank_activity_data_column
     {
-        trade_date: {col: "TRADE_DTM" },
-        amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_bank_income', outcome: 'individual_bank_outcome'},
+        trade_date: { col: "TRADE_DTM" },
+        amount_receipt: { col: "AMOUNT_RECEIPT", income: 'individual_bank_income', outcome: 'individual_bank_outcome' },
     }
   end
 
   def self.get_emoney_activity_data_column
     {
-        used_date: {col: "USED_DATE" },
-        amount_receipt: {col: "AMOUNT_RECEIPT", income: 'individual_emoney_income', outcome: 'individual_emoney_outcome'},
+        used_date: { col: "USED_DATE" },
+        amount_receipt: { col: "AMOUNT_RECEIPT", income: 'individual_emoney_income', outcome: 'individual_emoney_outcome' },
     }
   end
 end
