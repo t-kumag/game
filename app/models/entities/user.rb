@@ -41,6 +41,11 @@ class Entities::User < ApplicationRecord
     self.token_expires_at = DateTime.now + 30
   end
 
+  def change_password_reset_token
+    self.token = generate_token
+    self.token_expires_at = DateTime.now + 1.hour
+  end
+
   def clear_token
     self.token = nil
     self.token_expires_at = nil
