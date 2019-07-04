@@ -50,7 +50,7 @@ class Api::V1::UsersController < ApplicationController
 
       render json: {}, status: 200
     else
-      render json: {}, status: :bad_request
+      render json: { errors: { code: '', mesasge: "email not found." } }, status: 422
     end
   end
 
@@ -60,6 +60,8 @@ class Api::V1::UsersController < ApplicationController
 
     if change_password_params[:password].present? && change_password_params[:password_confirm].present?
       change_status = change_password_params[:password] == change_password_params[:password_confirm]
+    else
+      render json: { errors: { code: '', mesasge: "empty password." } }, status: 422 and return
     end
 
     if current_user.present? && DateTime.now <= current_user.token_expires_at && change_status
@@ -68,7 +70,7 @@ class Api::V1::UsersController < ApplicationController
       current_user.save!
       render json: {}, status: 200
     else
-      render json: {}, status: :unprocessable_entity
+      render json: { errors: { code: '', mesasge: "user not found or invalid token." } }, status: 422
     end
   end
 
