@@ -298,6 +298,8 @@ DEPENDENCIES
   hirb-unicode
   jbuilder (~> 2.5)
   kaminari
+  kaminari-actionview
+  kaminari-activerecord
   letter_opener_web
   listen (>= 3.0.5, < 3.2)
   mysql2
