@@ -14,13 +14,13 @@ class Services::ActivityService
   end
 
 
-  def self.set_activity_list(rec_key, tran, account)
+  def self.set_activity_list(financier_account_type_key, tran, account)
 
     activity = Entities::Activity.new
     activity[:count] = 0
     activity[:user_id] = account[:at_user_id]
     activity[:group_id] = account[:group_id]
-    activity_data_column = get_activity_data_column(rec_key)
+    activity_data_column = get_activity_data_column(financier_account_type_key)
 
     activity_data_column.each do |k, v|
       if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
@@ -33,24 +33,24 @@ class Services::ActivityService
     activity
   end
 
-  def self.check_activity_duplication(rec_key, activities, activity)
+  def self.check_activity_duplication(financier_account_type_key, activities, activity)
 
     latest_one = activities.present? ? activities.last : nil
     return true if latest_one.nil? ? true : false
 
-    activity_data_column = get_activity_data_column(rec_key)
+    activity_data_column = get_activity_data_column(financier_account_type_key)
     check_duplication_old_act(latest_one, activity, activity_data_column)
   end
 
   private
 
-  def self.get_activity_data_column(rec_key)
-    case rec_key
-    when "CARD_REC"
+  def self.get_activity_data_column(financier_account_type_key)
+    case financier_account_type_key
+    when "at_user_card_account_id"
       get_card_activity_data_column
-    when "BANK_REC"
+    when "at_user_bank_account_id"
       get_bank_activity_data_column
-    when "ETC_REC"
+    when "at_user_emoney_service_account_id"
       get_emoney_activity_data_column
     end
   end

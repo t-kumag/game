@@ -122,7 +122,7 @@ class Services::AtUserService::Sync
             end
             src_trans << tran
 
-            activity = get_activity(rec_key, tran, a, activities)
+            activity = get_activity(financier_account_type_key, tran, a, activities)
             if activity.present?
               activities << activity
             end
@@ -130,7 +130,7 @@ class Services::AtUserService::Sync
         end
         transaction_entity.import src_trans, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
         Services::ActivityService.save_activities(activities)
-        #Services::AtSyncTransactionLatestDateLogService.new.activity_sync_log(rec_key, a)
+        Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
       end
     rescue AtAPIStandardError => api_err
       raise api_err
@@ -285,10 +285,10 @@ class Services::AtUserService::Sync
 
   private
 
-  def get_activity(rec_key, tran, account, activities)
-    activity = Services::ActivityService.set_activity_list(rec_key, tran, account)
-    check_duplicate_activity = Services::ActivityService.check_activity_duplication(rec_key, activities, activity)
-    latest_sync_date = Services::AtSyncTransactionLatestDateLogService.get_latest_one(rec_key, account)
+  def get_activity(financier_account_type_key, tran, account, activities)
+    activity = Services::ActivityService.set_activity_list(financier_account_type_key, tran, account)
+    check_duplicate_activity = Services::ActivityService.check_activity_duplication(financier_account_type_key, activities, activity)
+    latest_sync_date = Services::AtSyncTransactionLatestDateLogService.get_latest_one(financier_account_type_key, account)
     check_difference_date = latest_sync_date.present? && latest_sync_date < activity[:date] ? true : false
 
     if check_duplicate_activity && (latest_sync_date.nil? || check_difference_date)

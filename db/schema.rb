@@ -50,8 +50,9 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
   end
 
   create_table "at_sync_transaction_latest_date_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.string "rec_key", null: false
+    t.integer "at_user_bank_account_id"
+    t.integer "at_user_card_account_id"
+    t.integer "at_user_emoney_service_account_id"
     t.datetime "latest_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
