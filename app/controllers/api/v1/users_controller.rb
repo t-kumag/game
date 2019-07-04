@@ -81,7 +81,7 @@ class Api::V1::UsersController < ApplicationController
 
   def at_sync
     at_user_service = Services::AtUserService.new(@current_user, params[:target])
-    at_user_service.exec_scraping
+    #at_user_service.exec_scraping
     at_user_service.sync
 
     # TODO: 仮り実装 user_distributed_transactionsに同期

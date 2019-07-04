@@ -4,7 +4,7 @@ class Api::V1::User::CardTransactionsController < ApplicationController
   # TODO(fujiura): card_account_id, transaction_id に対応するデータがないときの処理
 
   def index
-    @transactions = Services::AtCardTransactionService.new.list(params[:card_account_id])
+    @transactions = Services::AtCardTransactionService.new.list(params[:card_account_id], params[:page])
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
