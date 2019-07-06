@@ -13,6 +13,7 @@
 #
 
 class Entities::User < ApplicationRecord
+  acts_as_paranoid
   has_one :at_user
 
   has_one :user_icon

@@ -204,3 +204,11 @@ Entities::AtGroupedCategory.create(id:17, category_name: '入金');
 Entities::AtGroupedCategory.create(id:18, category_name: '出金');
 Entities::AtGroupedCategory.create(id:19, category_name: '手数料');
 
+
+# UserCancelQuestioin
+Entities::UserCancelQuestion.create(id:1, cancel_reason: '金融機関の登録が難しかった');
+Entities::UserCancelQuestion.create(id:2, cancel_reason: 'セキュリティの懸念があった');
+Entities::UserCancelQuestion.create(id:3, cancel_reason: '他サービスの方が便利に感じた');
+Entities::UserCancelQuestion.create(id:4, cancel_reason: '使いこなせなかった');
+Entities::UserCancelQuestion.create(id:5, cancel_reason: 'あまり使わなかった');
+Entities::UserCancelQuestion.create(id:6, cancel_reason: 'その他');

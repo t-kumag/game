@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_14_013325) do
+ActiveRecord::Schema.define(version: 2019_07_06_161208) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -47,6 +47,15 @@ ActiveRecord::Schema.define(version: 2019_06_14_013325) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "category_name"
+  end
+
+  create_table "at_sync_transaction_latest_date_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.integer "at_user_bank_account_id"
+    t.integer "at_user_card_account_id"
+    t.integer "at_user_emoney_service_account_id"
+    t.datetime "latest_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "at_transaction_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -280,6 +289,8 @@ ActiveRecord::Schema.define(version: 2019_06_14_013325) do
     t.integer "current_amount"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_goals_on_deleted_at"
     t.index ["goal_type_id"], name: "index_goals_on_goal_type_id"
     t.index ["group_id"], name: "index_goals_on_group_id"
     t.index ["user_id"], name: "index_goals_on_user_id"
@@ -331,6 +342,8 @@ ActiveRecord::Schema.define(version: 2019_06_14_013325) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_participate_groups_on_deleted_at"
     t.index ["group_id"], name: "index_participate_groups_on_group_id"
     t.index ["user_id"], name: "index_participate_groups_on_user_id"
   end
@@ -349,6 +362,29 @@ ActiveRecord::Schema.define(version: 2019_06_14_013325) do
     t.datetime "updated_at", null: false
     t.index ["budget_question_id"], name: "index_user_budget_questions_on_budget_question_id"
     t.index ["user_id"], name: "index_user_budget_questions_on_user_id"
+  end
+
+  create_table "user_cancel_answers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "user_cancel_question_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_cancel_question_id"], name: "index_user_cancel_answers_on_user_cancel_question_id"
+    t.index ["user_id"], name: "index_user_cancel_answers_on_user_id"
+  end
+
+  create_table "user_cancel_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.text "cancel_comment"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_cancel_comments_on_user_id"
+  end
+
+  create_table "user_cancel_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.text "cancel_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_distributed_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -408,6 +444,7 @@ ActiveRecord::Schema.define(version: 2019_06_14_013325) do
     t.integer "has_child"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "push"
     t.index ["user_id"], name: "index_user_profiles_on_user_id"
   end
 
@@ -432,6 +469,8 @@ ActiveRecord::Schema.define(version: 2019_06_14_013325) do
     t.boolean "email_authenticated", default: false
     t.datetime "token_expires_at"
     t.integer "rank", default: 0
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_users_on_deleted_at"
   end
 
   add_foreign_key "at_user_bank_accounts", "at_banks"
@@ -463,6 +502,9 @@ ActiveRecord::Schema.define(version: 2019_06_14_013325) do
   add_foreign_key "participate_groups", "users"
   add_foreign_key "user_budget_questions", "budget_questions"
   add_foreign_key "user_budget_questions", "users"
+  add_foreign_key "user_cancel_answers", "user_cancel_questions"
+  add_foreign_key "user_cancel_answers", "users"
+  add_foreign_key "user_cancel_comments", "users"
   add_foreign_key "user_distributed_transactions", "at_transaction_categories"
   add_foreign_key "user_distributed_transactions", "at_user_bank_transactions"
   add_foreign_key "user_distributed_transactions", "at_user_card_transactions"

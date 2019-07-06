@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate, only: [:at_url, :at_sync, :at_token]
+  before_action :authenticate, only: [:at_url, :at_sync, :at_token, :destroy]
   before_action :check_temporary_user, only: [:create]
 
   def create
@@ -64,8 +64,31 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def destroy
-    user_cancel_comments = delete_user_params[:user_cancel_comments]
+
+    cancel_comment = delete_user_params[:user_cancel_comments]
     cancel_checklists = delete_user_params[:cancel_checklists]
+
+    # TODO: バリデーション
+    # TODO 例外処理と共通化
+    begin
+      if cancel_checklists.present?
+        Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
+        Services::UserCancelCommentService.new(@current_user).register_cancel_comment(cancel_comment) if cancel_comment.present?
+        Services::ParingService.new(@current_user).cancel
+        Entities::User.find(@current_user.id).delete
+      else
+        render json: {}, status: :bad_request
+      end
+    rescue ActiveRecord::RecordInvalid => db_err
+      p db_err
+      render(json: {}, status: 400) && return
+    rescue => exception
+      p exception
+      render(json: {}, status: 400) && return
+    end
+
+    render json: {}, status: 200
+
   end
 
   private
