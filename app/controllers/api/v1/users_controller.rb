@@ -2,10 +2,6 @@ class Api::V1::UsersController < ApplicationController
   before_action :authenticate, only: [:at_url, :at_sync, :at_token]
   before_action :check_temporary_user, only: [:create]
 
-  def sign_up_params
-    params.permit(:email, :password)
-  end
-
   def create
     @user = Entities::User.new
     @user.email = sign_up_params[:email]
@@ -66,4 +62,19 @@ class Api::V1::UsersController < ApplicationController
     @response = Services::AtUserService.new(@current_user).token
     render 'at_token', formats: 'json', handlers: 'jbuilder'
   end
+
+  def destroy
+    user_cancel_comments = delete_user_params[:user_cancel_comments]
+    cancel_checklists = delete_user_params[:cancel_checklists]
+  end
+
+  private
+  def sign_up_params
+    params.permit(:email, :password)
+  end
+
+  def delete_user_params
+    params.permit(:user_cancel_comments, cancel_checklists: [])
+  end
+
 end
