@@ -95,8 +95,8 @@ class Services::AtUserService::Sync
         activities = []
         if res.has_key?(rec_key) && !res[rec_key].blank?
           res[rec_key].each do |i|
-            #TODO: ATからdecimalで返ってくるようになればこの処理は不要
-            i["BALANCE"] = i["BALANCE"].present? ? i["BALANCE"].to_d : 0
+            # 文字をintに、空文字の場合は0に変換
+            i["BALANCE"] = i["BALANCE"].present? ? i["BALANCE"].to_i : 0
 
             at_category_id = i["CATEGORY_ID"]
             if category_map.has_key?(at_category_id)

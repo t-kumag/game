@@ -2,9 +2,6 @@ class Api::V1::UsersController < ApplicationController
   before_action :authenticate, only: [:at_url, :at_sync, :at_token]
   before_action :check_temporary_user, only: [:create]
 
-  def sign_up_params
-    params.permit(:email, :password)
-  end
 
   def create
     @user = Entities::User.new
@@ -43,6 +40,40 @@ class Api::V1::UsersController < ApplicationController
     render 'activate', formats: 'json', handlers: 'jbuilder', status: 200
   end
 
+  def change_password_request
+    user = Entities::User.where(email: params[:email]).first
+
+    if user.present?
+      user.change_password_reset_token
+      user.save!
+      MailDelivery.user_change_password_request(user).deliver
+
+      render json: {}, status: 200
+    else
+      render json: { errors: { code: '', message: "email not found." } }, status: 422
+    end
+  end
+
+  def change_password
+    current_user = Entities::User.token_authenticate!(params[:token])
+    change_status = false
+
+    if change_password_params[:password].present? && change_password_params[:password_confirm].present?
+      change_status = change_password_params[:password] == change_password_params[:password_confirm]
+    else
+      render json: { errors: { code: '', message: "empty password." } }, status: 422 and return
+    end
+
+    if current_user.present? && DateTime.now <= current_user.token_expires_at && change_status
+      current_user.password = change_password_params[:password]
+      current_user.reset_token
+      current_user.save!
+      render json: {}, status: 200
+    else
+      render json: { errors: { code: '', message: "user not found or invalid token." } }, status: 422
+    end
+  end
+
   def at_url
     @response = Services::AtUserService.new(@current_user).at_url
     render 'at_url', formats: 'json', handlers: 'jbuilder'
@@ -65,5 +96,14 @@ class Api::V1::UsersController < ApplicationController
   def at_token
     @response = Services::AtUserService.new(@current_user).token
     render 'at_token', formats: 'json', handlers: 'jbuilder'
+  end
+
+  private
+  def sign_up_params
+    params.permit(:email, :password)
+  end
+
+  def change_password_params
+    params.permit(:password, :password_confirm)
   end
 end

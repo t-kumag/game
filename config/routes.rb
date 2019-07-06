@@ -53,7 +53,9 @@ Rails.application.routes.draw do
 
         resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index, :show, :create, :update, :destroy]
 
-        resources :profiles, only: [:show, :create, :update]
+        resources :profiles, only: [:create]
+        get 'profiles', :to => 'profiles#show'
+        put 'profiles', :to => 'profiles#update'
 
       end
 
@@ -90,6 +92,7 @@ Rails.application.routes.draw do
 
         get 'goal-graph/:id', :to => 'goals#graph'
 
+        get 'profiles', :to => 'profiles#show'
       end
 
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
@@ -102,6 +105,8 @@ Rails.application.routes.draw do
       delete 'pairing-requests', :to => 'pairing_requests#destroy'
 
       resources :users, only: [:create]
+      post 'users/change_password_request', to: 'users#change_password_request'
+      post 'users/change_password', to: 'users#change_password'
 
       get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'
