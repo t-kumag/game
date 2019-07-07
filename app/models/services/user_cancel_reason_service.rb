@@ -6,7 +6,7 @@ class Services::UserCancelReasonService
   end
 
   def register_cancel_reason(cancel_reason)
-    Entities::UserCancelAnswer.new(
+    Entities::UserCancelReason.new(
         user_id: @user.id,
         cancel_reason: cancel_reason,
     ).save!

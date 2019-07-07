@@ -73,7 +73,7 @@ class Api::V1::UsersController < ApplicationController
     begin
       if cancel_checklists.present?
         Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
-        Services::UserCancelCommentService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
+        Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
         Services::ParingService.new(@current_user).cancel
         Entities::User.find(@current_user.id).delete
       else
@@ -97,7 +97,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def delete_user_params
-    params.permit(:user_cancel_comments, cancel_checklists: [])
+    params.permit(:user_cancel_reason, cancel_checklists: [])
   end
 
 end
