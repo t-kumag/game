@@ -65,7 +65,7 @@ class Api::V1::UsersController < ApplicationController
 
   def destroy
 
-    cancel_comment = delete_user_params[:user_cancel_comments]
+    cancel_reason = delete_user_params[:user_cancel_reason]
     cancel_checklists = delete_user_params[:cancel_checklists]
 
     # TODO: バリデーション
@@ -73,7 +73,7 @@ class Api::V1::UsersController < ApplicationController
     begin
       if cancel_checklists.present?
         Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
-        Services::UserCancelCommentService.new(@current_user).register_cancel_comment(cancel_comment) if cancel_comment.present?
+        Services::UserCancelCommentService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
         Services::ParingService.new(@current_user).cancel
         Entities::User.find(@current_user.id).delete
       else

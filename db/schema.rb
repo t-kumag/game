@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_06_161208) do
+ActiveRecord::Schema.define(version: 2019_07_07_042731) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -373,18 +373,18 @@ ActiveRecord::Schema.define(version: 2019_07_06_161208) do
     t.index ["user_id"], name: "index_user_cancel_answers_on_user_id"
   end
 
-  create_table "user_cancel_comments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.bigint "user_id"
-    t.text "cancel_comment"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_user_cancel_comments_on_user_id"
-  end
-
   create_table "user_cancel_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.text "cancel_reason"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "user_cancel_reasons", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.text "cancel_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_cancel_reasons_on_user_id"
   end
 
   create_table "user_distributed_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -504,7 +504,7 @@ ActiveRecord::Schema.define(version: 2019_07_06_161208) do
   add_foreign_key "user_budget_questions", "users"
   add_foreign_key "user_cancel_answers", "user_cancel_questions"
   add_foreign_key "user_cancel_answers", "users"
-  add_foreign_key "user_cancel_comments", "users"
+  add_foreign_key "user_cancel_reasons", "users"
   add_foreign_key "user_distributed_transactions", "at_transaction_categories"
   add_foreign_key "user_distributed_transactions", "at_user_bank_transactions"
   add_foreign_key "user_distributed_transactions", "at_user_card_transactions"

@@ -1,14 +1,14 @@
-class Services::UserCancelCommentService
+class Services::UserCancelReasonService
 
 
   def initialize(user)
     @user = user
   end
 
-  def register_cancel_comment(cancel_comment)
+  def register_cancel_reason(cancel_reason)
     Entities::UserCancelAnswer.new(
         user_id: @user.id,
-        cancel_reason: cancel_comment,
+        cancel_reason: cancel_reason,
     ).save!
   end
 

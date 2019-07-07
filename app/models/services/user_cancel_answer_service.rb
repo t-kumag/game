@@ -6,7 +6,6 @@ class Services::UserCancelAnswerService
   end
 
   def register_cancel_checklist(cancel_checklists)
-    binding.pry
     cancel_checklists.each do |cancel_checklist|
       Entities::UserCancelAnswer.new(
           user_id: @user.id,
