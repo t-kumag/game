@@ -2,6 +2,10 @@ class Api::V1::UsersController < ApplicationController
   before_action :authenticate, only: [:at_url, :at_sync, :at_token, :destroy]
   before_action :check_temporary_user, only: [:create]
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 33335d1a3236e9a2ce208c6f3da765eec130fe9e
   def create
     @user = Entities::User.new
     @user.email = sign_up_params[:email]
@@ -37,6 +41,40 @@ class Api::V1::UsersController < ApplicationController
     user.save!
     @response = user
     render 'activate', formats: 'json', handlers: 'jbuilder', status: 200
+  end
+
+  def change_password_request
+    user = Entities::User.where(email: params[:email]).first
+
+    if user.present?
+      user.change_password_reset_token
+      user.save!
+      MailDelivery.user_change_password_request(user).deliver
+
+      render json: {}, status: 200
+    else
+      render json: { errors: { code: '', message: "email not found." } }, status: 422
+    end
+  end
+
+  def change_password
+    current_user = Entities::User.token_authenticate!(params[:token])
+    change_status = false
+
+    if change_password_params[:password].present? && change_password_params[:password_confirm].present?
+      change_status = change_password_params[:password] == change_password_params[:password_confirm]
+    else
+      render json: { errors: { code: '', message: "empty password." } }, status: 422 and return
+    end
+
+    if current_user.present? && DateTime.now <= current_user.token_expires_at && change_status
+      current_user.password = change_password_params[:password]
+      current_user.reset_token
+      current_user.save!
+      render json: {}, status: 200
+    else
+      render json: { errors: { code: '', message: "user not found or invalid token." } }, status: 422
+    end
   end
 
   def at_url
@@ -88,9 +126,7 @@ class Api::V1::UsersController < ApplicationController
       p exception
       render(json: {}, status: 400) && return
     end
-
     render json: {}, status: 200
-
   end
 
   private
@@ -100,6 +136,10 @@ class Api::V1::UsersController < ApplicationController
 
   def delete_user_params
     params.permit(:user_cancel_reason, cancel_checklists: [])
+  end
+
+  def change_password_params
+    params.permit(:password, :password_confirm)
   end
 
 end

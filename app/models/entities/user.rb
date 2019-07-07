@@ -42,6 +42,11 @@ class Entities::User < ApplicationRecord
     self.token_expires_at = DateTime.now + 30
   end
 
+  def change_password_reset_token
+    self.token = generate_token
+    self.token_expires_at = DateTime.now + 1.hour
+  end
+
   def clear_token
     self.token = nil
     self.token_expires_at = nil
@@ -62,9 +67,16 @@ class Entities::User < ApplicationRecord
     Digest::SHA256.hexdigest(id.to_s + time.to_s + salt)
   end
 
-  delegate :group_id, to: :participate_group
+  delegate :group_id, to: :participate_group, allow_nil: true
 
   def self.temporary_user(email)
     find_by(email: email, email_authenticated: 0)
+  end
+
+  def partner_user
+    return {} if group_id.blank?
+    participate_group = Entities::ParticipateGroup.where.not(user_id: id).where(group_id: group_id).first
+    return {} if participate_group.blank?
+    Entities::User.find(participate_group.user_id)
   end
 end

@@ -92,6 +92,7 @@ Rails.application.routes.draw do
 
         get 'goal-graph/:id', :to => 'goals#graph'
 
+        get 'profiles', :to => 'profiles#show'
       end
 
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
@@ -104,6 +105,8 @@ Rails.application.routes.draw do
       delete 'pairing-requests', :to => 'pairing_requests#destroy'
 
       resources :users, only: [:create]
+      post 'users/change_password_request', to: 'users#change_password_request'
+      post 'users/change_password', to: 'users#change_password'
       delete 'users', :to => 'users#destroy'
 
       get 'invite-url', :to => 'groups#invite_url'
