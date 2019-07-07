@@ -76,6 +76,8 @@ class Api::V1::UsersController < ApplicationController
         Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
         Services::ParingService.new(@current_user).cancel
         Entities::User.find(@current_user.id).delete
+        @current_user.clear_token
+        @current_user = nil
       else
         render json: {}, status: :bad_request
       end
