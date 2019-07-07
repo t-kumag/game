@@ -2,10 +2,6 @@ class Api::V1::UsersController < ApplicationController
   before_action :authenticate, only: [:at_url, :at_sync, :at_token, :destroy]
   before_action :check_temporary_user, only: [:create]
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 33335d1a3236e9a2ce208c6f3da765eec130fe9e
   def create
     @user = Entities::User.new
     @user.email = sign_up_params[:email]
