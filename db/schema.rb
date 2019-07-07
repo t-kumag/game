@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_28_112134) do
+ActiveRecord::Schema.define(version: 2019_07_07_162647) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "group_id"
-    t.integer "count", null: false
+    t.integer "count", default: 0, null: false
     t.string "activity_type", null: false
-    t.datetime "date", null: false
+    t.date "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -69,8 +69,8 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
   create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_bank_id"
-    t.decimal "balance", precision: 18, scale: 2
-    t.boolean "share"
+    t.bigint "balance", default: 0, null: false
+    t.boolean "share", default: false, null: false
     t.string "fnc_id", null: false
     t.string "fnc_cd", null: false
     t.string "fnc_nm", null: false
@@ -104,9 +104,9 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.string "description3"
     t.string "description4"
     t.string "description5"
-    t.decimal "amount_receipt", precision: 16, scale: 2
-    t.decimal "amount_payment", precision: 16, scale: 2
-    t.decimal "balance", precision: 16, scale: 2
+    t.bigint "amount_receipt", default: 0, null: false
+    t.bigint "amount_payment", default: 0, null: false
+    t.bigint "balance", default: 0, null: false
     t.string "currency", null: false
     t.integer "seq", null: false
     t.bigint "at_transaction_category_id", null: false
@@ -121,7 +121,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
   create_table "at_user_card_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_card_id"
-    t.boolean "share"
+    t.boolean "share", default: false, null: false
     t.string "fnc_id", null: false
     t.string "fnc_cd", null: false
     t.string "fnc_nm", null: false
@@ -150,8 +150,8 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.bigint "at_user_card_account_id"
     t.datetime "used_date", null: false
     t.string "branch_desc", null: false
-    t.decimal "amount", precision: 16, scale: 2, null: false
-    t.decimal "payment_amount", precision: 16, scale: 2, null: false
+    t.bigint "amount", default: 0, null: false
+    t.bigint "payment_amount", default: 0, null: false
     t.string "trade_gubun", null: false
     t.string "etc_desc"
     t.string "clm_ym", null: false
@@ -170,8 +170,8 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
   create_table "at_user_emoney_service_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_emoney_service_id"
-    t.decimal "balance", precision: 18, scale: 2
-    t.boolean "share"
+    t.bigint "balance", default: 0, null: false
+    t.boolean "share", default: false, null: false
     t.string "fnc_id", null: false
     t.string "fnc_cd", null: false
     t.string "fnc_nm", null: false
@@ -199,9 +199,9 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.datetime "used_date", null: false
     t.string "used_time"
     t.string "description"
-    t.decimal "amount_receipt", precision: 16, scale: 2, null: false
-    t.decimal "amount_payment", precision: 16, scale: 2, null: false
-    t.decimal "balance", precision: 18, scale: 2
+    t.bigint "amount_receipt", default: 0, null: false
+    t.bigint "amount_payment", default: 0, null: false
+    t.bigint "balance", default: 0, null: false
     t.integer "seq", null: false
     t.bigint "at_transaction_category_id", null: false
     t.datetime "created_at", null: false
@@ -218,7 +218,9 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.timestamp "expires_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["at_user_id"], name: "index_at_user_tokens_on_at_user_id"
+    t.index ["deleted_at"], name: "index_at_user_tokens_on_deleted_at"
   end
 
   create_table "at_users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -226,6 +228,8 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "at_user_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_at_users_on_deleted_at"
     t.index ["user_id"], name: "index_at_users_on_user_id"
   end
 
@@ -246,14 +250,14 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
   create_table "goal_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
-    t.integer "add_amount"
-    t.integer "monthly_amount"
-    t.integer "first_amount"
-    t.integer "before_current_amount"
-    t.integer "after_current_amount"
+    t.bigint "add_amount", default: 0, null: false
+    t.bigint "monthly_amount", default: 0, null: false
+    t.bigint "first_amount", default: 0, null: false
+    t.bigint "before_current_amount", default: 0, null: false
+    t.bigint "after_current_amount", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "goal_amount"
+    t.bigint "goal_amount", default: 0, null: false
     t.datetime "add_date"
     t.index ["at_user_bank_account_id"], name: "index_goal_logs_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_logs_on_goal_id"
@@ -262,8 +266,8 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
   create_table "goal_settings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
-    t.integer "monthly_amount"
-    t.integer "first_amount"
+    t.bigint "monthly_amount", default: 0, null: false
+    t.bigint "first_amount", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["at_user_bank_account_id"], name: "index_goal_settings_on_at_user_bank_account_id"
@@ -285,8 +289,8 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.string "img_url"
     t.date "start_date"
     t.date "end_date"
-    t.integer "goal_amount"
-    t.integer "current_amount"
+    t.bigint "goal_amount", default: 0, null: false
+    t.bigint "current_amount", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
@@ -329,7 +333,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.bigint "to_user_id"
     t.bigint "group_id"
     t.string "token"
-    t.integer "status"
+    t.bigint "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["from_user_id"], name: "index_pairing_requests_on_from_user_id"
@@ -390,7 +394,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
   create_table "user_distributed_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "group_id"
-    t.boolean "share"
+    t.boolean "share", default: false, null: false
     t.datetime "used_date", null: false
     t.bigint "at_user_bank_transaction_id"
     t.bigint "at_user_card_transaction_id"
@@ -399,7 +403,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "used_location"
-    t.integer "amount"
+    t.bigint "amount", default: 0, null: false
     t.bigint "at_transaction_category_id"
     t.index ["at_transaction_category_id"], name: "index_u_d_t_on_at_transaction_category_id"
     t.index ["at_user_bank_transaction_id"], name: "index_u_d_t_on_at_user_bank_transaction_id"
@@ -428,7 +432,7 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.bigint "payment_method_id"
     t.date "used_date", null: false
     t.string "title"
-    t.integer "amount"
+    t.bigint "amount", default: 0, null: false
     t.string "used_location"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -441,10 +445,10 @@ ActiveRecord::Schema.define(version: 2019_06_28_112134) do
     t.bigint "user_id"
     t.date "birthday"
     t.integer "gender"
-    t.integer "has_child"
+    t.integer "has_child", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "push"
+    t.boolean "push", default: false, null: false
     t.index ["user_id"], name: "index_user_profiles_on_user_id"
   end
 

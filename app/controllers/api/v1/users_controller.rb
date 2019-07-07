@@ -101,6 +101,9 @@ class Api::V1::UsersController < ApplicationController
 
     cancel_reason = delete_user_params[:user_cancel_reason]
     cancel_checklists = delete_user_params[:cancel_checklists]
+    at_user_bank_account_id = @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id)
+    at_user_card_account_id = @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id)
+    at_user_emoney_service_account_id = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id)
 
     # TODO: バリデーション
     # TODO 例外処理と共通化
@@ -109,7 +112,22 @@ class Api::V1::UsersController < ApplicationController
         Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
         Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
         Services::ParingService.new(@current_user).cancel
-        Entities::User.find(@current_user.id).delete
+
+        if at_user_bank_account_id.present?
+          Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_id)
+        end
+
+        if at_user_card_account_id.present?
+          Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, at_user_card_account_id)
+        end
+
+        if at_user_emoney_service_account_id.present?
+          Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_id)
+        end
+
+        # ユーザー削除
+        @current_user.at_user.destroy
+        @current_user.delete
         @current_user.clear_token
         @current_user = nil
       else

@@ -11,6 +11,7 @@
 #
 
 class Entities::AtUserToken < ApplicationRecord
+  acts_as_paranoid
   belongs_to :at_user, inverse_of: :at_user_tokens
 
 
