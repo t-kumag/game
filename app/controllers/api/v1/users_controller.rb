@@ -109,21 +109,12 @@ class Api::V1::UsersController < ApplicationController
     # TODO 例外処理と共通化
     begin
       if cancel_checklists.present?
+
         Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
         Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
         Services::ParingService.new(@current_user).cancel
 
-        if at_user_bank_account_id.present?
-          Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_id)
-        end
-
-        if at_user_card_account_id.present?
-          Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, at_user_card_account_id)
-        end
-
-        if at_user_emoney_service_account_id.present?
-          Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_id)
-        end
+        delete_user_account(at_user_bank_account_id, at_user_card_account_id, at_user_emoney_service_account_id)
 
         # ユーザー削除
         @current_user.at_user.destroy
@@ -156,4 +147,20 @@ class Api::V1::UsersController < ApplicationController
     params.permit(:password, :password_confirm)
   end
 
+
+  def delete_user_account(at_user_bank_account_id, at_user_card_account_id, at_user_emoney_service_account_id)
+
+    if at_user_bank_account_id.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_id)
+    end
+
+    if at_user_card_account_id.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, at_user_card_account_id)
+    end
+
+    if at_user_emoney_service_account_id.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_id)
+    end
+
+  end
 end
