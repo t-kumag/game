@@ -36,13 +36,13 @@ class Api::V1::Group::GoalsController < ApplicationController
     render(json: {}, status: 200)
   end
 
-  # TODO: 目標編集の仕様確認。内容によって修正対応
+  # TODO: 渡された goal_setting_idがgoalに紐づくものかをチェックする
   def update
     begin
       Entities::Goal.new.transaction do
         goal = Entities::Goal.find(params[:id])
         goal.update!(get_goal_params)
-        Entities::GoalSetting.find(params[:goal_settings][:id]).update!(get_goal_setting_params)
+        Entities::GoalSetting.find(params[:goal_settings][:goal_setting_id]).update!(get_goal_setting_params)
       end
 
     rescue => exception
@@ -53,7 +53,6 @@ class Api::V1::Group::GoalsController < ApplicationController
     render(json: {}, status: 200)
   end
 
-  # TODO: 要件確認して論理削除にする
   def destroy
     Entities::Goal.find(params[:id]).destroy
   end
@@ -76,13 +75,12 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def get_goal_params
     params.require(:goals).permit(
-      :group_id,
       :name,
       :img_url,
       :goal_type_id,
       :start_date,
       :end_date,
       :goal_amount
-    ).merge(user_id: @current_user.id, current_amount: 0)
+    ).merge(group_id: @current_user.group_id, user_id: @current_user.id, current_amount: 0)
   end
 end
