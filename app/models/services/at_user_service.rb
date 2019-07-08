@@ -260,7 +260,7 @@ class Services::AtUserService
 
   def get_accounts_skip_fnc_ids(accounts)
     accounts.map { |a|
-      next a.fnc_id if a.error_date.present? && a.error_date + 1.days > DateTime.now && a.error_count >= 2
+      next a.fnc_id if a.error_date.present? && a.error_date + 1.days > DateTime.now && a.error_count >= 1
       nil
     }.compact
   end
