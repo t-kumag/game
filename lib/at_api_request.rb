@@ -29,8 +29,7 @@ module AtAPIRequest
         @method = HttpMethod::POST
 
         at_user_id = "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}"
-        # email = "#{ACCOUNT_NAME_PREFIX}-#{user_id}@osdr.dev.co"
-        # pwd = Digest::MD5.hexdigest("#{PWD_SALT}#{user_id}") # 保存するのでrandとsaltで良いかも
+
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
           "USER_ID" => at_user_id,
