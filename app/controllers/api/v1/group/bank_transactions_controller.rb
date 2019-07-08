@@ -3,7 +3,7 @@ class Api::V1::Group::BankTransactionsController < ApplicationController
   before_action :authenticate
 
   def index
-    @transactions = Services::AtBankTransactionService.new.list(params[:bank_account_id])
+    @transactions = Services::AtBankTransactionService.new.list(params[:bank_account_id], params[:page])
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 

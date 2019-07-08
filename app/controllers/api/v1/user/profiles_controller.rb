@@ -29,11 +29,12 @@ class Api::V1::User::ProfilesController < ApplicationController
 
   def show
     @profile = @current_user.user_profile
-    if @profile.present? 
-      render 'index', formats: 'json', handlers: 'jbuilder'
+    @icon    = @current_user.user_icon
+    if @profile.present?
+      render 'show', formats: 'json', handlers: 'jbuilder'
     else
       render json: {}, status: 200
-    end  
+    end
   end
 
   private
@@ -46,11 +47,10 @@ class Api::V1::User::ProfilesController < ApplicationController
 
   def get_profile_params
     params.permit(
-        :gender,
-        :birthday,
-        :has_child,
-        :push
+      :gender,
+      :birthday,
+      :has_child,
+      :push
     )
   end
 end
-

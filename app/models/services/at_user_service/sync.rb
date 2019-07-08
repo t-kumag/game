@@ -69,8 +69,7 @@ class Services::AtUserService::Sync
 
     begin
       puts "sync transaction start ==============="
-      # TODO 日付をどこまで遡るかまともに考える
-      start_date = Time.now.ago(60.days).strftime("%Y%m%d")
+      start_date = Time.now.ago(Settings.at_sync_transaction_max_days.days).strftime("%Y%m%d")
       end_date = Time.now.strftime("%Y%m%d")
       token = @user.at_user.at_user_tokens.first.token
 
@@ -105,8 +104,8 @@ class Services::AtUserService::Sync
         src_trans = []
         if res.has_key?(rec_key) && !res[rec_key].blank?
           res[rec_key].each do |i|
-            #TODO: ATからdecimalで返ってくるようになればこの処理は不要
-            i["BALANCE"] = i["BALANCE"].present? ? i["BALANCE"].to_d : 0
+            # 文字をintに、空文字の場合は0に変換
+            i["BALANCE"] = i["BALANCE"].present? ? i["BALANCE"].to_i : 0
 
             at_category_id = i["CATEGORY_ID"]
             if category_map.has_key?(at_category_id)

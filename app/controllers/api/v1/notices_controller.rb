@@ -28,7 +28,7 @@ class Api::V1::NoticesController < ApplicationController
   end
 
   def index
-    @notices = Entities::Notice.all.order(created_at: "DESC")
+    @notices = Entities::Notice.order(created_at: "DESC").page(params[:page])
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
 

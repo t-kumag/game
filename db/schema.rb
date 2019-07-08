@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 2019_07_03_124332) do
     t.integer "group_id"
     t.integer "count", default: 0, null: false
     t.string "activity_type", null: false
-    t.date "date", null: false
+    t.datetime "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -47,6 +47,14 @@ ActiveRecord::Schema.define(version: 2019_07_03_124332) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "category_name"
+  end
+
+  create_table "at_sync_transaction_latest_date_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "rec_key", null: false
+    t.datetime "last_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "at_transaction_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
