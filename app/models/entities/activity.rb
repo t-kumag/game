@@ -74,7 +74,7 @@ class Entities::Activity < ApplicationRecord
   end
 
   #集計
-  def self.activities(own_user_id)
+  def self.activities(own_user_id, page)
     #・個人収入収支（デイリーでまとめて）
     #　　　　→　銀行出金、クレカ利用明細、電マネ利用明細等をまとめて、＠件で表示
     #　　　　　　※「振分け」も取引の増加になるため、この中に含む
@@ -118,6 +118,7 @@ class Entities::Activity < ApplicationRecord
                        "message": message})
     }
     @result
+    Kaminari.paginate_array(@result).page(page)
   end
 
 end

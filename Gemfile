@@ -97,3 +97,8 @@ gem 'paranoia'
 # settingslogic 定数を一元管理
 gem 'settingslogic'
 
+
+# pager
+gem 'kaminari'
+gem 'kaminari-activerecord'
+gem 'kaminari-actionview'

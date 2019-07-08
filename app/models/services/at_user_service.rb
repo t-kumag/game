@@ -88,41 +88,43 @@ class Services::AtUserService
   end
 
   # トークンを取得、叩くごとにtokenが更新される
-  # TODO: ミロクにtokenの仕様を確認中（一時的な対応）
   def token
+
+    return {} unless @user.try(:at_user).try(:at_user_tokens)
     begin
-      return {} unless @user.try(:at_user).try(:at_user_tokens)
+      # ミロクに確認してtokenは現状の破棄しなくても使用できるとのこと
+      # 使用できないtokenがあったのはurlencodeをしていなかった事が原因
+      # http://redmine.369webcash.com/issues/2319
 
-      params = {
-        at_user_id: @user.at_user.id,
-        token: @user.at_user.at_user_tokens.first.token
-      }
-      # 有効なtokenを取得する
-      requester = AtAPIRequest::AtUser::GetTokenStatus.new(params)
-      res = AtAPIClient.new(requester).request
-      p "current token===================="
-      p res
+      # params = {
+      #   at_user_id: @user.at_user.id,
+      #   token: @user.at_user.at_user_tokens.first.token
+      # }
+      # # 有効なtokenを取得する
+      # requester = AtAPIRequest::AtUser::GetTokenStatus.new(params)
+      # res = AtAPIClient.new(requester).request
+      # p "current token===================="
+      # p res
+      #
+      # if res.has_key?("EXPI_DT") && res["EXPI_DT"].present?
+      #   params = {
+      #       at_user_id: @user.at_user.id,
+      #       token: res["TOKEN_KEY"]
+      #   }
+      #   # tokenを削除する
+      #   requester = AtAPIRequest::AtUser::DeleteToken.new(params)
+      #   res = AtAPIClient.new(requester).request
+      #   p "delete token===================="
+      #   p res
+      # end
 
-      if res.has_key?("EXPI_DT") && res["EXPI_DT"].present?
-        params = {
-            at_user_id: @user.at_user.id,
-            token: res["TOKEN_KEY"]
-        }
-        # tokenを削除する
-        requester = AtAPIRequest::AtUser::DeleteToken.new(params)
-        res = AtAPIClient.new(requester).request
-        p "delete token===================="
-        p res
-      end
-
-      # tokenを取得する
+      Rails.logger.info("new token====================")
       params = {
           at_user_id: @user.at_user.at_user_id
       }
       requester = AtAPIRequest::AtUser::GetToken.new(params)
       res = AtAPIClient.new(requester).request
-      p "new token===================="
-      p res
+      Rails.logger.info(res)
       params = {
           token: res["TOKEN_KEY"],
           expires_at: res["EXPI_DT"]
@@ -133,8 +135,7 @@ class Services::AtUserService
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
-      p "exception===================="
-      p exception
+      raise exception
     end
     params
   end
