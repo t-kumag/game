@@ -23,7 +23,6 @@ class Services::GoalService
 
   def add_money(goal, goal_setting, add_amount)
     begin
-      at_user_bank_account = @user.at_user.at_user_bank_accounts.find(goal_setting.at_user_bank_account_id)
       ActiveRecord::Base.transaction do
         Entities::GoalLog.insert(goal, goal_setting, add_amount)
         goal.current_amount += add_amount
@@ -36,18 +35,17 @@ class Services::GoalService
     end
   end
 
-  private
-
   def check_bank_balance(add_amount, goal_setting)
-    at_user_bank_account = @user.at_user.at_user_bank_accounts.find(goal_setting.at_user_bank_account_id)
-    if add_amount.blank? || at_user_bank_account.blank? 
+    if add_amount.blank? || goal_setting&.at_user_bank_account.blank?
       false
-    elsif add_amount < at_user_bank_account.balance
+    elsif add_amount < goal_setting&.at_user_bank_account&.balance
       true
     else
       false
     end
   end
+
+  private
 
   def create_goal_user_log(goal, goal_setting)
     goal.goal_logs.create!(

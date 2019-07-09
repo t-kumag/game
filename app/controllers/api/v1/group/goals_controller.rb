@@ -66,13 +66,16 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def add_money
     current_user_banks = @current_user.at_user.at_user_bank_accounts.pluck(:at_bank_id)
-    goal = Entities::Goal.find(params[:id]).where(user_id: @current_user.id)
+    goal = Entities::Goal.find_by(id: params[:id], user_id: @current_user.id)
     goal_setting = goal.goal_settings.find_by(at_user_bank_account_id: current_user_banks)
 
     if current_user_banks.blank? || goal.blank? || goal_setting.blank? 
-      render(json: {}, status: 400)
-    elsif Services::GoalService.new(@current_user).check_bank_balance(params[:add_amount], goal_setting)
-      Services::GoalService.new(@current_user).add_money(goal, goal_setting, params[:add_amount])
+      render(json: {}, status: 400) && return
+    end
+    
+    goal_service = Services::GoalService.new(@current_user)
+    if goal_service.check_bank_balance(params[:add_amount], goal_setting)
+      goal_service.add_money(goal, goal_setting, params[:add_amount])
       render(json: {}, status: 200)
     else
       render(json: {errors: [{code:"", message:"minus balance"}]}, status: 422)
