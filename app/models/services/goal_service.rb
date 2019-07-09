@@ -22,41 +22,32 @@ class Services::GoalService
   end
 
   def add_money(goal, goal_setting, add_amount)
-    res = {}
     begin
-        at_user_bank_account = @user.at_user.at_user_bank_accounts.find(goal_setting.at_user_bank_account_id)
-        return { json: {}, status: 400 } unless at_user_bank_account.present?
-
-        if add_amount < at_user_bank_account.balance
-          ActiveRecord::Base.transaction do
-            before_current_amount = goal.current_amount
-            after_current_amount = goal.current_amount + add_amount
-            goal.current_amount += add_amount
-            goal.save!
-            
-            goal.goal_logs.create!(
-              goal_id: goal.id,
-              at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
-              add_amount: add_amount,
-              before_current_amount: before_current_amount,
-              after_current_amount: after_current_amount
-            )
-          end
-          res = { json: {}, status: 200 }
-        else
-          res = { json: {errors: [{code:"", message:"minus balance"}]}, status: 422 }
-        end
+      at_user_bank_account = @user.at_user.at_user_bank_accounts.find(goal_setting.at_user_bank_account_id)
+      ActiveRecord::Base.transaction do
+        Entities::GoalLog.insert(goal, goal_setting, add_amount)
+        goal.current_amount += add_amount
+        goal.save!
+      end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
-      p "exception===================="
       p exception
     end
-
-    return res
   end
 
   private
+
+  def check_bank_balance(add_amount, goal_setting)
+    at_user_bank_account = @user.at_user.at_user_bank_accounts.find(goal_setting.at_user_bank_account_id)
+    if add_amount.blank? || at_user_bank_account.blank? 
+      false
+    elsif add_amount < at_user_bank_account.balance
+      true
+    else
+      false
+    end
+  end
 
   def create_goal_user_log(goal, goal_setting)
     goal.goal_logs.create!(
