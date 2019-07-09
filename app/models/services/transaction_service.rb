@@ -17,20 +17,27 @@ class Services::TransactionService
   end
 
   def fetch_transactions(from, to, ids)
-    transactions = nil
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
-      transactions = Entities::UserDistributedTransaction.where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
+      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
+      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
+      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
     else
-      transactions = Entities::UserDistributedTransaction.where(user_id: @user_id, used_date: from..to)
+      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user_id, used_date: from..to)
+      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user_id, used_date: from..to)
+      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user_id, used_date: from..to)
     end
-    transactions
+    bank_tarnsactions + card_transactiohs + emoney_transactiohs
   end
 
   def generate_response_from_transactions(transactions)
+
     response = []
     transactions.each{ |t|
       response << {
+        at_user_bank_account_id:    t.at_user_bank_transaction.try(:at_user_bank_account_id),
+        at_user_card_account_id:   t.at_user_card_transaction.try(:at_user_card_account_id),
+        at_user_emoney_service_account_id: t.at_user_emoney_transaction.try(:at_user_emoney_service_account_id),
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
