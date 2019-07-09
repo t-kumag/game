@@ -208,7 +208,7 @@ class Services::AtUserService
 
   def delete_account(model, id)
     begin
-      account_fnc_id = model.find(id).pluck(:fnc_id).pop
+      account_fnc_id = model.find_by(id: id).fnc_id
       params = {}
       if account_fnc_id.present?
         params[:token] = @user.at_user.token
