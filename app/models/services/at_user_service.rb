@@ -1,9 +1,6 @@
 require 'nkf'
 
 class Services::AtUserService
-  # envに移す
-  PWD_SALT = "osdrdev"
-  ACCOUNT_NAME_PREFIX = "osdrdev"
 
   def initialize(user, target = 'all')
     @user = user
@@ -17,65 +14,62 @@ class Services::AtUserService
   def create_user
     begin
       require "securerandom"
-      rond_id = SecureRandom.hex
-      at_user = Entities::AtUser.new(
-        {
-          user_id: @user.id,
-          at_user_id: rond_id
+
+      ActiveRecord::Base.transaction do
+        # 仮登録 randomのat_user_idを登録しat_user.idを発行する
+        at_user = Entities::AtUser.new(
+          {
+            user_id: @user.id,
+            at_user_id: SecureRandom.hex
+          }
+        )
+        at_user.save!
+
+        params = {
+          at_user_id: "#{SecureRandom.hex}_#{at_user.id}"
         }
-      )
-      # at_user.password = at_user.generate_at_user_password
-      at_user.save!
-      params = {
-        at_user_id: at_user.at_user_id,
-        # at_user_password: at_user.password,
-        # at_user_email: at_user.at_user_email,
-      }
-      requester = AtAPIRequest::AtUser::CreateUser.new(params)
-      res = AtAPIClient.new(requester).request
-      at_user_token = Entities::AtUserToken.new({
-          at_user_id: at_user.id,
-          token: res["TOKEN_KEY"]
-        # token.expires_at = res["EXPI_DT"]
-      })
-      at_user_token.save!
-      at_user.at_user_tokens << at_user_token
+        requester = AtAPIRequest::AtUser::CreateUser.new(params)
+        res = AtAPIClient.new(requester).request
+
+        at_user_token = Entities::AtUserToken.new({
+            at_user_id: at_user.id,
+            token: res["TOKEN_KEY"],
+            expires_at: res["EXPI_DT"]
+        })
+        at_user_token.save!
+
+        # ATのuser作成完了後に正式なat_user_idで更新する
+        at_user.update!(
+            {
+                at_user_id: params[:at_user_id]
+            }
+        )
+      end
+
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
-      p exception
+      raise exception
     end
 
-    return at_user
+    Entities::AtUser.where(user_id: @user.id).first
   end
 
   def at_url
 
-    at_user = nil
-
-    if @user&.at_user&.at_user_tokens.blank?
-      puts "create_user ================="
-      at_user = create_user
-      p at_user
-    else
-      puts " @user.at_user ================="
-      at_user = @user.at_user 
-      p at_user
+    if @user.at_user.blank?
+      @user.at_user = create_user
     end
 
-    # TODO、tokenを含まないurl返す
-    # TODO: 開発用url
-    url = 'https://atdev.369webcash.com/openadd001.act'
-
-    puts "tokens========"
-    p at_user.at_user_tokens.first.token
+    Rails.logger.info("tokens========")
+    Rails.logger.info(@user.at_user.at_user_tokens.first.token)
 
     return {
-      url: url,
+      url: "#{Settings.at_url}/openadd001.act",
       chnl_id: "CHNL_OSIDORI",
-      token_key: at_user.at_user_tokens.first.token
+      token_key: @user.at_user.at_user_tokens.first.token
     }
   end
 
