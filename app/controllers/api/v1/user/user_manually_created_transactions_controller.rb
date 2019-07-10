@@ -13,12 +13,16 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = create_user_manually_created
-        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created
+        if params[:share] === true
+          options = {group_id: @current_user.group_id, share: params[:share]}
+        else
+          options = {}
+        end
+        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
       end
 
     rescue => exception
-      logger.error exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
 
     render(json: {}, status: 200)
@@ -28,12 +32,16 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = update_user_manually_created
-        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).update_user_manually_created
+        if params[:share] === true
+          options = {group_id: @current_user.group_id, share: params[:share]}
+        else
+          options = {}
+        end
+        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).update_user_manually_created(options)
       end
 
     rescue => exception
-      logger.error exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
 
     render(json: {}, status: 200)
@@ -46,10 +54,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction.destroy
       end
-
     rescue => exception
-      logger.error exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
     render(json: {}, status: 200)
   end
@@ -57,7 +63,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   private
 
   def find_transaction
-    Entities::UserManuallyCreatedTransaction.where(id: params[:id]).first
+    Entities::UserManuallyCreatedTransaction.where(id: params[:id], user_id: @current_user.id).first
   end
 
   def create_user_manually_created
