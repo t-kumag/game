@@ -1,4 +1,5 @@
 class Services::GoalService
+
   def initialize(user)
     @user = user
   end
@@ -13,6 +14,10 @@ class Services::GoalService
 
   def get_goal_user(group_id)
     Entities::Goal.find_by(user_id: @user.id, group_id: group_id)
+  end
+
+  def get_goal_one(id)
+    Entities::Goal.find_by(id)
   end
 
   def update_current_amount(goal, goal_setting)
