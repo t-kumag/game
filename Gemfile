@@ -102,3 +102,9 @@ gem 'settingslogic'
 gem 'kaminari'
 gem 'kaminari-activerecord'
 gem 'kaminari-actionview'
+
+# redis
+gem 'redis-rails'
+
+# sidekiq
+gem 'sidekiq'

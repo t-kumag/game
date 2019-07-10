@@ -10,7 +10,7 @@ services:
       - 3000:3000
     environment:
       - DB_HOST=db # osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
-      - DB_PORT=3306
+      - DB_PORT=3306my.cnf
       - DB_NAME=dev_osdr_db
       - DB_USER=devusr
       - DB_PWD=pass
@@ -48,3 +48,12 @@ services:
       - ./tmp/db/mysql_data:/var/lib/mysql # データの永続化
       - ./docker/db/sql:/docker-entrypoint-initdb.d # 初期データ投入
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --innodb-use-native-aio=0
+
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - .docker/redis/data:/data
