@@ -39,6 +39,8 @@ RUN apk update && \
 
 ADD . $ROOT_PATH
 
+RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+
 EXPOSE 3000
 
 # CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma/production.rb"]
