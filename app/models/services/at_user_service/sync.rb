@@ -48,6 +48,17 @@ class Services::AtUserService::Sync
             account[k] = Time.parse(i[v[:col]])
           end
         end
+
+        lastAccount = account_entity.find_by(fnc_id: account['fnc_id'])
+        # error_count が 1以上の場合はスクレイピングしないが、バッファされたRESULT_CODEでEが返るため
+        # error_count が 1未満の場合のみエラーとして扱う
+        if (account['last_rslt_cd'] === 'E' && lastAccount['error_count'] < 1)
+          account['error_date'] = lastAccount.present? && lastAccount['error_date'].blank? ? DateTime.now : lastAccount['error_date']
+          account['error_count'] = lastAccount['error_count'] + 1
+          # バルクインサート時にUPDATEされるようハッシュにキーを追加する
+          data_column.store('error_date', '')
+          data_column.store('error_count', '')
+        end
         accounts << account
       end
     end

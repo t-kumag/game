@@ -229,6 +229,37 @@ class Services::AtUserService
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
 
+  def reset_all_account_error
+    reset_entity_error(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount);
+    reset_entity_error(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount);
+    reset_entity_error(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);
+  end
+
+  def reset_entity_error(accounts, entity)
+    entity.import accounts.map { |a| reset_account_error(a) }, on_duplicate_key_update: [:error_date, :error_count], validate: false
+  end
+
+  def reset_account_error(account)
+    if (account.error_date.present? && account.error_date + 1.days <= DateTime.now)
+      account.error_date = nil
+      account.error_count = 0
+    end
+    account
+  end
+
+  def get_skip_fnc_ids
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_emoney_service_accounts)
+  end
+
+  def get_accounts_skip_fnc_ids(accounts)
+    accounts.map { |a|
+      next a.fnc_id if a.error_date.present? && a.error_date + 1.days > DateTime.now && a.error_count >= 1
+      nil
+    }.compact
+  end
+
   def exec_scraping
     puts "scraping=========="
     puts @target
@@ -257,10 +288,27 @@ class Services::AtUserService
         puts "scraping all=========="
         fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
         fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
-        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}	
+      end
+
+      skip_ids = []
+      case @target
+      when 'bank'
+        reset_entity_error(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount);
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts)
+      when 'card'
+        reset_entity_error(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount);
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts)
+      when 'emoney'
+        reset_entity_error(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);    
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_emoney_service_accounts)    
+      else
+        reset_all_account_error
+        skip_ids = get_skip_fnc_ids
       end
 
       fnc_ids.each do |fnc_id|
+        next if skip_ids.include?(fnc_id)
         params = {
           token: token,
           fnc_id: fnc_id
@@ -290,8 +338,6 @@ class Services::AtUserService
 
     # return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
-
-
 
   # ## openuserr003
   # ## トークン及びユーザーIDから、ユーザーの状態を照会します
