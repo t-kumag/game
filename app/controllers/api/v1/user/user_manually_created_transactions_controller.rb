@@ -5,7 +5,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
   def show
     @response = find_transaction
-    render(json: {}, status: 404) if @response.blank?
+    render(json: { errors: { code: '', mesasge: "record not found." } }, status: 422) and return if @response.blank?
     render :show, formats: :json, handlers: :jbuilder
   end
 
@@ -63,7 +63,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   private
 
   def find_transaction
-    Entities::UserManuallyCreatedTransaction.where(id: params[:id], user_id: @current_user.id).first
+    Entities::UserManuallyCreatedTransaction.find_by(id: params[:id], user_id: @current_user.id)
   end
 
   def create_user_manually_created
