@@ -31,7 +31,7 @@ class Services::GoalService
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
-      p exception
+      raise exception
     end
   end
 
