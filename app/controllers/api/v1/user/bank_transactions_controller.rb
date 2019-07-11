@@ -4,17 +4,17 @@ class Api::V1::User::BankTransactionsController < ApplicationController
   # TODO(fujiura): bank_account_id, transaction_id に対応するデータがないときの処理
 
   def index
-    @transactions = Services::AtBankTransactionService.new.list(params[:bank_account_id], params[:page])
+    @transactions = Services::AtBankTransactionService.new(@current_user).list(params[:bank_account_id], params[:page])
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
   def show
-    @response = Services::AtBankTransactionService.new.detail(params[:bank_account_id], params[:id],)
+    @response = Services::AtBankTransactionService.new(@current_user).detail(params[:bank_account_id], params[:id],)
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
   def update
-    @response = Services::AtBankTransactionService.new.update(
+    @response = Services::AtBankTransactionService.new(@current_user).update(
         params[:id],
         params[:at_transaction_category_id],
         params[:used_location],
