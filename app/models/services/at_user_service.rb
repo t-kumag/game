@@ -260,6 +260,13 @@ class Services::AtUserService
     }.compact
   end
 
+  # 抑止する口座情報取得
+  def get_skip_account(fnc_id)
+    Entities::AtUserBankAccount.find_by(fnc_id: fnc_id) || 
+    Entities::AtUserCardAccount.find_by(fnc_id: fnc_id) || 
+    Entities::AtUserEmoneyServiceAccount.find_by(fnc_id: fnc_id)
+  end
+
   def exec_scraping
     puts "scraping=========="
     puts @target
