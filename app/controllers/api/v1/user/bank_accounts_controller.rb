@@ -15,7 +15,8 @@ class Api::V1::User::BankAccountsController < ApplicationController
         @responses << {
           id: a.id,
           name: a.fnc_nm,
-          amount: a.balance
+          amount: a.balance,
+          fnc_id: a.fnc_id
         }
       end
     end

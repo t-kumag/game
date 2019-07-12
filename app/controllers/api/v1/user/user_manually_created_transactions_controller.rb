@@ -5,7 +5,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
   def show
     @response = find_transaction
-    render(json: {}, status: 404) if @response.blank?
+    render(json: { errors: { code: '', mesasge: "record not found." } }, status: 422) and return if @response.blank?
     render :show, formats: :json, handlers: :jbuilder
   end
 
@@ -13,12 +13,16 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = create_user_manually_created
-        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created
+        if params[:share] === true
+          options = {group_id: @current_user.group_id, share: params[:share]}
+        else
+          options = {}
+        end
+        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
       end
 
     rescue => exception
-      logger.error exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
 
     render(json: {}, status: 200)
@@ -28,12 +32,16 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = update_user_manually_created
-        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).update_user_manually_created
+        if params[:share] === true
+          options = {group_id: @current_user.group_id, share: params[:share]}
+        else
+          options = {}
+        end
+        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).update_user_manually_created(options)
       end
 
     rescue => exception
-      logger.error exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
 
     render(json: {}, status: 200)
@@ -46,10 +54,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction.destroy
       end
-
     rescue => exception
-      logger.error exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
     render(json: {}, status: 200)
   end
@@ -57,7 +63,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   private
 
   def find_transaction
-    Entities::UserManuallyCreatedTransaction.where(id: params[:id]).first
+    Entities::UserManuallyCreatedTransaction.find_by(id: params[:id], user_id: @current_user.id)
   end
 
   def create_user_manually_created
@@ -71,12 +77,14 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     ).merge(
       user_id: @current_user.id
     )
+
+    Services::ActivityService.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
     Entities::UserManuallyCreatedTransaction.create!(save_params)
+
   end
 
   def update_user_manually_created
     save_params = params.permit(
-      :id,
       :at_transaction_category_id,
       :payment_method_id,
       :used_date,
@@ -86,6 +94,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     ).merge(
       user_id: @current_user.id
     )
+
+    Services::ActivityService.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
     Entities::UserManuallyCreatedTransaction.find(params[:id]).update!(save_params)
     Entities::UserManuallyCreatedTransaction.find(params[:id])
   end

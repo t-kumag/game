@@ -16,7 +16,7 @@
 #
 
 class Entities::UserManuallyCreatedTransaction < ApplicationRecord
-  belongs_to :payment_method
+  belongs_to :payment_method, optional: true
   belongs_to :at_transaction_category
-  has_one :user_distributed_transaction
+  has_one :user_distributed_transaction ,:dependent => :destroy
 end

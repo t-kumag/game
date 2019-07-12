@@ -48,6 +48,17 @@ class Services::AtUserService::Sync
             account[k] = Time.parse(i[v[:col]])
           end
         end
+
+        lastAccount = account_entity.find_by(fnc_id: account['fnc_id'])
+        # error_count が 1以上の場合はスクレイピングしないが、バッファされたRESULT_CODEでEが返るため
+        # error_count が 1未満の場合のみエラーとして扱う
+        if (account['last_rslt_cd'] === 'E' && lastAccount['error_count'] < 1)
+          account['error_date'] = lastAccount.present? && lastAccount['error_date'].blank? ? DateTime.now : lastAccount['error_date']
+          account['error_count'] = lastAccount['error_count'] + 1
+          # バルクインサート時にUPDATEされるようハッシュにキーを追加する
+          data_column.store('error_date', '')
+          data_column.store('error_count', '')
+        end
         accounts << account
       end
     end
@@ -58,8 +69,7 @@ class Services::AtUserService::Sync
 
     begin
       puts "sync transaction start ==============="
-      # TODO 日付をどこまで遡るかまともに考える
-      start_date = Time.now.ago(60.days).strftime("%Y%m%d")
+      start_date = Time.now.ago(Settings.at_sync_transaction_max_days.days).strftime("%Y%m%d")
       end_date = Time.now.strftime("%Y%m%d")
       token = @user.at_user.at_user_tokens.first.token
 
@@ -92,6 +102,7 @@ class Services::AtUserService::Sync
         end
 
         src_trans = []
+        activities = []
         if res.has_key?(rec_key) && !res[rec_key].blank?
           res[rec_key].each do |i|
             # 文字をintに、空文字の場合は0に変換
@@ -120,9 +131,16 @@ class Services::AtUserService::Sync
               end
             end
             src_trans << tran
+
+            activity = get_activity(financier_account_type_key, tran, a, activities)
+            if activity.present?
+              activities << activity
+            end
           end
         end
         transaction_entity.import src_trans, :on_duplicate_key_update => data_column.map{|k,v| k }, :validate => false
+        Services::ActivityService.save_activities(activities)
+        Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
       end
     rescue AtAPIStandardError => api_err
       raise api_err
@@ -263,7 +281,6 @@ class Services::AtUserService::Sync
         },
         true # has_balance
       )
-
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
@@ -275,5 +292,17 @@ class Services::AtUserService::Sync
       # p exception.backtrace
     end
   end
-  
+
+  private
+
+  def get_activity(financier_account_type_key, tran, account, activities)
+    activity = Services::ActivityService.set_activity_list(financier_account_type_key, tran, account)
+    check_duplicate_activity = Services::ActivityService.check_activity_duplication(financier_account_type_key, activities, activity)
+    latest_sync_date = Services::AtSyncTransactionLatestDateLogService.get_latest_one(financier_account_type_key, account)
+    check_difference_date = latest_sync_date.present? && latest_sync_date < activity[:date] ? true : false
+
+    if check_duplicate_activity && (latest_sync_date.nil? || check_difference_date)
+      return activity
+    end
+  end
 end

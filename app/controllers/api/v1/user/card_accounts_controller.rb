@@ -21,7 +21,8 @@ class Api::V1::User::CardAccountsController < ApplicationController
           @responses << {
             id: ca.id,
             name: ca.fnc_nm,
-            amount: 0
+            amount: 0,
+            fnc_id: ca.fnc_id
           }
         end
       end

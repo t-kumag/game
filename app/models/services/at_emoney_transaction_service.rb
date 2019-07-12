@@ -1,7 +1,10 @@
 class Services::AtEmoneyTransactionService
-  def list(account_id)
+
+  # TODO: form toをつけないと検索範囲が広すぎる
+  def list(account_id, page)
     emoney = Entities::AtUserEmoneyServiceAccount.find(account_id)
-    emoney.at_user_emoney_transactions.order(id: "DESC")
+    result = emoney.at_user_emoney_transactions.order(id: "DESC")
+    Kaminari.paginate_array(result).page(page)
   end
 
   def detail(account_id, transaction_id)

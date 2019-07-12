@@ -1,9 +1,6 @@
 require 'nkf'
 
 class Services::AtUserService
-  # envに移す
-  PWD_SALT = "osdrdev"
-  ACCOUNT_NAME_PREFIX = "osdrdev"
 
   def initialize(user, target = 'all')
     @user = user
@@ -17,65 +14,62 @@ class Services::AtUserService
   def create_user
     begin
       require "securerandom"
-      rond_id = SecureRandom.hex
-      at_user = Entities::AtUser.new(
-        {
-          user_id: @user.id,
-          at_user_id: rond_id
+
+      ActiveRecord::Base.transaction do
+        # 仮登録 randomのat_user_idを登録しat_user.idを発行する
+        at_user = Entities::AtUser.new(
+          {
+            user_id: @user.id,
+            at_user_id: SecureRandom.hex
+          }
+        )
+        at_user.save!
+
+        params = {
+          at_user_id: "#{SecureRandom.hex}_#{at_user.id}"
         }
-      )
-      # at_user.password = at_user.generate_at_user_password
-      at_user.save!
-      params = {
-        at_user_id: at_user.at_user_id,
-        # at_user_password: at_user.password,
-        # at_user_email: at_user.at_user_email,
-      }
-      requester = AtAPIRequest::AtUser::CreateUser.new(params)
-      res = AtAPIClient.new(requester).request
-      at_user_token = Entities::AtUserToken.new({
-          at_user_id: at_user.id,
-          token: res["TOKEN_KEY"]
-        # token.expires_at = res["EXPI_DT"]
-      })
-      at_user_token.save!
-      at_user.at_user_tokens << at_user_token
+        requester = AtAPIRequest::AtUser::CreateUser.new(params)
+        res = AtAPIClient.new(requester).request
+
+        at_user_token = Entities::AtUserToken.new({
+            at_user_id: at_user.id,
+            token: res["TOKEN_KEY"],
+            expires_at: res["EXPI_DT"]
+        })
+        at_user_token.save!
+
+        # ATのuser作成完了後に正式なat_user_idで更新する
+        at_user.update!(
+            {
+                at_user_id: params[:at_user_id]
+            }
+        )
+      end
+
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
-      p exception
+      raise exception
     end
 
-    return at_user
+    Entities::AtUser.where(user_id: @user.id).first
   end
 
   def at_url
 
-    at_user = nil
-
-    if @user&.at_user&.at_user_tokens.blank?
-      puts "create_user ================="
-      at_user = create_user
-      p at_user
-    else
-      puts " @user.at_user ================="
-      at_user = @user.at_user 
-      p at_user
+    if @user.at_user.blank?
+      @user.at_user = create_user
     end
 
-    # TODO、tokenを含まないurl返す
-    # TODO: 開発用url
-    url = 'https://atdev.369webcash.com/openadd001.act'
-
-    puts "tokens========"
-    p at_user.at_user_tokens.first.token
+    Rails.logger.info("tokens========")
+    Rails.logger.info(@user.at_user.at_user_tokens.first.token)
 
     return {
-      url: url,
+      url: "#{Settings.at_url}/openadd001.act",
       chnl_id: "CHNL_OSIDORI",
-      token_key: at_user.at_user_tokens.first.token
+      token_key: @user.at_user.at_user_tokens.first.token
     }
   end
 
@@ -88,41 +82,43 @@ class Services::AtUserService
   end
 
   # トークンを取得、叩くごとにtokenが更新される
-  # TODO: ミロクにtokenの仕様を確認中（一時的な対応）
   def token
+
+    return {} unless @user.try(:at_user).try(:at_user_tokens)
     begin
-      return {} unless @user.try(:at_user).try(:at_user_tokens)
+      # ミロクに確認してtokenは現状の破棄しなくても使用できるとのこと
+      # 使用できないtokenがあったのはurlencodeをしていなかった事が原因
+      # http://redmine.369webcash.com/issues/2319
 
-      params = {
-        at_user_id: @user.at_user.id,
-        token: @user.at_user.at_user_tokens.first.token
-      }
-      # 有効なtokenを取得する
-      requester = AtAPIRequest::AtUser::GetTokenStatus.new(params)
-      res = AtAPIClient.new(requester).request
-      p "current token===================="
-      p res
+      # params = {
+      #   at_user_id: @user.at_user.id,
+      #   token: @user.at_user.at_user_tokens.first.token
+      # }
+      # # 有効なtokenを取得する
+      # requester = AtAPIRequest::AtUser::GetTokenStatus.new(params)
+      # res = AtAPIClient.new(requester).request
+      # p "current token===================="
+      # p res
+      #
+      # if res.has_key?("EXPI_DT") && res["EXPI_DT"].present?
+      #   params = {
+      #       at_user_id: @user.at_user.id,
+      #       token: res["TOKEN_KEY"]
+      #   }
+      #   # tokenを削除する
+      #   requester = AtAPIRequest::AtUser::DeleteToken.new(params)
+      #   res = AtAPIClient.new(requester).request
+      #   p "delete token===================="
+      #   p res
+      # end
 
-      if res.has_key?("EXPI_DT") && res["EXPI_DT"].present?
-        params = {
-            at_user_id: @user.at_user.id,
-            token: res["TOKEN_KEY"]
-        }
-        # tokenを削除する
-        requester = AtAPIRequest::AtUser::DeleteToken.new(params)
-        res = AtAPIClient.new(requester).request
-        p "delete token===================="
-        p res
-      end
-
-      # tokenを取得する
+      Rails.logger.info("new token====================")
       params = {
           at_user_id: @user.at_user.at_user_id
       }
       requester = AtAPIRequest::AtUser::GetToken.new(params)
       res = AtAPIClient.new(requester).request
-      p "new token===================="
-      p res
+      Rails.logger.info(res)
       params = {
           token: res["TOKEN_KEY"],
           expires_at: res["EXPI_DT"]
@@ -133,8 +129,7 @@ class Services::AtUserService
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
-      p "exception===================="
-      p exception
+      raise exception
     end
     params
   end
@@ -235,6 +230,37 @@ class Services::AtUserService
     return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
 
+  def reset_all_account_error
+    reset_entity_error(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount);
+    reset_entity_error(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount);
+    reset_entity_error(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);
+  end
+
+  def reset_entity_error(accounts, entity)
+    entity.import accounts.map { |a| reset_account_error(a) }, on_duplicate_key_update: [:error_date, :error_count], validate: false
+  end
+
+  def reset_account_error(account)
+    if (account.error_date.present? && account.error_date + 1.days <= DateTime.now)
+      account.error_date = nil
+      account.error_count = 0
+    end
+    account
+  end
+
+  def get_skip_fnc_ids
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_emoney_service_accounts)
+  end
+
+  def get_accounts_skip_fnc_ids(accounts)
+    accounts.map { |a|
+      next a.fnc_id if a.error_date.present? && a.error_date + 1.days > DateTime.now && a.error_count >= 1
+      nil
+    }.compact
+  end
+
   def exec_scraping
     puts "scraping=========="
     puts @target
@@ -263,10 +289,27 @@ class Services::AtUserService
         puts "scraping all=========="
         fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
         fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
-        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}	
+      end
+
+      skip_ids = []
+      case @target
+      when 'bank'
+        reset_entity_error(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount);
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts)
+      when 'card'
+        reset_entity_error(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount);
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts)
+      when 'emoney'
+        reset_entity_error(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);    
+        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_emoney_service_accounts)    
+      else
+        reset_all_account_error
+        skip_ids = get_skip_fnc_ids
       end
 
       fnc_ids.each do |fnc_id|
+        next if skip_ids.include?(fnc_id)
         params = {
           token: token,
           fnc_id: fnc_id
@@ -296,8 +339,6 @@ class Services::AtUserService
 
     # return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
-
-
 
   # ## openuserr003
   # ## トークン及びユーザーIDから、ユーザーの状態を照会します

@@ -4,7 +4,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
   # TODO(fujiura): emoney_account_id, transaction_id に対応するデータがないときの処理
 
   def index
-    @transactions = Services::AtEmoneyTransactionService.new.list(params[:emoney_account_id])
+    @transactions = Services::AtEmoneyTransactionService.new.list(params[:emoney_account_id], params[:page])
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
