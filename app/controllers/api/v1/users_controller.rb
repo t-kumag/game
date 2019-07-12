@@ -4,13 +4,21 @@ class Api::V1::UsersController < ApplicationController
 
 
   def create
-    @user = Entities::User.new
-    @user.email = sign_up_params[:email]
-    @user.password = sign_up_params[:password]
-    @user.email_authenticated = false
-    @user.reset_token
-    @user.save!
-    MailDelivery.user_registration(@user).deliver
+    begin
+      @user = Entities::User.new
+      @user.email = sign_up_params[:email]
+      @user.password = sign_up_params[:password]
+      @user.email_authenticated = false
+      @user.reset_token
+      @user.save!
+      MailDelivery.user_registration(@user).deliver
+    rescue ActiveRecord::RecordInvalid => db_err
+      p db_err
+      render(json: {}, status: 400) && return
+    rescue => exception
+      p exception
+      render(json: {}, status: 400) && return
+    end
 
     render 'create', formats: 'json', handlers: 'jbuilder', status: 200
   end
