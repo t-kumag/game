@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_03_124332) do
+ActiveRecord::Schema.define(version: 2019_07_12_041241) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -64,6 +64,8 @@ ActiveRecord::Schema.define(version: 2019_07_03_124332) do
     t.string "at_category_id", null: false
     t.string "category_name1"
     t.string "category_name2"
+    t.bigint "at_grouped_categories_id"
+    t.index ["at_grouped_categories_id"], name: "index_at_transaction_categories_on_at_grouped_categories_id"
   end
 
   create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -224,7 +226,9 @@ ActiveRecord::Schema.define(version: 2019_07_03_124332) do
     t.timestamp "expires_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
     t.index ["at_user_id"], name: "index_at_user_tokens_on_at_user_id"
+    t.index ["deleted_at"], name: "index_at_user_tokens_on_deleted_at"
   end
 
   create_table "at_users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -232,6 +236,8 @@ ActiveRecord::Schema.define(version: 2019_07_03_124332) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "at_user_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_at_users_on_deleted_at"
     t.index ["user_id"], name: "index_at_users_on_user_id"
   end
 
@@ -370,6 +376,29 @@ ActiveRecord::Schema.define(version: 2019_07_03_124332) do
     t.index ["user_id"], name: "index_user_budget_questions_on_user_id"
   end
 
+  create_table "user_cancel_answers", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "user_cancel_question_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_cancel_question_id"], name: "index_user_cancel_answers_on_user_cancel_question_id"
+    t.index ["user_id"], name: "index_user_cancel_answers_on_user_id"
+  end
+
+  create_table "user_cancel_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.text "cancel_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_cancel_reasons", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.text "cancel_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_cancel_reasons_on_user_id"
+  end
+
   create_table "user_distributed_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "group_id"
@@ -452,6 +481,8 @@ ActiveRecord::Schema.define(version: 2019_07_03_124332) do
     t.boolean "email_authenticated", default: false
     t.datetime "token_expires_at"
     t.integer "rank", default: 0
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_users_on_deleted_at"
   end
 
   add_foreign_key "at_user_bank_accounts", "at_banks"
@@ -483,6 +514,9 @@ ActiveRecord::Schema.define(version: 2019_07_03_124332) do
   add_foreign_key "participate_groups", "users"
   add_foreign_key "user_budget_questions", "budget_questions"
   add_foreign_key "user_budget_questions", "users"
+  add_foreign_key "user_cancel_answers", "user_cancel_questions"
+  add_foreign_key "user_cancel_answers", "users"
+  add_foreign_key "user_cancel_reasons", "users"
   add_foreign_key "user_distributed_transactions", "at_transaction_categories"
   add_foreign_key "user_distributed_transactions", "at_user_bank_transactions"
   add_foreign_key "user_distributed_transactions", "at_user_card_transactions"
