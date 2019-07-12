@@ -64,8 +64,8 @@ ActiveRecord::Schema.define(version: 2019_07_12_041241) do
     t.string "at_category_id", null: false
     t.string "category_name1"
     t.string "category_name2"
-    t.bigint "at_grouped_categories_id"
-    t.index ["at_grouped_categories_id"], name: "index_at_transaction_categories_on_at_grouped_categories_id"
+    t.bigint "at_grouped_category_id"
+    t.index ["at_grouped_category_id"], name: "index_at_transaction_categories_on_at_grouped_category_id"
   end
 
   create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
