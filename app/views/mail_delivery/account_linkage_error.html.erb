@@ -1,13 +1,13 @@
 
 <p>口座連携エラーが発生しました。</p>
 
-<p>エラー発生日時　<%= @error_date %></p>
+<p>エラー発生日時　<%= @account.error_date.strftime("%Y年%m月%d日 %H時%M分") %></p>
 
-<p>エラー回数　<%= @error_count %>回</p>
+<p>エラー回数　<%= @account.error_count %>回</p>
 
-<p>エラー発生した金融機関は、<%= @fnc_nm %>なります</p>
+<p>エラー発生した金融機関は、<%= @account.fnc_nm %>になります</p>
 
-<p>エラー詳細　<%= @error_detail %></p>
+<p>エラー詳細　<%= @account.last_rslt_msg %></p>
 
 <p>（注）<br>
 このメールは、登録メールアドレス宛に自動的にお送りしています。ご登録された覚えのない場合はお手数ですが以下お問い合わせ先までご連絡ください。
