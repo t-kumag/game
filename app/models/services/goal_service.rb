@@ -17,7 +17,19 @@ class Services::GoalService
   end
 
   def get_goal_one(id)
-    Entities::Goal.find_by(id)
+    goal = Entities::Goal.find_by(id)
+    {
+        goal_id: goal.id,
+        goal_type_id: goal.goal_type_id,
+        name: goal.name,
+        img_url: goal.img_url,
+        goal_amount: goal.goal_amount,
+        current_amount: goal.current_amount,
+        goal_difference_amount: goal.goal_amount - goal.current_amount,
+        start_date: goal.start_date,
+        end_date: goal.end_date,
+        goal_settings: goal.goal_settings
+    }
   end
 
   def update_current_amount(goal, goal_setting)

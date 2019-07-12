@@ -16,11 +16,6 @@ class Api::V1::Group::GoalsController < ApplicationController
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
-  def status
-    @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
-    render 'status', formats: 'json', handlers: 'jbuilder'
-  end
-
   def create
     goal_params = get_goal_params
     begin

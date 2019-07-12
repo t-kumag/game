@@ -78,7 +78,6 @@ Rails.application.routes.draw do
 
         # TODO goal_settingsの更新
         resources :goals, path: '/goals'
-        get 'goals/status/:id', to: 'goals#status'
 
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'
