@@ -208,15 +208,16 @@ class Services::AtUserService
 
   def delete_account(model, id)
     begin
+      binding.pry
       account_fnc_id = model.find_by(id: id).fnc_id
       params = {}
       if account_fnc_id.present?
-        params[:token] = @user.at_user.token
+        params[:token] = @user.token
         params[:fnc_id] = account_fnc_id
         request  = AtAPIRequest::AtUser::DeleteAccount.new(params)
         AtAPIClient.new(request).request
       end
-      model.find(id).pop.destroy
+      model.find_by(id: id).destroy
     end
   end
 
