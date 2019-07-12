@@ -8,7 +8,7 @@ class Api::V1::CategoriesController < ApplicationController
     @categories_all.each do |ca|
 
       transaction_categories = []
-      ca.at_transaction_category.each do |atc|
+      ca.at_transaction_categories.each do |atc|
         transaction_categories << {
             at_transaction_category_id: atc.id,
             at_transaction_category_category_name1: atc.category_name2

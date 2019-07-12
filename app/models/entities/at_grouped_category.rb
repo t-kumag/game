@@ -1,3 +1,3 @@
 class Entities::AtGroupedCategory < ApplicationRecord
-  has_many :at_transaction_category
+  has_many :at_transaction_categories
 end
