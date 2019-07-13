@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   # get "/", to: static("index.html")
   namespace :api, format: 'json' do
     namespace :v1 do
-      get 'category', :to => 'categories#index'
+      get 'categories', :to => 'categories#index'
       post 'auth/login', to: 'auth#login'
       delete 'auth/logout', to: 'auth#logout'
 
