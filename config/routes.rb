@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # get "/", to: static("index.html")
   namespace :api, format: 'json' do
     namespace :v1 do
+      get 'categories', :to => 'categories#index'
       post 'auth/login', to: 'auth#login'
       delete 'auth/logout', to: 'auth#logout'
 
@@ -78,6 +79,7 @@ Rails.application.routes.draw do
           resources :goal_settings, path: '/goal-settings', on: :member, only: [:create, :show, :update] do
           end
         end
+        post 'goals/:id/add_money', :to => 'goals#add_money'
 
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'

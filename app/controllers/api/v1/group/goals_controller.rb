@@ -12,8 +12,9 @@ class Api::V1::Group::GoalsController < ApplicationController
   def show
     # TODO: 自分のgoal_settingsだけを返す。相手のaccount_idが見えてしまうため
     # TODO: グループのgoalは参照できるが相手ののgoal_settingsは参照できない状態
-    @response = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
     render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @response.blank?
+
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
@@ -84,6 +85,25 @@ class Api::V1::Group::GoalsController < ApplicationController
     return render_404 if params[:id].blank?
     @responses = Services::GoalGraphService.new(@current_user, Entities::Goal.find(params[:id]), params[:span]).call
     render 'graph', formats: 'json', handlers: 'jbuilder'
+  end
+
+  def add_money
+    # TODO:パートナーの追加入金の動作検証　パートナーの目標設定作成IF完成後に動作検証する
+    current_user_banks = @current_user.at_user.at_user_bank_accounts.pluck(:at_bank_id)
+    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    goal_setting = goal.goal_settings.find_by(at_user_bank_account_id: current_user_banks)
+
+    if current_user_banks.blank? || goal.blank? || goal_setting.blank? 
+      render(json: {errors: [{code:"", message:"user not found or goal not found"}]}, status: 422) && return
+    end
+    
+    goal_service = Services::GoalService.new(@current_user)
+    if goal_service.check_bank_balance(params[:add_amount], goal_setting)
+      goal_service.add_money(goal, goal_setting, params[:add_amount])
+      render(json: {}, status: 200)
+    else
+      render(json: {errors: [{code:"", message:"minus balance"}]}, status: 422)
+    end
   end
 
   private

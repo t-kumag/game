@@ -11,4 +11,17 @@ class MailDelivery < ApplicationMailer
     mail( :to => user.email,
           :subject => '【OsidOri】パスワードの再設定をしてください' )
   end
+  
+  def account_linkage_error(user, account)
+    @account = account
+    mail( :to => user.email,
+          :subject => '【OsidOri】口座連携エラーが発生しました' )
+  end
+
+  def skip_scraping(user, account)
+    @account = account
+    mail( :to => user.email,
+          :subject => '【OsidOri】口座連携エラーのためスクレイピングスキップしました。' )
+  end
+
 end

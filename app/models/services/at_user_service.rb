@@ -260,6 +260,13 @@ class Services::AtUserService
     }.compact
   end
 
+  # 抑止する口座情報取得
+  def get_skip_account(fnc_id)
+    Entities::AtUserBankAccount.find_by(fnc_id: fnc_id) || 
+    Entities::AtUserCardAccount.find_by(fnc_id: fnc_id) || 
+    Entities::AtUserEmoneyServiceAccount.find_by(fnc_id: fnc_id)
+  end
+
   def exec_scraping
     puts "scraping=========="
     puts @target
@@ -308,7 +315,14 @@ class Services::AtUserService
       end
 
       fnc_ids.each do |fnc_id|
-        next if skip_ids.include?(fnc_id)
+
+        if skip_ids.include?(fnc_id)
+          # TODO スクレイピングスキップ時に、メール通知する場合はコメントアウト消す
+          # skip_account = get_skip_account(fnc_id)
+          # MailDelivery.skip_scraping(@user, skip_account).deliver
+          next
+        end
+
         params = {
           token: token,
           fnc_id: fnc_id
