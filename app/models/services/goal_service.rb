@@ -21,6 +21,30 @@ class Services::GoalService
     goal.save!
   end
 
+  def add_money(goal, goal_setting, add_amount)
+    begin
+      ActiveRecord::Base.transaction do
+        Entities::GoalLog.insert(goal, goal_setting, add_amount)
+        goal.current_amount += add_amount
+        goal.save!
+      end
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
+    rescue => exception
+      raise exception
+    end
+  end
+
+  def check_bank_balance(add_amount, goal_setting)
+    if add_amount.blank? || goal_setting&.at_user_bank_account.blank?
+      false
+    elsif add_amount < goal_setting&.at_user_bank_account&.balance
+      true
+    else
+      false
+    end
+  end
+
   private
 
   def create_goal_user_log(goal, goal_setting)
