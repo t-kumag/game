@@ -135,4 +135,36 @@ class ApplicationController < ActionController::Base
       render 'api/v1/errors/temporary_registration', formats: 'json', handlers: 'jbuilder', status: 422
     end
   end
+
+  # 参照可能な口座ID
+  # cardやemoneyも同様の処理が必要な場合はサービスに移行する
+  def disallowed_at_bank_ids?(bank_ids)
+    at_user_id         =  @current_user.at_user.id
+    partner_at_user_id =  @current_user.partner_user.try(:at_user).try(:id)
+
+    at_user_bank_ids = Entities::AtUserBankAccount.where(at_user_id: at_user_id).pluck(:id)
+    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
+    #if partner_at_user_id
+    #  at_user_bank_ids << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    #end
+    at_user_bank_ids.flatten!
+
+    bank_ids.each do |id|
+      unless at_user_bank_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  def require_group
+    unless @current_user.group_id.present?
+      render json: { errors: { code: '', message: "Require group." } }, status: 422
+    end
+  end
+
+  def render_disallowed_financier_ids
+    render json: { errors: { code: '', message: "Disallowed financier id." } }, status: 422
+  end
+
 end

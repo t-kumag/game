@@ -1,22 +1,27 @@
-# TODO: 遷移図にあわせてグループ目標だけ
-# TODO 画像のimg_urlのフォーマットや仕様を決める
-# TODO バッチ処理 current_amountへの加算タイミング
-# TODO 紐付け口座の変更処理
-
 class Api::V1::Group::GoalsController < ApplicationController
-  before_action :authenticate
+  before_action :authenticate, :require_group
 
   def index
-    @responses = Entities::Goal.where(user_id: @current_user.id)
+    # TODO: 自分のgoal_settingsだけを返す。相手のaccount_idが見えてしまうため
+    # TODO: グループのgoalは参照できるが相手ののgoal_settingsは参照できない状態
+    @responses = Entities::Goal.where(group_id: @current_user.group_id)
+    render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @responses.blank?
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
 
   def show
-    @response = Entities::Goal.find(params[:id])
+    # TODO: 自分のgoal_settingsだけを返す。相手のaccount_idが見えてしまうため
+    # TODO: グループのgoalは参照できるが相手ののgoal_settingsは参照できない状態
+    @response = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @response.blank?
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
   def create
+    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
+      return render_disallowed_financier_ids
+    end
+
     goal_params = get_goal_params
     begin
       goal_type = Entities::GoalType.find(goal_params[:goal_type_id]) unless goal_params[:goal_type_id].nil?
@@ -29,32 +34,50 @@ class Api::V1::Group::GoalsController < ApplicationController
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
-      p exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
 
     render(json: {}, status: 200)
   end
 
-  # TODO: 渡された goal_setting_idがgoalに紐づくものかをチェックする
   def update
-    begin
-      Entities::Goal.new.transaction do
-        goal = Entities::Goal.find(params[:id])
-        goal.update!(get_goal_params)
-        Entities::GoalSetting.find(params[:goal_settings][:goal_setting_id]).update!(get_goal_setting_params)
-      end
+    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
+      return render_disallowed_financier_ids
+    end
 
+    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if goal.blank?
+    goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
+    render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return if goal_setting.blank?
+
+    begin
+      ActiveRecord::Base.transaction do
+        goal.update!(get_goal_params)
+        goal_setting.update!(get_goal_setting_params)
+      end
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
     rescue => exception
-      p exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
 
     render(json: {}, status: 200)
   end
 
   def destroy
-    Entities::Goal.find(params[:id]).destroy
+    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    if goal.blank?
+      render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return
+    end
+    begin
+      goal.destroy
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
+    rescue => exception
+      raise exception
+    end
+
+    render(json: {}, status: 200)
   end
 
   def graph
@@ -81,6 +104,6 @@ class Api::V1::Group::GoalsController < ApplicationController
       :start_date,
       :end_date,
       :goal_amount
-    ).merge(group_id: @current_user.group_id, user_id: @current_user.id, current_amount: 0)
+    ).merge(group_id: @current_user.group_id, user_id: @current_user.id)
   end
 end
