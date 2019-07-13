@@ -12,7 +12,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def show
-    @response = Entities::Goal.find(params[:id])
+    @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
