@@ -22,18 +22,20 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
     end
 
     def summary
-      share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
         @response = {
           amount: 0,
         }
       else
-        amount = if share
-                   # shareを含む場合
-                   @current_user.at_user.at_user_emoney_service_accounts.sum{|i| i.current_month_payment}
-                 else
-                   @current_user.at_user.at_user_emoney_service_accounts.where(at_user_emoney_service_accounts: {share: false}).sum{|i| i.current_month_payment}
-                 end
+
+        amount = 0
+        group_id = @current_user.at_user.at_user_emoney_service_accounts.pluck(:group_id).pop
+
+        unless group_id.nil?
+          group_users = Services::AtUserEmoneyServiceAccountsService.get_balance_summary(group_id)
+          amount = group_users.sum{|i| i.current_month_payment }
+        end
+
         @response = {
           amount: amount
         }

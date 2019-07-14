@@ -6,7 +6,7 @@ namespace :accumulation do
 
       begin
         goal = Services::GoalService.new(user).get_goal_user(user.participate_group.group_id)
-        at_user_bank_account = Services::UserBankAccountsService.new.get_balance(user)
+        at_user_bank_account = Services::AtUserBankAccountsService.get_balance(user)
 
         at_user_bank_account.goal_settings.all.each do |goal_setting|
           if check_balance(at_user_bank_account, goal_setting, goal) && check_goal_amount(goal)

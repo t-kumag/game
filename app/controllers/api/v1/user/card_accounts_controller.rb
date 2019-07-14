@@ -31,21 +31,25 @@ class Api::V1::User::CardAccountsController < ApplicationController
 
     # TODO 今月の引き落としを計算
     def summary
-      share = false || params[:share]
+
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
         @response = {
           amount: 0,
         }
       else
-        amount = if share
-          # shareを含む場合
-          @current_user.at_user.at_user_card_accounts.sum{|i| i.current_month_payment}
-        else
-          @current_user.at_user.at_user_card_accounts.where(at_user_card_accounts: {share: false}).sum{|i| i.current_month_payment}
+
+        amount = 0
+        group_id = @current_user.at_user.at_user_card_accounts.pluck(:group_id).pop
+
+        unless group_id.nil?
+          group_users = Services::AtUserCardAccountsService.get_balance_summary(group_id)
+          amount = group_users.sum{|i| i.current_month_payment}
         end
+
         @response = {
           amount: amount
         }
+
       end
       render 'summary', formats: 'json', handlers: 'jbuilder'
     end

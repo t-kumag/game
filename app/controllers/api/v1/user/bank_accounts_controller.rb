@@ -24,20 +24,21 @@ class Api::V1::User::BankAccountsController < ApplicationController
   end
 
   def summary
-    share = false || params[:share]
     if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
       @response = {
         amount: 0,
       }
     else
-      amount = if share
-        # shareを含む場合
-        @current_user.at_user.at_user_bank_accounts.sum{|i| i.balance}
-      else
-        @current_user.at_user.at_user_bank_accounts.where(at_user_bank_accounts: {share: false}).sum{|i| i.balance}
+      group_id = @current_user.at_user.at_user_bank_accounts.pluck(:group_id).pop
+      amount = 0
+
+      unless group_id.nil?
+        group_users = Services::AtUserBankAccountsService.get_balance_summary(group_id)
+        amount = group_users.group_users.sum{|i| i.balance}
       end
+
       @response = {
-        amount: amount
+          amount: amount
       }
     end
     render 'summary', formats: 'json', handlers: 'jbuilder'
