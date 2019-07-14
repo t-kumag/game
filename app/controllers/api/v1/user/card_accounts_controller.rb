@@ -37,7 +37,6 @@ class Api::V1::User::CardAccountsController < ApplicationController
           amount: 0,
         }
       else
-
         amount = 0
         group_id = @current_user.at_user.at_user_card_accounts.pluck(:group_id).pop
 

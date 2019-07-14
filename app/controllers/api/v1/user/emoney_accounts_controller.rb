@@ -27,7 +27,6 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
           amount: 0,
         }
       else
-
         amount = 0
         group_id = @current_user.at_user.at_user_emoney_service_accounts.pluck(:group_id).pop
 
