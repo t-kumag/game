@@ -108,3 +108,4 @@ gem 'redis-rails'
 
 # sidekiq
 gem 'sidekiq'
+gem 'redis-namespace'
