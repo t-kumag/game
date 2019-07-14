@@ -9,7 +9,6 @@ class Api::V1::Group::BsController < ApplicationController
     share_off_bank_accounts = @current_user.try(:at_user).try(:at_user_bank_accounts).where(at_user_bank_accounts: {share: false})
     share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
 
-    binding.pry
     if share_off_bank_accounts
       share_off_goal_amount = Services::GoalService.new(@current_user).goal_amount(share_off_bank_accounts.pluck(:id))
     end
