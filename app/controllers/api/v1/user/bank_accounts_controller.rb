@@ -33,8 +33,8 @@ class Api::V1::User::BankAccountsController < ApplicationController
       group_id = @current_user.at_user.at_user_bank_accounts.pluck(:group_id).pop
 
       unless group_id.nil?
-        group_users = Services::AtUserBankAccountsService.get_balance_summary(group_id)
-        amount = group_users.group_users.sum{|i| i.balance}
+        pair_user = Services::AtUserBankAccountsService.get_balance_summary(group_id)
+        amount = pair_user.group_users.sum{|i| i.balance}
       end
 
       @response = {
