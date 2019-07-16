@@ -101,35 +101,32 @@ class Api::V1::UsersController < ApplicationController
 
     cancel_reason = delete_user_params[:user_cancel_reason]
     cancel_checklists = delete_user_params[:cancel_checklists]
-    at_user_bank_account_id = @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id)
-    at_user_card_account_id = @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id)
-    at_user_emoney_service_account_id = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id)
+    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id)
+    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id)
+    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id)
 
     # TODO: バリデーション
     # TODO 例外処理と共通化
     begin
-      if cancel_checklists.present?
-
-        Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
-        Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
-        Services::ParingService.new(@current_user).cancel
-
-        delete_user_account(at_user_bank_account_id, at_user_card_account_id, at_user_emoney_service_account_id)
-
-        # ユーザー削除
-        @current_user.at_user.destroy
-        @current_user.delete
-        @current_user.clear_token
-        @current_user = nil
-      else
-        render json: {}, status: :bad_request
+      ActiveRecord::Base.transaction do
+        if cancel_checklists.present?
+          Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
+          Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
+          Services::ParingService.new(@current_user).cancel
+          delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+          # ユーザー削除
+          @current_user.at_user.destroy
+          @current_user.clear_token
+          @current_user.delete
+          @current_user = nil
+        else
+          render json: {}, status: :bad_request
+        end
       end
     rescue ActiveRecord::RecordInvalid => db_err
-      p db_err
-      render(json: {}, status: 400) && return
+      raise db_err
     rescue => exception
-      p exception
-      render(json: {}, status: 400) && return
+      raise exception
     end
     render json: {}, status: 200
   end
@@ -148,18 +145,18 @@ class Api::V1::UsersController < ApplicationController
   end
 
 
-  def delete_user_account(at_user_bank_account_id, at_user_card_account_id, at_user_emoney_service_account_id)
+  def delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
 
-    if at_user_bank_account_id.present?
-      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_id)
+    if at_user_bank_account_ids.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_ids)
     end
 
-    if at_user_card_account_id.present?
-      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, at_user_card_account_id)
+    if at_user_card_account_ids.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, at_user_card_account_ids)
     end
 
-    if at_user_emoney_service_account_id.present?
-      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_id)
+    if at_user_emoney_service_account_ids.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_ids)
     end
 
   end
