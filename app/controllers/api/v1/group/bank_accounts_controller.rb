@@ -21,18 +21,19 @@ class Api::V1::Group::BankAccountsController < ApplicationController
 
   # TODO 目標金額の足しこみが必要
   def summary
-    share = false || params[:share]
     if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
       @response = {
           amount: 0,
       }
     else
-      amount = if share
-                 # shareを含む場合
-                 @current_user.at_user.at_user_bank_accounts.sum{|i| i.balance}
-               else
-                 @current_user.at_user.at_user_bank_accounts.where(at_user_bank_accounts: {share: false}).sum{|i| i.balance}
-               end
+      amount = 0
+      group_id = @current_user.group_id
+
+      unless group_id.nil?
+        pair_user = Services::AtUserBankAccountsService.get_balance_summary(group_id)
+        amount = pair_user.group_users.sum{|i| i.balance}
+      end
+
       @response = {
           amount: amount
       }
