@@ -38,11 +38,11 @@ class Api::V1::User::CardAccountsController < ApplicationController
         }
       else
         amount = 0
-        group_id = @current_user.at_user.at_user_card_accounts.pluck(:group_id).pop
+        group_id = @current_user.group_id
 
         unless group_id.nil?
           pair_user = Services::AtUserCardAccountsService.get_balance_summary(group_id)
-          amount = pair_user.sum{|i| i.current_month_payment}
+          amount = pair_user.sum{|i| i.current_month_payment(group_id) }
         end
 
         @response = {

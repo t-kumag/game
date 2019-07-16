@@ -30,7 +30,7 @@ class Api::V1::User::BankAccountsController < ApplicationController
       }
     else
       amount = 0
-      group_id = @current_user.at_user.at_user_bank_accounts.pluck(:group_id).pop
+      group_id = @current_user.group_id
 
       unless group_id.nil?
         pair_user = Services::AtUserBankAccountsService.get_balance_summary(group_id)

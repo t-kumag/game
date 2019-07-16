@@ -29,9 +29,13 @@ class Entities::AtUserCardAccount < ApplicationRecord
   belongs_to :at_card
   has_many :at_user_card_transactions
 
-  def current_month_payment
+  def current_month_payment(group_id = nil)
     current_month = Time.now.strftime("%Y%m").to_s
-    self.at_user_card_transactions.where(confirm_type: 'C', clm_ym: current_month ).sum{|i| i.amount}
+    if group_id.present?
+      self.at_user_card_transactions.where(group_id: group_id, confirm_type: 'C', clm_ym: current_month ).sum{|i| i.amount}
+    else
+      self.at_user_card_transactions.where(confirm_type: 'C', clm_ym: current_month ).sum{|i| i.amount}
+    end
   end
 
 end

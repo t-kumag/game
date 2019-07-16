@@ -28,13 +28,12 @@ class Entities::AtUserEmoneyServiceAccount < ApplicationRecord
   belongs_to :at_emoney_service
   has_many :at_user_emoney_transactions
 
-  def current_month_payment
-    # TODO: 電子マネーの当月引き落としのカウント（検索方法）を確認する。
-    #current_month = Time.now.strftime("%Y%m").to_s
-    # self.at_user_card_transactions.where(confirm_type: 'C', clm_ym: current_month ).sum{|i| i.amount}
-    self.at_user_emoney_transactions.where(used_date: (Time.zone.today.beginning_of_month)..(Time.zone.today.end_of_month)).sum{|i| i.amount}
-
-
+  def current_month_payment(group_id = nil)
+    if group_id.present?
+      self.at_user_emoney_transactions.where(group_id: group_id, used_date: (Time.zone.today.beginning_of_month)..(Time.zone.today.end_of_month)).sum{|i| i.amount}
+    else
+      self.at_user_emoney_transactions.where(used_date: (Time.zone.today.beginning_of_month)..(Time.zone.today.end_of_month)).sum{|i| i.amount}
+    end
   end
 
 end
