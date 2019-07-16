@@ -10,7 +10,8 @@ class Api::V1::Group::GoalSettingsController < ApplicationController
     if Entities::Goal.find(params[:goal_id]).blank?
       render json: { errors: { code: '', mesasge: "goal not found." } }, status: 422
     end
-    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
+    if get_goal_setting_params[:at_user_bank_account_id].present? &&
+        disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
       return render_disallowed_financier_ids
     end
 
@@ -55,6 +56,6 @@ class Api::V1::Group::GoalSettingsController < ApplicationController
       :at_user_bank_account_id,
       :monthly_amount,
       :first_amount
-    )
+    ).merge(user_id: @current_user.id)
   end
 end

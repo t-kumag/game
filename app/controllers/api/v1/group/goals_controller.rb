@@ -2,16 +2,12 @@ class Api::V1::Group::GoalsController < ApplicationController
   before_action :authenticate, :require_group
 
   def index
-    # TODO: 自分のgoal_settingsだけを返す。相手のaccount_idが見えてしまうため
-    # TODO: グループのgoalは参照できるが相手ののgoal_settingsは参照できない状態
     @responses = Entities::Goal.where(group_id: @current_user.group_id)
     render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @responses.blank?
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
 
   def show
-    # TODO: 自分のgoal_settingsだけを返す。相手のaccount_idが見えてしまうため
-    # TODO: グループのgoalは参照できるが相手ののgoal_settingsは参照できない状態
     @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
     render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @response.blank?
 
@@ -19,7 +15,8 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def create
-    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
+    if get_goal_setting_params[:at_user_bank_account_id].present? &&
+        disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
       return render_disallowed_financier_ids
     end
 
@@ -30,7 +27,10 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal_params[:name] = goal_type[:name] if goal_params[:name].blank?
         goal_params[:img_url] = goal_type[:img_url] if goal_params[:img_url].blank?
         goal = Entities::Goal.create!(goal_params)
+        # 自分の目標設定を登録
         goal.goal_settings.create!(get_goal_setting_params)
+        # 相手の目標設定を登録
+        goal.goal_settings.create!(get_partner_goal_setting_params(goal_params))
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
@@ -113,7 +113,15 @@ class Api::V1::Group::GoalsController < ApplicationController
       :at_user_bank_account_id,
       :monthly_amount,
       :first_amount
-    )
+    ).merge(user_id: @current_user.id)
+  end
+
+  def get_partner_goal_setting_params(goal_params)
+    {
+        user_id: @current_user.partner_user.id,
+        monthly_amount: goal_params[:goal_amount] - get_goal_setting_params[:monthly_amount] - get_goal_setting_params[:first_amount],
+        first_amount: 0
+    }
   end
 
   def get_goal_params
@@ -126,4 +134,5 @@ class Api::V1::Group::GoalsController < ApplicationController
       :goal_amount
     ).merge(group_id: @current_user.group_id, user_id: @current_user.id)
   end
+
 end
