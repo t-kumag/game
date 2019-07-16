@@ -203,7 +203,7 @@ class Services::AtUserService
 
   def delete_account(model, id)
     begin
-      account= model.find(id)
+      account = model.find(id)
       params = {}
       account.each do |a|
         if a.present?
