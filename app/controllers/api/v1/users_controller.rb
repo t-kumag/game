@@ -80,7 +80,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_sync
-    at_user_service = Services::AtUserService.new(@current_user)
+    at_user_service = Services::AtUserService.new(@current_user, params[:target])
     at_user_service.exec_scraping
     at_user_service.sync
 
