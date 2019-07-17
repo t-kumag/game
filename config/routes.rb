@@ -111,6 +111,9 @@ Rails.application.routes.draw do
       get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'
       get 'user/at-sync', :to => 'users#at_sync'
+      # sidekiqテスト用 at_sync_test
+      get 'user/at-sync-test', :to => 'users#at_sync_test'
+
       get 'user/at-token', :to => 'users#at_token'
       get 'user/activate', :to => 'users#activate'
       post 'user/resend', to: 'users#resend'

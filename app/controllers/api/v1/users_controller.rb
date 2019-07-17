@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate, only: [:at_url, :at_sync, :at_token]
+  before_action :authenticate, only: [:at_url, :at_sync, :at_token, :at_sync_test]
   before_action :check_temporary_user, only: [:create]
 
 
@@ -80,19 +80,19 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_sync
+    at_user_service = Services::AtUserService.new(@current_user)
+    at_user_service.exec_scraping
+    at_user_service.sync
+
+    puts 'user_distributed_transactions sync=========='
+    Services::UserDistributedTransactionService.new(@current_user, params[:target]).sync
+
+    render json: {}, status: 200
+  end
+
+  def at_sync_test
     AtSyncWorker.perform_async(@current_user.id, params[:target])
-
-    # at_user_service = Services::AtUserService.new(@current_user)
-    # at_user_service.exec_scraping
-    # at_user_service.sync
-    #
-    # # TODO: 仮り実装 user_distributed_transactionsに同期
-    # # TODO 手動振り分けの同期が未対応
-    # puts 'user_distributed_transactions sync=========='
-    # Services::UserDistributedTransactionService.new(@current_user, params[:target]).sync
-
-    obj = {}
-    render json: obj, status: 200
+    render json: {}, status: 200
   end
 
   def at_token

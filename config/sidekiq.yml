@@ -2,6 +2,7 @@
 :pidfile: ./tmp/pids/sidekiq.pid
 :logfile: ./log/sidekiq.log
 :concurrency:  25
+:max_retries: 0
 :queues:
   - default
   - event

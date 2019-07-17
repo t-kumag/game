@@ -261,6 +261,8 @@ class Services::AtUserService
   end
 
   def exec_scraping
+    Services::AtUserService::Sync.new(@user).sync_accounts
+
     puts "scraping=========="
     puts @target
 

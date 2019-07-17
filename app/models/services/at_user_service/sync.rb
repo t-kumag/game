@@ -155,132 +155,8 @@ class Services::AtUserService::Sync
 
   def sync
     begin
-      get_accounts_from_at
-
-      sync_account(
-        "CARD_DATA_REC",
-        "at_card_id",         
-        Entities::AtCard,
-        Entities::AtUserCardAccount,
-        {
-          fnc_id: {col: "FNC_ID" },
-          fnc_cd: {col: "FNC_CD" },
-          fnc_nm: {col: "FNC_NM" },
-          corp_yn: {col: "CORP_YN" },
-          brn_cd: {col: "BRN_CD" },
-          brn_nm: {col: "BRN_NM" },
-          acct_no: {col: "ACCT_NO" },
-          memo: {col: "MEMO" },
-          use_yn: {col: "USE_YN" },
-          cert_type: {col: "CERT_TYPE" },
-          scrap_dtm: {col: "SCRAP_DTM", opt: "time_parse" },
-          last_rslt_cd: {col:"LAST_RSLT_CD" },
-          last_rslt_msg: {col: "LAST_RSLT_MSG" }
-        }
-      )
-
-      sync_account(
-        "BANK_DATA_REC",
-        "at_bank_id",
-        Entities::AtBank,
-        Entities::AtUserBankAccount,
-        {
-          fnc_id: {col: "FNC_ID" },
-          fnc_cd: {col: "FNC_CD" },
-          fnc_nm: {col: "FNC_NM" },
-          corp_yn: {col: "CORP_YN" },
-          brn_cd: {col: "BRN_CD" },
-          brn_nm: {col: "BRN_NM" },
-          acct_no: {col: "ACCT_NO" },
-          acct_kind: {col: "ACCT_KIND"},
-          memo: {col: "MEMO" },
-          use_yn: {col: "USE_YN" },
-          cert_type: {col: "CERT_TYPE" },
-          scrap_dtm: {col: "SCRAP_DTM", opt: "time_parse" },
-          last_rslt_cd: {col:"LAST_RSLT_CD" },
-          last_rslt_msg: {col: "LAST_RSLT_MSG" }
-        }
-      )
-
-      sync_account(
-        "ETC_DATA_REC",
-        "at_emoney_service_id",
-        Entities::AtEmoneyService,
-        Entities::AtUserEmoneyServiceAccount,
-        {
-          fnc_id: {col: "FNC_ID" },
-          fnc_cd: {col: "FNC_CD" },
-          fnc_nm: {col: "FNC_NM" },
-          corp_yn: {col: "CORP_YN" },
-          memo: {col: "MEMO" },
-          use_yn: {col: "USE_YN" },
-          cert_type: {col: "CERT_TYPE" },
-          scrap_dtm: {col: "SCRAP_DTM", opt: "time_parse" },
-          last_rslt_cd: {col:"LAST_RSLT_CD" },
-          last_rslt_msg: {col: "LAST_RSLT_MSG" }
-        }
-      )
-
-      sync_transaction(
-        "CARD_REC",
-        "at_user_card_account_id",
-        Entities::AtUserCardAccount,
-        Entities::AtUserCardTransaction,
-        {
-          branch_desc: {col: "BRANCH_DESC" },
-          used_date: {col: "USED_DATE", opt: "time_parse_with_00:00:00"  },
-          amount: {col: "AMOUNT" },
-          payment_amount: {col: "PAYMENT_AMOUNT" },
-          trade_gubun: {col: "TRADE_GUBUN" },
-          etc_desc: {col: "ETC_DESC" },
-          clm_ym: {col: "CLM_YM" },
-          crdt_setl_dt: {col: "CRDT_SETL_DT" },
-          seq: {col: "SEQ" },
-          card_no: {col: "CARD_NO" },
-          confirm_type: {col: "CONFIRM_TYPE" },
-        },
-        false, # has_balance
-        'U' # U: 未確定含む
-      )
-
-      sync_transaction(
-        "BANK_REC",
-        "at_user_bank_account_id",
-        Entities::AtUserBankAccount,
-        Entities::AtUserBankTransaction,
-        {
-          # TODO date => dtmに変える
-          trade_date: {col: "TRADE_DTM", opt: "time_parse"  },
-          amount_receipt: {col: "AMOUNT_RECEIPT" },
-          amount_payment: {col: "AMOUNT_PAYMENT" },
-          balance: {col: "BALANCE" },
-          currency: {col: "CURRENCY" },
-          description1: {col: "DESCRIPTION1" },
-          description2: {col: "DESCRIPTION2" },
-          description3: {col: "DESCRIPTION3" },
-          description4: {col: "DESCRIPTION4" },
-          description5: {col: "DESCRIPTION5" },
-          seq: {col: "SEQ" },
-        },
-        true # has_balance
-      )
-
-      sync_transaction(
-        "ETC_REC",
-        "at_user_emoney_service_account_id",
-        Entities::AtUserEmoneyServiceAccount,
-        Entities::AtUserEmoneyTransaction,
-        {
-          used_date: {col: "USED_DATE", opt: "time_parse_with_00:00:00"  },
-          used_time: {col: "USED_TIME" },
-          description: {col: "DESCRIPTION" },
-          amount_receipt: {col: "AMOUNT_RECEIPT" },
-          amount_payment: {col: "AMOUNT_PAYMENT" },
-          balance: {col: "BALANCE" },
-          seq: {col: "SEQ" },
-        },
-        true # has_balance
-      )
+      sync_accounts
+      sync_transactions
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
@@ -291,6 +167,139 @@ class Services::AtUserService::Sync
       puts exception.backtrace.join("\n")
       # p exception.backtrace
     end
+  end
+
+  def sync_accounts
+    puts "sync_accounts=========="
+    get_accounts_from_at
+    sync_account(
+        "CARD_DATA_REC",
+        "at_card_id",
+        Entities::AtCard,
+        Entities::AtUserCardAccount,
+        {
+            fnc_id: {col: "FNC_ID" },
+            fnc_cd: {col: "FNC_CD" },
+            fnc_nm: {col: "FNC_NM" },
+            corp_yn: {col: "CORP_YN" },
+            brn_cd: {col: "BRN_CD" },
+            brn_nm: {col: "BRN_NM" },
+            acct_no: {col: "ACCT_NO" },
+            memo: {col: "MEMO" },
+            use_yn: {col: "USE_YN" },
+            cert_type: {col: "CERT_TYPE" },
+            scrap_dtm: {col: "SCRAP_DTM", opt: "time_parse" },
+            last_rslt_cd: {col:"LAST_RSLT_CD" },
+            last_rslt_msg: {col: "LAST_RSLT_MSG" }
+        }
+    )
+
+    sync_account(
+        "BANK_DATA_REC",
+        "at_bank_id",
+        Entities::AtBank,
+        Entities::AtUserBankAccount,
+        {
+            fnc_id: {col: "FNC_ID" },
+            fnc_cd: {col: "FNC_CD" },
+            fnc_nm: {col: "FNC_NM" },
+            corp_yn: {col: "CORP_YN" },
+            brn_cd: {col: "BRN_CD" },
+            brn_nm: {col: "BRN_NM" },
+            acct_no: {col: "ACCT_NO" },
+            acct_kind: {col: "ACCT_KIND"},
+            memo: {col: "MEMO" },
+            use_yn: {col: "USE_YN" },
+            cert_type: {col: "CERT_TYPE" },
+            scrap_dtm: {col: "SCRAP_DTM", opt: "time_parse" },
+            last_rslt_cd: {col:"LAST_RSLT_CD" },
+            last_rslt_msg: {col: "LAST_RSLT_MSG" }
+        }
+    )
+
+    sync_account(
+        "ETC_DATA_REC",
+        "at_emoney_service_id",
+        Entities::AtEmoneyService,
+        Entities::AtUserEmoneyServiceAccount,
+        {
+            fnc_id: {col: "FNC_ID" },
+            fnc_cd: {col: "FNC_CD" },
+            fnc_nm: {col: "FNC_NM" },
+            corp_yn: {col: "CORP_YN" },
+            memo: {col: "MEMO" },
+            use_yn: {col: "USE_YN" },
+            cert_type: {col: "CERT_TYPE" },
+            scrap_dtm: {col: "SCRAP_DTM", opt: "time_parse" },
+            last_rslt_cd: {col:"LAST_RSLT_CD" },
+            last_rslt_msg: {col: "LAST_RSLT_MSG" }
+        }
+    )
+  end
+
+  def sync_transactions
+    puts "sync_transactions=========="
+    get_accounts_from_at
+    sync_transaction(
+        "CARD_REC",
+        "at_user_card_account_id",
+        Entities::AtUserCardAccount,
+        Entities::AtUserCardTransaction,
+        {
+            branch_desc: {col: "BRANCH_DESC" },
+            used_date: {col: "USED_DATE", opt: "time_parse_with_00:00:00"  },
+            amount: {col: "AMOUNT" },
+            payment_amount: {col: "PAYMENT_AMOUNT" },
+            trade_gubun: {col: "TRADE_GUBUN" },
+            etc_desc: {col: "ETC_DESC" },
+            clm_ym: {col: "CLM_YM" },
+            crdt_setl_dt: {col: "CRDT_SETL_DT" },
+            seq: {col: "SEQ" },
+            card_no: {col: "CARD_NO" },
+            confirm_type: {col: "CONFIRM_TYPE" },
+        },
+        false, # has_balance
+        'U' # U: 未確定含む
+    )
+
+    sync_transaction(
+        "BANK_REC",
+        "at_user_bank_account_id",
+        Entities::AtUserBankAccount,
+        Entities::AtUserBankTransaction,
+        {
+            # TODO date => dtmに変える
+            trade_date: {col: "TRADE_DTM", opt: "time_parse"  },
+            amount_receipt: {col: "AMOUNT_RECEIPT" },
+            amount_payment: {col: "AMOUNT_PAYMENT" },
+            balance: {col: "BALANCE" },
+            currency: {col: "CURRENCY" },
+            description1: {col: "DESCRIPTION1" },
+            description2: {col: "DESCRIPTION2" },
+            description3: {col: "DESCRIPTION3" },
+            description4: {col: "DESCRIPTION4" },
+            description5: {col: "DESCRIPTION5" },
+            seq: {col: "SEQ" },
+        },
+        true # has_balance
+    )
+
+    sync_transaction(
+        "ETC_REC",
+        "at_user_emoney_service_account_id",
+        Entities::AtUserEmoneyServiceAccount,
+        Entities::AtUserEmoneyTransaction,
+        {
+            used_date: {col: "USED_DATE", opt: "time_parse_with_00:00:00"  },
+            used_time: {col: "USED_TIME" },
+            description: {col: "DESCRIPTION" },
+            amount_receipt: {col: "AMOUNT_RECEIPT" },
+            amount_payment: {col: "AMOUNT_PAYMENT" },
+            balance: {col: "BALANCE" },
+            seq: {col: "SEQ" },
+        },
+        true # has_balance
+    )
   end
 
   private

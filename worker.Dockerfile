@@ -40,5 +40,6 @@ RUN apk update && \
 ADD . $ROOT_PATH
 
 RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+RUN mkdir /app/tmp/pids
 
 CMD ["bundle", "exec", "sidekiq", "-C", "config/sidekiq.yml"]
