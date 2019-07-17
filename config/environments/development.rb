@@ -73,7 +73,4 @@ Rails.application.configure do
   config.log_level = :debug
   # logger format
   config.log_formatter = ::Logger::Formatter.new
-
-  # redis
-  config.cache_store = :redis_store, 'redis://0.0.0.0:6379/0', { expires_in: 90.minutes }
 end
