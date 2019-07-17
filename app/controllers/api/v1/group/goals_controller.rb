@@ -30,7 +30,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         # 自分の目標設定を登録
         goal.goal_settings.create!(get_goal_setting_params)
         # 相手の目標設定を登録
-        goal.goal_settings.create!(get_partner_goal_setting_params(goal_params))
+        goal.goal_settings.create!(get_partner_goal_setting_params)
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
@@ -116,12 +116,11 @@ class Api::V1::Group::GoalsController < ApplicationController
     ).merge(user_id: @current_user.id)
   end
 
-  def get_partner_goal_setting_params(goal_params)
-    {
-        user_id: @current_user.partner_user.id,
-        monthly_amount: goal_params[:goal_amount] - get_goal_setting_params[:monthly_amount] - get_goal_setting_params[:first_amount],
-        first_amount: 0
-    }
+  def get_partner_goal_setting_params
+    params.require(:partner_goal_settings).permit(
+      :monthly_amount,
+      :first_amount
+    ).merge(user_id: @current_user.partner_user.id)
   end
 
   def get_goal_params
