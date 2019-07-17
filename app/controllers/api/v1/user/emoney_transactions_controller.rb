@@ -9,7 +9,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
   end
 
   def show
-    @response = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:emoney_account_id], params[:id])
+    @response = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:id])
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 

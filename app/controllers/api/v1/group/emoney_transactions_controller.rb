@@ -3,23 +3,17 @@ class Api::V1::Group::EmoneyTransactionsController < ApplicationController
   before_action :authenticate
   
   def index
-    partner_user_id = Entities::ParticipateGroup.where(group_id: @current_user.group_id).where.not(user_id: @current_user.id).pluck(:user_id).first
-    partner_user = Entities::User.find(partner_user_id)
-    @transactions = Services::AtEmoneyTransactionService.new(partner_user).list(params[:emoney_account_id], params[:page])
+    @transactions = Services::AtEmoneyTransactionService.new(@current_user.partner_user, true).list(params[:emoney_account_id], params[:page])
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
   def show
-    partner_user_id = Entities::ParticipateGroup.where(group_id: @current_user.group_id).where.not(user_id: @current_user.id).pluck(:user_id).first
-    partner_user = Entities::User.find(partner_user_id)
-    @response = Services::AtEmoneyTransactionService.new(partner_user).detail(params[:emoney_account_id], params[:id])
+    @response = Services::AtEmoneyTransactionService.new(@current_user.partner_user, true).detail(params[:id])
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
   def update
-    partner_user_id = Entities::ParticipateGroup.where(group_id: @current_user.group_id).where.not(user_id: @current_user.id).pluck(:user_id).first
-    partner_user = Entities::User.find(partner_user_id)
-    @response = Services::AtEmoneyTransactionService.new(partner_user).update(
+    @response = Services::AtEmoneyTransactionService.new(@current_user.partner_user, true).update(
         params[:id],
         params[:at_transaction_category_id],
         params[:used_location],
