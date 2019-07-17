@@ -9,6 +9,10 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
+        # 消込用の銀行IDをレスポンスに追加
+        aubt.at_user_bank_account_id,
+        # 消込用の明細IDをレスポンスに追加
+        aubt.id,
         sum(aubt.amount_receipt) as amount_receipt,
         sum(aubt.amount_payment) as amount_payment,
         atc.category_name1,
@@ -42,6 +46,10 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
+        # 消込用のカードIDをレスポンスに追加
+        auct.at_user_card_account_id,
+        # 消込用の明細IDをレスポンスに追加
+        auct.id,
         sum(auct.amount) as amount_payment,
         atc.category_name1,
         atc.category_name2
@@ -155,6 +163,47 @@ class Services::PlService
     pl_bank = bank_category_summary(share, from, to)
     pl_card = card_category_summary(share, from, to)
     pl_emoney = emoney_category_summary(share, from, to)
+
+    bank = Entities::AtUserBankAccount.find(pl_bank.at_user_bank_account_id)
+    card = Entities::AtUserCardAccount.find(pl_card.at_user_card_account_id)
+    
+    # デビットカードの一覧を定数にしておくとのちのちいい
+    DEBIT_CARD_FNC_IDS = ["hoge","fuga"]
+    # デビットカード判定⓵
+    # if DEBIT_CARDS.include?(card.fnc_id)
+    
+    # デビットカード判定⓶
+    # MWIにIF作成してもらう
+    
+    # デビットカード判定⓷
+    if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
+      # デビットカードの場合、消込する
+      
+      # 消込用の配列
+      remove_bank_transactions = []
+
+      card.at_user_card_transactions.each do |card_transaction|
+        # カード明細の取引日と銀行明細の取引日が同日
+        # card_transaction.user_date === bank_transaction.trade_date
+        # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
+        # card_transaction.payment_amount === bank_transaction.amount_payment
+        remove_bank_transactions << bank.at_user_bank_transactions.find_by(
+            trade_date: card_transaction.user_date, 
+            amount_payment: card_transaction.payment_amount
+          )
+        end
+      end
+    else
+      # デビットカードじゃない場合、消込しない
+    end
+
+    # 消込処理
+    if remove_bank_transactions.present?
+      remove_bank_transaction_ids = remove_bank_transactions.pluck(:id)
+      pl_bank.reject do |t|
+        remove_bank_transaction_ids.include? t['id']
+      end
+    end
 
     #　P/L の計算から指定カテゴリを排除する
     pl_bank = remove_duplicated_transaction(pl_bank)
