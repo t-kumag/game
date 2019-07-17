@@ -35,8 +35,6 @@ Rails.application.routes.draw do
           end
         end
 
-        resources :goals, path: '/goals'
-
         get 'icon', to: 'icon#index'
         post 'icon', to: 'icon#create'
         put 'icon', to: 'icon#update'
@@ -77,9 +75,11 @@ Rails.application.routes.draw do
           end
         end
 
-        # TODO goal_settingsの更新
+        resources :goals, path: '/goals' do
+          resources :goal_settings, path: '/goal-settings', on: :member, only: [:create, :show, :update] do
+          end
+        end
         post 'goals/:id/add_money', :to => 'goals#add_money'
-        resources :goals, path: '/goals'
 
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'

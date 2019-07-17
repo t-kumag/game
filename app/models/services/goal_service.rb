@@ -17,7 +17,8 @@ class Services::GoalService
   end
 
   def get_goal_one(id)
-    goal = Entities::Goal.find_by(id)
+    goal = Entities::Goal.find_by(id: id, group_id: @user.group_id)
+    return {} if goal.blank?
     {
         goal_id: goal.id,
         goal_type_id: goal.goal_type_id,
