@@ -2,15 +2,21 @@ class Api::V1::UsersController < ApplicationController
   before_action :authenticate, only: [:at_url, :at_sync, :at_token, :at_sync_test]
   before_action :check_temporary_user, only: [:create]
 
-
   def create
-    @user = Entities::User.new
-    @user.email = sign_up_params[:email]
-    @user.password = sign_up_params[:password]
-    @user.email_authenticated = false
-    @user.reset_token
-    @user.save!
-    MailDelivery.user_registration(@user).deliver
+
+    begin
+      @user = Entities::User.new
+      @user.email = sign_up_params[:email]
+      @user.password = sign_up_params[:password]
+      @user.email_authenticated = false
+      @user.reset_token
+      @user.save!
+      MailDelivery.user_registration(@user).deliver
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
+    rescue => exception
+      raise exception
+    end
 
     render 'create', formats: 'json', handlers: 'jbuilder', status: 200
   end

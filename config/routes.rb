@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   # get "/", to: static("index.html")
   namespace :api, format: 'json' do
     namespace :v1 do
+      get 'categories', :to => 'categories#index'
       post 'auth/login', to: 'auth#login'
       delete 'auth/logout', to: 'auth#logout'
 
@@ -33,8 +34,6 @@ Rails.application.routes.draw do
           resources :emoney_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
           end
         end
-
-        resources :goals, path: '/goals'
 
         get 'icon', to: 'icon#index'
         post 'icon', to: 'icon#create'
@@ -76,8 +75,11 @@ Rails.application.routes.draw do
           end
         end
 
-        # TODO goal_settingsの更新
-        resources :goals, path: '/goals'
+        resources :goals, path: '/goals' do
+          resources :goal_settings, path: '/goal-settings', on: :member, only: [:create, :show, :update] do
+          end
+        end
+        post 'goals/:id/add_money', :to => 'goals#add_money'
 
         get 'card-accounts-summary', :to => 'card_accounts#summary'
         get 'bank-accounts-summary', :to => 'bank_accounts#summary'

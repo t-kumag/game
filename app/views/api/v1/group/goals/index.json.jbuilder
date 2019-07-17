@@ -15,6 +15,7 @@ json.app do
     json.goal_settings do
       json.array!(r.goal_settings) do |s|
         json.goal_setting_id s.id
+        json.user_id s.user_id
         json.at_user_bank_account_id s.at_user_bank_account_id
         json.monthly_amount s.monthly_amount
         json.first_amount s.first_amount
