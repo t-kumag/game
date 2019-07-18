@@ -6,8 +6,9 @@ class Api::V1::Group::BankAccountsController < ApplicationController
       @responses = []
     else
       @responses = []
+
       share_on_bank_accounts =
-          Entities::AtUserBankAccount.where(at_user_id: [@current_user.at_user.id, @current_user.partner_user.at_user.id]).where(share: true)
+          Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
       share_on_bank_accounts.each do |a|
         @responses << {
             id: a.id,
@@ -25,8 +26,10 @@ class Api::V1::Group::BankAccountsController < ApplicationController
           amount: 0,
       }
     else
+      @responses = []
+
       share_on_bank_accounts =
-          Entities::AtUserBankAccount.where(at_user_id: [@current_user.at_user.id, @current_user.partner_user.at_user.id]).where(share: true)
+          Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
       @response = {
           amount: share_on_bank_accounts.sum{|i| i.balance}
       }
