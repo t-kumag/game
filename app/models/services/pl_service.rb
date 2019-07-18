@@ -9,9 +9,7 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
-        # 消込用の銀行IDをレスポンスに追加
         aubt.at_user_bank_account_id,
-        # 消込用の明細IDをレスポンスに追加
         aubt.id,
         sum(aubt.amount_receipt) as amount_receipt,
         sum(aubt.amount_payment) as amount_payment,
@@ -46,9 +44,7 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
-        # 消込用のカードIDをレスポンスに追加
         auct.at_user_card_account_id,
-        # 消込用の明細IDをレスポンスに追加
         auct.id,
         sum(auct.amount) as amount_payment,
         atc.category_name1,
