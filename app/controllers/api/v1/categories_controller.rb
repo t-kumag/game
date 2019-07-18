@@ -1,7 +1,7 @@
 class Api::V1::CategoriesController < ApplicationController
+  before_action :authenticate
 
   def index
-
     @categories_all = Entities::AtGroupedCategory.all
     @responses = []
 

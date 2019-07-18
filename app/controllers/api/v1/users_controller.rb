@@ -1,15 +1,22 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate, only: [:at_url, :at_sync, :at_token, :destroy]
+  before_action :authenticate, only: [:at_url, :at_sync, :at_token, :destroy, :at_sync_test]
   before_action :check_temporary_user, only: [:create]
 
   def create
-    @user = Entities::User.new
-    @user.email = sign_up_params[:email]
-    @user.password = sign_up_params[:password]
-    @user.email_authenticated = false
-    @user.reset_token
-    @user.save!
-    MailDelivery.user_registration(@user).deliver
+
+    begin
+      @user = Entities::User.new
+      @user.email = sign_up_params[:email]
+      @user.password = sign_up_params[:password]
+      @user.email_authenticated = false
+      @user.reset_token
+      @user.save!
+      MailDelivery.user_registration(@user).deliver
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
+    rescue => exception
+      raise exception
+    end
 
     render 'create', formats: 'json', handlers: 'jbuilder', status: 200
   end
@@ -83,13 +90,15 @@ class Api::V1::UsersController < ApplicationController
     at_user_service.exec_scraping
     at_user_service.sync
 
-    # TODO: 仮り実装 user_distributed_transactionsに同期
-    # TODO 手動振り分けの同期が未対応
     puts 'user_distributed_transactions sync=========='
     Services::UserDistributedTransactionService.new(@current_user, params[:target]).sync
 
-    obj = {}
-    render json: obj, status: 200
+    render json: {}, status: 200
+  end
+
+  def at_sync_test
+    AtSyncWorker.perform_async(@current_user.id, params[:target])
+    render json: {}, status: 200
   end
 
   def at_token

@@ -2,19 +2,14 @@ class Api::V1::Group::CardAccountsController < ApplicationController
     before_action :authenticate
 
     def index
-      share = false || params[:share]
-      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
+      if @current_user.try(:at_user).try(:at_user_card_accounts).blank?
         @responses = []
       else
         @responses = []
 
-        accounts = if share
-                     @current_user.at_user.at_user_card_accounts
-                   else
-                     @current_user.at_user.at_user_card_accounts.where(at_user_card_accounts: {share: false})
-                   end
-
-        accounts.each do |ca|
+        share_on_card_accounts =
+            Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
+        share_on_card_accounts.each do |ca|
           @responses << {
               id: ca.id,
               name: ca.fnc_nm,
@@ -25,24 +20,20 @@ class Api::V1::Group::CardAccountsController < ApplicationController
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
-    # TODO 今月の引き落としを計算 shareされているもの
+    # TODO: user_distributed_transactionsを参照するようにする
     def summary
-      share = false || params[:share]
-      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
-        @response = {
+      if @current_user.try(:at_user).try(:at_user_card_accounts).blank?
+          @response = {
             amount: 0,
         }
       else
-        amount = if share
-                   # shareを含む場合
-                   @current_user.at_user.at_user_card_accounts.sum{|i| i.current_month_payment}
-                 else
-                   @current_user.at_user.at_user_card_accounts.where(at_user_card_accounts: {share: false}).sum{|i| i.current_month_payment}
-                 end
+        share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
+
         @response = {
-            amount: amount
+            amount: share_on_card_accounts.sum{|i| i.current_month_payment(share_on_card_accounts.pluck(:at_user_id))}
         }
       end
+
       render 'summary', formats: 'json', handlers: 'jbuilder'
     end
       

@@ -38,3 +38,4 @@ db/schema.rb
 .env.development
 .env.production
 .env.staging
+appendonly.aof
