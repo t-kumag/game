@@ -100,7 +100,7 @@ class Api::V1::UsersController < ApplicationController
   def destroy
 
     cancel_reason = delete_user_params[:user_cancel_reason]
-    cancel_checklists = delete_user_params[:cancel_checklists]
+    cancel_checklists = delete_user_params[:user_cancel_checklists]
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id)
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id)
     at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id)
@@ -120,7 +120,7 @@ class Api::V1::UsersController < ApplicationController
           @current_user.delete
           @current_user = nil
         else
-          render json: {}, status: :bad_request
+          render json: {}, status: :bad_request and return
         end
       end
     rescue ActiveRecord::RecordInvalid => db_err
@@ -137,7 +137,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def delete_user_params
-    params.permit(:user_cancel_reason, cancel_checklists: [])
+    params.permit(:user_cancel_reason, user_cancel_checklists: [])
   end
 
   def change_password_params
