@@ -27,15 +27,13 @@ class Api::V1::Group::CardAccountsController < ApplicationController
             amount: 0,
         }
       else
-        share_on_card_accounts =
-            Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
-        group_id = share_on_card_accounts.first.group_id
+        share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
 
         @response = {
-            amount: share_on_card_accounts.sum{|i| i.current_month_payment(group_id)}
+            amount: share_on_card_accounts.sum{|i| i.current_month_payment}
         }
-
       end
+
       render 'summary', formats: 'json', handlers: 'jbuilder'
     end
       

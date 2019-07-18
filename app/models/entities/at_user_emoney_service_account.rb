@@ -28,12 +28,8 @@ class Entities::AtUserEmoneyServiceAccount < ApplicationRecord
   belongs_to :at_emoney_service
   has_many :at_user_emoney_transactions
 
-  def current_month_payment(group_id = nil)
-    if group_id.present?
-      self.at_user_emoney_transactions.where(group_id: group_id, used_date: (Time.zone.today.beginning_of_month)..(Time.zone.today.end_of_month)).sum{|i| i.amount}
-    else
-      self.at_user_emoney_transactions.where(used_date: (Time.zone.today.beginning_of_month)..(Time.zone.today.end_of_month)).sum{|i| i.amount}
-    end
+  def current_month_payment
+    self.at_user_emoney_transactions.where(used_date: (Time.zone.today.beginning_of_month)..(Time.zone.today.end_of_month)).sum{|i| i.amount}
   end
 
 end

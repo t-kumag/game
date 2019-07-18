@@ -28,6 +28,7 @@ class Api::V1::Group::BankAccountsController < ApplicationController
     else
       share_on_bank_accounts =
           Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
+
       @response = {
           amount: share_on_bank_accounts.sum{|i| i.balance}
       }
