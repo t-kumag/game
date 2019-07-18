@@ -179,14 +179,14 @@ Entities::PaymentMethod.create(name: 'クレジットカード')
 end
 
 # GoalType
-Entities::GoalType.create(name: '住宅購入/頭金', img_url: 'test.png')
-Entities::GoalType.create(name: '子供教育資金', img_url: 'test.png')
-Entities::GoalType.create(name: '結婚/旅行', img_url: 'test.png')
-Entities::GoalType.create(name: 'とりあえず貯金', img_url: 'test.png')
-Entities::GoalType.create(name: '老後資金', img_url: 'test.png')
-Entities::GoalType.create(name: '繰り上げ返済', img_url: 'test.png')
-Entities::GoalType.create(name: '車/バイク', img_url: 'test.png')
-Entities::GoalType.create(name: 'その他', img_url: 'test.png')
+Entities::GoalType.create(id:1, name: '住宅購入/頭金', img_url: 'test.png')
+Entities::GoalType.create(id:2, name: '子供教育資金', img_url: 'test.png')
+Entities::GoalType.create(id:3, name: '結婚/旅行', img_url: 'test.png')
+Entities::GoalType.create(id:4, name: 'とりあえず貯金', img_url: 'test.png')
+Entities::GoalType.create(id:5, name: '老後資金', img_url: 'test.png')
+Entities::GoalType.create(id:6, name: '繰り上げ返済', img_url: 'test.png')
+Entities::GoalType.create(id:7, name: '車/バイク', img_url: 'test.png')
+Entities::GoalType.create(id:8, name: 'その他', img_url: 'test.png')
 
 # at_groupted_categories
 Entities::AtGroupedCategory.create(id:1, category_name: '未分類');
