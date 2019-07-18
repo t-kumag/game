@@ -2,13 +2,13 @@ class Api::V1::Group::BankAccountsController < ApplicationController
   before_action :authenticate
 
   def index
-    share = false || params[:share]
-    if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
+    if @current_user.try(:at_user).try(:at_user_bank_accounts).blank?
       @responses = []
     else
       @responses = []
-
-      @current_user.at_user.at_user_bank_accounts.each do |a|
+      share_on_bank_accounts =
+          Entities::AtUserBankAccount.where(at_user_id: [@current_user.at_user.id, @current_user.partner_user.at_user.id]).where(share: true)
+      share_on_bank_accounts.each do |a|
         @responses << {
             id: a.id,
             name: a.fnc_nm,
@@ -19,28 +19,19 @@ class Api::V1::Group::BankAccountsController < ApplicationController
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
-  # TODO 目標金額の足しこみが必要
   def summary
-    if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
+    if @current_user.try(:at_user).try(:at_user_bank_accounts).blank?
       @response = {
           amount: 0,
       }
     else
-      amount = 0
-      group_id = @current_user.group_id
-
-      unless group_id.nil?
-        pair_user = Services::AtUserBankAccountsService.get_balance_summary(group_id)
-        amount = pair_user.group_users.sum{|i| i.balance}
-      end
-
+      share_on_bank_accounts =
+          Entities::AtUserBankAccount.where(at_user_id: [@current_user.at_user.id, @current_user.partner_user.at_user.id]).where(share: true)
       @response = {
-          amount: amount
+          amount: share_on_bank_accounts.sum{|i| i.balance}
       }
     end
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
-
-
 end
 
