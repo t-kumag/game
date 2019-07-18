@@ -21,11 +21,8 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
+    # TODO: user_distributed_transactionsを参照するようにする
     def summary
-      # TODO: 家族の引き落とし総額について確認する。そもそも必要なのかどうかも含めて。
-      # TODO: 実装は/user/emoney-accounts-summaryとほぼ同じになる予定
-      # TODO: group_idが考慮されていない
-
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).blank?
         @response = {
             amount: 0,

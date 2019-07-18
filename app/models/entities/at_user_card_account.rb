@@ -30,7 +30,7 @@ class Entities::AtUserCardAccount < ApplicationRecord
   has_many :at_user_card_transactions
 
   def current_month_payment(account_ids=nil)
-    current_month = Time.now.strftime("%Y%m").to_s
+    current_month = Time.now.strftime("%Y-%m").to_s
     if account_ids.present?
       self.at_user_card_transactions.where(confirm_type: 'C', clm_ym: current_month, at_user_card_account_id: account_ids).sum{|i| i.amount}
     else

@@ -20,7 +20,7 @@ class Api::V1::Group::CardAccountsController < ApplicationController
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
-    # TODO 今月の引き落としを計算 shareされているもの
+    # TODO: user_distributed_transactionsを参照するようにする
     def summary
       if @current_user.try(:at_user).try(:at_user_card_accounts).blank?
           @response = {

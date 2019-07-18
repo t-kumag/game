@@ -20,6 +20,7 @@ class Api::V1::Group::BankAccountsController < ApplicationController
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
+  # TODO: user_distributed_transactionsを参照するようにする
   def summary
     if @current_user.try(:at_user).try(:at_user_bank_accounts).blank?
       @response = {
