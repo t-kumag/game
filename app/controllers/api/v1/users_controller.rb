@@ -101,12 +101,14 @@ class Api::V1::UsersController < ApplicationController
 
     cancel_reason = delete_user_params[:user_cancel_reason]
     cancel_checklists = delete_user_params[:user_cancel_checklists]
-    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id)
-    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id)
-    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id)
+    at_user_bank_account_ids = @current_user&.try(:at_user)&.try(:at_user_bank_accounts)&.pluck(:id)
+    at_user_card_account_ids = @current_user&.try(:at_user)&.try(:at_user_card_accounts)&.pluck(:id)
+    at_user_emoney_service_account_ids = @current_user&.try(:at_user)&.try(:at_user_emoney_service_accounts)&.pluck(:id)
 
     # TODO: バリデーション
     # TODO 例外処理と共通化
+    # 削除されるテーブル
+    # at_users, at_usuer_tokens, users, at_user_xxxx_accounts
     begin
       ActiveRecord::Base.transaction do
         if cancel_checklists.present?

@@ -207,7 +207,7 @@ class Services::AtUserService
       params = {}
       account.each do |a|
         if a.present?
-          params[:token] = @user.token
+          params[:token] = @user.at_user.token
           params[:fnc_id] = a.fnc_id
           request  = AtAPIRequest::AtUser::DeleteAccount.new(params)
           AtAPIClient.new(request).request

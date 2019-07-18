@@ -38,6 +38,7 @@ class Services::ParingService
       if at_user_bank_account_ids.present?
         Services::AtUserService.new(user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_ids)
       end
+
       if at_user_card_account_ids.present?
         Services::AtUserService.new(user).delete_account(Entities::AtUserCardAccount, at_user_card_account_ids)
       end
@@ -45,6 +46,7 @@ class Services::ParingService
       if at_user_emoney_service_account_ids.present?
         Services::AtUserService.new(user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_ids)
       end
+
     end
 
     # グループに紐づく中間テーブルを削除
