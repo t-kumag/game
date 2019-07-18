@@ -31,8 +31,6 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
             amount: 0,
         }
       else
-        @responses = []
-
         share_on_emoney_service_accounts =
             Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
         group_id = share_on_emoney_service_accounts.first.group_id

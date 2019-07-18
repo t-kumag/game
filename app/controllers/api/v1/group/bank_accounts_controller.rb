@@ -26,8 +26,6 @@ class Api::V1::Group::BankAccountsController < ApplicationController
           amount: 0,
       }
     else
-      @responses = []
-
       share_on_bank_accounts =
           Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
       @response = {
