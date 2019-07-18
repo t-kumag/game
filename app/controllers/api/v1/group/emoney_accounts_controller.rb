@@ -35,7 +35,7 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
             Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
 
         @response = {
-            amount: share_on_emoney_service_accounts.sum{|i| i.current_month_payment}
+            amount: share_on_emoney_service_accounts.sum{|i| i.current_month_payment(share_on_emoney_service_accounts.pluck(:at_user_id))}
         }
       end
 
