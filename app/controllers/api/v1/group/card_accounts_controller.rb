@@ -27,6 +27,8 @@ class Api::V1::Group::CardAccountsController < ApplicationController
             amount: 0,
         }
       else
+        @responses = []
+
         share_on_card_accounts =
             Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
         group_id = share_on_card_accounts.first.group_id
