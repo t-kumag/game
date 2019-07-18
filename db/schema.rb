@@ -17,7 +17,7 @@ ActiveRecord::Schema.define(version: 2019_07_12_041241) do
     t.integer "group_id"
     t.integer "count", default: 0, null: false
     t.string "activity_type", null: false
-    t.date "date", null: false
+    t.datetime "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
