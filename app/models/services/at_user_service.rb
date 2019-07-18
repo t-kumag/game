@@ -280,24 +280,41 @@ class Services::AtUserService
 
       fnc_ids = []
 
+      # ATのスクレイピングlog
+      scraping_ids = []
+
       # TODO リファクタリング
       # 負荷対応ため個別に分岐
       # 証券、保険などが増えると分岐が長くなるので渡されたmodelに対して処理を行うような作りに変える
       case @target
       when 'bank'
         puts "scraping bank=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
+        bank_accounts = @user.at_user.at_user_bank_accounts
+        fnc_ids = fnc_ids + bank_accounts.map{|i| i.fnc_id}
+        scraping_ids << bank_accounts.map{|i| {at_user_bank_account_id: i.id} }
       when 'card'
         puts "scraping card=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
+        card_accounts = @user.at_user.at_user_card_accounts
+        fnc_ids = fnc_ids + card_accounts.map{|i| i.fnc_id}
+        scraping_ids << card_accounts.map{|i| {at_user_card_account_id: i.id} }
       when 'emoney'
         puts "scraping emoney=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
+        emoney_accounts = @user.at_user.at_user_emoney_service_accounts
+        fnc_ids = fnc_ids + emoney_accounts.map{|i| i.fnc_id}
+        scraping_ids << card_accounts.map{|i| {at_user_emoney_service_account_id: i.id} }
       else
         puts "scraping all=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
-        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
-        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}	
+        bank_accounts = @user.at_user.at_user_bank_accounts
+        fnc_ids = fnc_ids + bank_accounts.map{|i| i.fnc_id}
+        scraping_ids << bank_accounts.map{|i| {at_user_bank_account_id: i.id} }
+
+        card_accounts = @user.at_user.at_user_card_accounts
+        fnc_ids = fnc_ids + card_accounts.map{|i| i.fnc_id}
+        scraping_ids << card_accounts.map{|i| {at_user_card_account_id: i.id} }
+
+        emoney_account = @user.at_user.at_user_emoney_service_accounts
+        fnc_ids = fnc_ids + emoney_account.map{|i| i.fnc_id}
+        scraping_ids << card_accounts.map{|i| {at_user_emoney_service_account_id: i.id} }
       end
 
       skip_ids = []
@@ -332,6 +349,9 @@ class Services::AtUserService
         requester = AtAPIRequest::AtUser::ExecScraping.new(params)
         res = AtAPIClient.new(requester).request
       end
+
+      # ATのスクレイピングlog
+      Entities::AtScrapingLog.insert(scraping_ids)
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err

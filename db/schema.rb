@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_12_041241) do
+ActiveRecord::Schema.define(version: 2019_07_18_082420) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -49,6 +49,17 @@ ActiveRecord::Schema.define(version: 2019_07_12_041241) do
     t.string "category_name"
   end
 
+  create_table "at_scraping_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_bank_account_id"
+    t.bigint "at_user_card_account_id"
+    t.bigint "at_user_emoney_service_account_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_bank_account_id"], name: "index_at_scraping_logs_on_at_user_bank_account_id"
+    t.index ["at_user_card_account_id"], name: "index_at_scraping_logs_on_at_user_card_account_id"
+    t.index ["at_user_emoney_service_account_id"], name: "index_at_scraping_logs_on_at_user_emoney_service_account_id"
+  end
+
   create_table "at_sync_transaction_latest_date_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "at_user_bank_account_id"
     t.integer "at_user_card_account_id"
@@ -56,6 +67,17 @@ ActiveRecord::Schema.define(version: 2019_07_12_041241) do
     t.datetime "latest_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "at_sync_transaction_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_bank_account_id"
+    t.bigint "at_user_card_account_id"
+    t.bigint "at_user_emoney_service_account_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_bank_account_id"], name: "index_at_sync_transaction_logs_on_at_user_bank_account_id"
+    t.index ["at_user_card_account_id"], name: "index_at_sync_transaction_logs_on_at_user_card_account_id"
+    t.index ["at_user_emoney_service_account_id"], name: "index_a_s_t_l_on_at_user_emoney_service_account_id"
   end
 
   create_table "at_transaction_categories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -278,6 +300,7 @@ ActiveRecord::Schema.define(version: 2019_07_12_041241) do
     t.bigint "first_amount", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_settings_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_settings_on_goal_id"
   end
@@ -485,6 +508,12 @@ ActiveRecord::Schema.define(version: 2019_07_12_041241) do
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
   end
 
+  add_foreign_key "at_scraping_logs", "at_user_bank_accounts"
+  add_foreign_key "at_scraping_logs", "at_user_card_accounts"
+  add_foreign_key "at_scraping_logs", "at_user_emoney_service_accounts"
+  add_foreign_key "at_sync_transaction_logs", "at_user_bank_accounts"
+  add_foreign_key "at_sync_transaction_logs", "at_user_card_accounts"
+  add_foreign_key "at_sync_transaction_logs", "at_user_emoney_service_accounts"
   add_foreign_key "at_user_bank_accounts", "at_banks"
   add_foreign_key "at_user_bank_accounts", "at_users"
   add_foreign_key "at_user_bank_transactions", "at_transaction_categories"
