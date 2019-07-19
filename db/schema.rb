@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_12_041241) do
+ActiveRecord::Schema.define(version: 2019_07_19_174250) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -278,6 +278,7 @@ ActiveRecord::Schema.define(version: 2019_07_12_041241) do
     t.bigint "first_amount", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_settings_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_settings_on_goal_id"
   end
@@ -341,6 +342,7 @@ ActiveRecord::Schema.define(version: 2019_07_12_041241) do
     t.bigint "to_user_id"
     t.bigint "group_id"
     t.string "token"
+    t.datetime "pairing_token_expires_at"
     t.bigint "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
