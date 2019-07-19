@@ -8,12 +8,16 @@ class Services::AtCardTransactionService
   # TODO: form toをつけないと検索範囲が広すぎる
   def list(account_id, page)
     distributed_transactions = get_distributed_transactions(account_id)
+    return {} if distributed_transactions.blank?
+
     result = distributed_transactions.order(at_user_card_transaction_id: "DESC")
     Kaminari.paginate_array(result).page(page)
   end
 
-  def detail(transaction_id)
-    distributed = get_distributed_transaction(transaction_id)
+  def detail(account_id, transaction_id)
+    distributed = get_distributed_transaction(account_id, transaction_id)
+    return {} if distributed.blank?
+
     category = Entities::AtTransactionCategory.find distributed.at_transaction_category_id
 
     {
@@ -28,8 +32,10 @@ class Services::AtCardTransactionService
     }
   end
 
-  def update(transaction_id, category_id, used_location, is_shared, group_id)
-    distributed = get_distributed_transaction(transaction_id)
+  def update(account_id, transaction_id, category_id, used_location, is_shared, group_id)
+    distributed = get_distributed_transaction(account_id, transaction_id)
+    return {} if distributed.blank?
+
     distributed.at_transaction_category_id = category_id
     distributed.used_location = used_location
     distributed.group_id = group_id
@@ -37,22 +43,48 @@ class Services::AtCardTransactionService
     distributed.save!
   end
 
-  def get_distributed_transaction(transaction_id)
-    distributed = Entities::UserDistributedTransaction.find_by(at_user_card_transaction_id: transaction_id, user_id: @user.id)
-    # グループ、且つシェアされていない口座の場合、シェアされている明細を取得
-    if @is_group === true && distributed.at_user_card_transaction.at_user_card_account.share === false
-      distributed = Entities::UserDistributedTransaction.find_by(at_user_card_transaction_id: transaction_id, user_id: @user.id, share: true)
+  def get_distributed_transaction(account_id, transaction_id)
+    if @is_group === true
+      card = Entities::AtUserCardAccount.find_by(id: account_id, at_user_id: [@user.at_user.id, @user.partner_user.at_user.id])
+    else
+      card = Entities::AtUserCardAccount.find_by(id: account_id, at_user_id: @user.at_user.id, share: false)
+    end
+    return {} if card.blank?
+
+    transaction = Entities::AtUserCardTransaction.find_by(id: transaction_id, at_user_card_account_id: card.id)
+    return {} if transaction.blank?
+
+    if @is_group === true
+      if card.share === true
+        distributed = transaction.user_distributed_transaction
+      else
+        distributed = Entities::UserDistributedTransaction.find_by(at_user_card_transaction_id: transaction.id, share: true)
+      end
+    else
+      distributed = Entities::UserDistributedTransaction.find_by(at_user_card_transaction_id: transaction.id, share: false)
     end
     distributed
   end
 
   def get_distributed_transactions(account_id)
-    card = @user.at_user.at_user_card_accounts.find(account_id)
+    if @is_group === true
+      card = Entities::AtUserCardAccount.find_by(id: account_id, at_user_id: [@user.at_user.id, @user.partner_user.at_user.id])
+    else
+      card = Entities::AtUserCardAccount.find_by(id: account_id, at_user_id: @user.at_user.id, share: false)
+    end
+    return {} if card.blank?
+
     transaction_ids = card.at_user_card_transactions.pluck(:id)
-    distributed_transactions = Entities::UserDistributedTransaction.where(at_user_card_transaction_id: transaction_ids)
-    # グループ、且つシェアされていない口座の場合、シェアされている全明細を取得
-    if @is_group === true && card.share === false
-      distributed_transactions = Entities::UserDistributedTransaction.where(at_user_card_transaction_id: transaction_ids, share: true)
+    return {} if transaction_ids.blank?
+
+    if @is_group === true
+      if card.share === true
+        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_card_transaction_id: transaction_ids)
+      else
+        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_card_transaction_id: transaction_ids, share: true)
+      end
+    else
+      distributed_transactions = Entities::UserDistributedTransaction.where(at_user_card_transaction_id: transaction_ids, share: false)
     end
     distributed_transactions
   end
