@@ -18,7 +18,7 @@
 #
 
 class Entities::AtUserEmoneyTransaction < ApplicationRecord
-  belongs_to :at_emoney_service_account
+  belongs_to :at_user_emoney_service_account
   has_one :user_distributed_transaction
 
   def amount
