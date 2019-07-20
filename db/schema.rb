@@ -342,7 +342,7 @@ ActiveRecord::Schema.define(version: 2019_07_19_174250) do
     t.bigint "to_user_id"
     t.bigint "group_id"
     t.string "token"
-    t.datetime "pairing_token_expires_at"
+    t.datetime "token_expires_at"
     t.bigint "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

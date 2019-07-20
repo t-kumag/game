@@ -25,7 +25,7 @@ class Api::V1::PairingRequestsController < ApplicationController
       from_user_id: @current_user.id,
       group_id: pg.group_id,
       token: token,
-      pairing_token_expires_at: DateTime.now + 7,
+      token_expires_at: DateTime.now + 7,
       status: 1 # TODO
     })
     render 'generate_pairing_token', formats: 'json', handlers: 'jbuilder', status: 200
@@ -46,7 +46,7 @@ class Api::V1::PairingRequestsController < ApplicationController
         puts "receive_pairing_request error =========="
         return
       end
-      if DateTime.now <= @pairing_request.pairing_token_expires_at
+      if DateTime.now <= @pairing_request.token_expires_at
         @pairing_request.to_user_id = @current_user.id
         @pairing_request.status = 2
         @pairing_request.save!
