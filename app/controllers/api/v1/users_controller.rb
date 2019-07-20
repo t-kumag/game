@@ -29,7 +29,7 @@ class Api::V1::UsersController < ApplicationController
       user.reset_token
       user.save!
       MailDelivery.user_registration(user).deliver
-
+f
       render json: obj, status: 200
     else
       render json: obj, status: :bad_request
