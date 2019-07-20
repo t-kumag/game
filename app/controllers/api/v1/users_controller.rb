@@ -117,7 +117,7 @@ class Api::V1::UsersController < ApplicationController
     # TODO: バリデーション
     # TODO 例外処理と共通化
     # 削除されるテーブル
-    # at_users, at_usuer_tokens, users, at_user_xxxx_accounts
+    # at_users, at_user_tokens, at_user_xxxx_accounts, users
     begin
       ActiveRecord::Base.transaction do
         if cancel_checklists.present?
