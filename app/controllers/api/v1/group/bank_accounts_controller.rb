@@ -1,7 +1,6 @@
 class Api::V1::Group::BankAccountsController < ApplicationController
   before_action :authenticate, :require_group
 
-
   def index
     if @current_user.try(:at_user).try(:at_user_bank_accounts).blank?
       @responses = []

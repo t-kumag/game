@@ -161,7 +161,6 @@ class ApplicationController < ActionController::Base
   end
 
   def require_group
-    binding.pry
     unless @current_user.group_id.present?
       render json: { errors: { code: '', message: "Require group." } }, status: 422
     end
