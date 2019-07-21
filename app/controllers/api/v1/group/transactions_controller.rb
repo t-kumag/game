@@ -1,5 +1,5 @@
 class Api::V1::Group::TransactionsController < ApplicationController
-  before_action :authenticate
+  before_action :authenticate, :before_action
 
   def index
     @response = []

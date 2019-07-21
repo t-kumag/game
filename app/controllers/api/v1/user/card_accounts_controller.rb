@@ -1,5 +1,6 @@
 class Api::V1::User::CardAccountsController < ApplicationController
     before_action :authenticate
+    before_action :require_group, only: [:update]
 
     def index
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?

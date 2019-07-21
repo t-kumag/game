@@ -1,5 +1,6 @@
 class Api::V1::PairingRequestsController < ApplicationController
   before_action :authenticate
+  before_action :require_group, only: [:receive_pairing_request]
 
   def generate_pairing_token
 

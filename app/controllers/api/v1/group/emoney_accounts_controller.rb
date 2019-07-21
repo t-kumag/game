@@ -1,5 +1,5 @@
 class Api::V1::Group::EmoneyAccountsController < ApplicationController
-    before_action :authenticate
+    before_action :authenticate, :require_group
 
     def index
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).blank?

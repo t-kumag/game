@@ -1,5 +1,6 @@
 # TODO(fujiura) group で取得する明細の情報を明確にする
 class Api::V1::Group::BankTransactionsController < ApplicationController
+  before_action :require_group, only: [:update]
   before_action :authenticate
 
   def index

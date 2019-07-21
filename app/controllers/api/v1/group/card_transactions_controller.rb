@@ -1,6 +1,7 @@
 # TODO(fujiura) group で取得する明細の情報を明確にする
 class Api::V1::Group::CardTransactionsController < ApplicationController
   before_action :authenticate
+  before_action :require_group, only: [:update]
 
   def index
     @transactions = Services::AtCardTransactionService.new.list(params[:card_account_id], params[:page])
