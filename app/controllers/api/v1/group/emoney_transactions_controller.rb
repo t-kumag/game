@@ -1,7 +1,6 @@
 # TODO(fujiura) group で取得する明細の情報を明確にする
 class Api::V1::Group::EmoneyTransactionsController < ApplicationController
   before_action :authenticate
-  before_action :require_group, only: [:update]
 
   def index
     @transactions = Services::AtEmoneyTransactionService.new.list(params[:emoney_account_id], params[:page])

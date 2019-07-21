@@ -1,5 +1,6 @@
 class Api::V1::Group::GoalsController < ApplicationController
   before_action :authenticate, :require_group
+  before_action :require_group, except: [:graph]
 
   def index
     @responses = Entities::Goal.where(group_id: @current_user.group_id)

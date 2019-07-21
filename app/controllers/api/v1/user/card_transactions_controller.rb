@@ -1,6 +1,5 @@
 class Api::V1::User::CardTransactionsController < ApplicationController
   before_action :authenticate
-  before_action :require_group, only: [:update]
 
   # TODO(fujiura): before_action で対象口座へのアクセス権があるかチェックする
   # TODO(fujiura): card_account_id, transaction_id に対応するデータがないときの処理

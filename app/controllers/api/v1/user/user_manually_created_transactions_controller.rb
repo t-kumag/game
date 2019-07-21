@@ -1,5 +1,6 @@
 class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationController
   before_action :authenticate
+  before_action :require_group, only: [:create, :update]
 
   @error = {}
 
