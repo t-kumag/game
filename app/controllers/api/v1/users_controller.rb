@@ -86,6 +86,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_sync
+    # ATユーザーが作成されていなければスキップする
+    return render json: {}, status: 200 unless @current_user.try(:at_user)
+
     at_user_service = Services::AtUserService.new(@current_user, params[:target])
     at_user_service.exec_scraping
     at_user_service.sync
