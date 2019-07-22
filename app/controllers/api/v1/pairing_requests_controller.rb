@@ -25,6 +25,7 @@ class Api::V1::PairingRequestsController < ApplicationController
       from_user_id: @current_user.id,
       group_id: pg.group_id,
       token: token,
+      token_expires_at: DateTime.now + 7,
       status: 1 # TODO
     })
     render 'generate_pairing_token', formats: 'json', handlers: 'jbuilder', status: 200
@@ -45,6 +46,9 @@ class Api::V1::PairingRequestsController < ApplicationController
         puts "receive_pairing_request error =========="
         return
       end
+
+      return render json: { errors: { code: '', message: "paring user not found or invalid token." } }, status: 422  if DateTime.now > @pairing_request.token_expires_at
+
       @pairing_request.to_user_id = @current_user.id
       @pairing_request.status = 2
       @pairing_request.save!
@@ -53,8 +57,9 @@ class Api::V1::PairingRequestsController < ApplicationController
         group_id: @pairing_request.group_id,
         user_id: @current_user.id
       })
+
+      render json: {}, status: 200
     end
-    render json: {}, status: 200
     # render 'receive_pairing_request', formats: 'json', handlers: 'jbuilder', status: 200
   end
 
