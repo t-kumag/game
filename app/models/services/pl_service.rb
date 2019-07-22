@@ -56,9 +56,9 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
+        udt.at_user_card_transaction_id,
         auct.at_user_card_account_id,
-        auct.id,
-        sum(auct.amount) as amount_payment,
+        auct.amount as amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -68,19 +68,23 @@ class Services::PlService
       ON
         auct.id = udt.at_user_card_transaction_id
       INNER JOIN
+        at_user_card_accounts as auca
+      ON
+        auca.id = auct.at_user_card_account_id
+      INNER JOIN
         at_transaction_categories as atc
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        #{sql_user_or_group}
+        udt.user_id in (#{get_user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      GROUP BY
-        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -90,8 +94,10 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
-        sum(auet.amount_receipt) as amount_receipt,
-        sum(auet.amount_payment) as amount_payment,
+        udt.at_user_emoney_transaction_id,
+        auet.at_user_emoney_service_account_id,
+        auet.amount_receipt,
+        auet.amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -101,19 +107,23 @@ class Services::PlService
       ON
         auet.id = udt.at_user_emoney_transaction_id
       INNER JOIN
+        at_user_emoney_service_accounts as auea
+      ON
+        auea.id = auet.at_user_emoney_service_account_id
+      INNER JOIN
         at_transaction_categories as atc
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        #{sql_user_or_group}
+        udt.user_id in (#{get_user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      GROUP BY
-        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -174,7 +184,7 @@ class Services::PlService
   def get_at_user_ids
     at_user_ids = [@user.at_user.id]
     if @with_group && @user.try(:partner_user).try(:at_user).id
-      return user_ids << @user.partner_user.at_user.id
+      return at_user_ids << @user.partner_user.at_user.id
     end
     at_user_ids
   end
