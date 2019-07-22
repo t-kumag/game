@@ -48,6 +48,8 @@ class Api::V1::PairingRequestsController < ApplicationController
       end
 
       return render json: { errors: { code: '', message: "paring user not found or invalid token." } }, status: 422  if DateTime.now > @pairing_request.token_expires_at
+      return render json: { errors: { code: '', message: "paring user already exists" } }, status: 422  if @pairing_request.status.to_i == 2
+      return render json: { errors: { code: '', message: "same user" } }, status: 422  if @pairing_request.from_user_id ==  @current_user.id
 
       @pairing_request.to_user_id = @current_user.id
       @pairing_request.status = 2
