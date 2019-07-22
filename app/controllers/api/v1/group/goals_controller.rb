@@ -15,10 +15,13 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def create
+
     if get_goal_setting_params[:at_user_bank_account_id].present? &&
         disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
       return render_disallowed_financier_ids
     end
+
+    return render json: { errors: { code: '', message: "five goal limit of free users" } }, status: 422  if Services::GoalService.check_goal_limit_of_free_user
 
     goal_params = get_goal_params
     begin

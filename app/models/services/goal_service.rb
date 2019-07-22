@@ -63,6 +63,10 @@ class Services::GoalService
     end
   end
 
+  def check_goal_limit_of_free_user
+    @current_user.free? && Entities::Goal.where(group_id: @current_user.group_id).count < 5
+  end
+
   private
 
   def create_goal_user_log(goal, goal_setting)
