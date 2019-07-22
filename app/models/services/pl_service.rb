@@ -38,7 +38,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id in (#{get_user_ids.join(',')})
+        udt.user_id in (#{user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
       AND
@@ -76,7 +76,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id in (#{get_user_ids.join(',')})
+        udt.user_id in (#{user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
       AND
@@ -115,7 +115,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id in (#{get_user_ids.join(',')})
+        udt.user_id in (#{user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
       AND
@@ -173,7 +173,7 @@ class Services::PlService
     end
   end
 
-  def get_user_ids
+  def user_ids
     user_ids = [@user.id]
     if @with_group && @user.try(:partner_user).id
       return user_ids << @user.partner_user.id
@@ -181,7 +181,7 @@ class Services::PlService
     user_ids
   end
 
-  def get_at_user_ids
+  def at_user_ids
     at_user_ids = [@user.at_user.id]
     if @with_group && @user.try(:partner_user).try(:at_user).id
       return at_user_ids << @user.partner_user.at_user.id
@@ -207,17 +207,17 @@ class Services::PlService
 
     # 全カード
     card_ids.each do |card_id|
-      card = Entities::AtUserCardAccount.find_by(id: card_id, at_user_id: get_at_user_ids)
+      card = Entities::AtUserCardAccount.find_by(id: card_id, at_user_id: at_user_ids)
       # デビットカードの場合、消込する
       if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
         bank_ids.each do |bank_id|
-          bank = Entities::AtUserBankAccount.find(bank_id, get_at_user_ids)
+          bank = Entities::AtUserBankAccount.find(bank_id, at_user_ids)
           card.at_user_card_transactions.each do |card_transaction|
             # カード明細の取引日と銀行明細の取引日が同日
             # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
             remove_bank_transactions << bank.at_user_bank_transactions.find_by(
-                trade_date: card_transaction.user_date, 
-                amount_payment: card_transaction.payment_amount
+                trade_date: card_transaction.used_date, 
+                amount_payment: card_transaction.amount
             )
           end
         end    
@@ -229,15 +229,14 @@ class Services::PlService
     # 消込処理
     if remove_bank_transactions.compact.present?
       remove_bank_transaction_ids = remove_bank_transactions.pluck(:id)
-      pl_bank = pl_bank.reject do |t|
+      pl_bank = pl_bank.reject do |v|
         remove_bank_transaction_ids.include? t['at_user_bank_transaction_id']
       end
     end
-    
-    # #　P/L の計算から指定カテゴリを排除する
-    # pl_bank = remove_duplicated_transaction(pl_bank)
-    # pl_card = remove_duplicated_transaction(pl_card)
-    # pl_emoney = remove_duplicated_transaction(pl_emoney)
+
+    pl_bank = group_by_category_id(pl_bank)
+    pl_card = groupi_by_category_id(pl_card)
+    pl_emoney = group_by_category_id(pl_emoney)
 
     pl_user_manually_created = user_manually_created_category_summary(share, from, to)
     merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
@@ -271,6 +270,43 @@ class Services::PlService
     transactions.reject do |t|
       ignore_at_transaction_category_ids.include? t['at_transaction_category_id']
     end
+  end
+
+  def group_by_category_id(pl)
+    after_summaries = []
+    pl.each do |v|
+      next if v['at_transaction_category_id'].blank?
+      # after_summaries から同カテゴリのアイテムを抽出
+      summary = after_summaries.select do |t|
+        v['at_transaction_category_id'] === t['at_transaction_category_id']
+      end.first
+
+      v['amount_receipt'] ||= 0
+      v['amount_payment'] ||= 0
+
+       # after_summaries に同カテゴリのアイテムがなければ即 INSERT し、あれば額のみ足し込み
+       if summary.blank?
+        after_summaries << {
+          at_transaction_category_id: v['at_transaction_category_id'],
+          category_name1: v['category_name1'],
+          category_name2: v['category_name2'],
+          amount_receipt: v['amount_receipt'],
+          amount_payment: v['amount_payment']
+        }.stringify_keys
+      else
+        idx = after_summaries.find_index(summary)
+        summary['amount_receipt'] ||= 0
+        summary['amount_payment'] ||= 0
+        after_summaries[idx] = {
+          at_transaction_category_id: v['at_transaction_category_id'],
+          category_name1: v['category_name1'],
+          category_name2: v['category_name2'],
+          amount_receipt: v['amount_receipt'] + summary['amount_receipt'],
+          amount_payment: v['amount_payment'] + summary['amount_payment']
+        }.stringify_keys
+      end
+    end
+    after_summaries
   end
 
   def merge_category_summary(pl, before_summaries)
