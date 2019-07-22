@@ -37,6 +37,18 @@ class ApplicationController < ActionController::Base
     render('api/v1/errors/record_invalid', formats: 'json', handlers: 'jbuilder', status: 400) && return
   end
 
+  def render_400_invalid_validation(e=[])
+    errors = e.map do |error|
+      {
+        "resource": error[:resource],
+        "field": error[:field],
+        "code": error[:code]
+      }
+    end
+
+    render json: {errors: errors}, status: 400
+  end
+
   def render_at_api_error(e = nil)
     @errors = [
       {
