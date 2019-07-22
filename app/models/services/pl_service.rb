@@ -200,14 +200,14 @@ class Services::PlService
 
     # 銀行口座ID一覧作成
     bank_ids = pl_bank.pluck("at_user_bank_account_id").uniq
-    card_ids = card_ids.pluck("at_user_card_account_id").uniq
+    card_ids = pl_card.pluck("at_user_card_account_id").uniq
     
     # 消込用の配列
     remove_bank_transactions = []
 
     # 全カード
     card_ids.each do |card_id|
-      card = Entities::AtUserCardAccount.find_by(id: card_id, user_id: get_at_user_ids)
+      card = Entities::AtUserCardAccount.find_by(id: card_id, at_user_id: get_at_user_ids)
       # デビットカードの場合、消込する
       if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
         bank_ids.each do |bank_id|
@@ -229,15 +229,15 @@ class Services::PlService
     # 消込処理
     if remove_bank_transactions.compact.present?
       remove_bank_transaction_ids = remove_bank_transactions.pluck(:id)
-      pl_bank.reject do |t|
+      pl_bank = pl_bank.reject do |t|
         remove_bank_transaction_ids.include? t['at_user_bank_transaction_id']
       end
     end
     
-    #　P/L の計算から指定カテゴリを排除する
-    pl_bank = remove_duplicated_transaction(pl_bank)
-    pl_card = remove_duplicated_transaction(pl_card)
-    pl_emoney = remove_duplicated_transaction(pl_emoney)
+    # #　P/L の計算から指定カテゴリを排除する
+    # pl_bank = remove_duplicated_transaction(pl_bank)
+    # pl_card = remove_duplicated_transaction(pl_card)
+    # pl_emoney = remove_duplicated_transaction(pl_emoney)
 
     pl_user_manually_created = user_manually_created_category_summary(share, from, to)
     merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
