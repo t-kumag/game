@@ -4,15 +4,23 @@ class Services::PlService
     @user = user
     @with_group = with_group
   end
+  
+  def ignore_at_category_ids
+    [
+      '1581', # カード返済（クレジットカード引き落とし）
+      '1699', # その他入金（電子マネーへのチャージ電子マネー側入金）
+      '1799', # その他出金（電子マネーへのチャージ銀行側出金）
+    ]
+  end
 
   def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
+        udt.at_user_bank_transaction_id,
         aubt.at_user_bank_account_id,
-        aubt.id,
-        sum(aubt.amount_receipt) as amount_receipt,
-        sum(aubt.amount_payment) as amount_payment,
+        aubt.amount_receipt,
+        aubt.amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -22,19 +30,23 @@ class Services::PlService
       ON
         aubt.id = udt.at_user_bank_transaction_id
       INNER JOIN
+        at_user_bank_accounts as auba
+      ON
+        auba.id = aubt.at_user_bank_account_id
+      INNER JOIN
         at_transaction_categories as atc
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        #{sql_user_or_group}
+        udt.user_id in (#{get_user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      GROUP BY
-        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -151,6 +163,22 @@ class Services::PlService
     end
   end
 
+  def get_user_ids
+    user_ids = [@user.id]
+    if @with_group && @user.try(:partner_user).id
+      return user_ids << @user.partner_user.id
+    end
+    user_ids
+  end
+
+  def get_at_user_ids
+    at_user_ids = [@user.at_user.id]
+    if @with_group && @user.try(:partner_user).try(:at_user).id
+      return user_ids << @user.partner_user.at_user.id
+    end
+    at_user_ids
+  end
+
   def pl_category_summary(share, from, to)
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
@@ -160,47 +188,42 @@ class Services::PlService
     pl_card = card_category_summary(share, from, to)
     pl_emoney = emoney_category_summary(share, from, to)
 
-    bank = Entities::AtUserBankAccount.find(pl_bank.at_user_bank_account_id)
-    card = Entities::AtUserCardAccount.find(pl_card.at_user_card_account_id)
+    # 銀行口座ID一覧作成
+    bank_ids = pl_bank.pluck("at_user_bank_account_id").uniq
+    card_ids = card_ids.pluck("at_user_card_account_id").uniq
     
-    # デビットカードの一覧を定数にしておくとのちのちいい
-    DEBIT_CARD_FNC_IDS = ["hoge","fuga"]
-    # デビットカード判定⓵
-    # if DEBIT_CARDS.include?(card.fnc_id)
-    
-    # デビットカード判定⓶
-    # MWIにIF作成してもらう
-    
-    # デビットカード判定⓷
-    if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
-      # デビットカードの場合、消込する
-      
-      # 消込用の配列
-      remove_bank_transactions = []
+    # 消込用の配列
+    remove_bank_transactions = []
 
-      card.at_user_card_transactions.each do |card_transaction|
-        # カード明細の取引日と銀行明細の取引日が同日
-        # card_transaction.user_date === bank_transaction.trade_date
-        # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
-        # card_transaction.payment_amount === bank_transaction.amount_payment
-        remove_bank_transactions << bank.at_user_bank_transactions.find_by(
-            trade_date: card_transaction.user_date, 
-            amount_payment: card_transaction.payment_amount
-          )
-        end
+    # 全カード
+    card_ids.each do |card_id|
+      card = Entities::AtUserCardAccount.find_by(id: card_id, user_id: get_at_user_ids)
+      # デビットカードの場合、消込する
+      if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
+        bank_ids.each do |bank_id|
+          bank = Entities::AtUserBankAccount.find(bank_id, get_at_user_ids)
+          card.at_user_card_transactions.each do |card_transaction|
+            # カード明細の取引日と銀行明細の取引日が同日
+            # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
+            remove_bank_transactions << bank.at_user_bank_transactions.find_by(
+                trade_date: card_transaction.user_date, 
+                amount_payment: card_transaction.payment_amount
+            )
+          end
+        end    
+      else
+        # デビットカードじゃない場合、消込しない
       end
-    else
-      # デビットカードじゃない場合、消込しない
     end
 
     # 消込処理
-    if remove_bank_transactions.present?
+    if remove_bank_transactions.compact.present?
       remove_bank_transaction_ids = remove_bank_transactions.pluck(:id)
       pl_bank.reject do |t|
-        remove_bank_transaction_ids.include? t['id']
+        remove_bank_transaction_ids.include? t['at_user_bank_transaction_id']
       end
     end
-
+    
     #　P/L の計算から指定カテゴリを排除する
     pl_bank = remove_duplicated_transaction(pl_bank)
     pl_card = remove_duplicated_transaction(pl_card)
