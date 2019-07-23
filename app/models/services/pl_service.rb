@@ -40,7 +40,7 @@ class Services::PlService
       WHERE
         udt.user_id in (#{user_ids.join(',')})
       AND
-        udt.share in (#{share.join(',')})
+        (auba.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
@@ -78,7 +78,7 @@ class Services::PlService
       WHERE
         udt.user_id in (#{user_ids.join(',')})
       AND
-        udt.share in (#{share.join(',')})
+        (auca.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
@@ -117,7 +117,7 @@ class Services::PlService
       WHERE
         udt.user_id in (#{user_ids.join(',')})
       AND
-        udt.share in (#{share.join(',')})
+        (auea.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
@@ -147,7 +147,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        #{sql_user_or_group}
+        udt.user_id in (#{user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
       AND
@@ -211,7 +211,7 @@ class Services::PlService
       # デビットカードの場合、消込する
       if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
         bank_ids.each do |bank_id|
-          bank = Entities::AtUserBankAccount.find(bank_id, at_user_ids)
+          bank = Entities::AtUserBankAccount.find_by(id: bank_id, at_user_id: at_user_ids)
           card.at_user_card_transactions.each do |card_transaction|
             # カード明細の取引日と銀行明細の取引日が同日
             # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
