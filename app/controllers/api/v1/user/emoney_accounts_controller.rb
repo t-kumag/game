@@ -1,6 +1,5 @@
 class Api::V1::User::EmoneyAccountsController < ApplicationController
     before_action :authenticate
-    before_action :require_group, only: [:update]
 
     def index
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
@@ -43,6 +42,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
     def update
       account_id = params[:id].to_i
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)
+        require_group && return if params[:share] == true
         account = Entities::AtUserEmoneyServiceAccount.find account_id
         account.update!(get_account_params)
         render json: {}, status: 200

@@ -1,6 +1,5 @@
 class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationController
   before_action :authenticate
-  before_action :require_group, only: [:create, :update]
 
   @error = {}
 
@@ -15,6 +14,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = create_user_manually_created
         if params[:share] === true
+          require_group && return
           options = {group_id: @current_user.group_id, share: params[:share]}
         else
           options = {}
@@ -34,6 +34,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = update_user_manually_created
         if params[:share] === true
+          require_group && return
           options = {group_id: @current_user.group_id, share: params[:share]}
         else
           options = {}
