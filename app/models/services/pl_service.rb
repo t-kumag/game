@@ -198,42 +198,11 @@ class Services::PlService
     pl_card = card_category_summary(share, from, to)
     pl_emoney = emoney_category_summary(share, from, to)
 
-    # 銀行口座ID一覧作成
-    bank_ids = pl_bank.pluck("at_user_bank_account_id").uniq
-    card_ids = pl_card.pluck("at_user_card_account_id").uniq
-    
-    # 消込用の配列
-    remove_bank_transactions = []
-
-    # 全カード
-    card_ids.each do |card_id|
-      card = Entities::AtUserCardAccount.find_by(id: card_id, at_user_id: at_user_ids)
-      # デビットカードの場合、消込する
-      if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
-        bank_ids.each do |bank_id|
-          bank = Entities::AtUserBankAccount.find_by(id: bank_id, at_user_id: at_user_ids)
-          card.at_user_card_transactions.each do |card_transaction|
-            # カード明細の取引日と銀行明細の取引日が同日
-            # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
-            bank.at_user_bank_transactions.map do |bank_transaction|
-              if bank_transaction.trade_date.strftime("%Y-%m-%d") === card_transaction.used_date.strftime("%Y-%m-%d") &&
-                bank_transaction.amount_payment === card_transaction.amount
-                remove_bank_transactions << bank_transaction
-              end
-            end
-          end
-        end    
-      else
-        # デビットカードじゃない場合、消込しない
-      end
-    end
-
+    # 消込用の配列取得
+    ignore_bank_transactions = ignore_bank_transaction(pl_bank, pl_card)
     # 消込処理
-    if remove_bank_transactions.present?
-      remove_bank_transaction_ids = remove_bank_transactions.pluck(:id)
-      pl_bank = pl_bank.reject do |t|
-        remove_bank_transaction_ids.include? t['at_user_bank_transaction_id']
-      end
+    if ignore_bank_transactions.present?
+      pl_bank = remove_bank_transaction(pl_bank ,ignore_bank_transactions)
     end
 
     pl_bank = group_by_category_id(pl_bank)
@@ -380,6 +349,49 @@ class Services::PlService
       end
     }
     summary.sort { |a, b| a['at_transaction_category_id'] <=> b['at_transaction_category_id'] }
+  end
+
+  private
+
+  def ignore_bank_transaction(pl_bank, pl_card)
+    # 銀行口座ID一覧作成
+    bank_ids = pl_bank.pluck("at_user_bank_account_id").uniq
+    card_ids = pl_card.pluck("at_user_card_account_id").uniq
+    
+    # 消込用の配列
+    ignore_bank_transaction = []
+ 
+    # 全カード
+    card_ids.each do |card_id|
+      card = Entities::AtUserCardAccount.find_by(id: card_id, at_user_id: at_user_ids)
+      # デビットカードの場合、消込する
+      if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
+        bank_ids.each do |bank_id|
+          bank = Entities::AtUserBankAccount.find_by(id: bank_id, at_user_id: at_user_ids)
+          card.at_user_card_transactions.each do |card_transaction|
+            # カード明細の取引日と銀行明細の取引日が同日
+            # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
+            bank.at_user_bank_transactions.map do |bank_transaction|
+              if bank_transaction.trade_date.strftime("%Y-%m-%d") === card_transaction.used_date.strftime("%Y-%m-%d") &&
+                bank_transaction.amount_payment === card_transaction.amount
+                ignore_bank_transaction << bank_transaction
+              end
+            end
+          end
+        end    
+      else
+        # デビットカードじゃない場合、消込しない
+      end
+    end
+
+    ignore_bank_transaction
+  end
+
+  def remove_bank_transaction(pl_bank, ignore_bank_transactions)
+    ignore_bank_transaction_ids = ignore_bank_transactions.pluck(:id)
+    pl_bank.reject do |t|
+      ignore_bank_transaction_ids.include? t['at_user_bank_transaction_id']
+    end
   end
 
 end
