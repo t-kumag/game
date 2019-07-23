@@ -13,7 +13,8 @@
 #
 
 class Entities::User < ApplicationRecord
-  has_one :at_user
+  acts_as_paranoid
+  has_one :at_user, dependent: :destroy
 
   has_one :user_icon
   has_many :access_grants, class_name: 'Doorkeeper::AccessGrant',

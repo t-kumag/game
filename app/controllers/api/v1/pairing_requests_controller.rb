@@ -60,7 +60,6 @@ class Api::V1::PairingRequestsController < ApplicationController
       rescue => exception
         raise exception
     end
-    # render 'receive_pairing_request', formats: 'json', handlers: 'jbuilder', status: 200
   end
 
   def destroy

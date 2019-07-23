@@ -31,15 +31,22 @@ class Services::ParingService
     # グループに所属するユーザーの共有口座削除
     all_user_ids.each do |user_id|
       user = Entities::User.find_by(id: user_id)
-      user&.at_user&.at_user_bank_accounts&.where(share: true)&.pluck(:id)&.each do |account_id|
-        Services::AtUserService.new(user).delete_account(Entities::AtUserBankAccount, account_id)
+      at_user_bank_account_ids = user&.at_user&.at_user_bank_accounts&.where(share: true)&.pluck(:id)
+      at_user_card_account_ids = user&.at_user&.at_user_card_accounts&.where(share: true)&.pluck(:id)
+      at_user_emoney_service_account_ids = user&.at_user&.at_user_emoney_service_accounts&.where(share: true)&.pluck(:id)
+
+      if at_user_bank_account_ids.present?
+        Services::AtUserService.new(user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_ids)
       end
-      user&.at_user&.at_user_card_accounts&.where(share: true)&.pluck(:id)&.each do |account_id|
-        Services::AtUserService.new(user).delete_account(Entities::AtUserCardAccount, account_id)
+
+      if at_user_card_account_ids.present?
+        Services::AtUserService.new(user).delete_account(Entities::AtUserCardAccount, at_user_card_account_ids)
       end
-      user&.at_user&.at_user_emoney_service_accounts&.where(share: true)&.pluck(:id)&.each do |account_id|
-        Services::AtUserService.new(user).delete_account(Entities::AtUserEmoneyServiceAccount, account_id)
+
+      if at_user_emoney_service_account_ids.present?
+        Services::AtUserService.new(user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_ids)
       end
+
     end
 
     # グループに紐づく中間テーブルを削除

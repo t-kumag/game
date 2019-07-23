@@ -12,11 +12,12 @@
 require "securerandom"
 
 class Entities::AtUser < ApplicationRecord
+  acts_as_paranoid
   belongs_to :user
   has_many :at_user_bank_accounts
   has_many :at_user_card_accounts
   has_many :at_user_emoney_service_accounts
-  has_many :at_user_tokens, inverse_of: :at_user
+  has_many :at_user_tokens, inverse_of: :at_user, dependent: :destroy
   
   # envに移す
   ACCOUNT_NAME_PREFIX = "osdrdev"
