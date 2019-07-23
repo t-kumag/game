@@ -215,10 +215,12 @@ class Services::PlService
           card.at_user_card_transactions.each do |card_transaction|
             # カード明細の取引日と銀行明細の取引日が同日
             # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
-            remove_bank_transactions << bank.at_user_bank_transactions.find_by(
-                trade_date: card_transaction.used_date, 
-                amount_payment: card_transaction.amount
-            )
+            bank.at_user_bank_transactions.map do |bank_transaction|
+              if bank_transaction.trade_date.strftime("%Y-%m-%d") === card_transaction.used_date.strftime("%Y-%m-%d") &&
+                bank_transaction.amount_payment === card_transaction.amount
+                remove_bank_transactions << bank_transaction
+              end
+            end
           end
         end    
       else
@@ -227,15 +229,15 @@ class Services::PlService
     end
 
     # 消込処理
-    if remove_bank_transactions.compact.present?
+    if remove_bank_transactions.present?
       remove_bank_transaction_ids = remove_bank_transactions.pluck(:id)
-      pl_bank = pl_bank.reject do |v|
+      pl_bank = pl_bank.reject do |t|
         remove_bank_transaction_ids.include? t['at_user_bank_transaction_id']
       end
     end
 
     pl_bank = group_by_category_id(pl_bank)
-    pl_card = groupi_by_category_id(pl_card)
+    pl_card = group_by_category_id(pl_card)
     pl_emoney = group_by_category_id(pl_emoney)
 
     pl_user_manually_created = user_manually_created_category_summary(share, from, to)
