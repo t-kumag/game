@@ -33,3 +33,13 @@ Things you may want to cover:
 1. `docker-compose up -d`
 1. You can see the response on `http://0.0.0.0:3000`.
 
+### ローカル環境構築手順 2019/04/02
+
+1. git clone https://github.com/osidori/osidori_api.git
+1. docker-compose build
+1. docker-compose run --rm app bundle exec rails db:create
+1. docker-compose run --rm app bundle exec rails db:init
+1. docker-compose run --rm app bundle exec rails db:migrate
+1. docker-compose run --rm app bundle exec rails db:seed
+1. docker-compose up
+1. http://0.0.0.0:3000/

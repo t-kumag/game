@@ -1,24 +1,62 @@
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  skip_before_action :verify_authenticity_token, if: :json_request? 
+  skip_before_action :verify_authenticity_token, if: :json_request?
 
   # before_filter :set_api_version
 
   # 例外ハンドル
-  # unless Rails.env.development?
-  #     rescue_from ActiveRecord::RecordNotFound, with: :render_404
+  rescue_from ActiveRecord::RecordNotFound, with: :render_422
+  rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
+  rescue_from AtAPIStandardError, with: :render_at_api_error
   #     rescue_from ActionController::RoutingError, with: :render_404
   #     rescue_from ActionView::MissingTemplate, with: :render_404
   #     rescue_from Exception, with: :render_500
-  # end
+
 
   # def set_api_version
   #     @api_version = request.path_info[5,2]
   # end
 
   def routing_error
-    raise ActionController::RoutingError.new(params[:path])
+    fail ActionController::RoutingError.new(params[:path])
+  end
+
+  def render_record_invalid(e = nil)
+    @errors = []
+    resource_name = e.record.class.to_s.split('::').last
+    e.record.errors.details.each do |key, detail|
+      detail.each do |value|
+        @errors << {
+          resource: resource_name,
+          field: key,
+          code: value[:error]
+        }
+      end
+    end
+    render('api/v1/errors/record_invalid', formats: 'json', handlers: 'jbuilder', status: 400) && return
+  end
+
+  def render_400_invalid_validation(e=[])
+    errors = e.map do |error|
+      {
+        "resource": error[:resource],
+        "field": error[:field],
+        "code": error[:code]
+      }
+    end
+
+    render json: {errors: errors}, status: 400
+  end
+
+  def render_at_api_error(e = nil)
+    @errors = [
+      {
+        code: e.code,
+        message: e.message
+      }
+    ]
+    render('api/v1/errors/at_api_error', formats: 'json', handlers: 'jbuilder', status: 200) && return
   end
 
   # def append_info_to_payload(payload)
@@ -34,42 +72,65 @@ class ApplicationController < ActionController::Base
   def render_404(e = nil)
     logger.info "Rendering 404 with exception: #{e.message}" if e
 
-    if request.xhr?
-    render json: { error: '404 error' }, status: 404 and return
-    else
-    format = params[:format] == :json ? :json : :html
-    render template: 'errors/error_404', formats: format, status: 404, layout: 'application', content_type: 'text/html'
-    end
+    render(json: { error: '404 error' }, status: 404) && return
+    # if request.xhr?
+    # render json: { error: '404 error' }, status: 404 and return
+    # else
+    # format = params[:format] == :json ? :json : :html
+    # render template: 'errors/error_404', formats: format, status: 404, layout: 'application', content_type: 'text/html'
+    # end
+  end
+
+  def render_422
+    render json: {errors: [{code: "message sample fobidden"}]}, status: 422 && return
   end
 
   def render_500(e = nil)
     logger.error e.message + "\n" + e.backtrace.join("\n")
-    ExceptionNotifier.notify_exception(e, :env => request.env, :data => {:message => "[#{Rails.env}]" + e.message + "::" + e.backtrace[0..50].join("::") + " ..."})
-    #Airbrake.notify(e) if e # Airbrake/Errbitを使う場合はこちら
+    ExceptionNotifier.notify_exception(e, env: request.env, data: { message: "[#{Rails.env}]" + e.message + '::' + e.backtrace[0..50].join('::') + ' ...' })
+    # Airbrake.notify(e) if e # Airbrake/Errbitを使う場合はこちら
 
     logger.info "Rendering 500 with exception: #{e.message}" if e
-    if request.xhr?
-      render json: { error: '500 error' }, status: 500 and return
-    else
-      format = params[:format] == :json ? :json : :html
-      render template: 'errors/error_500', formats: format, status: 500, layout: 'application', content_type: 'text/html'
-    end
+    render(json: { error: '500 error' }, status: 500) && return
+    # if request.xhr?
+    #   render json: { error: '500 error' }, status: 500 and return
+    # else
+    #   format = params[:format] == :json ? :json : :html
+    #   render template: 'errors/error_500', formats: format, status: 500, layout: 'application', content_type: 'text/html'
+    # end
   end
 
   private
+
   def authenticate
-    authenticate_token || render_unauthorized
+    return render_unauthorized unless authenticate_token
+    activated?
+  end
+
+  # def token_authenticate
+  #   authenticate_or_request_with_http_token do |token, options|
+  #     @user = User.token_authenticate!(token)
+  #     @user && DateTime.now <= @user.token_expire
+  #   end
+  # end
+
+  def activated?
+    return if @current_user.try(:email_authenticated)
+    render_forbidden
   end
 
   def authenticate_token
-    @current_user = Entities::User.find_by_token(bearer_token)
-    return false if @current_user.nil?
-    return true
+    @current_user = Entities::User.token_authenticate!(bearer_token)
+    @current_user && DateTime.now <= @current_user.token_expires_at
+  end
+
+  def render_forbidden
+    render json: {}, status: :forbidden
   end
 
   def render_unauthorized
     # render_errors(:unauthorized, ['invalid token'])
-    obj = { meta: {error: 'token invalid' }}    
+    obj = {}
     render json: obj, status: :unauthorized
   end
 
@@ -82,4 +143,43 @@ class ApplicationController < ActionController::Base
   def json_request?
     request.format.json?
   end
+
+  def check_temporary_user
+    @response = Entities::User.temporary_user(params[:email])
+    if @response.present?
+      render 'api/v1/errors/temporary_registration', formats: 'json', handlers: 'jbuilder', status: 422
+    end
+  end
+
+  # 参照可能な口座ID
+  # cardやemoneyも同様の処理が必要な場合はサービスに移行する
+  def disallowed_at_bank_ids?(bank_ids)
+    at_user_id         =  @current_user.at_user.id
+    partner_at_user_id =  @current_user.partner_user.try(:at_user).try(:id)
+
+    at_user_bank_ids = Entities::AtUserBankAccount.where(at_user_id: at_user_id).pluck(:id)
+    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
+    #if partner_at_user_id
+    #  at_user_bank_ids << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    #end
+    at_user_bank_ids.flatten!
+
+    bank_ids.each do |id|
+      unless at_user_bank_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  def require_group
+    unless @current_user.group_id.present?
+      render json: { errors: { code: '', message: "Require group." } }, status: 422
+    end
+  end
+
+  def render_disallowed_financier_ids
+    render json: { errors: { code: '', message: "Disallowed financier id." } }, status: 422
+  end
+
 end

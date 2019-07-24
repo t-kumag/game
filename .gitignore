@@ -32,3 +32,10 @@
 
 
 /vendor
+
+db/schema.rb
+.idea
+.env.development
+.env.production
+.env.staging
+appendonly.aof

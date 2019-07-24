@@ -1,23 +1,32 @@
 class Api::V1::User::BankTransactionsController < ApplicationController
-    before_action :authenticate
-    def index
-        id = params[:bank_account_id]
+  before_action :authenticate
+  # TODO(fujiura): before_action で対象口座へのアクセス権があるかチェックする
+  # TODO(fujiura): bank_account_id, transaction_id に対応するデータがないときの処理
 
-        p @current_user&.at_user&.at_user_bank_accounts.find(id)
-        # if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_bank_accounts.blank?
-        #     @bank_accounts = nil
-        #   else
-        #     @bank_accounts = @current_user.at_user.at_user_bank_accounts
-        # end
-        render 'list', formats: 'json', handlers: 'jbuilder'
-    end
+  def index
+    @transactions = Services::AtBankTransactionService.new(@current_user).list(params[:bank_account_id], params[:page])
+    render json: {}, status: 200 and return if @transactions.blank?
+    render 'list', formats: 'json', handlers: 'jbuilder'
+  end
 
-    def show
-        render 'show', formats: 'json', handlers: 'jbuilder'
-    end
+  def show
+    @response = Services::AtBankTransactionService.new(@current_user).detail(params[:bank_account_id], params[:id])
+    render json: {}, status: 200 and return if @response.blank?
+    render 'show', formats: 'json', handlers: 'jbuilder'
+  end
 
-    def update
-        render 'update', formats: 'json', handlers: 'jbuilder'
-    end
+  def update
+    @response = Services::AtBankTransactionService.new(@current_user).update(
+        params[:bank_account_id],
+        params[:id],
+        params[:at_transaction_category_id],
+        params[:used_location],
+        params[:is_shared],
+        params[:is_shared] ? @current_user.group_id : nil
+    )
+    render json: {}, status: 200 and return if @response.blank?
+    # TODO(fujiura): 何を返すべき？
+    render 'update', formats: 'json', handlers: 'jbuilder'
+  end
 
 end

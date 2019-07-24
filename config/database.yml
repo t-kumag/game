@@ -19,12 +19,11 @@ default: &default
 
 development:
   <<: *default
-  # host: db
-  host: localhost
-  port: 3306
-  database: dev_osdr_db
-  username: devusr
-  password: pass
+  host: <%= ENV.fetch("DB_HOST", 'localhost') %> # osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
+  port: <%= ENV.fetch("DB_PORT", '3306') %>
+  database: <%= ENV.fetch("DB_NAME", 'dev_osdr_db') %> # osdrdevdb
+  username: <%= ENV.fetch("DB_USER", 'root') %> # osdrdevuser
+  password: <%= ENV.fetch("DB_PWD", '') %> # qwermnbv10
 
 staging:
   <<: *default
@@ -45,11 +44,10 @@ test:
 
 production:
   <<: *default
-  host: osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
-  port: 3306
-  database: osdrdevdb
-  username: osdrdevuser
-  password: qwermnbv10
-
+  host: <%= ENV.fetch("DB_HOST", 'localhost') %> # osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
+  port: <%= ENV.fetch("DB_PORT", '3306') %>
+  database: <%= ENV.fetch("DB_NAME", 'dev_osdr_db') %> # osdrdevdb
+  username: <%= ENV.fetch("DB_USER", 'devusr') %> # osdrdevuser
+  password: <%= ENV.fetch("DB_PWD", 'pass') %> # qwermnbv10
 
 

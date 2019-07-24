@@ -1,12 +1,12 @@
-json.meta do
-    json.error ''
-end
+#json.error  'sample'
 
 json.app do
-    json.array!(@card_accounts) do |account|
-        json.account_id account.id
-        json.name account.fnc_nm
-        json.amount account.amount
-        # json.error account[:error]
+    json.array!(@responses) do |r|
+        json.account_id r[:id]
+        json.name r[:name]
+        json.amount r[:amount]
+        json.fnc_id r[:fnc_id]
+        json.error ""
     end
 end
+  

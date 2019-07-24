@@ -5,12 +5,16 @@ module AtAPIRequest
   end
 
   class Request
-    # envに移す
-    PWD_SALT = "osdrdev".freeze
-    ACCOUNT_NAME_PREFIX = "osdrdev".freeze
-    CHNL_ID = "CHNL_OSIDORI".freeze
-    URL = "https://atdev.369webcash.com".freeze
+    PWD_SALT = Settings.at_pwd_salt
+    ACCOUNT_NAME_PREFIX = Settings.at_account_name_prefix
+    CHNL_ID = Settings.at_chnl_id
+    URL = Settings.at_url
     attr_reader :path, :params, :url, :method
+
+    Rails.logger.info("PWD_SALT: #{PWD_SALT}")
+    Rails.logger.info("ACCOUNT_NAME_PREFIX: #{ACCOUNT_NAME_PREFIX}")
+    Rails.logger.info("CHNL_ID: #{CHNL_ID}")
+    Rails.logger.info("URL: #{URL}")
 
     def url
       URL
@@ -25,8 +29,7 @@ module AtAPIRequest
         @method = HttpMethod::POST
 
         at_user_id = "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}"
-        # email = "#{ACCOUNT_NAME_PREFIX}-#{user_id}@osdr.dev.co"
-        # pwd = Digest::MD5.hexdigest("#{PWD_SALT}#{user_id}") # 保存するのでrandとsaltで良いかも
+
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
           "USER_ID" => at_user_id,
@@ -53,30 +56,36 @@ module AtAPIRequest
       end
     end
 
-    # params = {
-    #   at_user_id: "",
-    #   at_user_password: "",
-    # }
-    class GetToken
+    class GetToken < AtAPIRequest::Request
       def initialize(params)
         @path = "/opentoknr001.jct"
         @method = HttpMethod::GET
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
-          "USER_ID" => params[:at_user_id],
+          "USER_ID" => "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}",
           # "USER_PW" => params[:at_user_password],
         }
       end
     end
 
+    class DeleteToken < AtAPIRequest::Request
+      def initialize(params)
+        @path = "/opentoknd001.jct"
+        @method = HttpMethod::GET
+        @params = {
+            "TOKEN_KEY" => params[:token]
+        }
+      end
+    end
+
     # 有効な場合は有効期限が延長される
-    class GetTokenStatus
+    class GetTokenStatus < AtAPIRequest::Request
       def initialize(params)
         @path = "/opentoknr002.jct"
         @method = HttpMethod::GET
         @params = {
           "CHNL_ID" => AtAPIRequest::Request::CHNL_ID,
-          "USER_ID" => params[:at_user_id],
+          "USER_ID" => "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}",
           "TOKEN_KEY" => params[:token],
         }
       end
@@ -145,7 +154,17 @@ module AtAPIRequest
       end
     end
 
+    # 金融機関削除
+    class DeleteAccount < AtAPIRequest::Request
+      def initialize(params)
+        @path = "/openfincd001.jct"
+        @method = HttpMethod::GET
+        @params = {
+            "TOKEN_KEY" => params[:token],
+            "FNC_ID" => params[:fnc_id]
+        }
+      end
+    end
 
-    				
   end
 end

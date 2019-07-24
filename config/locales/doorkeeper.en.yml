@@ -1,9 +1,9 @@
-# en:
-#   activerecord:
-#     attributes:
-#       doorkeeper/application:
-#         name: 'Name'
-#         redirect_uri: 'Redirect URI'
+en:
+  activerecord:
+    attributes:
+      doorkeeper/application:
+        name: 'Name'
+        redirect_uri: 'Redirect URI'
 #     errors:
 #       models:
 #         doorkeeper/application:

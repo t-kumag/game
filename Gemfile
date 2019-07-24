@@ -8,6 +8,7 @@ gem 'rails', '~> 5.2.1'
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 gem 'mysql2'
+# gem 'mysql2', '~> 0.3.20'
 
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
@@ -88,8 +89,23 @@ gem 'capistrano3-unicorn'
 gem 'capistrano3-puma' # pumaを使う場合はこれも必要
 
 gem 'activerecord-import'
+gem 'kaminari'
+
+# paranoia 論理削除
+gem 'paranoia'
+
+# settingslogic 定数を一元管理
+gem 'settingslogic'
 
 
+# pager
+gem 'kaminari'
+gem 'kaminari-activerecord'
+gem 'kaminari-actionview'
 
+# redis
+gem 'redis-rails'
 
-
+# sidekiq
+gem 'sidekiq'
+gem 'redis-namespace'
