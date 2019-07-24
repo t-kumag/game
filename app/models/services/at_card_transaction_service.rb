@@ -10,7 +10,7 @@ class Services::AtCardTransactionService
     distributed_transactions = get_distributed_transactions(account_id)
     return {} if distributed_transactions.blank?
 
-    result = distributed_transactions.order(at_user_card_transaction_id: "DESC")
+    result = distributed_transactions.order(used_date: "DESC")
     Kaminari.paginate_array(result).page(page)
   end
 
