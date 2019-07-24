@@ -196,15 +196,15 @@ class Api::V1::UsersController < ApplicationController
 
     number_of_account =  0
     if at_user_bank_account_ids.present?
-      number_of_account +=  at_user_bank_account_ids.count
+      number_of_account += at_user_bank_account_ids.count
     end
 
     if at_user_card_account_ids.present?
-      number_of_account +=  at_user_card_account_ids.count
+      number_of_account += at_user_card_account_ids.count
     end
 
     if at_user_emoney_service_account_ids.present?
-      number_of_account +=  at_user_emoney_service_account_ids.count
+      number_of_account += at_user_emoney_service_account_ids.count
     end
     @current_user.free? && number_of_account <= Settings.at_user_limit_free_account
 
