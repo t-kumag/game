@@ -30,11 +30,7 @@ class Api::V1::User::ProfilesController < ApplicationController
   def show
     @profile = @current_user.user_profile
     @icon    = @current_user.user_icon
-    if @profile.present?
-      render 'show', formats: 'json', handlers: 'jbuilder'
-    else
-      render json: {}, status: 200
-    end
+    render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
   private
