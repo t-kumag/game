@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :authenticate, only: [:at_url, :at_sync, :at_token, :at_sync_test]
+  before_action :authenticate, only: [:at_url, :at_sync, :at_token, :destroy, :at_sync_test]
   before_action :check_temporary_user, only: [:create]
 
   def create
@@ -86,6 +86,9 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_sync
+    # ATユーザーが作成されていなければスキップする
+    return render json: {}, status: 200 unless @current_user.try(:at_user)
+
     at_user_service = Services::AtUserService.new(@current_user, params[:target])
     at_user_service.exec_scraping
     at_user_service.sync
@@ -106,12 +109,79 @@ class Api::V1::UsersController < ApplicationController
     render 'at_token', formats: 'json', handlers: 'jbuilder'
   end
 
+  def destroy
+    cancel_reason = delete_user_params[:user_cancel_reason]
+    cancel_checklists = delete_user_params[:user_cancel_checklists]
+    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
+    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
+    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
+
+    return render_400_invalid_validation([{ "field": 'user_cancel_reason', "code": 'blank' }]) unless cancel_checklists.present?
+
+    # 削除対象のテーブル
+    # at_users, at_user_tokens, at_user_xxxx_accounts, users
+    begin
+      ActiveRecord::Base.transaction do
+        begin
+          # ATのユーザーアカウント 口座アカウント削除
+          # ATの共有している口座の削除 ペアリングの解除の処理を行う
+          Services::ParingService.new(@current_user).cancel
+          # ATの共有していない口座の削除
+          delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+        rescue AtAPIStandardError => at_err
+          # TODO クラッシュレポートの仕組みを入れるアラートメールなどで通知する
+          p at_err
+        end
+
+        begin
+          Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
+          Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
+
+          # 削除対象のテーブル
+          # at_users users
+          @current_user.at_user.at_user_tokens.destroy_all
+          @current_user.at_user.destroy
+          @current_user.delete
+          @current_user = nil
+
+        rescue => exception
+          raise exception
+        end
+      end
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
+    end
+
+    render json: {}, status: 200
+  end
+
   private
   def sign_up_params
     params.permit(:email, :password)
   end
 
+  def delete_user_params
+    params.permit(:user_cancel_reason, user_cancel_checklists: [])
+  end
+
   def change_password_params
     params.permit(:password, :password_confirm)
+  end
+
+
+  def delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+
+    if at_user_bank_account_ids.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_ids)
+    end
+
+    if at_user_card_account_ids.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, at_user_card_account_ids)
+    end
+
+    if at_user_emoney_service_account_ids.present?
+      Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_ids)
+    end
+
   end
 end

@@ -1,23 +1,13 @@
 class Api::V1::User::CardAccountsController < ApplicationController
     before_action :authenticate
 
-    # TODO 口座登録後に登録するものがあるか確認
-    # TODO 現状はsync処理のみ
-
     def index
-      share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
         @responses = []
       else
         @responses = []
 
-        accounts = if share
-          @current_user.at_user.at_user_card_accounts
-        else
-          @current_user.at_user.at_user_card_accounts.where(at_user_card_accounts: {share: false})
-        end
-
-        accounts.each do |ca|
+        @current_user.at_user.at_user_card_accounts.where(share: false).each do |ca|
           @responses << {
             id: ca.id,
             name: ca.fnc_nm,
@@ -29,7 +19,7 @@ class Api::V1::User::CardAccountsController < ApplicationController
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
-    # TODO 今月の引き落としを計算
+    # TODO: user_distributed_transactionsを参照するようにする
     def summary
       share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
@@ -58,7 +48,7 @@ class Api::V1::User::CardAccountsController < ApplicationController
         render json: {}, status: 200
       else
         # TODO(fujiura): code の検討と、エラー処理共通化
-        render json: {errors: [{code: "message sample fobidden"}]}, status: 200
+        render json: { errors: { code: '', mesasge: "account not found." } }, status: 200
       end
     end
 

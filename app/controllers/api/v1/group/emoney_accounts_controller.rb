@@ -2,11 +2,15 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
     before_action :authenticate
 
     def index
-      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
+      if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).blank?
         @responses = []
       else
         @responses = []
-        @current_user.at_user.at_user_emoney_service_accounts.each do |a|
+
+        share_on_emoney_service_accounts =
+            Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
+
+        share_on_emoney_service_accounts.each do |a|
           @responses << {
               id: a.id,
               name: a.fnc_nm,
@@ -17,25 +21,18 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
+    # TODO: user_distributed_transactionsを参照するようにする
     def summary
-      # TODO: 家族の引き落とし総額について確認する。そもそも必要なのかどうかも含めて。
-      # TODO: 実装は/user/emoney-accounts-summaryとほぼ同じになる予定
-      # TODO: group_idが考慮されていない
-
-      share = false || params[:share]
-      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
+      if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).blank?
         @response = {
             amount: 0,
         }
       else
-        amount = if share
-                   # shareを含む場合
-                   @current_user.at_user.at_user_emoney_service_accounts.sum{|i| i.current_month_payment}
-                 else
-                   @current_user.at_user.at_user_emoney_service_accounts.where(at_user_emoney_service_accounts: {share: false}).sum{|i| i.current_month_payment}
-                 end
+        share_on_emoney_service_accounts =
+            Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
+
         @response = {
-            amount: amount
+            amount: share_on_emoney_service_accounts.sum{|i| i.current_month_payment(share_on_emoney_service_accounts.pluck(:at_user_id))}
         }
       end
 

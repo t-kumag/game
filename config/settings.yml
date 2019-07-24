@@ -6,6 +6,8 @@ defaults: &defaults
   at_account_name_prefix: osdrdev
   at_sync_transaction_max_days: 90
 
+  pairing_token_salt: 2dhp2fw5gra4aks
+
 test:
   <<: *defaults
   api_url: https://beta2.osidori-dev.com

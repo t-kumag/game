@@ -109,6 +109,7 @@ Rails.application.routes.draw do
       resources :users, only: [:create]
       post 'users/change_password_request', to: 'users#change_password_request'
       post 'users/change_password', to: 'users#change_password'
+      delete 'users', :to => 'users#destroy'
 
       get 'invite-url', :to => 'groups#invite_url'
       get 'user/at-url', :to => 'users#at_url'

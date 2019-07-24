@@ -1,15 +1,12 @@
 class Api::V1::User::EmoneyAccountsController < ApplicationController
     before_action :authenticate
 
-    # TODO 口座登録後に登録するものがあるか確認
-    # TODO 現状はsync処理のみ
-
     def index
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
         @responses = []
       else
         @responses = []
-        @current_user.at_user.at_user_emoney_service_accounts.each do |a|
+        @current_user.at_user.at_user_emoney_service_accounts.where(share: false).each do |a|
           @responses << {
             id: a.id,
             name: a.fnc_nm,
@@ -21,6 +18,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
+    # TODO: user_distributed_transactionsを参照するようにする
     def summary
       share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
@@ -48,8 +46,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
         account.update!(get_account_params)
         render json: {}, status: 200
       else
-        # TODO(fujiura): code の検討と、エラー処理共通化
-        render json: {errors: [{code: "message sample fobidden"}]}, status: 200
+        render json: { errors: { code: '', mesasge: "account not found." } }, status: 200
       end
     end
 

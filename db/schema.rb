@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_07_18_082420) do
 
+ActiveRecord::Schema.define(version: 2019_07_18_082420) do
+  
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "group_id"
@@ -364,6 +365,7 @@ ActiveRecord::Schema.define(version: 2019_07_18_082420) do
     t.bigint "to_user_id"
     t.bigint "group_id"
     t.string "token"
+    t.datetime "token_expires_at"
     t.bigint "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
