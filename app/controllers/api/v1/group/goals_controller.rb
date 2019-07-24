@@ -15,7 +15,6 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def create
-
     if get_goal_setting_params[:at_user_bank_account_id].present? &&
         disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
       return render_disallowed_financier_ids
