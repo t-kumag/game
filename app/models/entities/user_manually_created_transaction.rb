@@ -21,5 +21,4 @@ class Entities::UserManuallyCreatedTransaction < ApplicationRecord
   has_one :user_distributed_transaction ,:dependent => :destroy
 
   validates :at_transaction_category_id, presence: true
-  validates :payment_method_id, presence: true
 end
