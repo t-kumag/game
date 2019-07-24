@@ -15,7 +15,7 @@ class Services::AtCardTransactionService
     distributed_transactions = get_distributed_transactions(account_id)
     return {} if distributed_transactions.blank?
 
-    result = distributed_transactions.where(created_at: @from..@to).order(used_date: "DESC")
+    result = distributed_transactions.where(used_date: @from..@to).order(used_date: "DESC")
     Kaminari.paginate_array(result).page(page)
   end
 
