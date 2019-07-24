@@ -22,12 +22,12 @@ class Services::TransactionService
       bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
       card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
       emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
-      user_manually_created_transaction = Entities::UserDistributedTransaction.includes(:user_manually_created_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
+      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
     else
       bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user_id, used_date: from..to)
       card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user_id, used_date: from..to)
       emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user_id, used_date: from..to)
-      user_manually_created_transaction = Entities::UserDistributedTransaction.includes(:user_manually_created_transaction).where(user_id: @user_id, used_date: from..to)
+      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user_id, used_date: from..to)
     end
     bank_tarnsactions + card_transactiohs + emoney_transactiohs + user_manually_created_transaction
   end
