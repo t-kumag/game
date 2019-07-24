@@ -5,6 +5,8 @@ defaults: &defaults
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdrdev
   at_sync_transaction_max_days: 90
+  at_user_limit_free_account: 5
+  at_user_limit_free_goal: 5
 
 test:
   <<: *defaults
@@ -13,6 +15,8 @@ test:
   at_pwd_salt: osdrdev
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdrdev
+  at_user_limit_free_account: 5
+  at_user_limit_free_goal: 5
 
 development:
   <<: *defaults
@@ -21,6 +25,8 @@ development:
   at_pwd_salt: osdrdev
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdrdev
+  at_user_limit_free_account: 5
+  at_user_limit_free_goal: 5
 
 staging:
   <<: *defaults
@@ -29,6 +35,8 @@ staging:
   at_pwd_salt: osdrstaging
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdrstaging
+  at_user_limit_free_account: 5
+  at_user_limit_free_goal: 5
 
 production:
   <<: *defaults
@@ -37,3 +45,5 @@ production:
   at_pwd_salt: osdr
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdr
+  at_user_limit_free_account: 5
+  at_user_limit_free_goal: 5
