@@ -61,7 +61,7 @@ class Services::TransactionService
       transactions = fetch_transactions(@from, @to, ids)
       # シェアしていない口座の明細 or シェアしていない明細を削除する
       transactions = remove_not_shared_transaction transactions
-      transactions = generate_response_from_transactions transac
+      transactions = generate_response_from_transactions transactions
       sort_by_used_date transactions
     else
       if @family === true
