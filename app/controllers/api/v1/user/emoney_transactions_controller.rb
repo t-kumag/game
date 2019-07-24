@@ -1,5 +1,6 @@
 class Api::V1::User::EmoneyTransactionsController < ApplicationController
   before_action :authenticate
+
   # TODO(fujiura): before_action で対象口座へのアクセス権があるかチェックする
   # TODO(fujiura): emoney_account_id, transaction_id に対応するデータがないときの処理
 

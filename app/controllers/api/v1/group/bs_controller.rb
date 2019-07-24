@@ -1,5 +1,5 @@
 class Api::V1::Group::BsController < ApplicationController
-  before_action :authenticate
+  before_action :authenticate, :require_group
 
   def summary
     amount = 0

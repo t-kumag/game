@@ -1,5 +1,5 @@
 class Api::V1::Group::CardAccountsController < ApplicationController
-    before_action :authenticate
+    before_action :authenticate, :require_group
 
     def index
       if @current_user.try(:at_user).try(:at_user_card_accounts).blank?

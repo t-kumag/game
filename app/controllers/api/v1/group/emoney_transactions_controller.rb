@@ -1,7 +1,7 @@
 # TODO(fujiura) group で取得する明細の情報を明確にする
 class Api::V1::Group::EmoneyTransactionsController < ApplicationController
   before_action :authenticate
-  
+
   def index
     @transactions = Services::AtEmoneyTransactionService.new(@current_user, true).list(params[:emoney_account_id], params[:page])
     render json: {}, status: 200 and return if @transactions.blank?
