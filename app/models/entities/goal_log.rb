@@ -5,8 +5,6 @@ class Entities::GoalLog < ApplicationRecord
   validates :goal_id, presence: true, on: :create
   validates :at_user_bank_account_id, presence: true, on: :create
 
-
-
   # Entities::GoalLog.insert(goal, goal_setting)
   def self.insert(goal, goal_setting, add_amount=0)
     params = {

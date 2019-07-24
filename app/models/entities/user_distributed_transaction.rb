@@ -26,7 +26,6 @@ class Entities::UserDistributedTransaction < ApplicationRecord
 
   validates :at_transaction_category_id, presence: true, on: :update
 
-
   def user_pl
 
     share = params[:share]

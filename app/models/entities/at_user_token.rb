@@ -16,7 +16,6 @@ class Entities::AtUserToken < ApplicationRecord
 
   validates :at_user_id, presence: true
 
-
   def self.create_token(at_user)
     params = {
       at_user_id: at_user.at_user_id,
