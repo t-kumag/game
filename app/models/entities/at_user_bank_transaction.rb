@@ -25,6 +25,8 @@ class Entities::AtUserBankTransaction < ApplicationRecord
   belongs_to :at_user_bank_account
   has_one :user_distributed_transaction
 
+  validates :at_transaction_category_id, presence: true
+
   def amount
     if self.amount_receipt != 0 
       return self.amount_receipt

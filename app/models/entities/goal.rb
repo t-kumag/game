@@ -5,4 +5,7 @@ class Entities::Goal < ApplicationRecord
   belongs_to :user
   has_many :goal_settings
   has_many :goal_logs
+
+  validates :goal_type_id, presence: true
+
 end

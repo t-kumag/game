@@ -12,5 +12,8 @@
 
 class Entities::UserBudgetQuestion < ApplicationRecord
   belongs_to :user
+
+  validates :user_id, presence: true
+  validates :budget_question_id, presence: true
 end
 

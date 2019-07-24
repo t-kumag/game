@@ -15,4 +15,7 @@ class Entities::ParticipateGroup < ApplicationRecord
   # TODO participate_groupsがinsertされないのでコメント
   #belongs_to :users
   belongs_to :group
+
+  validates :user_id, presence: true
+  validates :group_id, presence: true
 end

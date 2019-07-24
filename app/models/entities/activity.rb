@@ -1,5 +1,7 @@
 class Entities::Activity < ApplicationRecord
 
+  validates :user_id, presence: true
+
   #個人支出(銀行)
   def self.add_bank_outcome_individual(date, user_id, count = 1)
     self.new(

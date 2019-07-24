@@ -24,6 +24,9 @@ class Entities::UserDistributedTransaction < ApplicationRecord
   belongs_to :at_user_bank_transaction, optional: true
   belongs_to :at_user_emoney_transaction, optional: true
 
+  validates :at_transaction_category_id, presence: true, on: :update
+
+
   def user_pl
 
     share = params[:share]
