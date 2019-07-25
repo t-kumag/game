@@ -1,8 +1,13 @@
 class Services::AtCardTransactionService
 
-  def initialize(user, is_group=false)
+  def initialize(user, is_group=false, from=nil, to=nil)
     @user = user
     @is_group = is_group
+
+    # from の 00:00:00 から to の 23:59:59 までのデータを取得
+    # from/to の指定がなければ当月の月初から月末までのデータを取得
+    @from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
+    @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
   end
 
   # TODO: form toをつけないと検索範囲が広すぎる
@@ -10,7 +15,7 @@ class Services::AtCardTransactionService
     distributed_transactions = get_distributed_transactions(account_id)
     return {} if distributed_transactions.blank?
 
-    result = distributed_transactions.order(used_date: "DESC")
+    result = distributed_transactions.where(used_date: @from..@to).order(used_date: "DESC")
     Kaminari.paginate_array(result).page(page)
   end
 
