@@ -81,6 +81,12 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_url
+    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
+    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
+    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
+
+    return render json: { errors: { code: '', message: "five account limit of free users" } }, status: 422  if check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+
     @response = Services::AtUserService.new(@current_user).at_url
     render 'at_url', formats: 'json', handlers: 'jbuilder'
   end
@@ -170,7 +176,6 @@ class Api::V1::UsersController < ApplicationController
 
 
   def delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
-
     if at_user_bank_account_ids.present?
       Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_ids)
     end
@@ -184,4 +189,22 @@ class Api::V1::UsersController < ApplicationController
     end
 
   end
+
+  def check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+    number_of_account =  0
+    if at_user_bank_account_ids.present?
+      number_of_account += at_user_bank_account_ids.count
+    end
+
+    if at_user_card_account_ids.present?
+      number_of_account += at_user_card_account_ids.count
+    end
+
+    if at_user_emoney_service_account_ids.present?
+      number_of_account += at_user_emoney_service_account_ids.count
+    end
+    @current_user.free? && number_of_account <= Settings.at_user_limit_free_account
+
+  end
+
 end
