@@ -85,7 +85,7 @@ class Api::V1::UsersController < ApplicationController
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
     at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
 
-    return render json: { errors: { code: '', message: "five account limit of free users" } }, status: 422  if check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+    return render json: { errors: { code: '', message: "five account limit of free users" } }, status: 422  unless check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
 
     @response = Services::AtUserService.new(@current_user).at_url
     render 'at_url', formats: 'json', handlers: 'jbuilder'
@@ -203,7 +203,7 @@ class Api::V1::UsersController < ApplicationController
     if at_user_emoney_service_account_ids.present?
       number_of_account += at_user_emoney_service_account_ids.count
     end
-    @current_user.free? && number_of_account <= Settings.at_user_limit_free_account
+    @current_user.free? && number_of_account < Settings.at_user_limit_free_account
 
   end
 
