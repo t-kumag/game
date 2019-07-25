@@ -1,5 +1,5 @@
 class Services::TransactionService
-  def initialize(user_id, from, to, category_id)
+  def initialize(user_id, from, to, category_id, share, with_group=false)
     @user_id = user_id
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
@@ -7,6 +7,8 @@ class Services::TransactionService
     @from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
     @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
     @category_id = category_id
+    @share = share
+    @with_group = with_group
   end
 
   def type(transaction)
@@ -55,9 +57,75 @@ class Services::TransactionService
   end
 
   def list(ids = @category_id)
-    transactions = fetch_transactions(@from, @to, ids)
-    transactions = generate_response_from_transactions transactions
-    sort_by_used_date transactions
+    if @with_group === true
+      transactions = fetch_transactions(@from, @to, ids)
+      # シェアしていない口座の明細 or シェアしていない明細を削除する
+      transactions = remove_not_shared_transaction transactions
+      transactions = generate_response_from_transactions transactions
+      sort_by_used_date transactions
+    else
+      if @share === true
+        transactions = fetch_transactions(@from, @to, ids)
+        transactions = generate_response_from_transactions transactions
+        sort_by_used_date transactions
+      else
+        transactions = fetch_transactions(@from, @to, ids)
+        # シェアしている口座の明細 or シェアしている明細を削除する
+        transactions = remove_shared_transaction transactions
+        transactions = generate_response_from_transactions transactions
+        sort_by_used_date transactions
+      end
+    end
+  end
+
+  def remove_shared_transaction(transactions)
+    # シェアしている口座の明細 or シェアしている明細を削除する
+    transactions.reject do |t|
+      # シェアしている明細を削除する
+      if t.share === true
+        true
+      else
+        # シェアしていない明細、且つシェアしている口座
+        if t.try(:at_user_bank_transaction)
+          # 銀行
+          t.at_user_bank_transaction.at_user_bank_account.share === true 
+        elsif t.try(:at_user_card_transaction)
+          # カード
+          t.at_user_card_transaction.at_user_card_account.share === true
+        elsif t.try(:at_user_emoney_transaction)
+          # 電子マネー
+          t.at_user_emoney_transaction.at_user_emoney_service_account.share === true
+        else
+          # シェアしていない手動明細は除外しない
+          false
+        end
+      end
+    end
+  end
+
+  def remove_not_shared_transaction(transactions)
+    # シェアしていない口座の明細 or シェアしていない明細を削除する
+    transactions.reject do |t|
+      # シェアしている明細を削除しない
+      if t.share === true
+        false
+      else
+        # シェアしていない明細、且つシェアしていない口座
+        if t.try(:at_user_bank_transaction)
+          # 銀行
+          t.at_user_bank_transaction.at_user_bank_account.share === false
+        elsif t.try(:at_user_card_transaction)
+          # カード
+          t.at_user_card_transaction.at_user_card_account.share === false
+        elsif t.try(:at_user_emoney_transaction)
+          # 電子マネー
+          t.at_user_emoney_transaction.at_user_emoney_service_account.share === false
+        else
+          # シェアしていない手動明細は除外する
+          true
+        end
+      end
+    end
   end
 
   def grouped
