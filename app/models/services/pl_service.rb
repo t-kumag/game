@@ -4,13 +4,23 @@ class Services::PlService
     @user = user
     @with_group = with_group
   end
+  
+  def ignore_at_category_ids
+    [
+      '1581', # カード返済（クレジットカード引き落とし）
+      '1699', # その他入金（電子マネーへのチャージ電子マネー側入金）
+      '1799', # その他出金（電子マネーへのチャージ銀行側出金）
+    ]
+  end
 
   def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
-        sum(aubt.amount_receipt) as amount_receipt,
-        sum(aubt.amount_payment) as amount_payment,
+        udt.at_user_bank_transaction_id,
+        aubt.at_user_bank_account_id,
+        aubt.amount_receipt,
+        aubt.amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -20,19 +30,23 @@ class Services::PlService
       ON
         aubt.id = udt.at_user_bank_transaction_id
       INNER JOIN
+        at_user_bank_accounts as auba
+      ON
+        auba.id = aubt.at_user_bank_account_id
+      INNER JOIN
         at_transaction_categories as atc
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        #{sql_user_or_group}
+        udt.user_id in (#{user_ids.join(',')})
       AND
-        udt.share in (#{share.join(',')})
+        (auba.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      GROUP BY
-        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -42,7 +56,9 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
-        sum(auct.amount) as amount_payment,
+        udt.at_user_card_transaction_id,
+        auct.at_user_card_account_id,
+        auct.amount as amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -52,19 +68,23 @@ class Services::PlService
       ON
         auct.id = udt.at_user_card_transaction_id
       INNER JOIN
+        at_user_card_accounts as auca
+      ON
+        auca.id = auct.at_user_card_account_id
+      INNER JOIN
         at_transaction_categories as atc
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        #{sql_user_or_group}
+        udt.user_id in (#{user_ids.join(',')})
       AND
-        udt.share in (#{share.join(',')})
+        (auca.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      GROUP BY
-        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -74,8 +94,10 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
-        sum(auet.amount_receipt) as amount_receipt,
-        sum(auet.amount_payment) as amount_payment,
+        udt.at_user_emoney_transaction_id,
+        auet.at_user_emoney_service_account_id,
+        auet.amount_receipt,
+        auet.amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -85,19 +107,23 @@ class Services::PlService
       ON
         auet.id = udt.at_user_emoney_transaction_id
       INNER JOIN
+        at_user_emoney_service_accounts as auea
+      ON
+        auea.id = auet.at_user_emoney_service_account_id
+      INNER JOIN
         at_transaction_categories as atc
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        #{sql_user_or_group}
+        udt.user_id in (#{user_ids.join(',')})
       AND
-        udt.share in (#{share.join(',')})
+        (auea.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      GROUP BY
-        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -121,7 +147,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        #{sql_user_or_group}
+        udt.user_id in (#{user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
       AND
@@ -147,6 +173,22 @@ class Services::PlService
     end
   end
 
+  def user_ids
+    user_ids = [@user.id]
+    if @with_group && @user.try(:partner_user).try(:id)
+      return user_ids << @user.partner_user.id
+    end
+    user_ids
+  end
+
+  def at_user_ids
+    at_user_ids = [@user.at_user.id]
+    if @with_group && @user.try(:partner_user).try(:at_user).try(:id)
+      return at_user_ids << @user.partner_user.at_user.id
+    end
+    at_user_ids
+  end
+
   def pl_category_summary(share, from, to)
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
@@ -156,10 +198,11 @@ class Services::PlService
     pl_card = card_category_summary(share, from, to)
     pl_emoney = emoney_category_summary(share, from, to)
 
-    #　P/L の計算から指定カテゴリを排除する
-    pl_bank = remove_duplicated_transaction(pl_bank)
-    pl_card = remove_duplicated_transaction(pl_card)
-    pl_emoney = remove_duplicated_transaction(pl_emoney)
+    pl_bank = remove_debit_transactions(pl_bank, pl_card)
+
+    pl_bank = group_by_category_id(pl_bank)
+    pl_card = group_by_category_id(pl_card)
+    pl_emoney = group_by_category_id(pl_emoney)
 
     pl_user_manually_created = user_manually_created_category_summary(share, from, to)
     merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
@@ -195,6 +238,43 @@ class Services::PlService
     end
   end
 
+  def group_by_category_id(pl)
+    after_summaries = []
+    pl.each do |v|
+      next if v['at_transaction_category_id'].blank?
+      # after_summaries から同カテゴリのアイテムを抽出
+      summary = after_summaries.select do |t|
+        v['at_transaction_category_id'] === t['at_transaction_category_id']
+      end.first
+
+      v['amount_receipt'] ||= 0
+      v['amount_payment'] ||= 0
+
+       # after_summaries に同カテゴリのアイテムがなければ after_summaries に追加し、あれば額のみ足し込み
+       if summary.blank?
+        after_summaries << {
+          at_transaction_category_id: v['at_transaction_category_id'],
+          category_name1: v['category_name1'],
+          category_name2: v['category_name2'],
+          amount_receipt: v['amount_receipt'],
+          amount_payment: v['amount_payment']
+        }.stringify_keys
+      else
+        idx = after_summaries.find_index(summary)
+        summary['amount_receipt'] ||= 0
+        summary['amount_payment'] ||= 0
+        after_summaries[idx] = {
+          at_transaction_category_id: v['at_transaction_category_id'],
+          category_name1: v['category_name1'],
+          category_name2: v['category_name2'],
+          amount_receipt: v['amount_receipt'] + summary['amount_receipt'],
+          amount_payment: v['amount_payment'] + summary['amount_payment']
+        }.stringify_keys
+      end
+    end
+    after_summaries
+  end
+
   def merge_category_summary(pl, before_summaries)
     after_summaries = before_summaries.dup
     unless pl.blank? && after_summaries.blank?
@@ -208,7 +288,7 @@ class Services::PlService
         v['amount_receipt'] ||= 0
         v['amount_payment'] ||= 0
 
-        # after_summaries に同カテゴリのアイテムがなければ即 INSERT し、あれば額のみ足し込み
+        # after_summaries に同カテゴリのアイテムがなければ after_summaries に追加し、あれば額のみ足し込み
         if summary.blank?
           after_summaries << v
         else
@@ -264,6 +344,62 @@ class Services::PlService
       end
     }
     summary.sort { |a, b| a['at_transaction_category_id'] <=> b['at_transaction_category_id'] }
+  end
+
+  private
+  
+  def remove_debit_transactions(pl_bank, pl_card)
+    # デビットの明細リスト
+    debit_transactions = debit_transactions(pl_bank, pl_card)
+    # デビットの明細IDリスト
+    debit_transactions_ids = debit_transactions.pluck(:id)
+    # デビットの消込
+    pl_bank.reject do |t|
+      debit_transactions_ids.include? t['at_user_bank_transaction_id']
+    end
+  end
+
+  def debit_transactions(pl_bank, pl_card)
+    debit_transactions = []
+    bank_ids = pl_bank.pluck("at_user_bank_account_id").uniq
+    card_ids = pl_card.pluck("at_user_card_account_id").uniq
+    debit_card = debit_card(card_ids)
+
+    debit_card.each do |debit_card_id|
+      bank_ids.each do |bank_id|
+        debit_card = Entities::AtUserCardAccount.find_by(id: debit_card_id, at_user_id: at_user_ids)
+        bank = Entities::AtUserBankAccount.find_by(id: bank_id, at_user_id: at_user_ids)
+        debit_card.at_user_card_transactions.each do |card_transaction|
+          bank.at_user_bank_transactions.each do |bank_transaction|
+            debit_transactions << bank_transaction if check_trade_date_and_amount(bank_transaction, card_transaction)
+          end
+        end
+      end
+    end
+
+    debit_transactions
+  end
+
+  def debit_card(card_ids)
+    card_ids.reject do |card_id|
+      card = Entities::AtUserCardAccount.find_by(id: card_id, at_user_id: at_user_ids)
+      if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
+        false
+      else
+        true
+      end
+    end
+  end
+
+  def check_trade_date_and_amount(bank_transaction, card_transaction)
+    # カード明細の取引日と銀行明細の取引日が同日
+    # 且つカード明細の支払い金額と銀行明細の支払い金額が同額
+    if bank_transaction.trade_date.strftime("%Y-%m-%d") === card_transaction.used_date.strftime("%Y-%m-%d") &&
+      bank_transaction.amount_payment === card_transaction.amount
+      true
+    else
+      false
+    end
   end
 
 end
