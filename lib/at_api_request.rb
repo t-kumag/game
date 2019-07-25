@@ -166,5 +166,16 @@ module AtAPIRequest
       end
     end
 
+    # ATのユーザーアカウント削除（退会）
+    class DeleteAtUser < AtAPIRequest::Request
+      def initialize(params)
+        @path = "/openuserd002.jct"
+        @method = HttpMethod::GET
+        @params = {
+            "TOKEN_KEY" => params[:token]
+        }
+      end
+    end
+
   end
 end
