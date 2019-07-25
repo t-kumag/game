@@ -129,11 +129,12 @@ class Api::V1::UsersController < ApplicationController
     begin
       ActiveRecord::Base.transaction do
         begin
-          # ATのユーザーアカウント 口座アカウント削除
-          # ATの共有している口座の削除 ペアリングの解除の処理を行う
+          # 口座アカウント削除 ATの共有している口座の削除 ペアリングの解除の処理を行う
           Services::ParingService.new(@current_user).cancel
           # ATの共有していない口座の削除
           delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+          # ATのユーザーアカウント削除（退会）
+          Services::AtUserService.new(@current_user).delete_user
         rescue AtAPIStandardError => at_err
           # TODO クラッシュレポートの仕組みを入れるアラートメールなどで通知する
           p at_err

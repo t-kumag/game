@@ -217,6 +217,14 @@ class Services::AtUserService
     end
   end
 
+  def delete_user
+    params = {
+      token: @user.at_user.token
+    }
+    request  = AtAPIRequest::AtUser::DeleteAtUser.new(params)
+    AtAPIClient.new(request).request
+  end
+
   # ATサービスのDBに保存されている取引明細を照会します
   def transactions
     api_name = "/openscher002.jct"
