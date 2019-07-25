@@ -30,7 +30,10 @@ class Services::UserManuallyCreatedTransactionService
       at_user_bank_transaction_id: nil,
       at_user_card_transaction_id: nil,
       at_user_emoney_transaction_id: nil,
-      user_manually_created_transaction_id: @transaction.id
+      user_manually_created_transaction_id: @transaction.id,
+      used_location: @transaction.used_location,
+      amount: @transaction.amount,
+      at_transaction_category_id:  @transaction.at_transaction_category_id
     )
   end
 end
