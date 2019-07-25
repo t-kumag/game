@@ -21,7 +21,7 @@ class Api::V1::Group::GoalsController < ApplicationController
       return render_disallowed_financier_ids
     end
 
-    return render json: { errors: { code: '', message: "five goal limit of free users" } }, status: 422  if Services::GoalService.check_goal_limit_of_free_user
+    return render json: { errors: { code: '', message: "five goal limit of free users" } }, status: 422  unless Services::GoalService.check_goal_limit_of_free_user(@current_user)
 
     goal_params = get_goal_params
     begin

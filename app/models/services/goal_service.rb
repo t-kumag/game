@@ -63,8 +63,8 @@ class Services::GoalService
     end
   end
 
-  def self.check_goal_limit_of_free_user
-    @current_user.free? && Entities::Goal.where(group_id: @current_user.group_id).count <= Settings.at_user_limit_free_goal
+  def self.check_goal_limit_of_free_user(user)
+    user.free? && Entities::Goal.where(user_id: user.id).count < Settings.at_user_limit_free_goal
   end
 
   private
