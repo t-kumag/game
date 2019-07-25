@@ -1,5 +1,5 @@
 class Services::TransactionService
-  def initialize(user_id, from, to, category_id, family, with_group=false)
+  def initialize(user_id, from, to, category_id, share, with_group=false)
     @user_id = user_id
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
@@ -7,7 +7,7 @@ class Services::TransactionService
     @from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
     @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
     @category_id = category_id
-    @family = family
+    @share = share
     @with_group = with_group
   end
 
@@ -64,7 +64,7 @@ class Services::TransactionService
       transactions = generate_response_from_transactions transactions
       sort_by_used_date transactions
     else
-      if @family === true
+      if @share === true
         transactions = fetch_transactions(@from, @to, ids)
         transactions = generate_response_from_transactions transactions
         sort_by_used_date transactions
