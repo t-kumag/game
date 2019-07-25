@@ -24,6 +24,8 @@ class Entities::AtUserCardTransaction < ApplicationRecord
   belongs_to :at_user_card_account
   has_one :user_distributed_transaction
 
+  validates :at_transaction_category_id, presence: true
+
   def date
     self.used_date
   end
