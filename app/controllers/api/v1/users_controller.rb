@@ -203,7 +203,7 @@ class Api::V1::UsersController < ApplicationController
     if at_user_emoney_service_account_ids.present?
       number_of_account += at_user_emoney_service_account_ids.count
     end
-    @current_user.free? && number_of_account <= Settings.at_user_limit_free_account
+    @current_user.free? && number_of_account < Settings.at_user_limit_free_account
 
   end
 
