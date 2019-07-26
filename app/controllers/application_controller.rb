@@ -212,37 +212,19 @@ class ApplicationController < ActionController::Base
 
   # 参照可能な明細ID
   def disallowed_at_bank_transaction_ids?(bank_ids, bank_transaction_ids, with_group=false)
-    # １
-    # user_bank = @current_user.at_user.at_user_bank_accounts.find_by(id: bank_ids)
-    # at_user_bank_transaction_ids = user_bank.try(:at_user_bank_transactions).pluck(:id)
+    user_bank = @current_user.at_user.at_user_bank_accounts.find_by(id: bank_ids)
+    at_user_bank_transaction_ids = user_bank.try(:at_user_bank_transactions).pluck(:id)
     
-    # ２
-    return true if disallowed_at_bank_ids(bank_ids, with_group)?
-    at_user_bank_transaction_ids = Entities::AtUserBankTransaction.where(at_user_bank_Account_id: bank_ids).pluck(:id)
-
-    # ３
-    # user_id = @current_user.id
-    # partner_user_id = @current_user.try(:partner_user).try(:id)
-    # at_user_bank_transaction_ids = Entities::UserDistributedTransaction.where(user_id: user_id).where.not(at_user_bank_transaction_id: nil).pluck(:at_user_bank_transaction_id)
-    
-    # # 1 3
-    # if partner_user_id && with_group
-    #   # １
-    #   # partner_bank = @current_user.try(:partner_user).try(:at_user).try(:at_user_bank_accounts).find(id: bank_ids)
-    #   # at_user_bank_transaction_ids << partner_bank.try(:at_user_bank_transactions).pluck(:id) if partner_bank.present?
-
-    #   # 3
-    #   at_user_bank_transaction_ids << Entities::UserDistributedTransaction.where(user_id: user_id).where.not(at_user_bank_transaction_id: nil).pluck(:at_user_bank_transaction_id)
-    # end
-    # at_user_bank_transaction_ids.flatten!
+    if with_group
+      partner_bank = @current_user.try(:partner_user).try(:at_user).try(:at_user_bank_accounts).find_bys(id: bank_ids)
+      at_user_bank_transaction_ids << partner_bank.try(:at_user_bank_transactions).pluck(:id) if partner_bank.present?
+    end
+    at_user_bank_transaction_ids.flatten!
     
     bank_transaction_ids.each do |id|
       if with_group
-        # current_user の at_user_xxx_ids を取得し、transactionがその口座に属するか
-        # または、partner の at_user_xxx_ids を取得し、transactionがその口座に属するか、
         if at_user_bank_transaction_ids.include?(id)
           transaction = Entities::AtUserBankTransaction.find(id)
-          # かつ 明細 または口座が shareされているか
           if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_bank_account).try(:share)
             next
           else
@@ -252,8 +234,43 @@ class ApplicationController < ActionController::Base
           return true
         end
       else
-        # current_user の at_user_xxx_ids を取得し、transactionがその口座に属するか
         return true unless at_user_bank_transaction_ids.include?(id)
+      end
+    end
+    false
+  end
+
+  def disallowed_goal_ids(goal_ids, with_group=false)
+    user_id = @current_user.id
+    partner_user_id = @current_user.try(:partner_user).try(:id)
+
+    user_goal_ids = Entities::Goal.where(user_id: user_id).pluck(:id)
+    if partner_user_id && with_group
+      user_goal_ids << Entities::Goal.where(user_id: partner_user_id).pluck(:id)
+    end
+    user_goal_ids.flatten!
+
+    goal_ids.each do |id|
+      unless user_goal_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  def disallowed_goal_setting_ids(goal_ids, goal_setting_ids, with_group=false)
+    user_id = @current_user.id
+    partner_user_id = @current_user.try(:partner_user).try(:id)
+
+    user_goal_setting_ids = Entities::GoalSetting.where(goal_id: goal_ids, user_id: user_id).pluck(:id)
+    if partner_user_id && with_group
+      user_goal_setting_ids << Entities::GoalSetting.where(goal_id: goal_ids, user_id: partner_user_id).pluck(:id)
+    end
+    user_goal_setting_ids.flatten!
+
+    goal_setting_ids.each do |id|
+      unless user_goal_setting_ids.include?(id)
+        return true
       end
     end
     false
