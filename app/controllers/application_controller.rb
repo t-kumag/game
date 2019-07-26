@@ -326,7 +326,7 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  def disallowed_goal_ids(goal_ids, with_group=false)
+  def disallowed_goal_ids?(goal_ids, with_group=false)
     user_id = @current_user.id
     partner_user_id = @current_user.try(:partner_user).try(:id)
 
@@ -344,7 +344,7 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  def disallowed_goal_setting_ids(goal_ids, goal_setting_ids, with_group=false)
+  def disallowed_goal_setting_ids?(goal_ids, goal_setting_ids, with_group=false)
     user_id = @current_user.id
     partner_user_id = @current_user.try(:partner_user).try(:id)
 
