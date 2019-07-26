@@ -210,7 +210,6 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  # 参照可能な明細ID
   def disallowed_at_bank_transaction_ids?(bank_ids, bank_transaction_ids, with_group=false)
     user_bank = @current_user.at_user.at_user_bank_accounts.find_by(id: bank_ids)
     at_user_bank_transaction_ids = user_bank.try(:at_user_bank_transactions).pluck(:id)
@@ -235,6 +234,93 @@ class ApplicationController < ActionController::Base
         end
       else
         return true unless at_user_bank_transaction_ids.include?(id)
+      end
+    end
+    false
+  end
+
+  def disallowed_at_card_transaction_ids?(card_ids, card_transaction_ids, with_group=false)
+    user_card = @current_user.at_user.at_user_card_accounts.find_by(id: card_ids)
+    at_user_card_transaction_ids = user_card.try(:at_user_card_transactions).pluck(:id)
+    
+    if with_group
+      partner_card = @current_user.try(:partner_user).try(:at_user).try(:at_user_card_accounts).find_bys(id: card_ids)
+      at_user_card_transaction_ids << partner_card.try(:at_user_card_transactions).pluck(:id) if partner_card.present?
+    end
+    at_user_card_transaction_ids.flatten!
+    
+    card_transaction_ids.each do |id|
+      if with_group
+        if at_user_card_transaction_ids.include?(id)
+          transaction = Entities::AtUserCardTransaction.find(id)
+          if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_card_account).try(:share)
+            next
+          else
+            return true
+          end
+        else
+          return true
+        end
+      else
+        return true unless at_user_card_transaction_ids.include?(id)
+      end
+    end
+    false
+  end
+
+  def disallowed_at_emoney_transaction_ids?(emoney_ids, emoney_transaction_ids, with_group=false)
+    user_emoney = @current_user.at_user.at_user_emoney_accounts.find_by(id: emoney_ids)
+    at_user_emoney_transaction_ids = user_emoney.try(:at_user_emoney_transactions).pluck(:id)
+    
+    if with_group
+      partner_emoney = @current_user.try(:partner_user).try(:at_user).try(:at_user_emoney_accounts).find_bys(id: emoney_ids)
+      at_user_emoney_transaction_ids << partner_emoney.try(:at_user_emoney_transactions).pluck(:id) if partner_emoney.present?
+    end
+    at_user_emoney_transaction_ids.flatten!
+    
+    emoney_transaction_ids.each do |id|
+      if with_group
+        if at_user_emoney_transaction_ids.include?(id)
+          transaction = Entities::AtUserEmoneyTransaction.find(id)
+          if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_emoney_service_account).try(:share)
+            next
+          else
+            return true
+          end
+        else
+          return true
+        end
+      else
+        return true unless at_user_emoney_transaction_ids.include?(id)
+      end
+    end
+    false
+  end
+
+  def disallowed_manually_created_transaction_ids?(manually_created_transaction_ids, with_group=false)
+    user_id = @current_user.id
+    partner_user_id = @current_user.try(:partner_user).try(:id)
+
+    user_manually_created_transaction_ids = Entities::UserManuallyCreatedTransaction.where(user_id: user_id).pluck(:id)
+    if partner_user_id && with_group
+      user_manually_created_transaction_ids << Entities::UserManuallyCreatedTransaction.where(user_id: partner_user_id).pluck(:id)
+    end
+    user_manually_created_transaction_ids.flatten!
+    
+    manually_created_transaction_ids.each do |id|
+      if with_group
+        if user_manually_created_transaction_ids.include?(id)
+          transaction = Entities::UserManuallyCreatedTransaction.find(id)
+          if transaction.try(:user_distributed_transaction).try(:share)
+            next
+          else
+            return true
+          end
+        else
+          return true
+        end
+      else
+        return true unless user_manually_created_transaction_ids.include?(id)
       end
     end
     false
