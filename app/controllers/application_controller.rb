@@ -153,20 +153,107 @@ class ApplicationController < ActionController::Base
 
   # 参照可能な口座ID
   # cardやemoneyも同様の処理が必要な場合はサービスに移行する
-  def disallowed_at_bank_ids?(bank_ids)
+  def disallowed_at_bank_ids?(bank_ids, with_group=false)
     at_user_id         =  @current_user.at_user.id
-    partner_at_user_id =  @current_user.partner_user.try(:at_user).try(:id)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     at_user_bank_ids = Entities::AtUserBankAccount.where(at_user_id: at_user_id).pluck(:id)
     # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
-    #if partner_at_user_id
-    #  at_user_bank_ids << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
-    #end
+    if partner_at_user_id && with_group
+      at_user_bank_ids << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
     at_user_bank_ids.flatten!
 
     bank_ids.each do |id|
       unless at_user_bank_ids.include?(id)
         return true
+      end
+    end
+    false
+  end
+
+  def disallowed_at_card_ids?(card_ids, with_group=false)
+    at_user_id         =  @current_user.at_user.id
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+
+    at_user_card_ids = Entities::AtUserCardAccount.where(at_user_id: at_user_id).pluck(:id)
+    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
+    if partner_at_user_id && with_group
+      at_user_card_ids << Entities::AtUserCardAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
+    at_user_card_ids.flatten!
+
+    card_ids.each do |id|
+      unless at_user_card_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  def disallowed_at_emoney_ids?(emoney_ids, with_group=false)
+    at_user_id         =  @current_user.at_user.id
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+
+    at_user_emoney_ids = Entities::AtUserEmoneyServiceAccount.where(at_user_id: at_user_id).pluck(:id)
+    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
+    if partner_at_user_id && with_group
+      at_user_emoney_ids << Entities::AtUserEmoneyServiceAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
+    at_user_emoney_ids.flatten!
+
+    emoney_ids.each do |id|
+      unless at_user_emoney_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  # 参照可能な明細ID
+  def disallowed_at_bank_transaction_ids?(bank_ids, bank_transaction_ids, with_group=false)
+    # １
+    # user_bank = @current_user.at_user.at_user_bank_accounts.find_by(id: bank_ids)
+    # at_user_bank_transaction_ids = user_bank.try(:at_user_bank_transactions).pluck(:id)
+    
+    # ２
+    return true if disallowed_at_bank_ids(bank_ids, with_group)?
+    at_user_bank_transaction_ids = Entities::AtUserBankTransaction.where(at_user_bank_Account_id: bank_ids).pluck(:id)
+
+    # ３
+    # user_id = @current_user.id
+    # partner_user_id = @current_user.try(:partner_user).try(:id)
+    # at_user_bank_transaction_ids = Entities::UserDistributedTransaction.where(user_id: user_id).where.not(at_user_bank_transaction_id: nil).pluck(:at_user_bank_transaction_id)
+    
+    # # 1 3
+    # if partner_user_id && with_group
+    #   # １
+    #   # partner_bank = @current_user.try(:partner_user).try(:at_user).try(:at_user_bank_accounts).find(id: bank_ids)
+    #   # at_user_bank_transaction_ids << partner_bank.try(:at_user_bank_transactions).pluck(:id) if partner_bank.present?
+
+    #   # 3
+    #   at_user_bank_transaction_ids << Entities::UserDistributedTransaction.where(user_id: user_id).where.not(at_user_bank_transaction_id: nil).pluck(:at_user_bank_transaction_id)
+    # end
+    # at_user_bank_transaction_ids.flatten!
+    
+    bank_transaction_ids.each do |id|
+      if with_group
+        # current_user の at_user_xxx_ids を取得し、transactionがその口座に属するか
+        # または、partner の at_user_xxx_ids を取得し、transactionがその口座に属するか、
+        if at_user_bank_transaction_ids.include?(id)
+          transaction = Entities::AtUserBankTransaction.find(id)
+          # かつ 明細 または口座が shareされているか
+          if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_bank_account).try(:share)
+            next
+          else
+            return true
+          end
+        else
+          return true
+        end
+      else
+        # current_user の at_user_xxx_ids を取得し、transactionがその口座に属するか
+        return true unless at_user_bank_transaction_ids.include?(id)
       end
     end
     false
