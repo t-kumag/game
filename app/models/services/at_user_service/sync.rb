@@ -155,6 +155,12 @@ class Services::AtUserService::Sync
     p exception.backtrace
   end
 
+  # ビジネスサイドの仕様
+  # 無料会員はfnc_idごとに1日1回まで実行する
+  # TODO: 1日1回という判断をどうやるか？
+  # 仮仕様：レスポンスで判断する
+  # ALL_CNT == 0 BASIC_DATE == null
+  # の条件以外のときにat_sync_transaction_logsをinsertする
   def sync
     sync_accounts
     sync_transactions
