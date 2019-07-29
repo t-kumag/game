@@ -33,10 +33,16 @@ class Services::GoalService
     }
   end
 
-  def update_current_amount(goal, goal_setting)
-    create_goal_user_log(goal, goal_setting)
-    goal.current_amount = goal.current_amount + goal_setting.monthly_amount
-    goal.save!
+  def get_update_goal_data(goal, goal_setting)
+    {
+        id: goal.id,
+        group_id: goal.group_id,
+        user_id: goal.user_id,
+        name: goal.name,
+        img_url: goal.img_url,
+        goal_amount: goal.current_amount + goal_setting.monthly_amount,
+        current_amount: goal.current_amount
+    }
   end
 
   def add_money(goal, goal_setting, add_amount)
@@ -67,10 +73,8 @@ class Services::GoalService
     user.free? && Entities::Goal.where(user_id: user.id).count < Settings.at_user_limit_free_goal
   end
 
-  private
-
-  def create_goal_user_log(goal, goal_setting)
-    goal.goal_logs.create!(
+  def get_goal_user_log_data(goal, goal_setting)
+    {
         goal_id: goal_setting.goal_id,
         at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
         add_amount: 0,
@@ -80,7 +84,7 @@ class Services::GoalService
         after_current_amount: goal.current_amount + goal_setting.monthly_amount,
         add_date: DateTime.now,
         goal_amount: goal.goal_amount
-        )
+    }
   end
 
 

@@ -10,9 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+ActiveRecord::Schema.define(version: 2019_07_19_174250) do
 
-ActiveRecord::Schema.define(version: 2019_07_18_082420) do
-  
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "group_id"
@@ -117,7 +116,7 @@ ActiveRecord::Schema.define(version: 2019_07_18_082420) do
     t.datetime "error_date"
     t.integer "error_count", limit: 1, default: 0
     t.index ["at_bank_id"], name: "index_at_user_bank_accounts_on_at_bank_id"
-    t.index ["at_user_id", "fnc_cd"], name: "at_user_bank_accounts_at_user_id_fnc_cd", unique: true
+    t.index ["at_user_id", "fnc_id"], name: "at_user_bank_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_bank_accounts_on_at_user_id"
     t.index ["deleted_at"], name: "index_at_user_bank_accounts_on_deleted_at"
     t.index ["group_id"], name: "index_at_user_bank_accounts_on_group_id"
@@ -169,7 +168,7 @@ ActiveRecord::Schema.define(version: 2019_07_18_082420) do
     t.datetime "error_date"
     t.integer "error_count", limit: 1, default: 0
     t.index ["at_card_id"], name: "index_at_user_card_accounts_on_at_card_id"
-    t.index ["at_user_id", "fnc_cd"], name: "at_user_card_accounts_at_user_id_fnc_cd", unique: true
+    t.index ["at_user_id", "fnc_id"], name: "at_user_card_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_card_accounts_on_at_user_id"
     t.index ["deleted_at"], name: "index_at_user_card_accounts_on_deleted_at"
     t.index ["group_id"], name: "index_at_user_card_accounts_on_group_id"
@@ -219,7 +218,7 @@ ActiveRecord::Schema.define(version: 2019_07_18_082420) do
     t.datetime "error_date"
     t.integer "error_count", limit: 1, default: 0
     t.index ["at_emoney_service_id"], name: "index_at_user_emoney_service_accounts_on_at_emoney_service_id"
-    t.index ["at_user_id", "fnc_cd"], name: "at_user_emoney_service_accounts_at_user_id_fnc_cd", unique: true
+    t.index ["at_user_id", "fnc_id"], name: "at_user_emoney_service_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_emoney_service_accounts_on_at_user_id"
     t.index ["deleted_at"], name: "index_at_user_emoney_service_accounts_on_deleted_at"
     t.index ["group_id"], name: "index_at_user_emoney_service_accounts_on_group_id"
