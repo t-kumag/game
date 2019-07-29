@@ -86,6 +86,4 @@ class Services::GoalService
         goal_amount: goal.goal_amount
     }
   end
-
-
 end
