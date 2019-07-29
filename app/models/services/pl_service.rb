@@ -19,8 +19,14 @@ class Services::PlService
         udt.at_transaction_category_id,
         udt.at_user_bank_transaction_id,
         aubt.at_user_bank_account_id,
-        aubt.amount_receipt,
-        aubt.amount_payment,
+      CASE
+        WHEN udt.amount > 0 THEN udt.amount
+        ELSE 0
+      END AS amount_receipt,
+      CASE
+        WHEN udt.amount < 0 THEN udt.amount
+        ELSE 0
+      END AS amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -58,7 +64,10 @@ class Services::PlService
         udt.at_transaction_category_id,
         udt.at_user_card_transaction_id,
         auct.at_user_card_account_id,
-        auct.amount as amount_payment,
+      CASE
+        WHEN udt.amount < 0 THEN udt.amount
+        ELSE 0
+      END AS amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -96,8 +105,14 @@ class Services::PlService
         udt.at_transaction_category_id,
         udt.at_user_emoney_transaction_id,
         auet.at_user_emoney_service_account_id,
-        auet.amount_receipt,
-        auet.amount_payment,
+      CASE
+        WHEN udt.amount > 0 THEN udt.amount
+        ELSE 0
+      END AS amount_receipt,
+      CASE
+        WHEN udt.amount < 0 THEN udt.amount
+        ELSE 0
+      END AS amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -133,7 +148,10 @@ class Services::PlService
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
-        sum(umct.amount) as amount_payment,
+      CASE
+        WHEN udt.amount < 0 THEN udt.amount
+        ELSE 0
+      END AS amount_payment,
         atc.category_name1,
         atc.category_name2
       FROM
@@ -154,8 +172,6 @@ class Services::PlService
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
-      GROUP BY
-        udt.at_transaction_category_id
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash

@@ -26,6 +26,16 @@ class Entities::AtUserCardTransaction < ApplicationRecord
 
   validates :at_transaction_category_id, presence: true
 
+  def amount
+    if attributes['payment_amount'] != 0
+      attributes['payment_amount'] * -1
+    elsif  attributes['amount'] != 0
+      attributes['payment_amount'] * -1
+    else
+      0
+    end
+  end
+
   def date
     self.used_date
   end
