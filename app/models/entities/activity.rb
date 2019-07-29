@@ -98,26 +98,40 @@ class Entities::Activity < ApplicationRecord
       when "individual_bank_outcome"
         #message = "銀行口座の支出が" + a.count.to_s + "件あります。"
         message = "銀行口座の支出があります。"
+      when "individual_bank_income"
+        #message = "銀行口座に収入が" + a.count.to_s + "件あります。"
+        message = "銀行口座に収入があります。"
       when "individual_card_outcome"
         #message = "クレジットカードの支出が" + a.count.to_s + "件あります。"
         message = "クレジットカードの支出があります。"
       when "individual_emoney_outcome"
         #message = "電子マネーの支出が" + a.count.to_s + "件あります。"
         message = "電子マネーの支出があります。"
+      when "individual_emoney_income"
+        #message = "電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "電子マネーに収入があります。"
       when "partner_bank_outcome"
         #message = "夫婦の銀行口座の支出が" + a.count.to_s + "件あります。"
         message = "夫婦の銀行口座の支出があります。"
+      when "partner_bank_income"
+        #message = "夫婦の銀行口座に収入が" + a.count.to_s + "件あります。"
+        message = "夫婦の銀行口座に収入があります。"
       when "partner_card_outcome"
         #message = "夫婦のクレジットカードの支出が" + a.count.to_s + "件あります。"
         message = "夫婦のクレジットカードの支出があります。"
       when "partner_emoney_outcome"
         #message = "夫婦の電子マネーの支出が" + a.count.to_s + "件あります。"
         message = "夫婦の電子マネーの支出があります。"
+      when "partner_emoney_income"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "夫婦の電子マネーに収入があります。"
       end
+
       @result.push({
-                       "day": dayStr,
-                       "type": a.activity_type,
-                       "message": message})
+        "day": dayStr,
+        "type": a.activity_type,
+        "message": message
+      })
     }
     @result
     Kaminari.paginate_array(@result).page(page)
