@@ -13,7 +13,6 @@ namespace :accumulation do
 
         at_user_bank_account.goal_settings.all.each do |goal_setting|
           if check_balance(at_user_bank_account, goal_setting, goal) && check_goal_amount(goal)
-            binding.pry
             goal_logs << Services::GoalService.new(user).get_goal_user_log_data(goal, goal_setting)
             goals << Services::GoalService.new(user).get_update_goal_data(goal, goal_setting)
           end
