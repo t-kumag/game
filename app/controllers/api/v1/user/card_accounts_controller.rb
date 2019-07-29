@@ -62,6 +62,10 @@ class Api::V1::User::CardAccountsController < ApplicationController
 
     def destroy
       account_id = params[:id].to_i
+      if disallowed_at_card_ids?([account_id])
+        render_disallowed_financier_ids && return
+      end
+
       if @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id).include?(account_id)
         Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, [account_id])
       end
