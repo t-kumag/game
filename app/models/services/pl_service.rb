@@ -259,7 +259,7 @@ class Services::PlService
           amount_receipt: v['amount_receipt'],
           amount_payment: v['amount_payment']
         }.stringify_keys
-       else
+      else
         idx = after_summaries.find_index(summary)
         summary['amount_receipt'] ||= 0
         summary['amount_payment'] ||= 0
