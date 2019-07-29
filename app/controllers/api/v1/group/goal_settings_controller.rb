@@ -2,16 +2,23 @@ class Api::V1::Group::GoalSettingsController < ApplicationController
   before_action :authenticate
 
   def show
+    if disallowed_goal_setting_ids?(params[:goal_id], [params[:id].to_i], true)
+      render_disallowed_goal_setting_ids && return
+    end
     @response = Entities::GoalSetting.find(params[:id])
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
   def create
+    if disallowed_goal_ids?([params[:goal_id].to_i], true)
+      render_disallowed_goal_ids && return
+    end
+
     if Entities::Goal.find(params[:goal_id]).blank?
       render json: { errors: { code: '', mesasge: "goal not found." } }, status: 422
     end
     if get_goal_setting_params[:at_user_bank_account_id].present? &&
-        disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
+        disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id].to_i], true)
       return render_disallowed_financier_ids
     end
 
@@ -26,10 +33,15 @@ class Api::V1::Group::GoalSettingsController < ApplicationController
   end
 
   def update
+    if disallowed_goal_setting_ids?(params[:goal_id], [params[:id].to_i], true)
+      render_disallowed_goal_setting_ids && return
+    end
+
     if Entities::Goal.find(params[:goal_id]).blank?
       render json: { errors: { code: '', mesasge: "goal not found." } }, status: 422
     end
-    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
+    p get_goal_setting_params[:at_user_bank_account_id]
+    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id].to_i], true)
       return render_disallowed_financier_ids
     end
 
