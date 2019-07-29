@@ -311,10 +311,10 @@ class Services::AtUserService
       fnc_ids = fnc_ids + card_accounts.map{|i| i.fnc_id}
       scraping_ids << card_accounts.map{|i| {at_user_card_account_id: i.id} }
 
-      emoney_account = @user.at_user.at_user_emoney_service_accounts
-      emoney_account = skip_scraping(emoney_account)
-      fnc_ids = fnc_ids + emoney_account.map{|i| i.fnc_id}
-      scraping_ids << card_accounts.map{|i| {at_user_emoney_service_account_id: i.id} }
+      emoney_accounts = @user.at_user.at_user_emoney_service_accounts
+      emoney_accounts = skip_scraping(emoney_accounts)
+      fnc_ids = fnc_ids + emoney_accounts.map{|i| i.fnc_id}
+      scraping_ids << emoney_accounts.map{|i| {at_user_emoney_service_account_id: i.id} }
 
 
       # 口座が以上終了している場合にscrapingをskipする
