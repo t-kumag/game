@@ -9,6 +9,10 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def show
+    if disallowed_goal_ids?([params[:id].to_i], true)
+      render_disallowed_goal_ids && return
+    end
+
     @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
     render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @response.blank?
 
@@ -45,7 +49,15 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def update
-    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
+    if disallowed_goal_ids?([params[:id].to_i], true)
+      render_disallowed_goal_ids && return
+    end
+
+    if disallowed_goal_setting_ids?(params[:id], [params[:goal_settings][:goal_setting_id]], true)
+      render_disallowed_goal_setting_ids && return
+    end
+
+    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]], true)
       return render_disallowed_financier_ids
     end
 
@@ -69,6 +81,10 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def destroy
+    if disallowed_goal_ids?([params[:id].to_i], true)
+      render_disallowed_goal_ids && return
+    end
+
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     if goal.blank?
       render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return
@@ -86,11 +102,19 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def graph
     return render_404 if params[:id].blank?
+    if disallowed_goal_ids?([params[:id].to_i], true)
+      render_disallowed_goal_ids && return
+    end
+
     @responses = Services::GoalGraphService.new(@current_user, Entities::Goal.find(params[:id]), params[:span]).call
     render 'graph', formats: 'json', handlers: 'jbuilder'
   end
 
   def add_money
+    if disallowed_goal_ids?([params[:id].to_i], true)
+      render_disallowed_goal_ids && return
+    end
+
     # TODO:パートナーの追加入金の動作検証　パートナーの目標設定作成IF完成後に動作検証する
     current_user_banks = @current_user.at_user.at_user_bank_accounts.pluck(:at_bank_id)
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)

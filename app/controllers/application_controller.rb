@@ -344,13 +344,13 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  def disallowed_goal_setting_ids?(goal_ids, goal_setting_ids, with_group=false)
+  def disallowed_goal_setting_ids?(goal_id, goal_setting_ids, with_group=false)
     user_id = @current_user.id
     partner_user_id = @current_user.try(:partner_user).try(:id)
 
-    user_goal_setting_ids = Entities::GoalSetting.where(goal_id: goal_ids, user_id: user_id).pluck(:id)
+    user_goal_setting_ids = Entities::GoalSetting.where(goal_id: goal_id, user_id: user_id).pluck(:id)
     if partner_user_id && with_group
-      user_goal_setting_ids << Entities::GoalSetting.where(goal_id: goal_ids, user_id: partner_user_id).pluck(:id)
+      user_goal_setting_ids << Entities::GoalSetting.where(goal_id: goal_id, user_id: partner_user_id).pluck(:id)
     end
     user_goal_setting_ids.flatten!
 
