@@ -5,7 +5,12 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
   # TODO(fujiura): emoney_account_id, transaction_id に対応するデータがないときの処理
 
   def index
-    @transactions = Services::AtEmoneyTransactionService.new(@current_user).list(params[:emoney_account_id], params[:page])
+    account_id = params[:emoney_account_id].to_i
+    if disallowed_at_emoney_ids?([account_id])
+      render_disallowed_financier_ids && return
+    end
+
+    @transactions = Services::AtEmoneyTransactionService.new(@current_user).list(account_id, params[:page])
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
