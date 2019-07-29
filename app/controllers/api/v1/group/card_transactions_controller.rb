@@ -14,7 +14,12 @@ class Api::V1::Group::CardTransactionsController < ApplicationController
   end
 
   def show
-    @response = Services::AtCardTransactionService.new(@current_user, true).detail(params[:card_account_id], params[:id])
+    transaction_id = params[:id].to_i
+    if disallowed_at_card_transaction_ids?(params[:card_account_id], [transaction_id], true)
+      render_disallowed_transaction_ids && return
+    end
+
+    @response = Services::AtCardTransactionService.new(@current_user, true).detail(params[:card_account_id], transaction_id)
     render json: {}, status: 200 and return if @response.blank?
     render 'show', formats: 'json', handlers: 'jbuilder'
   end

@@ -16,7 +16,12 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
   end
 
   def show
-    @response = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:emoney_account_id], params[:id])
+    transaction_id = params[:id].to_i
+    if disallowed_at_emoney_transaction_ids?(params[:emoney_account_id], [transaction_id])
+      render_disallowed_transaction_ids && return
+    end
+
+    @response = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:emoney_account_id], transaction_id)
     render json: {}, status: 200 and return if @response.blank?
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
