@@ -25,9 +25,14 @@ class Api::V1::Group::BankTransactionsController < ApplicationController
   end
 
   def update
+    transaction_id = params[:id].to_i
+    if disallowed_at_bank_transaction_ids?(params[:bank_account_id], [transaction_id], true)
+      render_disallowed_transaction_ids && return
+    end
+
     @response = Services::AtBankTransactionService.new(@current_user, true).update(
         params[:bank_account_id],
-        params[:id],
+        transaction_id,
         params[:at_transaction_category_id],
         params[:used_location],
         params[:is_shared],

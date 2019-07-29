@@ -27,9 +27,13 @@ class Api::V1::User::CardTransactionsController < ApplicationController
   end
 
   def update
+    transaction_id = params[:id].to_i
+    if disallowed_at_card_transaction_ids?(params[:card_account_id], [transaction_id])
+      render_disallowed_transaction_ids && return
+    end
     @response = Services::AtCardTransactionService.new(@current_user).update(
         params[:card_account_id], 
-        params[:id],
+        transaction_id,
         params[:at_transaction_category_id],
         params[:used_location],
         params[:is_shared],

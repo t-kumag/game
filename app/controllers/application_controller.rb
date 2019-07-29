@@ -276,7 +276,7 @@ class ApplicationController < ActionController::Base
     at_user_emoney_transaction_ids = user_emoney.try(:at_user_emoney_transactions).pluck(:id) if user_emoney.try(:at_user_emoney_transactions).present?
     
     if with_group
-      partner_emoney = @current_user.try(:partner_user).try(:at_user).try(:at_user_emoney_accounts).find_by(id: emoney_id)
+      partner_emoney = @current_user.try(:partner_user).try(:at_user).try(:at_user_emoney_service_accounts).find_by(id: emoney_id)
       at_user_emoney_transaction_ids << partner_emoney.try(:at_user_emoney_transactions).pluck(:id) if partner_emoney.try(:at_user_emoney_transactions).present?
     end
     return true if at_user_emoney_transaction_ids.blank?
