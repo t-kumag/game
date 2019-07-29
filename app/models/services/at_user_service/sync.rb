@@ -73,6 +73,9 @@ class Services::AtUserService::Sync
     # db
     category_map = Entities::AtTransactionCategory.all.map { |i| [i.at_category_id, i] }.to_h
 
+    # ATの同期log
+    sync_account_ids = []
+
     ## account tracker上のデータ
     account_entity.where(at_user_id: @user.at_user.id).find_each do |a|
       params = {
@@ -135,7 +138,13 @@ class Services::AtUserService::Sync
       transaction_entity.import src_trans, on_duplicate_key_update: data_column.map { |k, _v| k }, validate: false
       Services::ActivityService.save_activities(activities)
       Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
+
+      # ATの同期log
+      sync_account_ids << {financier_account_type_key => a.id}
     end
+    # ATの同期log
+    Entities::AtSyncTransactionLog.insert(sync_account_ids)
+
   rescue AtAPIStandardError => api_err
     raise api_err
   rescue ActiveRecord::RecordInvalid => db_err
@@ -146,6 +155,12 @@ class Services::AtUserService::Sync
     p exception.backtrace
   end
 
+  # ビジネスサイドの仕様
+  # 無料会員はfnc_idごとに1日1回まで実行する
+  # TODO: 1日1回という判断をどうやるか？
+  # 仮仕様：レスポンスで判断する
+  # ALL_CNT == 0 BASIC_DATE == null
+  # の条件以外のときにat_sync_transaction_logsをinsertする
   def sync
     sync_accounts
     sync_transactions

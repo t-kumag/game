@@ -5,6 +5,8 @@ class Services::AtUserService
   def initialize(user, target = 'all')
     @user = user
     @target = target.blank? ? 'all' : target
+    @today = Date.today
+    # tokenは毎回更新する 有効期限は15分
     token
   end
 
@@ -277,6 +279,8 @@ class Services::AtUserService
     Entities::AtUserEmoneyServiceAccount.find_by(fnc_id: fnc_id)
   end
 
+  # ビジネスサイドの仕様
+  # 無料会員はfnc_idごとに1日1回まで実行する
   def exec_scraping
     Services::AtUserService::Sync.new(@user).sync_accounts
 
@@ -290,46 +294,38 @@ class Services::AtUserService
 
       fnc_ids = []
 
+      # ATのスクレイピングlog
+      scraping_ids = []
+
       # TODO リファクタリング
       # 負荷対応ため個別に分岐
       # 証券、保険などが増えると分岐が長くなるので渡されたmodelに対して処理を行うような作りに変える
-      case @target
-      when 'bank'
-        puts "scraping bank=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
-      when 'card'
-        puts "scraping card=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
-      when 'emoney'
-        puts "scraping emoney=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}
-      else
-        puts "scraping all=========="
-        fnc_ids = fnc_ids + @user.at_user.at_user_bank_accounts.map{|i| i.fnc_id}
-        fnc_ids = fnc_ids + @user.at_user.at_user_card_accounts.map{|i| i.fnc_id}
-        fnc_ids = fnc_ids + @user.at_user.at_user_emoney_service_accounts.map{|i| i.fnc_id}	
-      end
+      puts "scraping all=========="
+      bank_accounts = @user.at_user.at_user_bank_accounts
+      bank_accounts = skip_scraping(bank_accounts)
+      fnc_ids = fnc_ids + bank_accounts.map{|i| i.fnc_id}
+      scraping_ids << bank_accounts.map{|i| {at_user_bank_account_id: i.id} }
 
+      card_accounts = @user.at_user.at_user_card_accounts
+      card_accounts = skip_scraping(card_accounts)
+      fnc_ids = fnc_ids + card_accounts.map{|i| i.fnc_id}
+      scraping_ids << card_accounts.map{|i| {at_user_card_account_id: i.id} }
+
+      emoney_account = @user.at_user.at_user_emoney_service_accounts
+      emoney_account = skip_scraping(emoney_account)
+      fnc_ids = fnc_ids + emoney_account.map{|i| i.fnc_id}
+      scraping_ids << card_accounts.map{|i| {at_user_emoney_service_account_id: i.id} }
+
+
+      # 口座が以上終了している場合にscrapingをskipする
       skip_ids = []
-      case @target
-      when 'bank'
-        reset_entity_error(@user.at_user.at_user_bank_accounts, Entities::AtUserBankAccount);
-        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts)
-      when 'card'
-        reset_entity_error(@user.at_user.at_user_card_accounts, Entities::AtUserCardAccount);
-        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts)
-      when 'emoney'
-        reset_entity_error(@user.at_user.at_user_emoney_service_accounts, Entities::AtUserEmoneyServiceAccount);    
-        skip_ids = get_accounts_skip_fnc_ids(@user.at_user.at_user_emoney_service_accounts)    
-      else
-        reset_all_account_error
-        skip_ids = get_skip_fnc_ids
-      end
+      reset_all_account_error
+      skip_ids = get_skip_fnc_ids
+
 
       fnc_ids.each do |fnc_id|
 
         if skip_ids.include?(fnc_id)
-          # TODO スクレイピングスキップ時に、メール通知する場合はコメントアウト消す
           # skip_account = get_skip_account(fnc_id)
           # MailDelivery.skip_scraping(@user, skip_account).deliver
           next
@@ -342,6 +338,9 @@ class Services::AtUserService
         requester = AtAPIRequest::AtUser::ExecScraping.new(params)
         res = AtAPIClient.new(requester).request
       end
+
+      # ATのスクレイピングlog
+      Entities::AtScrapingLog.insert(scraping_ids)
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
@@ -352,7 +351,7 @@ class Services::AtUserService
     end
 
 
-    
+
     # api_name = "/openscher002.jct"
     # params = {
     #   "TOKEN_KEY" => token,
@@ -363,6 +362,12 @@ class Services::AtUserService
     # res = AtAPIClient.new(api_name, params).get
 
     # return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
+  end
+
+  # at_scraping_logsを確認しscraping指示をskipする
+  # TODO:課金実装時に無料と有料ユーザーの処理をわける
+  def skip_scraping(accounts)
+    accounts.reject{ |account| account.at_scraping_logs.find_by("created_at > #{@today}").present? }
   end
 
   # ## openuserr003

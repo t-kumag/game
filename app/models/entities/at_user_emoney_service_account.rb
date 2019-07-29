@@ -27,6 +27,8 @@ class Entities::AtUserEmoneyServiceAccount < ApplicationRecord
   belongs_to :at_user
   belongs_to :at_emoney_service
   has_many :at_user_emoney_transactions
+  has_many :at_scraping_logs
+  has_many :at_sync_transaction_logs
 
   def current_month_payment(account_ids=nil)
     if account_ids.present?
