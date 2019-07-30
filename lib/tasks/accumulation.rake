@@ -23,8 +23,8 @@ namespace :accumulation do
         #TODO: エラー処理については固定したフォーマットを考える
       end
     end
-    Entities::GoalLog.import goal_logs, on_duplicate_key_update: [:goal_id, :at_user_bank_account_id, :before_current_amount, :after_current_amount]
-    Entities::Goal.import goals, on_duplicate_key_update: [:id, :group_id, :user_id, :current_amount]
+    Entities::GoalLog.import goal_logs
+    Entities::Goal.import goals, on_duplicate_key_update: [:current_amount]
   end
 
   private
