@@ -3,7 +3,7 @@ class MailDelivery < ApplicationMailer
   def user_registration(user)
     @token = user.token
     mail( :to => user.email,
-          :subject => '【OsidOri】メールアドレスの認証をしてください' )
+          :subject => '【OsidOri】メールアドレス認証を完了してはじめましょう' )
   end
 
   def user_change_password_request(user)
