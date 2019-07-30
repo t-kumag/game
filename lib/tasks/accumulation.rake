@@ -24,7 +24,7 @@ namespace :accumulation do
       end
     end
     Entities::GoalLog.import goal_logs, on_duplicate_key_update: [:goal_id, :at_user_bank_account_id, :before_current_amount, :after_current_amount]
-    Entities::Goal.import goals, on_duplicate_key_update: [:id, :group_id, :user_id]
+    Entities::Goal.import goals, on_duplicate_key_update: [:id, :group_id, :user_id, :current_amount]
   end
 
   private

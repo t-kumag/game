@@ -36,12 +36,13 @@ class Services::GoalService
   def get_update_goal_data(goal, goal_setting)
     {
         id: goal.id,
+        goal_type_id: goal.goal_type_id,
         group_id: goal.group_id,
         user_id: goal.user_id,
         name: goal.name,
         img_url: goal.img_url,
-        goal_amount: goal.current_amount + goal_setting.monthly_amount,
-        current_amount: goal.current_amount
+        goal_amount: goal.goal_amount,
+        current_amount: goal.current_amount + goal_setting.monthly_amount
     }
   end
 
