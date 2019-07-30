@@ -7,7 +7,7 @@ class Services::TransactionService
     @from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
     @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
     @category_id = category_id
-    @share = share
+    @share = share == "true" ? true : false
     @with_group = with_group
   end
 
@@ -59,6 +59,8 @@ class Services::TransactionService
   def list(ids = @category_id)
     if @with_group === true
       transactions = fetch_transactions(@from, @to, ids)
+      # 削除済み口座の明細を除外する
+      transactions = remove_delete_account_transaction transactions
       # シェアしていない口座の明細 or シェアしていない明細を削除する
       transactions = remove_not_shared_transaction transactions
       transactions = generate_response_from_transactions transactions
@@ -66,10 +68,14 @@ class Services::TransactionService
     else
       if @share === true
         transactions = fetch_transactions(@from, @to, ids)
+        # 削除済み口座の明細を除外する
+        transactions = remove_delete_account_transaction transactions
         transactions = generate_response_from_transactions transactions
         sort_by_used_date transactions
       else
         transactions = fetch_transactions(@from, @to, ids)
+        # 削除済み口座の明細を除外する
+        transactions = remove_delete_account_transaction transactions
         # シェアしている口座の明細 or シェアしている明細を削除する
         transactions = remove_shared_transaction transactions
         transactions = generate_response_from_transactions transactions
@@ -124,6 +130,21 @@ class Services::TransactionService
           # シェアしていない手動明細は除外する
           true
         end
+      end
+    end
+  end
+
+  def remove_delete_account_transaction(transactions)
+    transactions.reject do |t| 
+      if t.try(:at_user_bank_transaction)
+        t.at_user_bank_transaction.at_user_bank_account == nil
+      elsif t.try(:at_user_card_transaction)
+        t.at_user_card_transaction.at_user_card_account == nil
+      elsif t.try(:at_user_emoney_transaction)
+        t.at_user_emoney_transaction.at_user_emoney_service_account == nil
+      else
+        # 手動明細は口座に紐づかないため除外しない
+        false
       end
     end
   end
