@@ -11,6 +11,8 @@ json.app do
     json.used_date r[:used_date].strftime('%Y-%m-%d %H:%M:%S')
     json.used_location r[:used_location]
     json.type r[:type]
+    json.is_shared r[:is_shared]
     json.transaction_id r[:transaction_id]
+    json.at_transaction_category_id r[:at_transaction_category_id]
   end
 end

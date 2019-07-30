@@ -42,6 +42,8 @@ class Services::TransactionService
         at_user_bank_account_id:    t.at_user_bank_transaction.try(:at_user_bank_account_id),
         at_user_card_account_id:   t.at_user_card_transaction.try(:at_user_card_account_id),
         at_user_emoney_service_account_id: t.at_user_emoney_transaction.try(:at_user_emoney_service_account_id),
+        at_transaction_category_id: t.at_transaction_category_id,
+        is_shared: shared(t),
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
@@ -140,6 +142,18 @@ class Services::TransactionService
       end
     else
       list
+    end
+  end
+
+  def shared(transaction)
+    if transaction.at_user_bank_transaction.try(:at_user_bank_account)
+      transaction.at_user_bank_transaction.at_user_bank_account.share || transaction.share
+    elsif transaction.at_user_card_transaction.try(:at_user_card_account)
+      transaction.at_user_card_transaction.at_user_card_account.share || transaction.share
+    elsif transaction.at_user_emoney_transaction.try(:at_user_emoney_service_account)
+      transaction.at_user_emoney_transaction.at_user_emoney_service_account.share || transaction.share
+    else
+      transaction.share
     end
   end
 end
