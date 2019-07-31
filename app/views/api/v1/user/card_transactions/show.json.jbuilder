@@ -3,7 +3,6 @@ json.app do
   json.amount @response[:amount]
   json.used_date @response[:used_date].strftime('%Y-%m-%d %H:%M:%S')
   json.used_location @response[:used_location]
-  json.payment_name @response[:payment_name]
   json.is_shared @response[:is_shared]
   json.at_transaction_category_id @response[:at_transaction_category_id]
   json.category_name1 @response[:category_name1]
