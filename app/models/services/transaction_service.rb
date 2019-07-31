@@ -1,6 +1,6 @@
 class Services::TransactionService
-  def initialize(user_id, from, to, category_id, share, with_group=false)
-    @user_id = user_id
+  def initialize(user, from, to, category_id, share, with_group=false)
+    @user = user
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # from/to の指定がなければ当月の月初から月末までのデータを取得
@@ -21,15 +21,15 @@ class Services::TransactionService
   def fetch_transactions(from, to, ids)
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
-      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
-      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
-      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
-      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
+      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
     else
-      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user_id, used_date: from..to)
-      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user_id, used_date: from..to)
-      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user_id, used_date: from..to)
-      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user_id, used_date: from..to)
+      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, used_date: from..to)
+      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, used_date: from..to)
+      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, used_date: from..to)
+      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, used_date: from..to)
     end
     bank_tarnsactions + card_transactiohs + emoney_transactiohs + user_manually_created_transaction
   end
@@ -43,7 +43,7 @@ class Services::TransactionService
         at_user_card_account_id:   t.at_user_card_transaction.try(:at_user_card_account_id),
         at_user_emoney_service_account_id: t.at_user_emoney_transaction.try(:at_user_emoney_service_account_id),
         at_transaction_category_id: t.at_transaction_category_id,
-        is_shared: shared(t),
+        is_shared: shared_account?(t) || t.share,
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
@@ -145,15 +145,19 @@ class Services::TransactionService
     end
   end
 
-  def shared(transaction)
-    if transaction.at_user_bank_transaction.try(:at_user_bank_account)
-      transaction.at_user_bank_transaction.at_user_bank_account.share || transaction.share
-    elsif transaction.at_user_card_transaction.try(:at_user_card_account)
-      transaction.at_user_card_transaction.at_user_card_account.share || transaction.share
-    elsif transaction.at_user_emoney_transaction.try(:at_user_emoney_service_account)
-      transaction.at_user_emoney_transaction.at_user_emoney_service_account.share || transaction.share
+  def shared_account?(transaction)
+    if transaction.try(:at_user_bank_transaction).try(:at_user_bank_account_id)
+      shared_bank_account_ids = @user.at_user.at_user_bank_accounts.where(share: true).pluck(:id)
+      shared_bank_account_ids.include?(transaction.at_user_bank_transaction.at_user_bank_account_id)
+    elsif transaction.try(:at_user_card_transaction).try(:at_user_card_account_id)
+      shared_card_account_ids =  @user.at_user.at_user_card_accounts.where(share: true).pluck(:id)
+      shared_card_account_ids.include?(transaction.at_user_card_transaction.at_user_card_account_id)
+    elsif transaction.try(:at_user_emoney_transaction).try(:at_user_emoney_service_account_id)
+      shared_emoney_account_ids = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
+      shared_emoney_account_ids.include?(transaction.at_user_emoney_transaction.at_user_emoney_service_account_id)
     else
-      transaction.share
+      # 手動明細は口座に紐づかないため口座シェア判定はfalse固定
+      false
     end
   end
 end
