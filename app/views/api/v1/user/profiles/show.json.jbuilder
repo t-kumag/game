@@ -6,7 +6,11 @@ json.app do
     json.gender  @profile.gender
     json.birthday  @profile.birthday
     json.has_child  @profile.has_child
+  end
+  if @profile.present? && @profile.push == true
     json.push  @profile.push
+  else
+    json.push  false
   end
   if @icon.present?
     json.img_url @icon.img_url if @icon.present?
