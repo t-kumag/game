@@ -81,51 +81,25 @@ class Services::TransactionService
   end
 
   def remove_shared_transaction(transactions)
-    # シェアしている口座の明細 or シェアしている明細を削除する
     transactions.reject do |t|
-      # シェアしている明細を削除する
-      if t.share === true
+      if shared_account?(t) || t.share
+        # シェアしている口座の明細 or シェアしている明細は削除する
         true
       else
-        # シェアしていない明細、且つシェアしている口座
-        if t.try(:at_user_bank_transaction)
-          # 銀行
-          t.at_user_bank_transaction.at_user_bank_account.share === true 
-        elsif t.try(:at_user_card_transaction)
-          # カード
-          t.at_user_card_transaction.at_user_card_account.share === true
-        elsif t.try(:at_user_emoney_transaction)
-          # 電子マネー
-          t.at_user_emoney_transaction.at_user_emoney_service_account.share === true
-        else
-          # シェアしていない手動明細は除外しない
-          false
-        end
+        # シェアしていない口座の明細 or シェアしていない明細は削除しない
+        false
       end
     end
   end
 
   def remove_not_shared_transaction(transactions)
-    # シェアしていない口座の明細 or シェアしていない明細を削除する
     transactions.reject do |t|
-      # シェアしている明細を削除しない
-      if t.share === true
+      if shared_account?(t) || t.share
+        # シェアしている口座の明細 or シェアしている明細は削除しない
         false
       else
-        # シェアしていない明細、且つシェアしていない口座
-        if t.try(:at_user_bank_transaction)
-          # 銀行
-          t.at_user_bank_transaction.at_user_bank_account.share === false
-        elsif t.try(:at_user_card_transaction)
-          # カード
-          t.at_user_card_transaction.at_user_card_account.share === false
-        elsif t.try(:at_user_emoney_transaction)
-          # 電子マネー
-          t.at_user_emoney_transaction.at_user_emoney_service_account.share === false
-        else
-          # シェアしていない手動明細は除外する
-          true
-        end
+        # シェアしていない口座の明細 or シェアしていない明細は削除する
+        true
       end
     end
   end
