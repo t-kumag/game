@@ -80,7 +80,10 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
 
-    Services::ActivityService.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
+    Services::ActivityService.create_user_manually_activity(@current_user.id,
+                                                            @current_user.group_id,
+                                                            save_params[:used_date],
+                                                            'individual_manual_outcome')
     Entities::UserManuallyCreatedTransaction.create!(save_params)
 
   end
@@ -97,8 +100,11 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
 
-    Services::ActivityService.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
     Entities::UserManuallyCreatedTransaction.find(params[:id]).update!(save_params)
+    Services::ActivityService.create_user_manually_activity(@current_user.id,
+                                                            @current_user.group_id,
+                                                            save_params[:used_date],
+                                                            'individual_manual_outcome')
     Entities::UserManuallyCreatedTransaction.find(params[:id])
   end
 end

@@ -5,6 +5,7 @@ namespace :accumulation do
 
     goal_logs = []
     goals = []
+    activities = []
 
     Entities::User.find_each do |user|
       begin
@@ -15,6 +16,7 @@ namespace :accumulation do
           if check_balance(at_user_bank_account, goal_setting, goal) && check_goal_amount(goal)
             goal_logs << Services::GoalService.new(user).get_goal_user_log_data(goal, goal_setting)
             goals << Services::GoalService.new(user).get_update_goal_data(goal, goal_setting)
+            activities << Services::ActivityService.get_activity_data(user, 'goal_add_money')
           end
         end
       rescue ActiveRecord::RecordInvalid => db_err
@@ -23,6 +25,7 @@ namespace :accumulation do
         #TODO: エラー処理については固定したフォーマットを考える
       end
     end
+    Entities::Activity.import activities
     Entities::GoalLog.import goal_logs
     Entities::Goal.import goals, on_duplicate_key_update: [:current_amount]
   end
