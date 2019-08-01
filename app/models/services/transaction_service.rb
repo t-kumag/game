@@ -1,11 +1,12 @@
 class Services::TransactionService
-  def initialize(user, from, to, category_id, share, with_group=false)
+  def initialize(user, category_id, share, with_group=false)
     @user = user
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # from/to の指定がなければ当月の月初から月末までのデータを取得
-    @from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
-    @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
+    #@from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
+    #@to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
+
     @category_id = category_id
     @share = share == "true" ? true : false
     @with_group = with_group
@@ -21,15 +22,15 @@ class Services::TransactionService
   def fetch_transactions(from, to, ids)
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
-      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids)
+      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, at_transaction_category_id: ids)
+      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, at_transaction_category_id: ids)
+      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, at_transaction_category_id: ids)
     else
-      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, used_date: from..to)
-      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, used_date: from..to)
-      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, used_date: from..to)
-      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, used_date: from..to)
+      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id)
+      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id)
+      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id)
+      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id)
     end
     bank_tarnsactions + card_transactiohs + emoney_transactiohs + user_manually_created_transaction
   end
