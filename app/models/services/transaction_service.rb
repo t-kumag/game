@@ -1,13 +1,13 @@
 class Services::TransactionService
-  def initialize(user_id, from, to, category_id, share, with_group=false)
-    @user_id = user_id
+  def initialize(user, from, to, category_id, share, with_group=false)
+    @user = user
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # from/to の指定がなければ当月の月初から月末までのデータを取得
     @from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
     @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
     @category_id = category_id
-    @share = share
+    @share = share == "true" ? true : false
     @with_group = with_group
   end
 
@@ -21,15 +21,15 @@ class Services::TransactionService
   def fetch_transactions(from, to, ids)
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
-      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
-      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
-      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
-      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user_id, at_transaction_category_id: ids, used_date: from..to)
+      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
     else
-      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user_id, used_date: from..to)
-      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user_id, used_date: from..to)
-      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user_id, used_date: from..to)
-      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user_id, used_date: from..to)
+      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, used_date: from..to)
+      card_transactiohs   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, used_date: from..to)
+      emoney_transactiohs = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, used_date: from..to)
+      user_manually_created_transaction = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, used_date: from..to)
     end
     bank_tarnsactions + card_transactiohs + emoney_transactiohs + user_manually_created_transaction
   end
@@ -42,6 +42,8 @@ class Services::TransactionService
         at_user_bank_account_id:    t.at_user_bank_transaction.try(:at_user_bank_account_id),
         at_user_card_account_id:   t.at_user_card_transaction.try(:at_user_card_account_id),
         at_user_emoney_service_account_id: t.at_user_emoney_transaction.try(:at_user_emoney_service_account_id),
+        at_transaction_category_id: t.at_transaction_category_id,
+        is_shared: shared_account?(t) || t.share,
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
@@ -59,6 +61,8 @@ class Services::TransactionService
   def list(ids = @category_id)
     if @with_group === true
       transactions = fetch_transactions(@from, @to, ids)
+      # 削除済み口座の明細を除外する
+      transactions = remove_delete_account_transaction transactions
       # シェアしていない口座の明細 or シェアしていない明細を削除する
       transactions = remove_not_shared_transaction transactions
       transactions = generate_response_from_transactions transactions
@@ -66,10 +70,14 @@ class Services::TransactionService
     else
       if @share === true
         transactions = fetch_transactions(@from, @to, ids)
+        # 削除済み口座の明細を除外する
+        transactions = remove_delete_account_transaction transactions
         transactions = generate_response_from_transactions transactions
         sort_by_used_date transactions
       else
         transactions = fetch_transactions(@from, @to, ids)
+        # 削除済み口座の明細を除外する
+        transactions = remove_delete_account_transaction transactions
         # シェアしている口座の明細 or シェアしている明細を削除する
         transactions = remove_shared_transaction transactions
         transactions = generate_response_from_transactions transactions
@@ -79,51 +87,44 @@ class Services::TransactionService
   end
 
   def remove_shared_transaction(transactions)
-    # シェアしている口座の明細 or シェアしている明細を削除する
     transactions.reject do |t|
-      # シェアしている明細を削除する
-      if t.share === true
+      if shared_account?(t) || t.share
+        # シェアしている口座の明細 or シェアしている明細は削除する
         true
       else
-        # シェアしていない明細、且つシェアしている口座
-        if t.try(:at_user_bank_transaction)
-          # 銀行
-          t.at_user_bank_transaction.at_user_bank_account.share === true 
-        elsif t.try(:at_user_card_transaction)
-          # カード
-          t.at_user_card_transaction.at_user_card_account.share === true
-        elsif t.try(:at_user_emoney_transaction)
-          # 電子マネー
-          t.at_user_emoney_transaction.at_user_emoney_service_account.share === true
-        else
-          # シェアしていない手動明細は除外しない
-          false
-        end
+        # シェアしていない口座の明細 or シェアしていない明細は削除しない
+        false
       end
     end
   end
 
   def remove_not_shared_transaction(transactions)
-    # シェアしていない口座の明細 or シェアしていない明細を削除する
     transactions.reject do |t|
-      # シェアしている明細を削除しない
-      if t.share === true
+      if shared_account?(t) || t.share
+        # シェアしている口座の明細 or シェアしている明細は削除しない
         false
       else
-        # シェアしていない明細、且つシェアしていない口座
-        if t.try(:at_user_bank_transaction)
-          # 銀行
-          t.at_user_bank_transaction.at_user_bank_account.share === false
-        elsif t.try(:at_user_card_transaction)
-          # カード
-          t.at_user_card_transaction.at_user_card_account.share === false
-        elsif t.try(:at_user_emoney_transaction)
-          # 電子マネー
-          t.at_user_emoney_transaction.at_user_emoney_service_account.share === false
-        else
-          # シェアしていない手動明細は除外する
-          true
-        end
+        # シェアしていない口座の明細 or シェアしていない明細は削除する
+        true
+      end
+    end
+  end
+
+  def remove_delete_account_transaction(transactions)
+    delete_bank_account_ids = Entities::AtUserBankAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
+    delete_card_account_ids = Entities::AtUserCardAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
+    delete_emoney_account_ids = Entities::AtUserEmoneyServiceAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
+
+    transactions.reject do |t|
+      if t.try(:at_user_bank_transaction)
+        delete_bank_account_ids.include?(t.at_user_bank_transaction.at_user_bank_account_id)
+      elsif t.try(:at_user_card_transaction)
+        delete_card_account_ids.include?(t.at_user_card_transaction.at_user_card_account_id)
+      elsif t.try(:at_user_emoney_transaction)
+        delete_emoney_account_ids.include?(t.at_user_emoney_transaction.at_user_emoney_service_account_id)
+      else
+        # 手動明細は口座に紐づかないため除外しない
+        false
       end
     end
   end
@@ -140,6 +141,22 @@ class Services::TransactionService
       end
     else
       list
+    end
+  end
+
+  def shared_account?(transaction)
+    if transaction.try(:at_user_bank_transaction).try(:at_user_bank_account_id)
+      shared_bank_account_ids = @user.at_user.at_user_bank_accounts.where(share: true).pluck(:id)
+      shared_bank_account_ids.include?(transaction.at_user_bank_transaction.at_user_bank_account_id)
+    elsif transaction.try(:at_user_card_transaction).try(:at_user_card_account_id)
+      shared_card_account_ids =  @user.at_user.at_user_card_accounts.where(share: true).pluck(:id)
+      shared_card_account_ids.include?(transaction.at_user_card_transaction.at_user_card_account_id)
+    elsif transaction.try(:at_user_emoney_transaction).try(:at_user_emoney_service_account_id)
+      shared_emoney_account_ids = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
+      shared_emoney_account_ids.include?(transaction.at_user_emoney_transaction.at_user_emoney_service_account_id)
+    else
+      # 手動明細は口座に紐づかないため口座シェア判定はfalse固定
+      false
     end
   end
 end

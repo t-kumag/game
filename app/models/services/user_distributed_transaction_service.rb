@@ -55,10 +55,11 @@ class Services::UserDistributedTransactionService
     end
   end
 
+  # confirm_type: 'C' 確定分だけをimportする
   def sync_at_user_card_transactions
     accounts = @user.at_user.at_user_card_accounts
     accounts.each do |account|
-      transactions = Entities::AtUserCardTransaction.where(at_user_card_account_id: account.id)
+      transactions = Entities::AtUserCardTransaction.where(at_user_card_account_id: account.id, confirm_type: 'C')
       save_list = transactions.map do |transaction|
         Entities::UserDistributedTransaction.new(
             user_id: @user.id,

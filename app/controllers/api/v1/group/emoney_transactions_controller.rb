@@ -1,4 +1,3 @@
-# TODO(fujiura) group で取得する明細の情報を明確にする
 class Api::V1::Group::EmoneyTransactionsController < ApplicationController
   before_action :authenticate
 
@@ -8,7 +7,8 @@ class Api::V1::Group::EmoneyTransactionsController < ApplicationController
       render_disallowed_financier_ids && return
     end
 
-    @transactions = Services::AtEmoneyTransactionService.new(@current_user, true).list(account_id, params[:page])
+    @transactions = Services::AtEmoneyTransactionService.new(@current_user, true, params[:from], params[:to]).list(account_id, params[:page])
+    @categories   = Entities::AtTransactionCategory.all
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
@@ -35,12 +35,11 @@ class Api::V1::Group::EmoneyTransactionsController < ApplicationController
         transaction_id,
         params[:at_transaction_category_id],
         params[:used_location],
-        params[:is_shared],
-        params[:is_shared] ? @current_user.group_id : nil
+        params[:share],
+        params[:share] ? @current_user.group_id : nil
     )
     render json: {}, status: 200 and return if @response.blank?
 
-    # TODO(fujiura): 何を返すべき？
     render 'update', formats: 'json', handlers: 'jbuilder'
   end
 

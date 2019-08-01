@@ -28,6 +28,8 @@ class Entities::AtUserCardAccount < ApplicationRecord
   belongs_to :at_user
   belongs_to :at_card
   has_many :at_user_card_transactions
+  has_many :at_scraping_logs
+  has_many :at_sync_transaction_logs
 
   def current_month_payment(account_ids=nil)
     current_month = Time.now.strftime("%Y-%m").to_s

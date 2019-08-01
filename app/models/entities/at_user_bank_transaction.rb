@@ -29,11 +29,11 @@ class Entities::AtUserBankTransaction < ApplicationRecord
 
   def amount
     if self.amount_receipt != 0 
-      return self.amount_receipt
+      self.amount_receipt
     elsif self.amount_payment != 0 
-      return self.amount_payment * -1
+      self.amount_payment * -1
     else
-      return 0
+      0
     end
   end
 

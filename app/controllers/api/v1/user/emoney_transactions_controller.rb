@@ -1,16 +1,14 @@
 class Api::V1::User::EmoneyTransactionsController < ApplicationController
   before_action :authenticate
 
-  # TODO(fujiura): before_action で対象口座へのアクセス権があるかチェックする
-  # TODO(fujiura): emoney_account_id, transaction_id に対応するデータがないときの処理
-
   def index
     account_id = params[:emoney_account_id].to_i
     if disallowed_at_emoney_ids?([account_id])
       render_disallowed_financier_ids && return
     end
 
-    @transactions = Services::AtEmoneyTransactionService.new(@current_user).list(account_id, params[:page])
+    @transactions = Services::AtEmoneyTransactionService.new(@current_user, false, params[:from], params[:to]).list(account_id, params[:page])
+    @categories   = Entities::AtTransactionCategory.all
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
@@ -37,11 +35,11 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
         transaction_id,
         params[:at_transaction_category_id],
         params[:used_location],
-        params[:is_shared],
-        params[:is_shared] ? @current_user.group_id : nil
+        params[:share],
+        params[:share] ? @current_user.group_id : nil
     )
     render json: {}, status: 200 and return if @response.blank?
-    # TODO(fujiura): 何を返すべき？
+
     render 'update', formats: 'json', handlers: 'jbuilder'
   end
 
