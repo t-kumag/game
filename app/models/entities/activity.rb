@@ -136,7 +136,7 @@ class Entities::Activity < ApplicationRecord
         message = "目標が作成されました。"
       when "goal_add_money"
         #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
-        message = "目標の追加入金がありました。"
+        message = "目標に入金がありました。"
       end
 
       @result.push({
