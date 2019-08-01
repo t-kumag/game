@@ -223,19 +223,16 @@ class ApplicationController < ActionController::Base
     at_user_bank_transaction_ids.flatten!
     
     bank_transaction_ids.each do |id|
+      # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
+      return true unless at_user_bank_transaction_ids.include?(id)
+
       if with_group
-        if at_user_bank_transaction_ids.include?(id)
-          transaction = Entities::AtUserBankTransaction.find(id)
-          if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_bank_account).try(:share)
-            next
-          else
-            return true
-          end
+        transaction = Entities::AtUserBankTransaction.find(id)
+        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_bank_account).try(:share)
+          next
         else
           return true
         end
-      else
-        return true unless at_user_bank_transaction_ids.include?(id)
       end
     end
     false
@@ -253,19 +250,16 @@ class ApplicationController < ActionController::Base
     at_user_card_transaction_ids.flatten!
     
     card_transaction_ids.each do |id|
+      # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
+      return true unless at_user_card_transaction_ids.include?(id)
+
       if with_group
-        if at_user_card_transaction_ids.include?(id)
-          transaction = Entities::AtUserCardTransaction.find(id)
-          if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_card_account).try(:share)
-            next
-          else
-            return true
-          end
+        transaction = Entities::AtUserCardTransaction.find(id)
+        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_card_account).try(:share)
+          next
         else
           return true
         end
-      else
-        return true unless at_user_card_transaction_ids.include?(id)
       end
     end
     false
@@ -283,19 +277,16 @@ class ApplicationController < ActionController::Base
     at_user_emoney_transaction_ids.flatten!
     
     emoney_transaction_ids.each do |id|
+      # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
+      return true unless at_user_emoney_transaction_ids.include?(id)
+
       if with_group
-        if at_user_emoney_transaction_ids.include?(id)
-          transaction = Entities::AtUserEmoneyTransaction.find(id)
-          if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_emoney_service_account).try(:share)
-            next
-          else
-            return true
-          end
+        transaction = Entities::AtUserEmoneyTransaction.find(id)
+        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_emoney_service_account).try(:share)
+          next
         else
           return true
         end
-      else
-        return true unless at_user_emoney_transaction_ids.include?(id)
       end
     end
     false
@@ -312,19 +303,16 @@ class ApplicationController < ActionController::Base
     user_manually_created_transaction_ids.flatten!
     
     manually_created_transaction_ids.each do |id|
+      # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
+      return true unless user_manually_created_transaction_ids.include?(id)
+
       if with_group
-        if user_manually_created_transaction_ids.include?(id)
-          transaction = Entities::UserManuallyCreatedTransaction.find(id)
-          if transaction.try(:user_distributed_transaction).try(:share)
-            next
-          else
-            return true
-          end
+        transaction = Entities::UserManuallyCreatedTransaction.find(id)
+        if transaction.try(:user_distributed_transaction).try(:share)
+          next
         else
           return true
         end
-      else
-        return true unless user_manually_created_transaction_ids.include?(id)
       end
     end
     false
