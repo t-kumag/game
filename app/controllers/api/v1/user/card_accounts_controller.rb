@@ -12,7 +12,9 @@ class Api::V1::User::CardAccountsController < ApplicationController
             id: ca.id,
             name: ca.fnc_nm,
             amount: 0,
-            fnc_id: ca.fnc_id
+            fnc_id: ca.fnc_id,
+            last_rslt_cd: ca.last_rslt_cd,
+            last_rslt_msg: ca.last_rslt_msg
           }
         end
       end
