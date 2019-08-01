@@ -130,7 +130,7 @@ class Entities::Activity < ApplicationRecord
         message = "夫婦の電子マネーに収入があります。"
       when "pairing_created"
         #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
-        message = "パートナーが参加しました。"
+        message = "ぺアリングが完了しました！"
       when "goal_created"
         #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
         message = "目標が作成されました。"
