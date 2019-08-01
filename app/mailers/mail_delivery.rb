@@ -9,7 +9,7 @@ class MailDelivery < ApplicationMailer
   def user_change_password_request(user)
     @token = user.token
     mail( :to => user.email,
-          :subject => '【OsidOri】パスワードの再設定をしてください' )
+          :subject => '【OsidOri】パスワード再設定のご連絡' )
   end
   
   def account_linkage_error(user, account)
