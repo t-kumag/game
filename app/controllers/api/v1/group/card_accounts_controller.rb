@@ -13,7 +13,10 @@ class Api::V1::Group::CardAccountsController < ApplicationController
           @responses << {
               id: ca.id,
               name: ca.fnc_nm,
-              amount: 0
+              amount: 0,
+              fnc_id: ca.fnc_id,
+              last_rslt_cd: ca.last_rslt_cd,
+              last_rslt_msg: ca.last_rslt_msg
           }
         end
       end

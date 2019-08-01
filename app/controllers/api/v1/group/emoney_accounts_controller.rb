@@ -14,7 +14,10 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
           @responses << {
               id: a.id,
               name: a.fnc_nm,
-              amount: a.balance
+              amount: a.balance,
+              fnc_id: a.fnc_id,
+              last_rslt_cd: a.last_rslt_cd,
+              last_rslt_msg: a.last_rslt_msg
           }
         end
       end
