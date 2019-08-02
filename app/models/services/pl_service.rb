@@ -109,9 +109,7 @@ class Services::PlService
     pl_emoney = group_by_category_id(pl_emoney)
 
     toal_category_suummaries =  merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
-    if page.present?
-      return Kaminari.paginate_array(toal_category_suummaries).page(page)
-    end
+    return Kaminari.paginate_array(toal_category_suummaries).page(page) if page.present?
 
     toal_category_suummaries
   end
