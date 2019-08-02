@@ -1,10 +1,10 @@
 class Services::TransactionService
   def initialize(user, category_id, share, with_group=false, page=1)
     @user = user
-    @page = page
     @category_id = category_id
     @share = share == "true" ? true : false
     @with_group = with_group
+    @page = page
   end
 
   def type(transaction)
