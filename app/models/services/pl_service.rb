@@ -13,88 +13,45 @@ class Services::PlService
     ]
   end
 
-  def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month, page=nil)
     bank_category_summary_sql = get_bank_category_sql(share)
+    used_date_sql = get_used_date_category_sql(from, to) unless page.present?
     sql = <<-EOS
       #{bank_category_summary_sql}
-      AND
-        udt.used_date >= "#{from}"
-      AND
-        udt.used_date <= "#{to}"
+      #{used_date_sql}
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def bank_category_summary_pagination(share)
-    bank_category_summary_sql = get_bank_category_sql(share)
-    sql = <<-EOS
-      #{bank_category_summary_sql}
-    EOS
-
-    ActiveRecord::Base.connection.select_all(sql).to_hash
-  end
-
-  def card_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def card_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month, page=nil)
     card_category_summary_sql = get_card_category_sql(share)
+    used_date_sql = get_used_date_category_sql(from, to) unless page.present?
     sql = <<-EOS
       #{card_category_summary_sql}
-      AND
-        udt.used_date >= "#{from}"
-      AND
-        udt.used_date <= "#{to}"
+      #{used_date_sql}
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def card_category_summary_pagination(share)
-    card_category_summary_sql = get_card_category_sql(share)
-    sql = <<-EOS
-      #{card_category_summary_sql}
-    EOS
-    ActiveRecord::Base.connection.select_all(sql).to_hash
-  end
-
-  def emoney_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def emoney_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month, page=nil)
     emoney_category_summary_sql = get_emoney_category_sql(share)
+    used_date_sql = get_used_date_category_sql(from, to) unless page.present?
     sql = <<-EOS
       #{emoney_category_summary_sql}
-      AND
-        udt.used_date >= "#{from}"
-      AND
-        udt.used_date <= "#{to}"
+      #{used_date_sql}
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def emoney_category_summary_pagination(share)
-    emoney_category_summary_sql = get_emoney_category_sql(share)
-    sql = <<-EOS
-      #{emoney_category_summary_sql}
-    EOS
-
-    ActiveRecord::Base.connection.select_all(sql).to_hash
-  end
-
-  def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month, page=nil)
     user_manually_created_category_summary_sql = get_user_manually_created_category_summary_sql(share)
+    used_date_sql = get_used_date_category_sql(from, to) unless page.present?
     sql = <<-EOS
       #{user_manually_created_category_summary_sql}
-      AND
-        udt.used_date >= "#{from}"
-      AND
-        udt.used_date <= "#{to}"
-    EOS
-
-    ActiveRecord::Base.connection.select_all(sql).to_hash
-  end
-
-  def user_manually_created_category_summary_pagination(share)
-    user_manually_created_category_summary_sql = get_user_manually_created_category_summary_sql(share)
-    sql = <<-EOS
-      #{user_manually_created_category_summary_sql}
+      #{used_date_sql}
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -128,14 +85,22 @@ class Services::PlService
     at_user_ids
   end
 
-  def pl_category_summary(share, from, to)
+  def pl_category_summary(share, from, to, page=nil)
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
 
     # P/L 用の明細を取得
-    pl_bank = bank_category_summary(share, from, to)
-    pl_card = card_category_summary(share, from, to)
-    pl_emoney = emoney_category_summary(share, from, to)
+    if page.nil?
+      pl_bank = bank_category_summary(share, from, to)
+      pl_card = card_category_summary(share, from, to)
+      pl_emoney = emoney_category_summary(share, from, to)
+      pl_user_manually_created = user_manually_created_category_summary(share, from, to)
+    else
+      pl_bank = bank_category_summary(share, from, to, page)
+      pl_card = card_category_summary(share, from, to, page)
+      pl_emoney = emoney_category_summary(share, from, to, page)
+      pl_user_manually_created = user_manually_created_category_summary(share,from,to, page)
+    end
 
     pl_bank = remove_debit_transactions(pl_bank, pl_card)
 
@@ -143,8 +108,12 @@ class Services::PlService
     pl_card = group_by_category_id(pl_card)
     pl_emoney = group_by_category_id(pl_emoney)
 
-    pl_user_manually_created = user_manually_created_category_summary(share, from, to)
-    merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
+    toal_category_suummaries =  merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
+    if page.present?
+      return Kaminari.paginate_array(toal_category_suummaries).page(page)
+    end
+
+    toal_category_suummaries
   end
 
   def pl_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
@@ -163,23 +132,6 @@ class Services::PlService
       pl_summaries[:expense_amount] += summary['amount_payment']
     end
     pl_summaries
-  end
-
-  def pl_category_summary_pagination(share, page)
-    # P/L 用の明細を取得
-    pl_bank = bank_category_summary_pagination(share)
-    pl_card = card_category_summary_pagination(share)
-    pl_emoney = emoney_category_summary_pagination(share)
-
-    pl_bank = remove_debit_transactions(pl_bank, pl_card)
-
-    pl_bank = group_by_category_id(pl_bank)
-    pl_card = group_by_category_id(pl_card)
-    pl_emoney = group_by_category_id(pl_emoney)
-    pl_user_manually_created = user_manually_created_category_summary(share)
-
-    toal_category_suummaries = merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
-    Kaminari.paginate_array(toal_category_suummaries).page(page)
   end
 
   def remove_duplicated_transaction(transactions)
@@ -267,7 +219,7 @@ class Services::PlService
     after_summaries
   end
 
-  def pl_grouped_category_summary(share, page)
+  def pl_grouped_category_summary(share, from=nil, to=nil, page=1)
     # PL を大項目ごとに集計し直すため、大項目の一覧を取得
     grouped_categories = Entities::AtGroupedCategory.all.map { |category|
       {
@@ -277,7 +229,7 @@ class Services::PlService
     }
     summary = []
     # 小項目ごとの PL 集計結果から、大項目ごとに再集計を行う
-    pl_category_summary_pagination(share, page).each { |item|
+    pl_category_summary(share, nil,nil, page).each { |item|
       # category_name1　が有効なら
       matched_category = grouped_categories.find { |category| category[:name] === item['category_name1'] }
       if (matched_category.present?)
@@ -490,4 +442,15 @@ class Services::PlService
       AND
         udt.share in (#{share.join(',')})"
   end
+
+  def get_used_date_category_sql(from, to)
+
+    sql = "
+      AND
+        udt.used_date >= #{from}
+      AND
+        udt.used_date >= #{to}
+    "
+  end
+
 end

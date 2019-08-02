@@ -63,7 +63,7 @@ class Services::TransactionService
       transactions = remove_not_shared_transaction transactions
       transactions = generate_response_from_transactions transactions
       sort_by_used_date transactions
-      Kaminari.paginate_array(transactions).page(page)
+      Kaminari.paginate_array(transactions).page(@page)
     else
       if @share === true
         transactions = fetch_transactions(ids, @page)
@@ -80,7 +80,7 @@ class Services::TransactionService
         transactions = remove_shared_transaction transactions
         transactions = generate_response_from_transactions transactions
         sort_by_used_date transactions
-        Kaminari.paginate_array(transactions).page(page)
+        Kaminari.paginate_array(transactions).page(@page)
       end
     end
   end
