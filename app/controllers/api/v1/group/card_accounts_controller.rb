@@ -13,7 +13,7 @@ class Api::V1::Group::CardAccountsController < ApplicationController
           @responses << {
               id: ca.id,
               name: ca.fnc_nm,
-              amount: 0,
+              amount: ca.current_month_used_amount,
               fnc_id: ca.fnc_id,
               last_rslt_cd: ca.last_rslt_cd,
               last_rslt_msg: ca.last_rslt_msg
@@ -23,7 +23,6 @@ class Api::V1::Group::CardAccountsController < ApplicationController
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
-    # TODO: user_distributed_transactionsを参照するようにする
     def summary
       if @current_user.try(:at_user).try(:at_user_card_accounts).blank?
           @response = {
@@ -31,9 +30,9 @@ class Api::V1::Group::CardAccountsController < ApplicationController
         }
       else
         share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
-
+        # TODO: リリース後対応 各口座の今月の利用額の合算 → 今月の引落額の合算にするにする
         @response = {
-            amount: share_on_card_accounts.sum{|i| i.current_month_payment(share_on_card_accounts.pluck(:at_user_id))}
+            amount: share_on_card_accounts.sum{|i| i.current_month_used_amount}
         }
       end
 
