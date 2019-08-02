@@ -3,6 +3,7 @@ class Services::PlService
   def initialize(user, with_group=false)
     @user = user
     @with_group = with_group
+    @per_page_num = 25
   end
   
   def ignore_at_category_ids
@@ -13,7 +14,8 @@ class Services::PlService
     ]
   end
 
-  def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def bank_category_summary(share, page)
+    offset_start = get_offset_start(page)
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
@@ -49,16 +51,14 @@ class Services::PlService
         (auba.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
-      AND
-        udt.used_date >= "#{from}"
-      AND
-        udt.used_date <= "#{to}"
+      LIMIT
+        #{@per_page_num} OFFSET #{offset_start}
     EOS
-
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def card_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def card_category_summary(share, page)
+    offset_start = get_offset_start(page)
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
@@ -90,16 +90,15 @@ class Services::PlService
         (auca.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
-      AND
-        udt.used_date >= "#{from}"
-      AND
-        udt.used_date <= "#{to}"
+      LIMIT
+        #{@per_page_num} OFFSET #{offset_start}
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def emoney_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def emoney_category_summary(share, page)
+    offset_start = get_offset_start(page)
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
@@ -135,16 +134,15 @@ class Services::PlService
         (auea.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
-      AND
-        udt.used_date >= "#{from}"
-      AND
-        udt.used_date <= "#{to}"
+      LIMIT
+        #{@per_page_num} OFFSET #{offset_start}
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+  def user_manually_created_category_summary(share, page)
+    offset_start = get_offset_start(page)
     sql = <<-EOS
       SELECT
         udt.at_transaction_category_id,
@@ -168,10 +166,8 @@ class Services::PlService
         udt.user_id in (#{user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
-      AND
-        udt.used_date >= "#{from}"
-      AND
-        udt.used_date <= "#{to}"
+      LIMIT 
+        #{@per_page_num} OFFSET #{offset_start}
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -205,14 +201,15 @@ class Services::PlService
     at_user_ids
   end
 
-  def pl_category_summary(share, from, to)
-    from = from || Time.zone.today.beginning_of_month
-    to = to || Time.zone.today.end_of_month
+  def pl_category_summary(share, page)
+
+    # 文字から数値へ変換
+    page = page.to_i
 
     # P/L 用の明細を取得
-    pl_bank = bank_category_summary(share, from, to)
-    pl_card = card_category_summary(share, from, to)
-    pl_emoney = emoney_category_summary(share, from, to)
+    pl_bank = bank_category_summary(share, page)
+    pl_card = card_category_summary(share, page)
+    pl_emoney = emoney_category_summary(share, page)
 
     pl_bank = remove_debit_transactions(pl_bank, pl_card)
 
@@ -220,15 +217,13 @@ class Services::PlService
     pl_card = group_by_category_id(pl_card)
     pl_emoney = group_by_category_id(pl_emoney)
 
-    pl_user_manually_created = user_manually_created_category_summary(share, from, to)
+    pl_user_manually_created = user_manually_created_category_summary(share, page)
     merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
   end
 
-  def pl_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
-    from = from || Time.zone.today.beginning_of_month
-    to = to || Time.zone.today.end_of_month
+  def pl_summary(share, page)
 
-    pl_category_summary = pl_category_summary(share, from, to)
+    pl_category_summary = pl_category_summary(share, page)
     pl_summaries = {
         income_amount: 0,
         expense_amount: 0
@@ -327,9 +322,7 @@ class Services::PlService
     after_summaries
   end
 
-  def pl_grouped_category_summary(share, from, to)
-    from = from || Time.zone.today.beginning_of_month
-    to = to || Time.zone.today.end_of_month
+  def pl_grouped_category_summary(share, page)
 
     # PL を大項目ごとに集計し直すため、大項目の一覧を取得
     grouped_categories = Entities::AtGroupedCategory.all.map { |category|
@@ -340,7 +333,7 @@ class Services::PlService
     }
     summary = []
     # 小項目ごとの PL 集計結果から、大項目ごとに再集計を行う
-    pl_category_summary(share, from, to).each { |item|
+    pl_category_summary(share, page).each { |item|
       # category_name1　が有効なら
       matched_category = grouped_categories.find { |category| category[:name] === item['category_name1'] }
       if (matched_category.present?)
@@ -416,6 +409,13 @@ class Services::PlService
     else
       false
     end
+  end
+
+  def get_offset_start(page)
+    # 0以下、1は0スタート,そこから25ずつ増やしたいためページを一つ減らすために必要
+    # 2 -> 25, 3 -> 50, 4 -> 75, 5 ->100 といった感じ
+    page = page - 1
+    page < 1 ? 0 : page * @per_page_num
   end
 
 end
