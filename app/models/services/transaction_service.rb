@@ -71,7 +71,7 @@ class Services::TransactionService
         transactions = remove_delete_account_transaction transactions
         transactions = generate_response_from_transactions transactions
         sort_by_used_date transactions
-        Kaminari.paginate_array(transactions).page(page)
+        Kaminari.paginate_array(transactions).page(@page)
       else
         transactions = fetch_transactions(ids)
         # 削除済み口座の明細を除外する

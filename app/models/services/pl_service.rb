@@ -131,6 +131,7 @@ class Services::PlService
       pl_summaries[:income_amount] += summary['amount_receipt']
       pl_summaries[:expense_amount] += summary['amount_payment']
     end
+
     pl_summaries
   end
 
@@ -180,6 +181,7 @@ class Services::PlService
         }.stringify_keys
       end
     end
+
     after_summaries
   end
 
@@ -248,6 +250,7 @@ class Services::PlService
         summary[index]['amount_payment'] += item['amount_payment']
       end
     }
+
     summary.sort { |a, b| a['at_transaction_category_id'] <=> b['at_transaction_category_id'] }
   end
 
