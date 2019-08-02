@@ -90,16 +90,16 @@ class Services::PlService
     to = to || Time.zone.today.end_of_month
 
     # P/L 用の明細を取得
-    if page.nil?
-      pl_bank = bank_category_summary(share, from, to)
-      pl_card = card_category_summary(share, from, to)
-      pl_emoney = emoney_category_summary(share, from, to)
-      pl_user_manually_created = user_manually_created_category_summary(share, from, to)
-    else
+    if page.present?
       pl_bank = bank_category_summary(share, from, to, page)
       pl_card = card_category_summary(share, from, to, page)
       pl_emoney = emoney_category_summary(share, from, to, page)
       pl_user_manually_created = user_manually_created_category_summary(share,from,to, page)
+    else
+      pl_bank = bank_category_summary(share, from, to)
+      pl_card = card_category_summary(share, from, to)
+      pl_emoney = emoney_category_summary(share, from, to)
+      pl_user_manually_created = user_manually_created_category_summary(share, from, to)
     end
 
     pl_bank = remove_debit_transactions(pl_bank, pl_card)
@@ -444,13 +444,11 @@ class Services::PlService
   end
 
   def get_used_date_category_sql(from, to)
-
     sql = "
       AND
         udt.used_date >= #{from}
       AND
-        udt.used_date >= #{to}
-    "
+        udt.used_date >= #{to}"
   end
 
 end
