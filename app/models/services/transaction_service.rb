@@ -14,7 +14,7 @@ class Services::TransactionService
     return "manually_created" unless transaction.user_manually_created_transaction_id.nil?
   end
 
-  def fetch_transactions(ids, page)
+  def fetch_transactions(ids)
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
       bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids)
@@ -56,7 +56,7 @@ class Services::TransactionService
 
   def list(ids = @category_id)
     if @with_group === true
-      transactions = fetch_transactions(ids, @page)
+      transactions = fetch_transactions(ids)
       # 削除済み口座の明細を除外する
       transactions = remove_delete_account_transaction transactions
       # シェアしていない口座の明細 or シェアしていない明細を削除する
@@ -66,14 +66,14 @@ class Services::TransactionService
       Kaminari.paginate_array(transactions).page(@page)
     else
       if @share === true
-        transactions = fetch_transactions(ids, @page)
+        transactions = fetch_transactions(ids)
         # 削除済み口座の明細を除外する
         transactions = remove_delete_account_transaction transactions
         transactions = generate_response_from_transactions transactions
         sort_by_used_date transactions
         Kaminari.paginate_array(transactions).page(page)
       else
-        transactions = fetch_transactions(ids, @page)
+        transactions = fetch_transactions(ids)
         # 削除済み口座の明細を除外する
         transactions = remove_delete_account_transaction transactions
         # シェアしている口座の明細 or シェアしている明細を削除する
