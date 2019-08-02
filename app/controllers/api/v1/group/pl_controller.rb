@@ -3,13 +3,13 @@ class Api::V1::Group::PlController < ApplicationController
 
   def summary
     share = params[:share] == "true" ? [1] : [0,1]
-    @response = Services::PlService.new(@current_user, true).pl_summary(share, params[:page])
+    @response = Services::PlService.new(@current_user, true).pl_summary(share, params[:from], params[:to])
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
 
   def categories
     share = params[:share] == "true" ? [1] : [0,1]
-    @response = Services::PlService.new(@current_user, true).pl_category_summary(share, params[:page])
+    @response = Services::PlService.new(@current_user, true).pl_category_summary_pagination(share, params[:page])
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
