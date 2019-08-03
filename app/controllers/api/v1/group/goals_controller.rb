@@ -35,6 +35,11 @@ class Api::V1::Group::GoalsController < ApplicationController
         # 相手の目標設定を登録
         goal.goal_settings.create!(get_partner_goal_setting_params)
       end
+
+      Services::ActivityService.create_user_manually_activity(@current_user.id,
+                                                              @current_user.group_id,
+                                                              Time.zone.now,
+                                                              :goal_created)
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
@@ -103,6 +108,10 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal_service = Services::GoalService.new(@current_user)
     if goal_service.check_bank_balance(params[:add_amount], goal_setting)
       goal_service.add_money(goal, goal_setting, params[:add_amount])
+      Services::ActivityService.create_user_manually_activity(@current_user.id,
+                                                              @current_user.group_id,
+                                                              Time.zone.now,
+                                                              :goal_add_money)
       render(json: {}, status: 200)
     else
       render(json: {errors: [{code:"", message:"minus balance"}]}, status: 422)

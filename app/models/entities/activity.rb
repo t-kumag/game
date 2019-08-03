@@ -116,6 +116,9 @@ class Entities::Activity < ApplicationRecord
       when "partner_bank_income"
         #message = "夫婦の銀行口座に収入が" + a.count.to_s + "件あります。"
         message = "夫婦の銀行口座に収入があります。"
+      when "individual_manual_outcome"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "手動で明細が作成されました。"
       when "partner_card_outcome"
         #message = "夫婦のクレジットカードの支出が" + a.count.to_s + "件あります。"
         message = "夫婦のクレジットカードの支出があります。"
@@ -125,6 +128,15 @@ class Entities::Activity < ApplicationRecord
       when "partner_emoney_income"
         #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
         message = "夫婦の電子マネーに収入があります。"
+      when "pairing_created"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "ぺアリングが完了しました！"
+      when "goal_created"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "目標が作成されました。"
+      when "goal_add_money"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "目標に入金がありました。"
       end
 
       @result.push({

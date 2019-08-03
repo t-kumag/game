@@ -1,21 +1,30 @@
 class Services::ActivityService
 
+  def self.get_activity_data(user, activity_type)
+    {
+        user_id: user.id,
+        group_id: user.group_id,
+        count: 0,
+        activity_type: activity_type,
+        date: Time.zone.now
+    }
+  end
+
   def self.save_activities(activities)
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_user_manually_activity(user, save_params, activity_type)
-    Entities::Activity.find_or_create_by(date: save_params[:used_date], activity_type: activity_type) do |activity|
-      activity.user_id = user.id
+  def self.create_user_manually_activity(user_id, group_id, used_date, activity_type)
+    Entities::Activity.find_or_create_by(user_id: user_id, date: used_date, activity_type: activity_type) do |activity|
+      activity.user_id = user_id
+      activity.group_id = group_id
       activity.count = 0
       activity.activity_type = activity_type
-      activity.date = save_params[:used_date]
+      activity.date = used_date
     end
   end
 
-
   def self.set_activity_list(financier_account_type_key, tran, account)
-
     activity = Entities::Activity.new
     activity[:count] = 0
     activity[:user_id] = account[:at_user_id]
@@ -29,21 +38,17 @@ class Services::ActivityService
         activity[:activity_type] = (tran[k].to_i == 0) ? v[:income] : v[:outcome]
       end
     end
-
     activity
   end
 
   def self.check_activity_duplication(financier_account_type_key, activities, activity)
-
     latest_one = activities.present? ? activities.last : nil
     return true if latest_one.nil? ? true : false
-
     activity_data_column = get_activity_data_column(financier_account_type_key)
     check_duplication_old_act(latest_one, activity, activity_data_column)
   end
 
   private
-
   def self.get_activity_data_column(financier_account_type_key)
     case financier_account_type_key
     when "at_user_card_account_id"
@@ -56,9 +61,7 @@ class Services::ActivityService
   end
 
   def self.check_duplication_old_act(latest_one, activity, activity_data_column)
-
     src_insert = { date: false, activity: false }
-
     activity_data_column.each do |k, v|
       if v[:col] == "USED_DATE" || v[:col] == "TRADE_DTM"
         src_insert[:date] = activity[:date] == latest_one[:date]
@@ -66,7 +69,6 @@ class Services::ActivityService
         src_insert[:activity] = activity[:activity_type] == latest_one[:activity_type]
       end
     end
-
     ((src_insert[:date] == true) && (src_insert[:activity] == true)) ? false : true
   end
 
