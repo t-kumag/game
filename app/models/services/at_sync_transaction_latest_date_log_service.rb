@@ -26,14 +26,14 @@ class Services::AtSyncTransactionLatestDateLogService
 
   def self.set_at_user_card_account_id(account)
     Entities::AtSyncTransactionLatestDateLog.new(
-        at_user_card_account_id: account.at_user_id.to_i,
+        at_user_card_account_id: account.id,
         latest_date: DateTime.now
     )
   end
 
   def self.set_at_user_bank_account_id(account)
     Entities::AtSyncTransactionLatestDateLog.new(
-        at_user_bank_account_id: account.at_user_id,
+        at_user_bank_account_id: account.id,
         latest_date: DateTime.now
     )
   end
