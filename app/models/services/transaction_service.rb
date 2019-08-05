@@ -165,7 +165,6 @@ class Services::TransactionService
     shared[:bank_account_ids] = @user.at_user.at_user_bank_accounts.where(share: true).pluck(:id)
     shared[:card_account_ids] =  @user.at_user.at_user_card_accounts.where(share: true).pluck(:id)
     shared[:emoney_account_ids] = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
-
     shared
   end
 end
