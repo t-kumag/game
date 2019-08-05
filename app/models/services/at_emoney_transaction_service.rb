@@ -7,11 +7,10 @@ class Services::AtEmoneyTransactionService
 
   # TODO: form toをつけないと検索範囲が広すぎる
   def list(account_id, page)
-    distributed_transactions = get_distributed_transactions(account_id)
+    distributed_transactions = get_distributed_transactions(account_id, page)
     return {} if distributed_transactions.blank?
 
-    result = distributed_transactions.order(used_date: "DESC")
-    Kaminari.paginate_array(result).page(page)
+    distributed_transactions
   end
 
   def detail(account_id, transaction_id)
@@ -67,7 +66,7 @@ class Services::AtEmoneyTransactionService
     distributed
   end
 
-  def get_distributed_transactions(account_id)
+  def get_distributed_transactions(account_id, page)
     if @is_group === true
       emoney = Entities::AtUserEmoneyServiceAccount.find_by(id: account_id, at_user_id: [@user.at_user.id, @user.partner_user.try(:at_user).try(:id)])
     else
@@ -80,12 +79,12 @@ class Services::AtEmoneyTransactionService
 
     if @is_group === true
       if emoney.share === true
-        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_emoney_transaction_id: transaction_ids)
+        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_emoney_transaction_id: transaction_ids).page(page)
       else
-        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_emoney_transaction_id: transaction_ids, share: true)
+        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_emoney_transaction_id: transaction_ids, share: true).page(page)
       end
     else
-      distributed_transactions = Entities::UserDistributedTransaction.where(at_user_emoney_transaction_id: transaction_ids, share: false)
+      distributed_transactions = Entities::UserDistributedTransaction.where(at_user_emoney_transaction_id: transaction_ids, share: false).page(page)
     end
     distributed_transactions
   end
