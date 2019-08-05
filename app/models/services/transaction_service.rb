@@ -30,7 +30,7 @@ class Services::TransactionService
     bank_tarnsactions + card_transactions + emoney_transactions + user_manually_created_transactions
   end
 
-  def generate_response_from_transactions(transactions)
+  def generate_response_from_transactions(transactions, shared_accounts)
 
     response = []
     transactions.each{ |t|
@@ -39,7 +39,7 @@ class Services::TransactionService
         at_user_card_account_id:   t.at_user_card_transaction.try(:at_user_card_account_id),
         at_user_emoney_service_account_id: t.at_user_emoney_transaction.try(:at_user_emoney_service_account_id),
         at_transaction_category_id: t.at_transaction_category_id,
-        is_shared: shared_account?(t) || t.share,
+        is_shared: shared_account?(t, shared_accounts) || t.share,
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
@@ -55,13 +55,15 @@ class Services::TransactionService
   end
 
   def list(ids = @category_id)
+    shared_accounts = get_shared_account_ids
+
     if @with_group === true
       transactions = fetch_transactions(ids)
       # 削除済み口座の明細を除外する
       transactions = remove_delete_account_transaction transactions
       # シェアしていない口座の明細 or シェアしていない明細を削除する
-      transactions = remove_not_shared_transaction transactions
-      transactions = generate_response_from_transactions transactions
+      transactions = remove_not_shared_transaction(transactions, shared_accounts)
+      transactions = generate_response_from_transactions(transactions, shared_accounts)
       sort_by_used_date transactions
       Kaminari.paginate_array(transactions).page(@page)
     else
@@ -69,7 +71,7 @@ class Services::TransactionService
         transactions = fetch_transactions(ids)
         # 削除済み口座の明細を除外する
         transactions = remove_delete_account_transaction transactions
-        transactions = generate_response_from_transactions transactions
+        transactions = generate_response_from_transactions(transactions, shared_accounts)
         sort_by_used_date transactions
         Kaminari.paginate_array(transactions).page(@page)
       else
@@ -77,17 +79,17 @@ class Services::TransactionService
         # 削除済み口座の明細を除外する
         transactions = remove_delete_account_transaction transactions
         # シェアしている口座の明細 or シェアしている明細を削除する
-        transactions = remove_shared_transaction transactions
-        transactions = generate_response_from_transactions transactions
+        transactions = remove_shared_transaction(transactions, shared_accounts)
+        transactions = generate_response_from_transactions(transactions, shared_accounts)
         sort_by_used_date transactions
         Kaminari.paginate_array(transactions).page(@page)
       end
     end
   end
 
-  def remove_shared_transaction(transactions)
+  def remove_shared_transaction(transactions, shared_accounts)
     transactions.reject do |t|
-      if shared_account?(t) || t.share
+      if shared_account?(t, shared_accounts) || t.share
         # シェアしている口座の明細 or シェアしている明細は削除する
         true
       else
@@ -97,9 +99,10 @@ class Services::TransactionService
     end
   end
 
-  def remove_not_shared_transaction(transactions)
+  def remove_not_shared_transaction(transactions, shared_accounts)
+
     transactions.reject do |t|
-      if shared_account?(t) || t.share
+      if shared_account?(t, shared_accounts) || t.share
         # シェアしている口座の明細 or シェアしている明細は削除しない
         false
       else
@@ -110,6 +113,7 @@ class Services::TransactionService
   end
 
   def remove_delete_account_transaction(transactions)
+
     delete_bank_account_ids = Entities::AtUserBankAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
     delete_card_account_ids = Entities::AtUserCardAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
     delete_emoney_account_ids = Entities::AtUserEmoneyServiceAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
@@ -143,19 +147,24 @@ class Services::TransactionService
     end
   end
 
-  def shared_account?(transaction)
+  def shared_account?(transaction, shared_accounts)
     if transaction.try(:at_user_bank_transaction).try(:at_user_bank_account_id)
-      shared_bank_account_ids = @user.at_user.at_user_bank_accounts.where(share: true).pluck(:id)
-      shared_bank_account_ids.include?(transaction.at_user_bank_transaction.at_user_bank_account_id)
+      shared_accounts[:bank_account_ids].include?(transaction.at_user_bank_transaction.at_user_bank_account_id)
     elsif transaction.try(:at_user_card_transaction).try(:at_user_card_account_id)
-      shared_card_account_ids =  @user.at_user.at_user_card_accounts.where(share: true).pluck(:id)
-      shared_card_account_ids.include?(transaction.at_user_card_transaction.at_user_card_account_id)
+      shared_accounts[:card_account_ids].include?(transaction.at_user_card_transaction.at_user_card_account_id)
     elsif transaction.try(:at_user_emoney_transaction).try(:at_user_emoney_service_account_id)
-      shared_emoney_account_ids = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
-      shared_emoney_account_ids.include?(transaction.at_user_emoney_transaction.at_user_emoney_service_account_id)
+      shared_accounts[:emoney_account_ids].include?(transaction.at_user_emoney_transaction.at_user_emoney_service_account_id)
     else
       # 手動明細は口座に紐づかないため口座シェア判定はfalse固定
       false
     end
+  end
+
+  def get_shared_account_ids
+    shared = {}
+    shared[:bank_account_ids] = @user.at_user.at_user_bank_accounts.where(share: true).pluck(:id)
+    shared[:card_account_ids] =  @user.at_user.at_user_card_accounts.where(share: true).pluck(:id)
+    shared[:emoney_account_ids] = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
+    shared
   end
 end
