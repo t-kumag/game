@@ -2,6 +2,7 @@ class Api::V1::User::ProfilesController < ApplicationController
   before_action :authenticate
 
   def create
+    return render(json: { errors: { code: '', mesasge: "user profile is registered." } }, status: 422) if @current_user.try(:user_profile)
     begin
       Entities::UserProfile.new(user_profile_params).save!
     rescue ActiveRecord::RecordInvalid => db_err

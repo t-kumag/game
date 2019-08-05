@@ -61,16 +61,19 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def change_password
-    current_user = Entities::User.token_authenticate!(params[:token])
-    change_status = false
-
-    if change_password_params[:password].present? && change_password_params[:password_confirm].present?
-      change_status = change_password_params[:password] == change_password_params[:password_confirm]
-    else
-      render json: { errors: { code: '', message: "empty password." } }, status: 422 and return
+    unless change_password_params[:password].present?
+      render_400_invalid_validation([{resource: 'User', field: 'password', code: 'empty'}]) and return
+    end
+    unless change_password_params[:password_confirm].present?
+      render_400_invalid_validation([{resource: 'User', field: 'password_confirm', code: 'empty'}]) and return
+    end
+    change_status = change_password_params[:password] == change_password_params[:password_confirm]
+    unless change_status
+      render_400_invalid_validation([{resource: 'User', field: 'password_confirm', code: 'confirmation'}]) and return
     end
 
-    if current_user.present? && DateTime.now <= current_user.token_expires_at && change_status
+    current_user = Entities::User.token_authenticate!(params[:token])
+    if current_user.present? && DateTime.now <= current_user.token_expires_at
       current_user.password = change_password_params[:password]
       current_user.reset_token
       current_user.save!

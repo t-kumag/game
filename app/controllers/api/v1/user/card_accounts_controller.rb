@@ -11,15 +11,16 @@ class Api::V1::User::CardAccountsController < ApplicationController
           @responses << {
             id: ca.id,
             name: ca.fnc_nm,
-            amount: 0,
-            fnc_id: ca.fnc_id
+            amount: ca.current_month_used_amount,
+            fnc_id: ca.fnc_id,
+            last_rslt_cd: ca.last_rslt_cd,
+            last_rslt_msg: ca.last_rslt_msg
           }
         end
       end
       render 'list', formats: 'json', handlers: 'jbuilder'
     end
 
-    # TODO: user_distributed_transactionsを参照するようにする
     def summary
       share = false || params[:share]
       if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
@@ -29,9 +30,11 @@ class Api::V1::User::CardAccountsController < ApplicationController
       else
         amount = if share
           # shareを含む場合
-          @current_user.at_user.at_user_card_accounts.sum{|i| i.current_month_payment}
+          # TODO: リリース後対応 各口座の今月の利用額の合算 → 今月の引落額の合算にする
+          @current_user.at_user.at_user_card_accounts.sum{|i| i.current_month_used_amount}
         else
-          @current_user.at_user.at_user_card_accounts.where(at_user_card_accounts: {share: false}).sum{|i| i.current_month_payment}
+          # TODO: リリース後対応 各口座の今月の利用額の合算 → 今月の引落額の合算にする
+          @current_user.at_user.at_user_card_accounts.where(share: false).sum{|i| i.current_month_used_amount}
         end
         @response = {
           amount: amount
