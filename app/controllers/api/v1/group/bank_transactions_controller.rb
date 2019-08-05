@@ -2,7 +2,7 @@ class Api::V1::Group::BankTransactionsController < ApplicationController
   before_action :authenticate
 
   def index
-    @transactions = Services::AtBankTransactionService.new(@current_user, true, params[:from], params[:to]).list(params[:bank_account_id], params[:page])
+    @transactions = Services::AtBankTransactionService.new(@current_user, true).list(params[:bank_account_id], params[:page])
     @categories   = Entities::AtTransactionCategory.all
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'

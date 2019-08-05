@@ -1,13 +1,8 @@
 class Services::AtCardTransactionService
 
-  def initialize(user, is_group=false, from=nil, to=nil)
+  def initialize(user, is_group=false)
     @user = user
     @is_group = is_group
-
-    # from の 00:00:00 から to の 23:59:59 までのデータを取得
-    # from/to の指定がなければ当月の月初から月末までのデータを取得
-    #@from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
-    #@to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
   end
 
   # TODO: form toをつけないと検索範囲が広すぎる
