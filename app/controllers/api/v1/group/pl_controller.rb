@@ -1,4 +1,4 @@
-wclass Api::V1::Group::PlController < ApplicationController
+class Api::V1::Group::PlController < ApplicationController
   before_action :authenticate
 
   def summary
