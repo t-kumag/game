@@ -13,45 +13,165 @@ class Services::PlService
     ]
   end
 
-  def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month, page=nil)
-    bank_category_summary_sql = get_bank_category_sql(share)
-    used_date_sql = get_used_date_category_sql(from, to) unless page.present?
+  def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
-      #{bank_category_summary_sql}
-      #{used_date_sql}
+      SELECT
+        udt.at_transaction_category_id,
+        udt.at_user_bank_transaction_id,
+        aubt.at_user_bank_account_id,
+      CASE
+        WHEN udt.amount > 0 THEN udt.amount
+        ELSE 0
+      END AS amount_receipt,
+      CASE
+        WHEN udt.amount < 0 THEN udt.amount
+        ELSE 0
+      END AS amount_payment,
+        atc.category_name1,
+        atc.category_name2
+      FROM
+        user_distributed_transactions as udt
+      INNER JOIN
+        at_user_bank_transactions as aubt
+      ON
+        aubt.id = udt.at_user_bank_transaction_id
+      INNER JOIN
+        at_user_bank_accounts as auba
+      ON
+        auba.id = aubt.at_user_bank_account_id
+      INNER JOIN
+        at_transaction_categories as atc
+      ON
+        udt.at_transaction_category_id = atc.id
+      WHERE
+        udt.user_id in (#{user_ids.join(',')})
+      AND
+        (auba.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+      AND
+        udt.used_date >= "#{from}"
+      AND
+        udt.used_date <= "#{to}"
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def card_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month, page=nil)
-    card_category_summary_sql = get_card_category_sql(share)
-    used_date_sql = get_used_date_category_sql(from, to) unless page.present?
+  def card_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
-      #{card_category_summary_sql}
-      #{used_date_sql}
+      SELECT
+        udt.at_transaction_category_id,
+        udt.at_user_card_transaction_id,
+        auct.at_user_card_account_id,
+      CASE
+        WHEN udt.amount < 0 THEN udt.amount
+        ELSE 0
+      END AS amount_payment,
+        atc.category_name1,
+        atc.category_name2
+      FROM
+        user_distributed_transactions as udt
+      INNER JOIN
+        at_user_card_transactions as auct
+      ON
+        auct.id = udt.at_user_card_transaction_id
+      INNER JOIN
+        at_user_card_accounts as auca
+      ON
+        auca.id = auct.at_user_card_account_id
+      INNER JOIN
+        at_transaction_categories as atc
+      ON
+        udt.at_transaction_category_id = atc.id
+      WHERE
+        udt.user_id in (#{user_ids.join(',')})
+      AND
+        (auca.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+      AND
+        udt.used_date >= "#{from}"
+      AND
+        udt.used_date <= "#{to}"
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def emoney_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month, page=nil)
-    emoney_category_summary_sql = get_emoney_category_sql(share)
-    used_date_sql = get_used_date_category_sql(from, to) unless page.present?
+  def emoney_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
-      #{emoney_category_summary_sql}
-      #{used_date_sql}
+      SELECT
+        udt.at_transaction_category_id,
+        udt.at_user_emoney_transaction_id,
+        auet.at_user_emoney_service_account_id,
+      CASE
+        WHEN udt.amount > 0 THEN udt.amount
+        ELSE 0
+      END AS amount_receipt,
+      CASE
+        WHEN udt.amount < 0 THEN udt.amount
+        ELSE 0
+      END AS amount_payment,
+        atc.category_name1,
+        atc.category_name2
+      FROM
+        user_distributed_transactions as udt
+      INNER JOIN
+        at_user_emoney_transactions as auet
+      ON
+        auet.id = udt.at_user_emoney_transaction_id
+      INNER JOIN
+        at_user_emoney_service_accounts as auea
+      ON
+        auea.id = auet.at_user_emoney_service_account_id
+      INNER JOIN
+        at_transaction_categories as atc
+      ON
+        udt.at_transaction_category_id = atc.id
+      WHERE
+        udt.user_id in (#{user_ids.join(',')})
+      AND
+        (auea.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+      AND
+        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+      AND
+        udt.used_date >= "#{from}"
+      AND
+        udt.used_date <= "#{to}"
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month, page=nil)
-    user_manually_created_category_summary_sql = get_user_manually_created_category_summary_sql(share)
-    used_date_sql = get_used_date_category_sql(from, to) unless page.present?
+  def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
     sql = <<-EOS
-      #{user_manually_created_category_summary_sql}
-      #{used_date_sql}
+      SELECT
+        udt.at_transaction_category_id,
+      CASE
+        WHEN udt.amount < 0 THEN udt.amount
+        ELSE 0
+      END AS amount_payment,
+        atc.category_name1,
+        atc.category_name2
+      FROM
+        user_distributed_transactions as udt
+      INNER JOIN
+        user_manually_created_transactions as umct
+      ON
+        umct.id = udt.user_manually_created_transaction_id
+      INNER JOIN
+        at_transaction_categories as atc
+      ON
+        udt.at_transaction_category_id = atc.id
+      WHERE
+        udt.user_id in (#{user_ids.join(',')})
+      AND
+        udt.share in (#{share.join(',')})
+      AND
+        udt.used_date >= "#{from}"
+      AND
+        udt.used_date <= "#{to}"
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -85,22 +205,14 @@ class Services::PlService
     at_user_ids
   end
 
-  def pl_category_summary(share, from, to, page=nil)
+  def pl_category_summary(share, from, to)
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
 
     # P/L 用の明細を取得
-    if page.present?
-      pl_bank = bank_category_summary(share, from, to, page)
-      pl_card = card_category_summary(share, from, to, page)
-      pl_emoney = emoney_category_summary(share, from, to, page)
-      pl_user_manually_created = user_manually_created_category_summary(share,from,to, page)
-    else
-      pl_bank = bank_category_summary(share, from, to)
-      pl_card = card_category_summary(share, from, to)
-      pl_emoney = emoney_category_summary(share, from, to)
-      pl_user_manually_created = user_manually_created_category_summary(share, from, to)
-    end
+    pl_bank = bank_category_summary(share, from, to)
+    pl_card = card_category_summary(share, from, to)
+    pl_emoney = emoney_category_summary(share, from, to)
 
     pl_bank = remove_debit_transactions(pl_bank, pl_card)
 
@@ -108,10 +220,8 @@ class Services::PlService
     pl_card = group_by_category_id(pl_card)
     pl_emoney = group_by_category_id(pl_emoney)
 
-    toal_category_suummaries =  merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
-    return Kaminari.paginate_array(toal_category_suummaries).page(page) if page.present?
-
-    toal_category_suummaries
+    pl_user_manually_created = user_manually_created_category_summary(share, from, to)
+    merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
   end
 
   def pl_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
@@ -129,7 +239,6 @@ class Services::PlService
       pl_summaries[:income_amount] += summary['amount_receipt']
       pl_summaries[:expense_amount] += summary['amount_payment']
     end
-
     pl_summaries
   end
 
@@ -179,7 +288,6 @@ class Services::PlService
         }.stringify_keys
       end
     end
-
     after_summaries
   end
 
@@ -219,7 +327,10 @@ class Services::PlService
     after_summaries
   end
 
-  def pl_grouped_category_summary(share, from=nil, to=nil, page=1)
+  def pl_grouped_category_summary(share, from, to)
+    from = from || Time.zone.today.beginning_of_month
+    to = to || Time.zone.today.end_of_month
+
     # PL を大項目ごとに集計し直すため、大項目の一覧を取得
     grouped_categories = Entities::AtGroupedCategory.all.map { |category|
       {
@@ -229,7 +340,7 @@ class Services::PlService
     }
     summary = []
     # 小項目ごとの PL 集計結果から、大項目ごとに再集計を行う
-    pl_category_summary(share, nil,nil, page).each { |item|
+    pl_category_summary(share, from, to).each { |item|
       # category_name1　が有効なら
       matched_category = grouped_categories.find { |category| category[:name] === item['category_name1'] }
       if (matched_category.present?)
@@ -248,7 +359,6 @@ class Services::PlService
         summary[index]['amount_payment'] += item['amount_payment']
       end
     }
-
     summary.sort { |a, b| a['at_transaction_category_id'] <=> b['at_transaction_category_id'] }
   end
 
@@ -306,150 +416,6 @@ class Services::PlService
     else
       false
     end
-  end
-
-  def get_bank_category_sql(share)
-    sql = "
-      SELECT
-        udt.at_transaction_category_id,
-        udt.at_user_bank_transaction_id,
-        aubt.at_user_bank_account_id,
-      CASE
-        WHEN udt.amount > 0 THEN udt.amount
-        ELSE 0
-      END AS amount_receipt,
-      CASE
-        WHEN udt.amount < 0 THEN udt.amount
-        ELSE 0
-      END AS amount_payment,
-        atc.category_name1,
-        atc.category_name2
-      FROM
-        user_distributed_transactions as udt
-      INNER JOIN
-        at_user_bank_transactions as aubt
-      ON
-        aubt.id = udt.at_user_bank_transaction_id
-      INNER JOIN
-        at_user_bank_accounts as auba
-      ON
-        auba.id = aubt.at_user_bank_account_id
-      INNER JOIN
-        at_transaction_categories as atc
-      ON
-        udt.at_transaction_category_id = atc.id
-      WHERE
-        udt.user_id in (#{user_ids.join(',')})
-      AND
-        (auba.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
-      AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})"
-  end
-
-  def get_card_category_sql(share)
-    sql = "
-      SELECT
-        udt.at_transaction_category_id,
-        udt.at_user_card_transaction_id,
-        auct.at_user_card_account_id,
-      CASE
-        WHEN udt.amount < 0 THEN udt.amount
-        ELSE 0
-      END AS amount_payment,
-        atc.category_name1,
-        atc.category_name2
-      FROM
-        user_distributed_transactions as udt
-      INNER JOIN
-        at_user_card_transactions as auct
-      ON
-        auct.id = udt.at_user_card_transaction_id
-      INNER JOIN
-        at_user_card_accounts as auca
-      ON
-        auca.id = auct.at_user_card_account_id
-      INNER JOIN
-        at_transaction_categories as atc
-      ON
-        udt.at_transaction_category_id = atc.id
-      WHERE
-        udt.user_id in (#{user_ids.join(',')})
-      AND
-        (auca.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
-      AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})"
-  end
-
-  def get_emoney_category_sql(share)
-    sql = "
-      SELECT
-        udt.at_transaction_category_id,
-        udt.at_user_emoney_transaction_id,
-        auet.at_user_emoney_service_account_id,
-      CASE
-        WHEN udt.amount > 0 THEN udt.amount
-        ELSE 0
-      END AS amount_receipt,
-      CASE
-        WHEN udt.amount < 0 THEN udt.amount
-        ELSE 0
-      END AS amount_payment,
-        atc.category_name1,
-        atc.category_name2
-      FROM
-        user_distributed_transactions as udt
-      INNER JOIN
-        at_user_emoney_transactions as auet
-      ON
-        auet.id = udt.at_user_emoney_transaction_id
-      INNER JOIN
-        at_user_emoney_service_accounts as auea
-      ON
-        auea.id = auet.at_user_emoney_service_account_id
-      INNER JOIN
-        at_transaction_categories as atc
-      ON
-        udt.at_transaction_category_id = atc.id
-      WHERE
-        udt.user_id in (#{user_ids.join(',')})
-      AND
-        (auea.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
-      AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})"
-  end
-
-  def get_user_manually_created_category_summary_sql(share)
-    sql = "
-      SELECT
-        udt.at_transaction_category_id,
-      CASE
-        WHEN udt.amount < 0 THEN udt.amount
-        ELSE 0
-      END AS amount_payment,
-        atc.category_name1,
-        atc.category_name2
-      FROM
-        user_distributed_transactions as udt
-      INNER JOIN
-        user_manually_created_transactions as umct
-      ON
-        umct.id = udt.user_manually_created_transaction_id
-      INNER JOIN
-        at_transaction_categories as atc
-      ON
-        udt.at_transaction_category_id = atc.id
-      WHERE
-        udt.user_id in (#{user_ids.join(',')})
-      AND
-        udt.share in (#{share.join(',')})"
-  end
-
-  def get_used_date_category_sql(from, to)
-    sql = "
-      AND
-        udt.used_date >= #{from}
-      AND
-        udt.used_date >= #{to}"
   end
 
 end
