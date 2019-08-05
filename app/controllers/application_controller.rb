@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound, with: :render_422
   rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
   rescue_from AtAPIStandardError, with: :render_at_api_error
-  #     rescue_from ActionController::RoutingError, with: :render_404
+  rescue_from ActionController::RoutingError, with: :render_404
   #     rescue_from ActionView::MissingTemplate, with: :render_404
   #     rescue_from Exception, with: :render_500
 
@@ -158,7 +158,6 @@ class ApplicationController < ActionController::Base
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     at_user_bank_ids = Entities::AtUserBankAccount.where(at_user_id: at_user_id).pluck(:id)
-    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
     if partner_at_user_id && with_group
       at_user_bank_ids << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
     end
@@ -177,7 +176,6 @@ class ApplicationController < ActionController::Base
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     at_user_card_ids = Entities::AtUserCardAccount.where(at_user_id: at_user_id).pluck(:id)
-    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
     if partner_at_user_id && with_group
       at_user_card_ids << Entities::AtUserCardAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
     end
@@ -196,7 +194,6 @@ class ApplicationController < ActionController::Base
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     at_user_emoney_ids = Entities::AtUserEmoneyServiceAccount.where(at_user_id: at_user_id).pluck(:id)
-    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
     if partner_at_user_id && with_group
       at_user_emoney_ids << Entities::AtUserEmoneyServiceAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
     end
