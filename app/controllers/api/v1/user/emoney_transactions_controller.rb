@@ -7,7 +7,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
       render_disallowed_financier_ids && return
     end
 
-    @transactions = Services::AtEmoneyTransactionService.new(@current_user, false, params[:from], params[:to]).list(account_id, params[:page])
+    @transactions = Services::AtEmoneyTransactionService.new(@current_user, false).list(account_id, params[:page])
     @categories   = Entities::AtTransactionCategory.all
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'

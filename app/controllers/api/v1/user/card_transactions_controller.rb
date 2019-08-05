@@ -7,7 +7,8 @@ class Api::V1::User::CardTransactionsController < ApplicationController
       render_disallowed_financier_ids && return
     end
 
-    @transactions = Services::AtCardTransactionService.new(@current_user, false, params[:from], params[:to]).list(account_id, params[:page])
+    @transactions = Services::AtCardTransactionService.new(@current_user, false).list(account_id, params[:page])
+
     @categories   = Entities::AtTransactionCategory.all
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
