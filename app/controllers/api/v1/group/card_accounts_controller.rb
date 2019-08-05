@@ -2,13 +2,11 @@ class Api::V1::Group::CardAccountsController < ApplicationController
     before_action :authenticate, :require_group
 
     def index
-      if @current_user.try(:at_user).try(:at_user_card_accounts).blank?
+      share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
+      if share_on_card_accounts.blank?
         @responses = []
       else
         @responses = []
-
-        share_on_card_accounts =
-            Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
         share_on_card_accounts.each do |ca|
           @responses << {
               id: ca.id,
@@ -24,13 +22,12 @@ class Api::V1::Group::CardAccountsController < ApplicationController
     end
 
     def summary
-      if @current_user.try(:at_user).try(:at_user_card_accounts).blank?
+      share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
+      if share_on_card_accounts.blank?
           @response = {
             amount: 0,
         }
       else
-        share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
-        # TODO: リリース後対応 各口座の今月の利用額の合算 → 今月の引落額の合算にするにする
         @response = {
             amount: share_on_card_accounts.sum{|i| i.current_month_used_amount}
         }
