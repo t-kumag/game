@@ -78,12 +78,18 @@ class Services::AtBankTransactionService
 
     if @is_group === true
       if bank.share === true
-        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_bank_transaction_id: transaction_ids).order(used_date: "DESC").page(page)
+        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_bank_transaction_id: transaction_ids)
+                                       .order(used_date: "DESC")
+                                       .page(page)
       else
-        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_bank_transaction_id: transaction_ids, share: true).order(used_date: "DESC").page(page)
+        distributed_transactions = Entities::UserDistributedTransaction.where(at_user_bank_transaction_id: transaction_ids, share: true)
+                                       .order(used_date: "DESC")
+                                       .page(page)
       end
     else
-      distributed_transactions = Entities::UserDistributedTransaction.where(at_user_bank_transaction_id: transaction_ids, share: false).order(used_date: "DESC").page(page)
+      distributed_transactions = Entities::UserDistributedTransaction.where(at_user_bank_transaction_id: transaction_ids, share: false)
+                                     .order(used_date: "DESC")
+                                     .page(page)
     end
     distributed_transactions
   end
