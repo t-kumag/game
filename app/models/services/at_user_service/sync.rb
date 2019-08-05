@@ -310,8 +310,6 @@ class Services::AtUserService::Sync
     latest_sync_date = Services::AtSyncTransactionLatestDateLogService.get_latest_one(financier_account_type_key, account)
     check_difference_date = latest_sync_date.present? && latest_sync_date < activity[:date] ? true : false
 
-    if check_duplicate_activity && check_difference_date
-      return activity
-    end
+    return activity  if check_duplicate_activity && check_difference_date
   end
 end
