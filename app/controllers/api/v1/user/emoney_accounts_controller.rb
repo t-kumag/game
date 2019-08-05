@@ -43,6 +43,10 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
 
     def update
       account_id = params[:id].to_i
+      if disallowed_at_emoney_ids?([account_id])
+        render_disallowed_financier_ids && return
+      end
+
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)
         require_group && return if params[:share] == true
         account = Entities::AtUserEmoneyServiceAccount.find account_id
@@ -62,6 +66,10 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
 
     def destroy
       account_id = params[:id].to_i
+      if disallowed_at_emoney_ids?([account_id])
+        render_disallowed_financier_ids && return
+      end
+
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)
         Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, [account_id])
       end

@@ -4,6 +4,10 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   @error = {}
 
   def show
+    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
+      render_disallowed_transaction_ids && return
+    end
+
     @response = find_transaction
     render(json: { errors: { code: '', mesasge: "record not found." } }, status: 422) and return if @response.blank?
     render :show, formats: :json, handlers: :jbuilder
@@ -30,6 +34,10 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def update
+    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
+      render_disallowed_transaction_ids && return 
+    end
+
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = update_user_manually_created
@@ -50,6 +58,10 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def destroy
+    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
+      render_disallowed_transaction_ids && return 
+    end
+
     transaction = find_transaction
     render(json: {}, status: 404) if transaction.blank?
     begin

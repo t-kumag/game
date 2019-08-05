@@ -153,19 +153,201 @@ class ApplicationController < ActionController::Base
 
   # 参照可能な口座ID
   # cardやemoneyも同様の処理が必要な場合はサービスに移行する
-  def disallowed_at_bank_ids?(bank_ids)
+  def disallowed_at_bank_ids?(bank_ids, with_group=false)
     at_user_id         =  @current_user.at_user.id
-    partner_at_user_id =  @current_user.partner_user.try(:at_user).try(:id)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     at_user_bank_ids = Entities::AtUserBankAccount.where(at_user_id: at_user_id).pluck(:id)
     # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
-    #if partner_at_user_id
-    #  at_user_bank_ids << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
-    #end
+    if partner_at_user_id && with_group
+      at_user_bank_ids << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
     at_user_bank_ids.flatten!
 
     bank_ids.each do |id|
       unless at_user_bank_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  def disallowed_at_card_ids?(card_ids, with_group=false)
+    at_user_id         =  @current_user.at_user.id
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+
+    at_user_card_ids = Entities::AtUserCardAccount.where(at_user_id: at_user_id).pluck(:id)
+    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
+    if partner_at_user_id && with_group
+      at_user_card_ids << Entities::AtUserCardAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
+    at_user_card_ids.flatten!
+
+    card_ids.each do |id|
+      unless at_user_card_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  def disallowed_at_emoney_ids?(emoney_ids, with_group=false)
+    at_user_id         =  @current_user.at_user.id
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+
+    at_user_emoney_ids = Entities::AtUserEmoneyServiceAccount.where(at_user_id: at_user_id).pluck(:id)
+    # TODO:仕様確認 共有口座を指定することができるのか？その場合間接的に口座残高がわかってしまうリスクがある
+    if partner_at_user_id && with_group
+      at_user_emoney_ids << Entities::AtUserEmoneyServiceAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
+    at_user_emoney_ids.flatten!
+
+    emoney_ids.each do |id|
+      unless at_user_emoney_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  def disallowed_at_bank_transaction_ids?(bank_id, bank_transaction_ids, with_group=false)
+    user_bank = @current_user.at_user.at_user_bank_accounts.find_by(id: bank_id)
+    at_user_bank_transaction_ids = user_bank.try(:at_user_bank_transactions).pluck(:id) if user_bank.try(:at_user_bank_transactions).present?
+    
+    if with_group
+      partner_bank = @current_user.try(:partner_user).try(:at_user).try(:at_user_bank_accounts).find_by(id: bank_id)
+      at_user_bank_transaction_ids << partner_bank.try(:at_user_bank_transactions).pluck(:id) if partner_bank..try(:at_user_bank_transactions).present?
+    end
+
+    return true if at_user_bank_transaction_ids.blank?
+    at_user_bank_transaction_ids.flatten!
+    
+    bank_transaction_ids.each do |id|
+      # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
+      return true unless at_user_bank_transaction_ids.include?(id)
+
+      if with_group
+        transaction = Entities::AtUserBankTransaction.find(id)
+        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_bank_account).try(:share)
+          next
+        else
+          return true
+        end
+      end
+    end
+    false
+  end
+
+  def disallowed_at_card_transaction_ids?(card_id, card_transaction_ids, with_group=false)
+    user_card = @current_user.at_user.at_user_card_accounts.find_by(id: card_id)
+    at_user_card_transaction_ids = user_card.try(:at_user_card_transactions).pluck(:id) if user_card.try(:at_user_card_transactions).present?
+    
+    if with_group
+      partner_card = @current_user.try(:partner_user).try(:at_user).try(:at_user_card_accounts).find_by(id: card_id)
+      at_user_card_transaction_ids << partner_card.try(:at_user_card_transactions).pluck(:id) if partner_card.try(:at_user_card_transactions).present?
+    end
+    return true if at_user_card_transaction_ids.blank?
+    at_user_card_transaction_ids.flatten!
+    
+    card_transaction_ids.each do |id|
+      # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
+      return true unless at_user_card_transaction_ids.include?(id)
+
+      if with_group
+        transaction = Entities::AtUserCardTransaction.find(id)
+        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_card_account).try(:share)
+          next
+        else
+          return true
+        end
+      end
+    end
+    false
+  end
+
+  def disallowed_at_emoney_transaction_ids?(emoney_id, emoney_transaction_ids, with_group=false)
+    user_emoney = @current_user.at_user.at_user_emoney_service_accounts.find_by(id: emoney_id)
+    at_user_emoney_transaction_ids = user_emoney.try(:at_user_emoney_transactions).pluck(:id) if user_emoney.try(:at_user_emoney_transactions).present?
+    
+    if with_group
+      partner_emoney = @current_user.try(:partner_user).try(:at_user).try(:at_user_emoney_service_accounts).find_by(id: emoney_id)
+      at_user_emoney_transaction_ids << partner_emoney.try(:at_user_emoney_transactions).pluck(:id) if partner_emoney.try(:at_user_emoney_transactions).present?
+    end
+    return true if at_user_emoney_transaction_ids.blank?
+    at_user_emoney_transaction_ids.flatten!
+    
+    emoney_transaction_ids.each do |id|
+      # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
+      return true unless at_user_emoney_transaction_ids.include?(id)
+
+      if with_group
+        transaction = Entities::AtUserEmoneyTransaction.find(id)
+        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_emoney_service_account).try(:share)
+          next
+        else
+          return true
+        end
+      end
+    end
+    false
+  end
+
+  def disallowed_manually_created_transaction_ids?(manually_created_transaction_ids, with_group=false)
+    user_id = @current_user.id
+    partner_user_id = @current_user.try(:partner_user).try(:id)
+
+    user_manually_created_transaction_ids = Entities::UserManuallyCreatedTransaction.where(user_id: user_id).pluck(:id)
+    if partner_user_id && with_group
+      user_manually_created_transaction_ids << Entities::UserManuallyCreatedTransaction.where(user_id: partner_user_id).pluck(:id)
+    end
+    user_manually_created_transaction_ids.flatten!
+    
+    manually_created_transaction_ids.each do |id|
+      # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
+      return true unless user_manually_created_transaction_ids.include?(id)
+
+      if with_group
+        transaction = Entities::UserManuallyCreatedTransaction.find(id)
+        if transaction.try(:user_distributed_transaction).try(:share)
+          next
+        else
+          return true
+        end
+      end
+    end
+    false
+  end
+
+  def disallowed_goal_ids?(goal_ids, with_group=false)
+    user_id = @current_user.id
+    partner_user_id = @current_user.try(:partner_user).try(:id)
+
+    user_goal_ids = Entities::Goal.where(user_id: user_id).pluck(:id)
+    if partner_user_id && with_group
+      user_goal_ids << Entities::Goal.where(user_id: partner_user_id).pluck(:id)
+    end
+    user_goal_ids.flatten!
+
+    goal_ids.each do |id|
+      unless user_goal_ids.include?(id)
+        return true
+      end
+    end
+    false
+  end
+
+  def disallowed_goal_setting_ids?(goal_id, goal_setting_ids, with_group=false)
+    user_id = @current_user.id
+    partner_user_id = @current_user.try(:partner_user).try(:id)
+
+    user_goal_setting_ids = Entities::GoalSetting.where(goal_id: goal_id, user_id: user_id).pluck(:id)
+    if partner_user_id && with_group
+      user_goal_setting_ids << Entities::GoalSetting.where(goal_id: goal_id, user_id: partner_user_id).pluck(:id)
+    end
+    user_goal_setting_ids.flatten!
+
+    goal_setting_ids.each do |id|
+      unless user_goal_setting_ids.include?(id)
         return true
       end
     end
@@ -182,4 +364,15 @@ class ApplicationController < ActionController::Base
     render json: { errors: { code: '', message: "Disallowed financier id." } }, status: 422
   end
 
+  def render_disallowed_transaction_ids
+    render json: { errors: { code: '', message: "Disallowed transaction id." } }, status: 422
+  end
+
+  def render_disallowed_goal_ids
+    render json: { errors: { code: '', message: "Disallowed goal id." } }, status: 422
+  end
+
+  def render_disallowed_goal_setting_ids
+    render json: { errors: { code: '', message: "Disallowed goal setting id." } }, status: 422
+  end
 end
