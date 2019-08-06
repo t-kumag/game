@@ -90,7 +90,8 @@ class Entities::Activity < ApplicationRecord
     # TODO:・目標の設定
 
     @result = []
-    own_activities = where(user_id: own_user_id).order(created_at: "DESC")
+    own_activities = where(user_id: own_user_id).order(created_at: "DESC").page(page)
+
     own_activities.each {|a|
       dayStr = a.created_at.strftime('%Y-%m-%d')
       message = ""
@@ -146,7 +147,6 @@ class Entities::Activity < ApplicationRecord
       })
     }
     @result
-    Kaminari.paginate_array(@result).page(page)
   end
 
 end

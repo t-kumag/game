@@ -24,10 +24,10 @@ class Services::ActivityService
     end
   end
 
-  def self.set_activity_list(financier_account_type_key, tran, account)
+  def self.set_activity_list(financier_account_type_key, tran, account, user)
     activity = Entities::Activity.new
     activity[:count] = 0
-    activity[:user_id] = account[:at_user_id]
+    activity[:user_id] = user.id
     activity[:group_id] = account[:group_id]
     activity_data_column = get_activity_data_column(financier_account_type_key)
 
