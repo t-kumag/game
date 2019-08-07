@@ -128,18 +128,10 @@ class Services::TransactionService
   end
 
   def grouped
-    if @category_id.present?
-      grouped_category = Entities::AtGroupedCategory.find_by_id @category_id
-      if (grouped_category.present?)
-        categories_in_group = Entities::AtTransactionCategory.where category_name1: grouped_category.category_name
-        ids = categories_in_group.pluck(:id)
-        list ids
-      else
-        return []
-      end
-    else
-      list
-    end
+    return list unless @category_id.present?
+    grouped_category_name = Entities::AtGroupedCategory.find_by_id(@category_id).category_name
+    return [] unless grouped_category_name.present?
+    list Entities::AtTransactionCategory.where(category_name1: grouped_category_name).pluck(:id)
   end
 
   def shared_account?(transaction, shared_accounts)
