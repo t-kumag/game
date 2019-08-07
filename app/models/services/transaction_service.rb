@@ -130,7 +130,7 @@ class Services::TransactionService
   def grouped
     return list unless @category_id.present?
     grouped_category_name = Entities::AtGroupedCategory.find_by_id(@category_id).category_name
-    return [] unless (grouped_category_name.present?)
+    return [] unless grouped_category_name.present?
     list Entities::AtTransactionCategory.where(category_name1: grouped_category_name).pluck(:id)
   end
 
