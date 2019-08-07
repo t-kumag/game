@@ -385,6 +385,7 @@ class Services::PlService
       bank_ids.each do |bank_id|
         debit_card = Entities::AtUserCardAccount.find_by(id: debit_card_id, at_user_id: at_user_ids)
         bank = Entities::AtUserBankAccount.find_by(id: bank_id, at_user_id: at_user_ids)
+        next unless debit_card.try(:at_user_card_transactions)
         debit_card.at_user_card_transactions.each do |card_transaction|
           bank.at_user_bank_transactions.each do |bank_transaction|
             debit_transactions << bank_transaction if check_trade_date_and_amount(bank_transaction, card_transaction)
@@ -399,6 +400,7 @@ class Services::PlService
   def debit_card(card_ids)
     card_ids.reject do |card_id|
       card = Entities::AtUserCardAccount.find_by(id: card_id, at_user_id: at_user_ids)
+      next unless card.present?
       if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
         false
       else
