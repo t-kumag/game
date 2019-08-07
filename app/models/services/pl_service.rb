@@ -53,6 +53,8 @@ class Services::PlService
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
+      AND
+        auba.deleted_at IS NULL
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -94,6 +96,8 @@ class Services::PlService
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
+      AND
+        auca.deleted_at IS NULL
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
@@ -139,6 +143,8 @@ class Services::PlService
         udt.used_date >= "#{from}"
       AND
         udt.used_date <= "#{to}"
+      AND
+        auea.deleted_at IS NULL
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
