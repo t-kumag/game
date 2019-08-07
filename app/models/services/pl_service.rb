@@ -399,6 +399,7 @@ class Services::PlService
   def debit_card(card_ids)
     card_ids.reject do |card_id|
       card = Entities::AtUserCardAccount.find_by(id: card_id, at_user_id: at_user_ids)
+      next unless card.present?
       if card.fnc_nm.include?("デビット") || card.fnc_nm.include?("ﾃﾞﾋﾞｯﾄ")
         false
       else
