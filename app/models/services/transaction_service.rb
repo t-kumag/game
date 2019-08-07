@@ -1,10 +1,9 @@
 class Services::TransactionService
-  def initialize(user, category_id, share, with_group=false, page=1, from, to)
+  def initialize(user, category_id, share, with_group=false, from, to)
     @user = user
     @category_id = category_id
     @share = share == "true" ? true : false
     @with_group = with_group
-    @page = page
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # from/to の指定がなければ当月の月初から月末までのデータを取得
@@ -70,25 +69,16 @@ class Services::TransactionService
       transactions = remove_not_shared_transaction(transactions, shared_accounts)
       transactions = generate_response_from_transactions(transactions, shared_accounts)
       sort_by_used_date transactions
-      Kaminari.paginate_array(transactions).page(@page)
+
     else
+      transactions = fetch_transactions(ids, @from, @to)
+      # 削除済み口座の明細を除外する
+      transactions = remove_delete_account_transaction transactions
       if @share === true
-        transactions = fetch_transactions(ids, @from, @to)
-        # 削除済み口座の明細を除外する
-        transactions = remove_delete_account_transaction transactions
-        transactions = generate_response_from_transactions(transactions, shared_accounts)
-        sort_by_used_date transactions
-        Kaminari.paginate_array(transactions).page(@page)
-      else
-        transactions = fetch_transactions(ids, @from, @to)
-        # 削除済み口座の明細を除外する
-        transactions = remove_delete_account_transaction transactions
-        # シェアしている口座の明細 or シェアしている明細を削除する
         transactions = remove_shared_transaction(transactions, shared_accounts)
-        transactions = generate_response_from_transactions(transactions, shared_accounts)
-        sort_by_used_date transactions
-        Kaminari.paginate_array(transactions).page(@page)
       end
+      transactions = generate_response_from_transactions(transactions, shared_accounts)
+      sort_by_used_date transactions
     end
   end
 
