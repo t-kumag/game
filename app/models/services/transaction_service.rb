@@ -77,7 +77,8 @@ class Services::TransactionService
       transactions = fetch_transactions(ids, @from, @to)
       # 削除済み口座の明細を除外する
       transactions = remove_delete_account_transaction transactions
-      if @share === true
+      # 家族共有OFFの場合、# シェアしている口座の明細 or シェアしている明細を削除する
+      if @share === false
         transactions = remove_shared_transaction(transactions, shared_accounts)
       end
       transactions = generate_response_from_transactions(transactions, shared_accounts)
