@@ -7,7 +7,7 @@ defaults: &defaults
   at_sync_transaction_max_days: 90
   at_user_limit_free_account: 5
   at_user_limit_free_goal: 5
-
+  mail_setting_from: OsidOri <info@osidori.co>
   pairing_token_salt: 2dhp2fw5gra4aks
 
 test:
