@@ -1,9 +1,10 @@
 class Services::TransactionService
-  def initialize(user, category_id, share, with_group=false, from, to)
+  def initialize(user, category_id, share, scope=nil, with_group=false, from, to)
     @user = user
     @category_id = category_id
     @share = share == "true" ? true : false
     @with_group = with_group
+    @scope = scope
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # from/to の指定がなければ当月の月初から月末までのデータを取得
@@ -68,6 +69,8 @@ class Services::TransactionService
       # シェアしていない口座の明細 or シェアしていない明細を削除する
       transactions = remove_not_shared_transaction(transactions, shared_accounts)
       transactions = generate_response_from_transactions(transactions, shared_accounts)
+      remove_scope_income(transactions)
+      remove_scope_expence(transactions)
       sort_by_used_date transactions
 
     else
@@ -78,7 +81,21 @@ class Services::TransactionService
         transactions = remove_shared_transaction(transactions, shared_accounts)
       end
       transactions = generate_response_from_transactions(transactions, shared_accounts)
+      remove_scope_income(transactions)
+      remove_scope_expence(transactions)
       sort_by_used_date transactions
+    end
+  end
+
+  def remove_scope_income(transactions)
+    if @scope == "income"
+      transactions.reject! {|t| t[:amount] < 0}
+    end
+  end
+
+  def remove_scope_expence(transactions)
+    if @scope == "expence"
+      transactions.reject! {|t| t[:amount] > 0}
     end
   end
 
