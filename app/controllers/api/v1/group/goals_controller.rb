@@ -30,7 +30,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal_params = get_goal_params
     begin
       goal_type = Entities::GoalType.find(goal_params[:goal_type_id]) unless goal_params[:goal_type_id].nil?
-      ActiveRecord::Base.transaction do
+      Entities::Goal.new.transaction do
         goal_params[:name] = goal_type[:name] if goal_params[:name].blank?
         goal_params[:img_url] = goal_type[:img_url] if goal_params[:img_url].blank?
         goal = Entities::Goal.create!(goal_params)
