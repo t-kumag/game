@@ -1,5 +1,5 @@
 class Api::V1::BudgetQuestionsController < ApplicationController
-  before_action :authenticate
+   before_action :authenticate
 
   # POST /api/v1/budget-questions
   # {
@@ -25,7 +25,7 @@ class Api::V1::BudgetQuestionsController < ApplicationController
               user_id: @current_user.id,
               budget_question_id: budget_question[:budget_question_id],
               step: budget_question[:step]
-            ).save
+            ).save!
           end
         end
       end
