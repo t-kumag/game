@@ -39,7 +39,6 @@ class Api::V1::Group::TransactionsController < ApplicationController
         false,
         params[:scope],
         false,
-        true,
         params[:from],
         params[:to]
     ).grouped
