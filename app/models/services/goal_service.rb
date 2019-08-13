@@ -19,6 +19,10 @@ class Services::GoalService
   def get_goal_one(id)
     goal = Entities::Goal.find_by(id: id, group_id: @user.group_id)
     return {} if goal.blank?
+
+    owner_current_amount = get_user_current_amount(@user.at_user.at_user_bank_accounts.first.id)
+    partner_current_amount = get_user_current_amount(@user.partner_user.at_user.at_user_bank_accounts.first.id)
+
     {
         goal_id: goal.id,
         goal_type_id: goal.goal_type_id,
@@ -26,9 +30,10 @@ class Services::GoalService
         img_url: goal.img_url,
         goal_amount: goal.goal_amount,
         current_amount: goal.current_amount,
-        goal_difference_amount: goal.goal_amount - goal.current_amount,
         start_date: goal.start_date,
         end_date: goal.end_date,
+        owner_current_amount: owner_current_amount,
+        partner_current_amount: partner_current_amount,
         goal_settings: goal.goal_settings
     }
   end
@@ -87,4 +92,16 @@ class Services::GoalService
         goal_amount: goal.goal_amount
     }
   end
+
+  def get_user_current_amount(at_user_bank_account_id)
+    goal_logs = Entities::GoalLog.where(at_user_bank_account_id: at_user_bank_account_id).order(created_at: :desc)
+    {
+        monthly_amount: goal_logs.sum{|i| i.monthly_amount },
+        first_amount: goal_logs.sum{|i| i.first_amount },
+        current_amount: goal_logs.first.after_current_amount,
+        add_amount: goal_logs.sum{|i| i.add_amount }
+    }
+  end
+
+
 end
