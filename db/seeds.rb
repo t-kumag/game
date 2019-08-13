@@ -19,7 +19,7 @@ Entities::PaymentMethod.create(name: '口座')
 Entities::PaymentMethod.create(name: 'クレジットカード')
 
 # BudgetQuestion
-5.times do
+10.times do
   Entities::BudgetQuestion.create
 end
 
