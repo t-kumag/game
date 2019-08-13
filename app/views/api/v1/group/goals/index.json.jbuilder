@@ -6,7 +6,7 @@ json.app do
       json.goal_id r.id
       json.goal_type_id r.goal_type_id
       json.name r.name
-      json.img_url r.img_url
+      json.img_url "#{Settings.s3_img_url}#{r.img_url}" if r.img_url.present?
       json.goal_amount r.goal_amount
       json.current_amount r.current_amount
       json.start_date r.start_date
