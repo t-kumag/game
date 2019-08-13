@@ -20,8 +20,14 @@ class Services::GoalService
     goal = Entities::Goal.find_by(id: id, group_id: @user.group_id)
     return {} if goal.blank?
 
-    owner_current_amount = get_user_current_amount(@user.at_user.at_user_bank_accounts.first.id)
-    partner_current_amount = get_user_current_amount(@user.partner_user.at_user.at_user_bank_accounts.first.id)
+    users = {}
+    goal.goal_settings.each do |gs|
+      users[:owner] = Entities::User.find(gs.user_id) if gs.at_user_bank_account_id.present?
+      users[:partner] = Entities::User.find(gs.user_id) unless gs.at_user_bank_account_id.present?
+    end
+
+    owner_current_amount = get_user_current_amount(users[:owner].at_user.at_user_bank_accounts.first.id)
+    partner_current_amount = get_user_current_amount(users[:partner].at_user.at_user_bank_accounts.first.id)
 
     {
         goal_id: goal.id,
