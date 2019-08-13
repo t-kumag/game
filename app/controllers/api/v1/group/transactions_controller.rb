@@ -8,9 +8,9 @@ class Api::V1::Group::TransactionsController < ApplicationController
     @response += Services::TransactionService.new(
         @current_user,
         params[:category_id],
-        false,
+        true,                # share 
         params[:scope],
-        true,
+        true,                # with_group
         params[:from],
         params[:to]
     ).list
@@ -18,9 +18,9 @@ class Api::V1::Group::TransactionsController < ApplicationController
     @response += Services::TransactionService.new(
         @current_user.partner_user,
         params[:category_id],
-        false,
+        true,                # share 
         params[:scope],
-        true,
+        true,                # with_group
         params[:from],
         params[:to]
     ).list
@@ -36,9 +36,9 @@ class Api::V1::Group::TransactionsController < ApplicationController
     @response += Services::TransactionService.new(
         @current_user,
         params[:category_id],
-        false,
+        true,                # share
         params[:scope],
-        false,
+        true,                # with_group
         params[:from],
         params[:to]
     ).grouped
@@ -46,9 +46,9 @@ class Api::V1::Group::TransactionsController < ApplicationController
     @response += Services::TransactionService.new(
         @current_user.partner_user,
         params[:category_id],
-        false,
+        true,                # share
         params[:scope],
-        true,
+        true,                # with_group
         params[:from],
         params[:to]
     ).grouped
