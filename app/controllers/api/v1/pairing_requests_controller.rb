@@ -36,7 +36,7 @@ class Api::V1::PairingRequestsController < ApplicationController
         return render json: { errors: { code: '', message: 'to user group taken' } }, status: 422 if to_user_group.present?
 
         # group_id発行
-        new_group = Entities::Group.create
+        new_group = Entities::Group.create!
 
         @pairing_request.to_user_id = @current_user.id
         @pairing_request.status = 2
@@ -47,7 +47,7 @@ class Api::V1::PairingRequestsController < ApplicationController
         Entities::ParticipateGroup.create!(group_id: new_group.id,
                                            user_id: @pairing_request.from_user_id)
 
-        Entities::ParticipateGroup.create(group_id: new_group.id,
+        Entities::ParticipateGroup.create!(group_id: new_group.id,
                                           user_id: @pairing_request.to_user_id)
 
         Services::ActivityService.create_user_manually_activity(@pairing_request.from_user_id,

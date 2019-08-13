@@ -66,7 +66,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     render(json: {}, status: 404) if transaction.blank?
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
-        transaction.destroy
+        transaction.destroy!
       end
     rescue => exception
       raise exception
