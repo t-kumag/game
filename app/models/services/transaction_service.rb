@@ -56,7 +56,8 @@ class Services::TransactionService
   end
 
   def sort_by_used_date(transactions)
-    transactions.sort_by! { |a| a[:used_date] }.reverse!
+    i = 0
+    transactions.sort_by! { |a| [a[:used_date], i += 1] }.reverse!
   end
 
   def list(ids = @category_id)
