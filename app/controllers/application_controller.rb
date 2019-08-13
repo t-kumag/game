@@ -209,7 +209,8 @@ class ApplicationController < ActionController::Base
 
   def disallowed_at_bank_transaction_ids?(bank_id, bank_transaction_ids, with_group=false)
     user_bank = @current_user.at_user.at_user_bank_accounts.find_by(id: bank_id)
-    at_user_bank_transaction_ids = user_bank.try(:at_user_bank_transactions).pluck(:id) if user_bank.try(:at_user_bank_transactions).present?
+    at_user_bank_transaction_ids = []
+    at_user_bank_transaction_ids << user_bank.try(:at_user_bank_transactions).pluck(:id) if user_bank.try(:at_user_bank_transactions).present?
     
     if with_group
       partner_bank = @current_user.try(:partner_user).try(:at_user).try(:at_user_bank_accounts).find_by(id: bank_id)
@@ -237,7 +238,8 @@ class ApplicationController < ActionController::Base
 
   def disallowed_at_card_transaction_ids?(card_id, card_transaction_ids, with_group=false)
     user_card = @current_user.at_user.at_user_card_accounts.find_by(id: card_id)
-    at_user_card_transaction_ids = user_card.try(:at_user_card_transactions).pluck(:id) if user_card.try(:at_user_card_transactions).present?
+    at_user_card_transaction_ids = []
+    at_user_card_transaction_ids << user_card.try(:at_user_card_transactions).pluck(:id) if user_card.try(:at_user_card_transactions).present?
     
     if with_group
       partner_card = @current_user.try(:partner_user).try(:at_user).try(:at_user_card_accounts).find_by(id: card_id)
@@ -264,7 +266,8 @@ class ApplicationController < ActionController::Base
 
   def disallowed_at_emoney_transaction_ids?(emoney_id, emoney_transaction_ids, with_group=false)
     user_emoney = @current_user.at_user.at_user_emoney_service_accounts.find_by(id: emoney_id)
-    at_user_emoney_transaction_ids = user_emoney.try(:at_user_emoney_transactions).pluck(:id) if user_emoney.try(:at_user_emoney_transactions).present?
+    at_user_emoney_transaction_ids = []
+    at_user_emoney_transaction_ids << user_emoney.try(:at_user_emoney_transactions).pluck(:id) if user_emoney.try(:at_user_emoney_transactions).present?
     
     if with_group
       partner_emoney = @current_user.try(:partner_user).try(:at_user).try(:at_user_emoney_service_accounts).find_by(id: emoney_id)
