@@ -9,6 +9,7 @@ defaults: &defaults
   at_user_limit_free_goal: 5
   mail_setting_from: OsidOri <info@osidori.co>
   pairing_token_salt: 2dhp2fw5gra4aks
+  s3_img_url: https://osdr-img-test.s3-ap-northeast-1.amazonaws.com
 
 test:
   <<: *defaults
@@ -33,6 +34,7 @@ staging:
   at_pwd_salt: osdrstaging
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdrstaging
+  s3_img_url: https://osidori-img-stg.s3-ap-northeast-1.amazonaws.com
 
 production:
   <<: *defaults
@@ -41,3 +43,4 @@ production:
   at_pwd_salt: osdr
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdr
+  s3_img_url: https://osidori-img.s3-ap-northeast-1.amazonaws.com
