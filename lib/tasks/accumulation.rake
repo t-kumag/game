@@ -36,9 +36,7 @@ namespace :accumulation do
     balance_minus_goal = at_user_bank_account.balance - goal.current_amount
 
     # (銀行口座の残高 - 積み立て済み金額 ) > 月額貯金額
-    if balance_minus_goal > goal_setting.monthly_amount
-      return true
-    end
+    return true if balance_minus_goal > goal_setting.monthly_amount
     # ここはAPIエラーを投げる?
     return false
   end
@@ -46,9 +44,7 @@ namespace :accumulation do
   def check_goal_amount(goal)
 
     # 目標金額 > 現在の貯金額
-    if goal.goal_amount > goal.current_amount
-      return true
-    end
+    return true if goal.goal_amount > goal.current_amount
     # ここはAPIエラーを投げる?
     return false
   end

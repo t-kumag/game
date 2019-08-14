@@ -11,16 +11,17 @@ json.app do
     json.end_date @response[:end_date]
   end
   json.owner_current_amount do
-    json.monthly_amount 123 # TODO: 合計を返す
-    json.first_amount 123 # TODO: 合計を返す
-    json.add_amount 123 # TODO: 合計を返す
+    json.monthly_amount @response[:owner_current_amount][:monthly_amount]
+    json.first_amount @response[:owner_current_amount][:first_amount]
+    json.add_amount @response[:owner_current_amount][:add_amount]
+    json.current_amount @response[:owner_current_amount][:current_amount]
   end
   json.partner_current_amount do
-    json.monthly_amount 123 # TODO: 合計を返す
-    json.first_amount 123 # TODO: 合計を返す
-    json.add_amount 123 # TODO: 合計を返す
+    json.monthly_amount @response[:partner_current_amount][:monthly_amount]
+    json.first_amount @response[:partner_current_amount][:first_amount]
+    json.add_amount @response[:partner_current_amount][:add_amount]
+    json.current_amount @response[:partner_current_amount][:current_amount]
   end
-
   json.goal_settings do
     json.array!(@response[:goal_settings]) do |r|
       json.goal_setting_id r.id
