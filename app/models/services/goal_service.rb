@@ -106,16 +106,29 @@ class Services::GoalService
 
   def get_user_current_amount(user)
     goal_logs = Entities::GoalLog.where(user_id: user.id)
-    monthly_amount = goal_logs.sum{|i| i.monthly_amount }
-    first_amount = goal_logs.sum{|i| i.first_amount }
-    add_amount = goal_logs.sum{|i| i.add_amount }
-
-    #「月々の積立金 + 初回入金 + 追加入金」現在の口座残高を調べるために合算した数値となる
+    monthly_amount = get_monthly_amount_sum(goal_logs)
+    first_amount = get_first_amount_sum(goal_logs)
+    add_amount = get_add_amount_sum(goal_logs)
+    #「月々の積立金(monthly_amount) + 初回入金(first_amount) + 追加入金(add_amount)」現在の口座残高を調べるために合算した数値となる
     {
         monthly_amount: monthly_amount,
         first_amount: first_amount,
-        add_amount: add_amount,
-        current_amount: monthly_amount + first_amount + add_amount
+        current_amount: monthly_amount + first_amount + add_amount,
+        add_amount: add_amount
     }
+  end
+
+  private
+
+  def get_monthly_amount_sum(goal_logs)
+    goal_logs.sum{|i| i.monthly_amount }
+  end
+
+  def get_first_amount_sum(goal_logs)
+    goal_logs.sum{|i| i.first_amount }
+  end
+
+  def get_add_amount_sum(goal_logs)
+    goal_logs.sum{|i| i.add_amount }
   end
 end
