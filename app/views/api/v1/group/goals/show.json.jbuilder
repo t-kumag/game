@@ -13,14 +13,14 @@ json.app do
   json.owner_current_amount do
     json.monthly_amount @response[:owner_current_amount][:monthly_amount]
     json.first_amount @response[:owner_current_amount][:first_amount]
-    json.current_amount @response[:owner_current_amount][:current_amount]
     json.add_amount @response[:owner_current_amount][:add_amount]
+    json.current_amount @response[:owner_current_amount][:current_amount]
   end
   json.partner_current_amount do
     json.monthly_amount @response[:partner_current_amount][:monthly_amount]
     json.first_amount @response[:partner_current_amount][:first_amount]
-    json.current_amount @response[:partner_current_amount][:current_amount]
     json.add_amount @response[:partner_current_amount][:add_amount]
+    json.current_amount @response[:partner_current_amount][:current_amount]
   end
   json.goal_settings do
     json.array!(@response[:goal_settings]) do |r|
