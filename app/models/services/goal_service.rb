@@ -127,7 +127,6 @@ class Services::GoalService
 
   def get_first_amount_sum(goal_logs)
     goal_logs.sum{|i| i.first_amount }
-
   end
 
   def get_add_amount_sum(goal_logs)
