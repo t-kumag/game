@@ -46,7 +46,7 @@ class Services::PlService
       WHERE
         udt.user_id in (#{user_ids.join(',')})
       AND
-        (auba.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+        #{sql_shared("auba", share)}
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
@@ -89,7 +89,7 @@ class Services::PlService
       WHERE
         udt.user_id in (#{user_ids.join(',')})
       AND
-        (auca.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+        #{sql_shared("auca", share)}
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
@@ -136,7 +136,7 @@ class Services::PlService
       WHERE
         udt.user_id in (#{user_ids.join(',')})
       AND
-        (auea.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
+        #{sql_shared("auea", share)}
       AND
         udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
@@ -183,15 +183,24 @@ class Services::PlService
     ActiveRecord::Base.connection.select_all(sql).to_hash
   end
 
-  def sql_user_or_group
+  def sql_shared(account, share)
     if @with_group && @user.group_id.size > 1
+      # 家族 シェアしている口座 or シェアしている明細
       <<-EOS
-        udt.group_id = #{@user.group_id}
+        (#{account}.share = 1 OR udt.share = 1)
       EOS
     else
-      <<-EOS
-        udt.user_id = #{@user.id}
-      EOS
+      if share.size > 1
+        # 個人 家族ON シェアしていない口座 and 全明細
+        <<-EOS
+          #{account}.share = 0 AND udt.share in (0, 1)
+        EOS
+      else
+        # 個人 家族OFF シェアしていない口座 and シェアしていない明細
+        <<-EOS
+          #{account}.share = 0 AND udt.share = 0
+        EOS
+      end
     end
   end
 
