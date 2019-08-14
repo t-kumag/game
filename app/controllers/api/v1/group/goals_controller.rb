@@ -3,7 +3,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   before_action :require_group, except: [:graph]
 
   def index
-    @responses = Entities::Goal.where(group_id: @current_user.group_id)
+    @responses = get_goal_lists(Entities::Goal.where(group_id: @current_user.group_id))
     render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @responses.blank?
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
@@ -168,5 +168,31 @@ class Api::V1::Group::GoalsController < ApplicationController
       :goal_amount
     ).merge(group_id: @current_user.group_id, user_id: @current_user.id)
   end
+
+  def get_goal_lists(goal)
+    goals = {}
+
+
+    goals = goal.map do |g|
+      user_amount = Services::GoalService.new(@current_user).get_user_current_amount(@current_user, g.id)
+      {
+          id: g.id,
+          group_id: g.group_id,
+          user_id: g.user_id,
+          goal_type_id: g.goal_type_id,
+          name: g.name,
+          img_url: g.img_url,
+          start_date: g.start_date,
+          end_date: g.end_date,
+          goal_amount: g.goal_amount,
+          current_amount: g.current_amount,
+          progress_all: (user_amount[:current_amount].to_f / g.goal_amount).round(1),
+          progress_monthly: Services::GoalGraphService.new(@current_user, Entities::Goal.find(g.id), 1).call,
+          goal_settings: g.goal_settings
+      }
+    end
+    goals
+  end
+
 
 end
