@@ -30,8 +30,8 @@ class Services::GoalService
       users[:partner] = @user
     end
 
-    owner_current_amount = get_user_current_amount(users[:owner])
-    partner_current_amount = get_user_current_amount(users[:partner])
+    owner_current_amount = get_user_current_amount(users[:owner], goal.id)
+    partner_current_amount = get_user_current_amount(users[:partner], goal.id)
 
     {
         goal_id: goal.id,
@@ -104,8 +104,8 @@ class Services::GoalService
     }
   end
 
-  def get_user_current_amount(user)
-    goal_logs = Entities::GoalLog.where(user_id: user.id)
+  def get_user_current_amount(user, goal_id)
+    goal_logs = Entities::GoalLog.where(user_id: user.id, goal_id: goal_id)
     monthly_amount = get_monthly_amount_sum(goal_logs)
     first_amount = get_first_amount_sum(goal_logs)
     add_amount = get_add_amount_sum(goal_logs)
