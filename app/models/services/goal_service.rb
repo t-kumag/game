@@ -21,13 +21,17 @@ class Services::GoalService
     return {} if goal.blank?
 
     users = {}
-    goal.goal_settings.each do |gs|
-      users[:owner] = Entities::User.find(gs.user_id) if gs.at_user_bank_account_id.present?
-      users[:partner] = Entities::User.find(gs.user_id) unless gs.at_user_bank_account_id.present?
+
+    if goal.user_id == @user.id
+      users[:owner] = @user
+      users[:partner] = @user.partner_user
+    else
+      users[:owner] = @user.partner_user
+      users[:partner] = @user
     end
 
-    owner_current_amount = get_user_current_amount(users[:owner].at_user.at_user_bank_accounts.first.id)
-    partner_current_amount = get_user_current_amount(users[:partner].at_user.at_user_bank_accounts.first.id)
+    owner_current_amount = get_user_current_amount(users[:owner])
+    partner_current_amount = get_user_current_amount(users[:partner])
 
     {
         goal_id: goal.id,
@@ -94,17 +98,19 @@ class Services::GoalService
         first_amount: goal_setting.first_amount,
         before_current_amount: goal.current_amount,
         after_current_amount: goal.current_amount + goal_setting.monthly_amount,
+        user_id: goal_setting.user_id,
         add_date: DateTime.now,
         goal_amount: goal.goal_amount
     }
   end
 
-  def get_user_current_amount(at_user_bank_account_id)
-    goal_logs = Entities::GoalLog.where(at_user_bank_account_id: at_user_bank_account_id).order(created_at: :desc)
+  def get_user_current_amount(user)
+    goal_logs = Entities::GoalLog.where(user_id: user.id)
     {
         monthly_amount: goal_logs.sum{|i| i.monthly_amount },
         first_amount: goal_logs.sum{|i| i.first_amount },
-        current_amount: goal_logs.first.after_current_amount,
+        # 現在の口座残高を調べるために合算した数値となる: 「月々の積立金 + 初回入金 + 追加入金」
+        current_amount: goal_logs.sum{|i| i.monthly_amount  + i.first_amount + i.add_amount },
         add_amount: goal_logs.sum{|i| i.add_amount }
     }
   end
