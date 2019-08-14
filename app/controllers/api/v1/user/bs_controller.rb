@@ -19,7 +19,9 @@ class Api::V1::User::BsController < ApplicationController
     end
 
     @response = {
-        amount: bank_amount + emoney_amount - goal_amount
+        amount: bank_amount + emoney_amount
+        # TODO: 目標一覧を口座取引に表示するまで目標金額はBSに含めない
+        #amount: bank_amount + emoney_amount - goal_amount
     }
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end

@@ -25,7 +25,9 @@ class Api::V1::Group::BsController < ApplicationController
     end
 
     @response = {
-        amount: bank_amount + emoney_amount + share_off_goal_amount - share_on_goal_amount
+        amount: bank_amount + emoney_amount
+        # TODO: 目標一覧を口座取引に表示するまで目標金額はBSに含めない
+        # amount: bank_amount + emoney_amount + share_off_goal_amount - share_on_goal_amount
     }
     render 'summary', formats: 'json', handlers: 'jbuilder'
   end
