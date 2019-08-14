@@ -12,6 +12,13 @@ json.app do
       json.start_date r.start_date
       json.end_date r.end_date
     end
+    json.progress_all do
+      json.progress 0.5 # TODO: 全体の達成率を返す
+    end
+    json.progress_monthly do
+      json.progress 0.7 # TODO: 月の達成率を返す
+      json.icon "smile" # TODO: アイコンステータスを返す
+    end
     json.goal_settings do
       json.array!(r.goal_settings) do |s|
         json.goal_setting_id s.id
