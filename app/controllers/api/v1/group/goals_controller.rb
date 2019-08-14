@@ -120,10 +120,11 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_ids && return
     end
 
+    # TODO:パートナーの追加入金の動作検証　パートナーの目標設定作成IF完成後に動作検証する
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     goal_setting = goal.goal_settings.find_by(user_id: @current_user.id)
 
-    if @current_user.blank? || goal.blank? || goal_setting.blank?
+    if goal.blank? || goal_setting.blank?
       render(json: {errors: [{code:"", message:"user not found or goal not found"}]}, status: 422) && return
     end
     
