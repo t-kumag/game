@@ -109,7 +109,8 @@ class Services::GoalService
     monthly_amount = get_monthly_amount_sum(goal_logs)
     first_amount = get_first_amount_sum(goal_logs)
     add_amount = get_add_amount_sum(goal_logs)
-    #「月々の積立金(monthly_amount) + 初回入金(first_amount) + 追加入金(add_amount)」現在の口座残高を調べるために合算した数値となる
+
+    #「月々の積立金(monthly_amount) + 初回入金(first_amount) + 追加入金(add_amount)」: 現在の口座残高を調べるために合算した数値となる
     {
         monthly_amount: monthly_amount,
         first_amount: first_amount,
