@@ -329,9 +329,7 @@ class ApplicationController < ActionController::Base
   end
 
   def require_group
-    unless @current_user.group_id.present?
-      render json: { errors: { code: '', message: "Require group." } }, status: 422
-    end
+    render json: { errors: { code: '', message: "Require group." } }, status: 422 unless @current_user.group_id.present?
   end
 
   def render_disallowed_financier_ids
