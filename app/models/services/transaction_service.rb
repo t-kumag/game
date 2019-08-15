@@ -45,6 +45,8 @@ class Services::TransactionService
         at_user_emoney_service_account_id: t.at_user_emoney_transaction.try(:at_user_emoney_service_account_id),
         at_transaction_category_id: t.at_transaction_category_id,
         is_shared: shared_account?(t, shared_accounts) || t.share,
+        is_account_shared: shared_account?(t, shared_accounts),
+        user_id: t.user_id,
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,

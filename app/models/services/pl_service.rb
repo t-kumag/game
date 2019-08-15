@@ -9,6 +9,7 @@ class Services::PlService
     [
       '1581', # カード返済（クレジットカード引き落とし）
       '1699', # その他入金（電子マネーへのチャージ電子マネー側入金）
+      '1781', # カード出金
       '1799', # その他出金（電子マネーへのチャージ銀行側出金）
     ]
   end
@@ -48,7 +49,7 @@ class Services::PlService
       AND
         #{sql_shared("auba", share)}
       AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+        atc.at_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
@@ -91,7 +92,7 @@ class Services::PlService
       AND
         #{sql_shared("auca", share)}
       AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+        atc.at_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
@@ -138,7 +139,7 @@ class Services::PlService
       AND
         #{sql_shared("auea", share)}
       AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+        atc.at_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
@@ -184,7 +185,7 @@ class Services::PlService
   end
 
   def sql_shared(account, share)
-    if @with_group && @user.group_id.size > 1
+    if @with_group
       # 家族 シェアしている口座 or シェアしている明細
       <<-EOS
         (#{account}.share = 1 OR udt.share = 1)
