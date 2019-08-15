@@ -13,10 +13,10 @@ json.app do
       json.end_date r[:end_date]
     end
     json.progress_all do
-      json.progress r[:progress_all][:progress] # TODO: 全体の達成率を返す
+      json.progress r[:progress_all][:progress]
     end
     json.progress_monthly do
-      json.progress r[:progress_monthly][:progress]  # TODO: 月の達成率を返す
+      json.progress r[:progress_monthly][:progress]
       json.icon r[:progress_monthly][:icon]
     end
     json.goal_settings do

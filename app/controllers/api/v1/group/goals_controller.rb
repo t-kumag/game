@@ -205,13 +205,9 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def get_icon(monthly_achieving_rate)
-    if monthly_achieving_rate >= 0.7
-      return "best"
-    elsif monthly_achieving_rate >= 0.5
-      return  "normal"
-    else
-      return "bad"
-    end
+    return "best" if monthly_achieving_rate >= 0.7
+    return "normal" if monthly_achieving_rate >= 0.5
+    "bad"
   end
 
   def get_montly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
