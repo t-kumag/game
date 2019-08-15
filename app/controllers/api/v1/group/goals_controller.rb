@@ -3,8 +3,9 @@ class Api::V1::Group::GoalsController < ApplicationController
   before_action :require_group, except: [:graph]
 
   def index
-    @responses = get_goal_lists(Entities::Goal.where(group_id: @current_user.group_id))
-    render render(json: {}, status: 200) and return if @responses.blank?
+    goals = Entities::Goal.where(group_id: @current_user.group_id)
+    @responses = get_goal_lists(goals)  if goals.present?
+    render(json: {}, status: 200) and return if @responses.blank?
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
 
@@ -172,7 +173,6 @@ class Api::V1::Group::GoalsController < ApplicationController
   def get_goal_lists(goal)
     goals = {}
     goals = goal.map do |g|
-      user_amount = Services::GoalService.new(@current_user).get_user_current_amount(@current_user, g.id)
       {
           id: g.id,
           group_id: g.group_id,
@@ -184,8 +184,8 @@ class Api::V1::Group::GoalsController < ApplicationController
           end_date: g.end_date,
           goal_amount: g.goal_amount,
           current_amount: g.current_amount,
-          progress_all: get_progress_all(user_amount[:current_amount],  g.goal_amount),
-          progress_monthly: get_progress_monthly(Entities::Goal.find(g.id)),
+          progress_all: get_progress_all(g.current_amount,  g.goal_amount),
+          progress_monthly: get_progress_monthly(g),
           goal_settings: g.goal_settings
       }
     end
@@ -195,7 +195,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   private
   def get_progress_all(current_amount, goal_amount)
     # progress: 現在の貯金額 / 目標の貯金額
-    { preogress: (current_amount.to_f / goal_amount.to_f).round(1) }
+    { progress: (current_amount.to_f / goal_amount.to_f).round(1) }
   end
 
   def get_monthly_total_amount(goal)
@@ -228,9 +228,12 @@ class Api::V1::Group::GoalsController < ApplicationController
   def get_progress_monthly(goal)
     monthly_amount = get_monthly_total_amount(goal)
     difference_month = get_difference_month(goal)
+    # 1ヶ月分の目標金額 = 目標金額
+    monthly_goal_amount = goal.goal_amount
 
     # 1ヶ月分の目標金額 = 目標金額 / 目標までの月数
-    monthly_goal_amount = goal.goal_amount / difference_month
+    monthly_goal_amount = goal.goal_amount / difference_month  unless difference_month <= 0
+
     get_monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
   end
 end

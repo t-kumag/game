@@ -164,10 +164,9 @@ class ApplicationController < ActionController::Base
     at_user_bank_ids.flatten!
 
     bank_ids.each do |id|
-      unless at_user_bank_ids.include?(id)
-        return true
-      end
+      return true unless at_user_bank_ids.include?(id)
     end
+
     false
   end
 
@@ -182,9 +181,7 @@ class ApplicationController < ActionController::Base
     at_user_card_ids.flatten!
 
     card_ids.each do |id|
-      unless at_user_card_ids.include?(id)
-        return true
-      end
+      return true unless at_user_card_ids.include?(id)
     end
     false
   end
@@ -200,9 +197,7 @@ class ApplicationController < ActionController::Base
     at_user_emoney_ids.flatten!
 
     emoney_ids.each do |id|
-      unless at_user_emoney_ids.include?(id)
-        return true
-      end
+      return true unless at_user_emoney_ids.include?(id)
     end
     false
   end
@@ -226,11 +221,8 @@ class ApplicationController < ActionController::Base
 
       if with_group
         transaction = Entities::AtUserBankTransaction.find(id)
-        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_bank_account).try(:share)
-          next
-        else
-          return true
-        end
+        next if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_bank_account).try(:share)
+        return true
       end
     end
     false
@@ -254,11 +246,8 @@ class ApplicationController < ActionController::Base
 
       if with_group
         transaction = Entities::AtUserCardTransaction.find(id)
-        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_card_account).try(:share)
-          next
-        else
-          return true
-        end
+        next if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_card_account).try(:share)
+        return true
       end
     end
     false
@@ -282,11 +271,8 @@ class ApplicationController < ActionController::Base
 
       if with_group
         transaction = Entities::AtUserEmoneyTransaction.find(id)
-        if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_emoney_service_account).try(:share)
-          next
-        else
-          return true
-        end
+        next if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_emoney_service_account).try(:share)
+        return true
       end
     end
     false
@@ -308,11 +294,8 @@ class ApplicationController < ActionController::Base
 
       if with_group
         transaction = Entities::UserManuallyCreatedTransaction.find(id)
-        if transaction.try(:user_distributed_transaction).try(:share)
-          next
-        else
-          return true
-        end
+        next if transaction.try(:user_distributed_transaction).try(:share)
+        return true
       end
     end
     false
@@ -329,9 +312,7 @@ class ApplicationController < ActionController::Base
     user_goal_ids.flatten!
 
     goal_ids.each do |id|
-      unless user_goal_ids.include?(id)
-        return true
-      end
+      return true unless user_goal_ids.include?(id)
     end
     false
   end
@@ -347,9 +328,7 @@ class ApplicationController < ActionController::Base
     user_goal_setting_ids.flatten!
 
     goal_setting_ids.each do |id|
-      unless user_goal_setting_ids.include?(id)
-        return true
-      end
+      return true unless user_goal_setting_ids.include?(id)
     end
     false
   end
