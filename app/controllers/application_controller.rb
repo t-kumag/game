@@ -177,6 +177,7 @@ class ApplicationController < ActionController::Base
     at_user_card_ids = Entities::AtUserCardAccount.where(at_user_id: at_user_id).pluck(:id)
     if partner_at_user_id && with_group
       at_user_card_ids << Entities::AtUserCardAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
     at_user_card_ids.flatten!
 
     card_ids.each do |id|
