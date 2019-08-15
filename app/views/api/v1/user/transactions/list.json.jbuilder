@@ -10,6 +10,7 @@ json.app do
     json.used_location r[:used_location]
     json.type r[:type]
     json.is_shared r[:is_shared]
+    json.is_account_shared r[:is_account_shared]
     json.transaction_id r[:transaction_id]
     json.at_transaction_category_id r[:at_transaction_category_id]
   end
