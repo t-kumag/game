@@ -192,9 +192,9 @@ class Services::PlService
       EOS
     else
       if share.size > 1
-        # 個人 家族ON 全口座 and 全明細
+        # 個人 家族ON シェアしていない口座 and 全明細
         <<-EOS
-          #{account}.share in (0, 1) AND udt.share in (0, 1)
+          #{account}.share = 0 AND udt.share in (0, 1)
         EOS
       else
         # 個人 家族OFF シェアしていない口座 and シェアしていない明細
