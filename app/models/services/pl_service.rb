@@ -185,7 +185,7 @@ class Services::PlService
   end
 
   def sql_shared(account, share)
-    if @with_group && @user.group_id.size > 1
+    if @with_group
       # 家族 シェアしている口座 or シェアしている明細
       <<-EOS
         (#{account}.share = 1 OR udt.share = 1)
