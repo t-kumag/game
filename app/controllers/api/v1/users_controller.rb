@@ -61,16 +61,19 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def change_password
-    current_user = Entities::User.token_authenticate!(params[:token])
-    change_status = false
-
-    if change_password_params[:password].present? && change_password_params[:password_confirm].present?
-      change_status = change_password_params[:password] == change_password_params[:password_confirm]
-    else
-      render json: { errors: { code: '', message: "empty password." } }, status: 422 and return
+    unless change_password_params[:password].present?
+      render_400_invalid_validation([{resource: 'User', field: 'password', code: 'empty'}]) and return
+    end
+    unless change_password_params[:password_confirm].present?
+      render_400_invalid_validation([{resource: 'User', field: 'password_confirm', code: 'empty'}]) and return
+    end
+    change_status = change_password_params[:password] == change_password_params[:password_confirm]
+    unless change_status
+      render_400_invalid_validation([{resource: 'User', field: 'password_confirm', code: 'confirmation'}]) and return
     end
 
-    if current_user.present? && DateTime.now <= current_user.token_expires_at && change_status
+    current_user = Entities::User.token_authenticate!(params[:token])
+    if current_user.present? && DateTime.now <= current_user.token_expires_at
       current_user.password = change_password_params[:password]
       current_user.reset_token
       current_user.save!
@@ -81,6 +84,12 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_url
+    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
+    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
+    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
+
+    return render json: { errors: { code: '', message: "five account limit of free users" } }, status: 422  unless check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+
     @response = Services::AtUserService.new(@current_user).at_url
     render 'at_url', formats: 'json', handlers: 'jbuilder'
   end
@@ -88,6 +97,11 @@ class Api::V1::UsersController < ApplicationController
   def at_sync
     # ATユーザーが作成されていなければスキップする
     return render json: {}, status: 200 unless @current_user.try(:at_user)
+
+    if params[:only_accounts] == "true"
+      Services::AtUserService::Sync.new(@current_user).sync_accounts
+      return render json: {}, status: 200
+    end
 
     at_user_service = Services::AtUserService.new(@current_user, params[:target])
     at_user_service.exec_scraping
@@ -123,11 +137,12 @@ class Api::V1::UsersController < ApplicationController
     begin
       ActiveRecord::Base.transaction do
         begin
-          # ATのユーザーアカウント 口座アカウント削除
-          # ATの共有している口座の削除 ペアリングの解除の処理を行う
+          # 口座アカウント削除 ATの共有している口座の削除 ペアリングの解除の処理を行う
           Services::ParingService.new(@current_user).cancel
           # ATの共有していない口座の削除
           delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+          # ATのユーザーアカウント削除（退会）
+          Services::AtUserService.new(@current_user).delete_user
         rescue AtAPIStandardError => at_err
           # TODO クラッシュレポートの仕組みを入れるアラートメールなどで通知する
           p at_err
@@ -170,7 +185,6 @@ class Api::V1::UsersController < ApplicationController
 
 
   def delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
-
     if at_user_bank_account_ids.present?
       Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_ids)
     end
@@ -184,4 +198,22 @@ class Api::V1::UsersController < ApplicationController
     end
 
   end
+
+  def check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+    number_of_account =  0
+    if at_user_bank_account_ids.present?
+      number_of_account += at_user_bank_account_ids.count
+    end
+
+    if at_user_card_account_ids.present?
+      number_of_account += at_user_card_account_ids.count
+    end
+
+    if at_user_emoney_service_account_ids.present?
+      number_of_account += at_user_emoney_service_account_ids.count
+    end
+    @current_user.free? && number_of_account < Settings.at_user_limit_free_account
+
+  end
+
 end

@@ -1,19 +1,21 @@
 class Api::V1::Group::BankAccountsController < ApplicationController
-  before_action :authenticate
+  before_action :authenticate, :require_group
 
   def index
-    if @current_user.try(:at_user).try(:at_user_bank_accounts).blank?
+    share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
+    if share_on_bank_accounts.blank?
       @responses = []
     else
       @responses = []
 
-      share_on_bank_accounts =
-          Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
       share_on_bank_accounts.each do |a|
         @responses << {
             id: a.id,
             name: a.fnc_nm,
-            amount: a.balance
+            amount: a.balance,
+            fnc_id: a.fnc_id,
+            last_rslt_cd: a.last_rslt_cd,
+            last_rslt_msg: a.last_rslt_msg
         }
       end
     end
@@ -22,14 +24,12 @@ class Api::V1::Group::BankAccountsController < ApplicationController
 
   # TODO: user_distributed_transactionsを参照するようにする
   def summary
-    if @current_user.try(:at_user).try(:at_user_bank_accounts).blank?
+    share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
+    if share_on_bank_accounts.blank?
       @response = {
           amount: 0,
       }
     else
-      share_on_bank_accounts =
-          Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
-
       @response = {
           amount: share_on_bank_accounts.sum{|i| i.balance}
       }

@@ -1,5 +1,7 @@
 class Entities::Activity < ApplicationRecord
 
+  validates :user_id, presence: true
+
   #個人支出(銀行)
   def self.add_bank_outcome_individual(date, user_id, count = 1)
     self.new(
@@ -88,7 +90,8 @@ class Entities::Activity < ApplicationRecord
     # TODO:・目標の設定
 
     @result = []
-    own_activities = where(user_id: own_user_id).order(created_at: "DESC")
+    own_activities = where(user_id: own_user_id).order(created_at: "DESC").page(page)
+
     own_activities.each {|a|
       dayStr = a.created_at.strftime('%Y-%m-%d')
       message = ""
@@ -96,29 +99,54 @@ class Entities::Activity < ApplicationRecord
       when "individual_bank_outcome"
         #message = "銀行口座の支出が" + a.count.to_s + "件あります。"
         message = "銀行口座の支出があります。"
+      when "individual_bank_income"
+        #message = "銀行口座に収入が" + a.count.to_s + "件あります。"
+        message = "銀行口座に収入があります。"
       when "individual_card_outcome"
         #message = "クレジットカードの支出が" + a.count.to_s + "件あります。"
         message = "クレジットカードの支出があります。"
       when "individual_emoney_outcome"
         #message = "電子マネーの支出が" + a.count.to_s + "件あります。"
         message = "電子マネーの支出があります。"
+      when "individual_emoney_income"
+        #message = "電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "電子マネーに収入があります。"
       when "partner_bank_outcome"
         #message = "夫婦の銀行口座の支出が" + a.count.to_s + "件あります。"
         message = "夫婦の銀行口座の支出があります。"
+      when "partner_bank_income"
+        #message = "夫婦の銀行口座に収入が" + a.count.to_s + "件あります。"
+        message = "夫婦の銀行口座に収入があります。"
+      when "individual_manual_outcome"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "手動で明細が作成されました。"
       when "partner_card_outcome"
         #message = "夫婦のクレジットカードの支出が" + a.count.to_s + "件あります。"
         message = "夫婦のクレジットカードの支出があります。"
       when "partner_emoney_outcome"
         #message = "夫婦の電子マネーの支出が" + a.count.to_s + "件あります。"
         message = "夫婦の電子マネーの支出があります。"
+      when "partner_emoney_income"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "夫婦の電子マネーに収入があります。"
+      when "pairing_created"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "ぺアリングが完了しました！"
+      when "goal_created"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "目標が作成されました。"
+      when "goal_add_money"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "目標に入金がありました。"
       end
+
       @result.push({
-                       "day": dayStr,
-                       "type": a.activity_type,
-                       "message": message})
+        "day": dayStr,
+        "type": a.activity_type,
+        "message": message
+      })
     }
     @result
-    Kaminari.paginate_array(@result).page(page)
   end
 
 end

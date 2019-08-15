@@ -2,6 +2,7 @@ class Api::V1::User::ProfilesController < ApplicationController
   before_action :authenticate
 
   def create
+    return render(json: { errors: { code: '', mesasge: "user profile is registered." } }, status: 422) if @current_user.try(:user_profile)
     begin
       Entities::UserProfile.new(user_profile_params).save!
     rescue ActiveRecord::RecordInvalid => db_err
@@ -30,11 +31,7 @@ class Api::V1::User::ProfilesController < ApplicationController
   def show
     @profile = @current_user.user_profile
     @icon    = @current_user.user_icon
-    if @profile.present?
-      render 'show', formats: 'json', handlers: 'jbuilder'
-    else
-      render json: {}, status: 200
-    end
+    render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
   private

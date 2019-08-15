@@ -2,10 +2,9 @@
 <script type="text/javascript">
 
 //カスタムURLスキーム
-let custom_pairing_url = 'osidori://pairing?token='; 
+let custom_pairing_url = 'osidori://pairing?token=';
 
-// @TODO AppStoreでのosidoriアプリURLが確定したら更新
-let app_store_url = 'https://www.osidori.co/?token=';
+let osidori_home_url = 'https://www.osidori.co/';
 
 // token が正しく取れなかった場合、空文字
 let token = getParam('token') ? getParam('token') : "";
@@ -15,9 +14,9 @@ location.href = `${custom_pairing_url}${token}`
 
 // アプリを起動処理で未インストールだった場合のタイマー処理
 let timerId = setTimeout(function() {
-    // AppStoreのosidoriアプリURLに飛ばす
-    location.href = app_store_url;
-}, 500); 
+    // osidoriのホームページに飛ばす
+    location.href = osidori_home_url;
+}, 5000); 
 
 /**
  * Get the URL parameter value

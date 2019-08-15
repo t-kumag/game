@@ -28,14 +28,25 @@ class Entities::AtUserCardAccount < ApplicationRecord
   belongs_to :at_user
   belongs_to :at_card
   has_many :at_user_card_transactions
+  has_many :at_scraping_logs
+  has_many :at_sync_transaction_logs
 
-  def current_month_payment(account_ids=nil)
+  # 今月の引落し額
+  def current_month_payment_amount
     current_month = Time.now.strftime("%Y-%m").to_s
-    if account_ids.present?
-      self.at_user_card_transactions.where(confirm_type: 'C', clm_ym: current_month, at_user_card_account_id: account_ids).sum{|i| i.amount}
-    else
-      self.at_user_card_transactions.where(confirm_type: 'C', clm_ym: current_month ).sum{|i| i.amount}
-    end
+    # clm_ym（決済月）が当日の同月の明細、且つ 確定（confirm_typeがC）された明細の支払い金額（payment_amount）の合算
+    self.at_user_card_transactions.where(clm_ym: current_month, confirm_type: 'C').sum{|i| i.payment_amount}
+    # a = Entities::UserDistributedTransaction.where(at_user_card_transaction_id: at_user_card_transaction_ids).sum{|i| i.amount}
   end
 
+  # 今月の利用額
+  def current_month_used_amount
+    from = Time.zone.today.beginning_of_month.beginning_of_day
+    to = Time.zone.today.end_of_month.end_of_day
+    # used_date（利用日付）が当日と同月
+    at_user_card_transaction_ids = self.at_user_card_transactions.where(used_date: from..to).pluck(:id)
+    # 確定、未確定関係なくのuser_distributed_transactionsのamountの合算
+    Entities::UserDistributedTransaction.where(at_user_card_transaction_id: at_user_card_transaction_ids).sum{|i| i.amount}
+  end
+  
 end

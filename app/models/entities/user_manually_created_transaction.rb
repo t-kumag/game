@@ -19,4 +19,16 @@ class Entities::UserManuallyCreatedTransaction < ApplicationRecord
   belongs_to :payment_method, optional: true
   belongs_to :at_transaction_category
   has_one :user_distributed_transaction ,:dependent => :destroy
+
+  validates :at_transaction_category_id, presence: true
+
+  def amount
+    if attributes['amount'] < 0
+      attributes['amount']
+    elsif attributes['amount'] > 0
+      attributes['amount'] * -1
+    else
+      0
+    end
+  end
 end

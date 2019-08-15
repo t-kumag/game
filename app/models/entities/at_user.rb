@@ -18,7 +18,10 @@ class Entities::AtUser < ApplicationRecord
   has_many :at_user_card_accounts
   has_many :at_user_emoney_service_accounts
   has_many :at_user_tokens, inverse_of: :at_user, dependent: :destroy
-  
+
+  validates :user_id, presence: true
+  validates :at_user_id, presence: true
+
   # envに移す
   ACCOUNT_NAME_PREFIX = "osdrdev"
 

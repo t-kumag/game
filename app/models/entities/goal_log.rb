@@ -2,6 +2,9 @@ class Entities::GoalLog < ApplicationRecord
   belongs_to :goal
   belongs_to :at_user_bank_account, optional: true
 
+  validates :goal_id, presence: true, on: :create
+  validates :at_user_bank_account_id, presence: true, on: :create
+
   # Entities::GoalLog.insert(goal, goal_setting)
   def self.insert(goal, goal_setting, add_amount=0)
     params = {
@@ -13,6 +16,7 @@ class Entities::GoalLog < ApplicationRecord
       before_current_amount: goal.current_amount,
       after_current_amount: goal.current_amount + add_amount,
       goal_amount: goal.goal_amount,
+      user_id: goal_setting.user_id,
       add_date: DateTime.now
     }
     self.create!(params)

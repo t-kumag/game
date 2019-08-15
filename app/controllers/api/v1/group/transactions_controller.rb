@@ -1,13 +1,29 @@
 class Api::V1::Group::TransactionsController < ApplicationController
-  before_action :authenticate
+  before_action :authenticate, :require_group
 
   def index
     @response = []
    
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
-    Entities::ParticipateGroup.where(group_id: @current_user.group_id).pluck(:user_id).each { |id|
-      @response += Services::TransactionService.new(id, params[:from], params[:to], params[:category_id]).list
-    }
+    @response += Services::TransactionService.new(
+        @current_user,
+        params[:category_id],
+        true,                # share 
+        params[:scope],
+        true,                # with_group
+        params[:from],
+        params[:to]
+    ).list
+
+    @response += Services::TransactionService.new(
+        @current_user.partner_user,
+        params[:category_id],
+        true,                # share 
+        params[:scope],
+        true,                # with_group
+        params[:from],
+        params[:to]
+    ).list
 
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'
@@ -17,9 +33,25 @@ class Api::V1::Group::TransactionsController < ApplicationController
     @response = []
 
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
-    Entities::ParticipateGroup.where(group_id: @current_user.group_id).pluck(:user_id).each { |id|
-      @response += Services::TransactionService.new(id, params[:from], params[:to], params[:category_id]).grouped
-    }
+    @response += Services::TransactionService.new(
+        @current_user,
+        params[:category_id],
+        true,                # share
+        params[:scope],
+        true,                # with_group
+        params[:from],
+        params[:to]
+    ).grouped
+
+    @response += Services::TransactionService.new(
+        @current_user.partner_user,
+        params[:category_id],
+        true,                # share
+        params[:scope],
+        true,                # with_group
+        params[:from],
+        params[:to]
+    ).grouped
 
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'

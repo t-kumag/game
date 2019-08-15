@@ -4,6 +4,10 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   @error = {}
 
   def show
+    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
+      render_disallowed_transaction_ids && return
+    end
+
     @response = find_transaction
     render(json: { errors: { code: '', mesasge: "record not found." } }, status: 422) and return if @response.blank?
     render :show, formats: :json, handlers: :jbuilder
@@ -14,6 +18,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = create_user_manually_created
         if params[:share] === true
+          require_group && return
           options = {group_id: @current_user.group_id, share: params[:share]}
         else
           options = {}
@@ -29,10 +34,15 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def update
+    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
+      render_disallowed_transaction_ids && return 
+    end
+
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction = update_user_manually_created
         if params[:share] === true
+          require_group && return
           options = {group_id: @current_user.group_id, share: params[:share]}
         else
           options = {}
@@ -48,11 +58,15 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def destroy
+    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
+      render_disallowed_transaction_ids && return 
+    end
+
     transaction = find_transaction
     render(json: {}, status: 404) if transaction.blank?
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
-        transaction.destroy
+        transaction.destroy!
       end
     rescue => exception
       raise exception
@@ -78,7 +92,10 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
 
-    Services::ActivityService.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
+    Services::ActivityService.create_user_manually_activity(@current_user.id,
+                                                            @current_user.group_id,
+                                                            save_params[:used_date],
+                                                            'individual_manual_outcome')
     Entities::UserManuallyCreatedTransaction.create!(save_params)
 
   end
@@ -95,8 +112,11 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
 
-    Services::ActivityService.create_user_manually_activity(@current_user, save_params, :individual_manual_outcome)
     Entities::UserManuallyCreatedTransaction.find(params[:id]).update!(save_params)
+    Services::ActivityService.create_user_manually_activity(@current_user.id,
+                                                            @current_user.group_id,
+                                                            save_params[:used_date],
+                                                            'individual_manual_outcome')
     Entities::UserManuallyCreatedTransaction.find(params[:id])
   end
 end
