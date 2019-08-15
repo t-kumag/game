@@ -194,7 +194,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   private
   def get_progress_all(current_amount, goal_amount)
-    # 現在の貯金額 - 目標の貯金額
+    # progress: 現在の貯金額 / 目標の貯金額
     { preogress: (current_amount.to_f / goal_amount.to_f).round(1) }
   end
 
@@ -211,7 +211,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def get_monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
-    # 当月の貯金額 - 目標の貯金額
+    # 1ヶ月の進捗状況 =  当月の貯金額 - 目標の貯金額
     monthly_achieving_rate = (monthly_amount.to_f / monthly_goal_amount.to_f).round(1)
     {
         progress:  monthly_achieving_rate,
