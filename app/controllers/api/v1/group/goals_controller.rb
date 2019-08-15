@@ -4,7 +4,8 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def index
     @responses = Entities::Goal.where(group_id: @current_user.group_id)
-    render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @responses.blank?
+    render render(json: {}, status: 200) and return if @responses.blank?
+
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
 
