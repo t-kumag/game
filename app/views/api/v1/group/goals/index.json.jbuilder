@@ -17,7 +17,7 @@ json.app do
     end
     json.progress_monthly do
       json.progress 0.7 # TODO: 月の達成率を返す
-      json.icon "smile" # TODO: アイコンステータスを返す
+      json.icon "normal" # TODO: アイコンステータスを返す
     end
     json.goal_settings do
       json.array!(r.goal_settings) do |s|
