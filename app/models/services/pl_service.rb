@@ -9,6 +9,7 @@ class Services::PlService
     [
       '1581', # カード返済（クレジットカード引き落とし）
       '1699', # その他入金（電子マネーへのチャージ電子マネー側入金）
+      '1781', # カード出金
       '1799', # その他出金（電子マネーへのチャージ銀行側出金）
     ]
   end
@@ -48,7 +49,7 @@ class Services::PlService
       AND
         (auba.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+        atc.at_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
@@ -91,7 +92,7 @@ class Services::PlService
       AND
         (auca.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+        atc.at_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
@@ -138,7 +139,7 @@ class Services::PlService
       AND
         (auea.share in (#{share.join(',')}) OR udt.share in (#{share.join(',')}))
       AND
-        udt.at_transaction_category_id not in (#{ignore_at_category_ids.join(',')})
+        atc.at_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
       AND
