@@ -171,8 +171,6 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def get_goal_lists(goal)
     goals = {}
-
-
     goals = goal.map do |g|
       user_amount = Services::GoalService.new(@current_user).get_user_current_amount(@current_user, g.id)
       {
@@ -186,12 +184,52 @@ class Api::V1::Group::GoalsController < ApplicationController
           end_date: g.end_date,
           goal_amount: g.goal_amount,
           current_amount: g.current_amount,
-          progress_all: (user_amount[:current_amount].to_f / g.goal_amount).round(1),
-          progress_monthly: Services::GoalGraphService.new(@current_user, Entities::Goal.find(g.id), 1).call,
+          progress_all: get_progress_all(user_amount[:current_amount],  g.goal_amount),
+          progress_monthly: get_progress_monthly(Entities::Goal.find(g.id)),
           goal_settings: g.goal_settings
       }
     end
     goals
+  end
+
+  private
+  def get_progress_all(current_amount, goal_amount)
+    # 現在の貯金額 - 目標の貯金額
+    { preogress: (current_amount.to_f / goal_amount.to_f).round(1) }
+  end
+
+  def get_monthly_total_amount(goal)
+    this_month_goal_logs = goal.goal_logs.where(add_date: (Time.zone.today.beginning_of_month)...(Time.zone.today.end_of_month))
+    #月々の積立金(monthly_amount) + 初回入金(first_amount) + 追加入金(add_amount)
+    this_month_goal_logs.sum{|i| i.monthly_amount + i.first_amount + i.add_amount}
+  end
+
+  def get_icon(monthly_achieving_rate)
+    if monthly_achieving_rate >= 0.7
+      return "best"
+    elsif monthly_achieving_rate >= 0.5
+      return  "normal"
+    else
+      return "bad"
+    end
+  end
+
+  def get_montly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
+    # 当月の貯金額 - 目標の貯金額
+    monthly_achieving_rate = (monthly_amount.to_f / monthly_goal_amount.to_f).round(1)
+    icon = get_icon(monthly_achieving_rate)
+    {
+        progress: monthly_achieving_rate,
+        icon: icon
+    }
+
+  end
+
+  def get_progress_monthly(goal)
+    monthly_amount = get_monthly_total_amount(goal)
+    monthly_goal_amount = goal.goal_amount / 10
+
+    get_montly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
   end
 
 
