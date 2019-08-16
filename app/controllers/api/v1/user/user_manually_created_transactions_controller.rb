@@ -4,12 +4,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   @error = {}
 
   def show
-    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
-      render_disallowed_transaction_ids && return
-    end
-
     @response = find_transaction
-    render(json: { errors: { code: '', mesasge: "record not found." } }, status: 422) and return if @response.blank?
+    render_disallowed_transaction_ids && return if @response.blank?
     render :show, formats: :json, handlers: :jbuilder
   end
 
@@ -34,13 +30,13 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def update
-    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
-      render_disallowed_transaction_ids && return 
-    end
 
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
-        transaction = update_user_manually_created
+        transaction = find_transaction
+        render_disallowed_transaction_ids && return if transaction.blank?
+        update_user_manually_created(transaction)
+
         if params[:share] === true
           require_group && return
           options = {group_id: @current_user.group_id, share: params[:share]}
@@ -58,12 +54,10 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def destroy
-    if disallowed_manually_created_transaction_ids?([params[:id].to_i])
-      render_disallowed_transaction_ids && return 
-    end
 
     transaction = find_transaction
-    render(json: {}, status: 404) if transaction.blank?
+    render_disallowed_transaction_ids && return if transaction.blank?
+
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         transaction.destroy!
@@ -77,7 +71,16 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   private
 
   def find_transaction
-    Entities::UserManuallyCreatedTransaction.find_by(id: params[:id], user_id: @current_user.id)
+    # パラメータの明細IDが自身の明細の場合、明細のシェア関係なく返す
+    transacticon = Entities::UserManuallyCreatedTransaction.find_by(id: params[:id], user_id: @current_user.id)
+    if transacticon.blank? && @current_user.group_id.present?
+      # パラメータの明細IDがパートナーの明細の場合、シェアされている明細を返す
+      transacticon = Entities::UserManuallyCreatedTransaction.find_by(id: params[:id], user_id: @current_user.partner_user.id)
+      # シェアしていない明細は、422を返す
+      transacticon = nil unless transacticon.user_distributed_transaction.share
+    end
+    
+    transacticon
   end
 
   def create_user_manually_created
@@ -100,7 +103,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
   end
 
-  def update_user_manually_created
+  def update_user_manually_created(transaction)
     save_params = params.permit(
       :at_transaction_category_id,
       :payment_method_id,
@@ -108,15 +111,14 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :title,
       :amount,
       :used_location
-    ).merge(
-      user_id: @current_user.id
     )
 
-    Entities::UserManuallyCreatedTransaction.find(params[:id]).update!(save_params)
+    transaction.update!(save_params)
+
     Services::ActivityService.create_user_manually_activity(@current_user.id,
                                                             @current_user.group_id,
                                                             save_params[:used_date],
                                                             'individual_manual_outcome')
-    Entities::UserManuallyCreatedTransaction.find(params[:id])
+    transaction
   end
 end
