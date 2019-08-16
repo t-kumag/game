@@ -90,5 +90,4 @@ class Services::AtBankTransactionService
     end
     distributed_transactions
   end
-
 end
