@@ -13,11 +13,10 @@ namespace :accumulation do
         at_user_bank_account = Services::AtUserBankAccountsService.get_balance(user.at_user.id)
 
         at_user_bank_account.goal_settings.all.each do |goal_setting|
-          if check_balance(at_user_bank_account, goal_setting, goal) && check_goal_amount(goal)
-            goal_logs << Services::GoalService.new(user).get_goal_user_log_data(goal, goal_setting)
-            goals << Services::GoalService.new(user).get_update_goal_data(goal, goal_setting)
-            activities << Services::ActivityService.get_activity_data(user, 'goal_add_money')
-          end
+          next if check_balance(at_user_bank_account, goal_setting, goal) && check_goal_amount(goal)
+          goal_logs << Services::GoalLogService.get_user_goal_log(goal, goal_setting)
+          goals << Services::GoalService.new(user).get_update_goal_data(goal, goal_setting)
+          activities << Services::ActivityService.get_activity_data(user, 'goal_add_money')
         end
       rescue ActiveRecord::RecordInvalid => db_err
         raise db_err
