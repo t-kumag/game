@@ -80,10 +80,7 @@ class Services::TransactionService
       transactions = fetch_transactions(ids, @from, @to)
       # 削除済み口座の明細を除外する
       transactions = remove_delete_account_transaction transactions
-      # 家族共有OFFの場合、# シェアしている口座の明細 or シェアしている明細を削除する
-      if @share === false
-        transactions = remove_shared_transaction(transactions, shared_accounts)
-      end
+      transactions = remove_shared_transaction(transactions, shared_accounts)
       transactions = generate_response_from_transactions(transactions, shared_accounts)
       remove_scope_income(transactions)
       remove_scope_expence(transactions)
@@ -105,12 +102,24 @@ class Services::TransactionService
 
   def remove_shared_transaction(transactions, shared_accounts)
     transactions.reject do |t|
-      if shared_account?(t, shared_accounts) || t.share
-        # シェアしている口座の明細 or シェアしている明細は削除する
-        true
+      if @share === true
+        # 家族ONの場合
+        if shared_account?(t, shared_accounts)
+          # シェアしている口座の明細は削除する
+          true
+        else
+          # シェアしていない口座の明細 or シェアしていない明細は削除しない
+          false
+        end
       else
-        # シェアしていない口座の明細 or シェアしていない明細は削除しない
-        false
+        # 家族OFFの場合
+        if shared_account?(t, shared_accounts) || t.share
+          # シェアしている口座の明細 or シェアしている明細は削除する
+          true
+        else
+          # シェアしていない口座の明細 or シェアしていない明細は削除しない
+          false
+        end
       end
     end
   end
