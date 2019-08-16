@@ -1,9 +1,5 @@
 class Services::GoalLogService
 
-  def initialize(user)
-    @user = user
-  end
-
   def self.add_amount_insert(goal, goal_setting, add_amount=0)
     params = {
         goal_id: goal.id,
