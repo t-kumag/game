@@ -39,8 +39,8 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
         emoney_account_transaction_param[:share],
         emoney_account_transaction_param[:group_id],
     )
-    render json: {}, status: 200 and return if @response.blank?
 
+    render json: {}, status: 200 and return if @response.blank?
     render 'update', formats: 'json', handlers: 'jbuilder'
   end
 
@@ -58,6 +58,4 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
         group_id: share ? @current_user.group_id : nil
     }
   end
-
-
 end
