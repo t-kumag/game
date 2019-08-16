@@ -30,7 +30,7 @@ class Api::V1::User::BankTransactionsController < ApplicationController
     end
 
     @exist_bank_transaction = Services::AtBankTransactionService.new(@current_user).detail(params[:bank_account_id], transaction_id)
-    bank_account_transaction_param = get_card_account_transaction_param(params, transaction_id, @exist_card_transaction)
+    bank_account_transaction_param = get_bank_account_transaction_param(params, transaction_id, @exist_bank_transaction)
 
     @response = Services::AtBankTransactionService.new(@current_user).update(
         bank_account_transaction_param[:bank_account_id],
