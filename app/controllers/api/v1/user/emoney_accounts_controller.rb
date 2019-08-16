@@ -2,7 +2,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
     before_action :authenticate
 
     def index
-      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
+      if @current_user.try(:at_user).blank? || @current_user.try(:at_user).try(:at_user_emoney_service_accounts).blank?
         @responses = []
       else
         @responses = []
@@ -23,7 +23,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
     # TODO: user_distributed_transactionsを参照するようにする
     def summary
       share = false || params[:share]
-      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_emoney_service_accounts.blank?
+      if @current_user.try(:at_user).blank? || @current_user.try(:at_user).try(:at_user_emoney_service_accounts).blank?
         @response = {
           amount: 0,
         }
