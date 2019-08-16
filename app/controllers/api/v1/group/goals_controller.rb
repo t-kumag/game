@@ -228,7 +228,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   # 何ヶ月分の差があるかを算出するメソッド
   # 月の目標金額を算出するには、開始月と終了月の月数を取得
   def get_difference_month(goal)
-    (goal.end_date.to_time.month+ goal.end_date.to_time.year * 12) - (goal.start_date.month + goal.start_date.to_time.year * 12)
+    (goal.end_date.to_time.month + goal.end_date.to_time.year * 12) - (goal.start_date.month + goal.start_date.to_time.year * 12)
   end
 
   def get_progress_monthly(goal)
@@ -239,7 +239,6 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     # 1ヶ月分の目標金額 = 目標金額 / 目標までの月数
     monthly_goal_amount = goal.goal_amount / difference_month  unless difference_month <= 0
-
     get_monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
   end
 
