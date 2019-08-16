@@ -194,8 +194,11 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   private
   def get_progress_all(current_amount, goal_amount)
+    calculate_float_result = calculate_float_value_result(current_amount, goal_amount)
+
     # progress: 現在の貯金額 / 目標の貯金額
-    { progress: (current_amount.to_f / goal_amount.to_f).round(1) }
+    # 切り捨てでの実装はBigDecimalを使用する必要があるために使用している
+    { progress: BigDecimal(calculate_float_result).floor(1).to_f }
   end
 
   def get_monthly_total_amount(goal)
@@ -211,10 +214,13 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def get_monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
+    calculate_float_result = calculate_float_value_result(monthly_amount, monthly_goal_amount)
+
     # 1ヶ月の進捗状況 =  当月の貯金額 - 目標の貯金額
-    monthly_achieving_rate = (monthly_amount.to_f / monthly_goal_amount.to_f).round(1)
+    # 切り捨てでの実装はBigDecimalを使用する必要があるために使用している
+    monthly_achieving_rate = BigDecimal(calculate_float_result).floor(1).to_f
     {
-        progress:  monthly_achieving_rate,
+        progress: monthly_achieving_rate,
         icon: get_icon(monthly_achieving_rate)
     }
   end
@@ -236,4 +242,9 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     get_monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
   end
+
+  def calculate_float_value_result(amount1, amount2)
+    (amount1.to_f / amount2.to_f).to_s
+  end
+
 end
