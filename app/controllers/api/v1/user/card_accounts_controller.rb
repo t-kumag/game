@@ -2,7 +2,7 @@ class Api::V1::User::CardAccountsController < ApplicationController
     before_action :authenticate
 
     def index
-      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
+      if @current_user.try(:at_user).blank? || @current_user.try(:at_user).try(:at_user_card_accounts).blank?
         @responses = []
       else
         @responses = []
@@ -23,7 +23,7 @@ class Api::V1::User::CardAccountsController < ApplicationController
 
     def summary
       share = false || params[:share]
-      if @current_user&.at_user.blank? || @current_user&.at_user&.at_user_card_accounts.blank?
+      if @current_user.try(:at_user).blank? || @current_user.try(:at_user).try(:at_user_card_accounts).blank?
         @response = {
           amount: 0,
         }

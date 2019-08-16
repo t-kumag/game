@@ -53,14 +53,11 @@ class Services::AtBankTransactionService
     transaction = Entities::AtUserBankTransaction.find_by(id: transaction_id, at_user_bank_account_id: bank.id)
     return {} if transaction.blank?
 
-    if @is_group === true
-      if bank.share === true
-        distributed = transaction.user_distributed_transaction
-      else
-        distributed = Entities::UserDistributedTransaction.find_by(at_user_bank_transaction_id: transaction.id, share: true)
-      end
+    distributed = Entities::UserDistributedTransaction.find_by(at_user_bank_transaction_id: transaction.id) unless @is_group === true
+    if bank.share === true
+      distributed = transaction.user_distributed_transaction
     else
-      distributed = Entities::UserDistributedTransaction.find_by(at_user_bank_transaction_id: transaction.id)
+      distributed = Entities::UserDistributedTransaction.find_by(at_user_bank_transaction_id: transaction.id, share: true)
     end
     distributed
   end
