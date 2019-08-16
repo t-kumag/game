@@ -64,7 +64,7 @@ class Services::GoalService
   def add_money(goal, goal_setting, add_amount)
     begin
       ActiveRecord::Base.transaction do
-        Entities::GoalLog.insert(goal, goal_setting, add_amount)
+        Services::GoalLogService.add_amount_insert(goal, goal_setting, add_amount)
         goal.current_amount += add_amount
         goal.save!
       end
@@ -87,21 +87,6 @@ class Services::GoalService
 
   def self.check_goal_limit_of_free_user(user)
     user.free? && Entities::Goal.where(user_id: user.id).count < Settings.at_user_limit_free_goal
-  end
-
-  def get_goal_user_log_data(goal, goal_setting)
-    {
-        goal_id: goal_setting.goal_id,
-        at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
-        add_amount: 0,
-        monthly_amount: goal_setting.monthly_amount,
-        first_amount: goal_setting.first_amount,
-        before_current_amount: goal.current_amount,
-        after_current_amount: goal.current_amount + goal_setting.monthly_amount,
-        user_id: goal_setting.user_id,
-        add_date: DateTime.now,
-        goal_amount: goal.goal_amount
-    }
   end
 
   def get_user_current_amount(user, goal_id)
