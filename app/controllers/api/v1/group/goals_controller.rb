@@ -81,7 +81,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     begin
       ActiveRecord::Base.transaction do
-        goal.update!(get_goal_params)
+        goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
       end
     rescue ActiveRecord::RecordInvalid => db_err
@@ -166,15 +166,21 @@ class Api::V1::Group::GoalsController < ApplicationController
     ).merge(user_id: @current_user.partner_user.id)
   end
 
-  def get_goal_params
-    params.require(:goals).permit(
-      :name,
-      :img_url,
-      :goal_type_id,
-      :start_date,
-      :end_date,
-      :goal_amount
-    ).merge(group_id: @current_user.group_id, user_id: @current_user.id)
+  def goal_params_merge(goal_params)
+    goal_params.merge(group_id: @current_user.group_id, user_id: @current_user.id)
+  end
+
+  def get_goal_params(merge=true)
+    goal = params.require(:goals).permit(
+        :name,
+        :img_url,
+        :goal_type_id,
+        :start_date,
+        :end_date,
+        :goal_amount
+    )
+    return goal_params_merge(goal) if merge
+    goal
   end
 
   def goal_lists(goals)
