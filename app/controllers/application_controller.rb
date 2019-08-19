@@ -301,9 +301,8 @@ class ApplicationController < ActionController::Base
     partner_user_id = @current_user.try(:partner_user).try(:id)
 
     user_goal_ids = Entities::Goal.where(user_id: user_id).pluck(:id)
-    if partner_user_id && with_group
-      user_goal_ids << Entities::Goal.where(user_id: partner_user_id).pluck(:id)
-    end
+
+    user_goal_ids << Entities::Goal.where(user_id: partner_user_id).pluck(:id) if partner_user_id && with_group
     user_goal_ids.flatten!
 
     goal_ids.each do |id|

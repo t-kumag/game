@@ -26,7 +26,9 @@ class Api::V1::Group::GoalsController < ApplicationController
       return render_disallowed_financier_ids
     end
 
-    return render json: { errors: { code: '', message: "five goal limit of free users" } }, status: 422  unless Services::GoalService.check_goal_limit_of_free_user(@current_user)
+    unless Services::GoalService.check_goal_limit_of_free_user(@current_user)
+      return render json: { errors: { code: '', message: "five goal limit of free users" } }, status: 422
+    end
 
     goal_params = get_goal_params
     begin
@@ -39,6 +41,11 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal.goal_settings.create!(get_goal_setting_params)
         # 相手の目標設定を登録
         goal.goal_settings.create!(get_partner_goal_setting_params)
+
+        # 目標ログの登録
+        goal.goal_settings.each do |gs|
+          Services::GoalLogService.add_first_amount_insert(goal, gs) if gs.at_user_bank_account_id.present?
+        end
       end
 
       Services::ActivityService.create_user_manually_activity(@current_user.id,
@@ -121,7 +128,7 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_ids && return
     end
 
-    current_user_banks = @current_user.at_user.at_user_bank_accounts.pluck(:at_bank_id)
+    current_user_banks = @current_user.at_user.at_user_bank_accounts.pluck(:id)
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     goal_setting = goal.goal_settings.find_by(at_user_bank_account_id: current_user_banks)
 
