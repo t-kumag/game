@@ -11,13 +11,13 @@ json.app do
       json.current_amount r[:current_amount]
       json.start_date r[:start_date]
       json.end_date r[:end_date]
-    end
-    json.progress_all do
-      json.progress r[:progress_all][:progress]
-    end
-    json.progress_monthly do
-      json.progress r[:progress_monthly][:progress]
-      json.icon r[:progress_monthly][:icon]
+      json.progress_all do
+        json.progress r[:progress_all][:progress]
+      end
+      json.progress_monthly do
+        json.progress r[:progress_monthly][:progress]
+        json.icon r[:progress_monthly][:icon]
+      end
     end
     json.goal_settings do
       json.array!(r[:goal_settings]) do |s|
