@@ -166,7 +166,6 @@ class ApplicationController < ActionController::Base
     bank_ids.each do |id|
       return true unless at_user_bank_ids.include?(id)
     end
-
     false
   end
 
