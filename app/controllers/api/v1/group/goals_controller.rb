@@ -170,9 +170,8 @@ class Api::V1::Group::GoalsController < ApplicationController
     ).merge(group_id: @current_user.group_id, user_id: @current_user.id)
   end
 
-  def get_goal_lists(goal)
-    goals = {}
-    goals = goal.map do |g|
+  def get_goal_lists(goals)
+    goals = goals.map do |g|
       {
           id: g.id,
           group_id: g.group_id,
@@ -184,8 +183,8 @@ class Api::V1::Group::GoalsController < ApplicationController
           end_date: g.end_date,
           goal_amount: g.goal_amount,
           current_amount: g.current_amount,
-          progress_all: get_progress_all(g.current_amount,  g.goal_amount),
-          progress_monthly: get_progress_monthly(g),
+          progress_all: progress_all(g.current_amount,  g.goal_amount),
+          progress_monthly: progress_monthly(g),
           goal_settings: g.goal_settings
       }
     end
@@ -193,7 +192,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   private
-  def get_progress_all(current_amount, goal_amount)
+  def progress_all(current_amount, goal_amount)
     calculate_float_result = calculate_float_value_result(current_amount, goal_amount)
 
     # progress: 現在の貯金額 / 目標の貯金額
@@ -201,19 +200,19 @@ class Api::V1::Group::GoalsController < ApplicationController
     { progress: BigDecimal(calculate_float_result).floor(1).to_f }
   end
 
-  def get_monthly_total_amount(goal)
+  def monthly_total_amount(goal)
     this_month_goal_logs = goal.goal_logs.where(add_date: (Time.zone.today.beginning_of_month)...(Time.zone.today.end_of_month))
     #月々の積立金(monthly_amount) + 初回入金(first_amount) + 追加入金(add_amount)
     this_month_goal_logs.sum{|i| i.monthly_amount + i.first_amount + i.add_amount}
   end
 
-  def get_icon(monthly_achieving_rate)
+  def icon(monthly_achieving_rate)
     return "best" if monthly_achieving_rate >= 0.7
     return "normal" if monthly_achieving_rate >= 0.5
     "bad"
   end
 
-  def get_monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
+  def monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
     calculate_float_result = calculate_float_value_result(monthly_amount, monthly_goal_amount)
 
     # 1ヶ月の進捗状況 =  当月の貯金額 - 目標の貯金額
@@ -221,25 +220,25 @@ class Api::V1::Group::GoalsController < ApplicationController
     monthly_achieving_rate = BigDecimal(calculate_float_result).floor(1).to_f
     {
         progress: monthly_achieving_rate,
-        icon: get_icon(monthly_achieving_rate)
+        icon: icon(monthly_achieving_rate)
     }
   end
 
   # 何ヶ月分の差があるかを算出するメソッド
   # 月の目標金額を算出するには、開始月と終了月の月数を取得
-  def get_difference_month(goal)
+  def difference_month(goal)
     (goal.end_date.to_time.month + goal.end_date.to_time.year * 12) - (goal.start_date.month + goal.start_date.to_time.year * 12)
   end
 
-  def get_progress_monthly(goal)
-    monthly_amount = get_monthly_total_amount(goal)
-    difference_month = get_difference_month(goal)
+  def progress_monthly(goal)
+    monthly_amount = monthly_total_amount(goal)
+    difference_month = difference_month(goal)
     # 1ヶ月分の目標金額 = 目標金額
     monthly_goal_amount = goal.goal_amount
 
     # 1ヶ月分の目標金額 = 目標金額 / 目標までの月数
     monthly_goal_amount = goal.goal_amount / difference_month  unless difference_month <= 0
-    get_monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
+    monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
   end
 
   def calculate_float_value_result(amount1, amount2)
