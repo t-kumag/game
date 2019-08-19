@@ -61,7 +61,7 @@ class Services::AtEmoneyTransactionService
         distributed = Entities::UserDistributedTransaction.find_by(at_user_emoney_transaction_id: transaction.id, share: true)
       end
     else
-      distributed = Entities::UserDistributedTransaction.find_by(at_user_emoney_transaction_id: transaction.id, share: false)
+      distributed = Entities::UserDistributedTransaction.find_by(at_user_emoney_transaction_id: transaction.id)
     end
     distributed
   end

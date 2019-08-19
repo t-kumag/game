@@ -27,21 +27,15 @@ class Api::V1::User::IconController < ApplicationController
 
   def update
     @icon = @current_user.user_icon
-    if @icon.present?
-      @icon.img_url = params.permit(:img_url)[:img_url]
-      @icon.save!
-      render json: {}
-    else
-      render json: { errors: { code: '', mesasge: "icon not found." } }, status: 422
-    end
+    render json: { errors: { code: '', mesasge: "icon not found." } }, status: 422 unless @icon.present?
+    @icon.img_url = params.permit(:img_url)[:img_url]
+    @icon.save!
+    render json: {}
   end
 
   def index
     @icon = Entities::UserIcon.find_by(user_id: @current_user.id)
-    if @icon.present?
-      render 'index', formats: 'json', handlers: 'jbuilder'
-    else
-      render json: { errors: { code: '', mesasge: "icon not found." } }, status: 422
-    end
+    render json: { errors: { code: '', mesasge: "icon not found." } }, status: 422 unless @icon.present?
+    render 'index', formats: 'json', handlers: 'jbuilder'
   end
 end

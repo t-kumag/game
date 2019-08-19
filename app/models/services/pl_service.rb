@@ -9,7 +9,6 @@ class Services::PlService
     [
       '1581', # カード返済（クレジットカード引き落とし）
       '1699', # その他入金（電子マネーへのチャージ電子マネー側入金）
-      '1781', # カード出金
       '1799', # その他出金（電子マネーへのチャージ銀行側出金）
     ]
   end
@@ -185,16 +184,16 @@ class Services::PlService
   end
 
   def sql_shared(account, share)
-    if @with_group && @user.group_id.size > 1
+    if @with_group
       # 家族 シェアしている口座 or シェアしている明細
       <<-EOS
         (#{account}.share = 1 OR udt.share = 1)
       EOS
     else
       if share.size > 1
-        # 個人 家族ON 全口座 and 全明細
+        # 個人 家族ON シェアしていない口座 and 全明細
         <<-EOS
-          #{account}.share in (0, 1) AND udt.share in (0, 1)
+          #{account}.share = 0 AND udt.share in (0, 1)
         EOS
       else
         # 個人 家族OFF シェアしていない口座 and シェアしていない明細
