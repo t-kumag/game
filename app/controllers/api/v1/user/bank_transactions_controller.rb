@@ -6,8 +6,14 @@ class Api::V1::User::BankTransactionsController < ApplicationController
     if disallowed_at_bank_ids?([account_id])
       render_disallowed_financier_ids && return
     end
-    @transactions = Services::AtBankTransactionService.new(@current_user, false).list(account_id, params[:page])
-    @categories   = Entities::AtTransactionCategory.all
+
+    @transactions = Services::AtBankTransactionService.new(
+        @current_user,
+        false,
+        params[:from],
+        params[:to]
+    ).list(account_id)
+
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
