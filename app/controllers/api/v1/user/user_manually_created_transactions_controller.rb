@@ -21,7 +21,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         end
         Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
       end
-
     rescue => exception
       raise exception
     end
