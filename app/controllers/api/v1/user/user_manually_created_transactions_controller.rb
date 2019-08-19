@@ -114,7 +114,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     transaction.update!(update_param(save_params, transaction))
     Services::ActivityService.create_user_manually_activity(@current_user.id,
                                                             @current_user.group_id,
-                                                            user_manually_created_update_param[:used_date],
+                                                            transaction[:used_date],
                                                             'individual_manual_outcome')
     transaction
   end
