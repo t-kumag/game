@@ -6,7 +6,7 @@ json.app do
     json.used_location transaction.used_location
     json.is_shared transaction.share
     json.at_transaction_category_id transaction.at_transaction_category_id
-    json.category_name1 @categories.find{|c| c[:id]==transaction.at_transaction_category_id }[:category_name1]
-    json.category_name2 @categories.find{|c| c[:id]==transaction.at_transaction_category_id }[:category_name2]
+    json.category_name1 transaction.at_transaction_category.category_name1
+    json.category_name2 transaction.at_transaction_category.category_name2
   end
 end
