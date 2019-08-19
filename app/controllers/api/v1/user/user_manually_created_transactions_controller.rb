@@ -111,9 +111,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :used_location
     )
 
-    user_manually_created_update_param = user_manually_created_param(save_params, transaction)
-    transaction.update!(user_manually_created_update_param)
-
+    transaction.update!(update_param(save_params, transaction))
     Services::ActivityService.create_user_manually_activity(@current_user.id,
                                                             @current_user.group_id,
                                                             user_manually_created_update_param[:used_date],
@@ -121,7 +119,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     transaction
   end
 
-  def user_manually_created_param(save_param, transaction)
+  def update_param(save_param, transaction)
 
     at_transaction_category_id = save_param[:at_transaction_category_id].present? ?
                                      save_param[:at_transaction_category_id] : transaction[:at_transaction_category_id]
@@ -139,7 +137,5 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         amount: amount,
         used_location: used_location
     }
-
   end
-
 end
