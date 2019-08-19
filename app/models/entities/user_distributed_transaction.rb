@@ -23,6 +23,7 @@ class Entities::UserDistributedTransaction < ApplicationRecord
   belongs_to :at_user_card_transaction, optional: true
   belongs_to :at_user_bank_transaction, optional: true
   belongs_to :at_user_emoney_transaction, optional: true
+  belongs_to :at_transaction_category
 
   def user_pl
 
