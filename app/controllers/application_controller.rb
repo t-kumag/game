@@ -219,7 +219,7 @@ class ApplicationController < ActionController::Base
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless at_user_bank_transaction_ids.include?(id)
 
-      next if with_group
+      next unless with_group
       transaction = Entities::AtUserBankTransaction.find(id)
       next if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_bank_account).try(:share)
       return true
@@ -243,7 +243,7 @@ class ApplicationController < ActionController::Base
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless at_user_card_transaction_ids.include?(id)
 
-      next if with_group
+      next unless with_group
       transaction = Entities::AtUserCardTransaction.find(id)
       next if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_card_account).try(:share)
       return true
@@ -262,12 +262,12 @@ class ApplicationController < ActionController::Base
     end
     return true if at_user_emoney_transaction_ids.blank?
     at_user_emoney_transaction_ids.flatten!
-    
+
     emoney_transaction_ids.each do |id|
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless at_user_emoney_transaction_ids.include?(id)
 
-      next if with_group
+      next unless with_group
       transaction = Entities::AtUserEmoneyTransaction.find(id)
       next if transaction.try(:user_distributed_transaction).try(:share) || transaction.try(:at_user_emoney_service_account).try(:share)
       return true
@@ -288,7 +288,7 @@ class ApplicationController < ActionController::Base
     manually_created_transaction_ids.each do |id|
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless user_manually_created_transaction_ids.include?(id)
-      next if with_group
+      next unless with_group
       transaction = Entities::UserManuallyCreatedTransaction.find(id)
       next if transaction.try(:user_distributed_transaction).try(:share)
       return true
