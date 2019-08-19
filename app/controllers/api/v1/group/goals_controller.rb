@@ -4,7 +4,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def index
     goals = Entities::Goal.where(group_id: @current_user.group_id)
-    @responses = get_goal_lists(goals)  if goals.present?
+    @responses = goal_lists(goals)  if goals.present?
     render(json: {}, status: 200) and return if @responses.blank?
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
@@ -170,7 +170,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     ).merge(group_id: @current_user.group_id, user_id: @current_user.id)
   end
 
-  def get_goal_lists(goals)
+  def goal_lists(goals)
     goals = goals.map do |g|
       {
           id: g.id,
