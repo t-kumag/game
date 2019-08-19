@@ -70,10 +70,6 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_setting_ids && return
     end
 
-    if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]], true)
-      return render_disallowed_financier_ids
-    end
-
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if goal.blank?
     goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
