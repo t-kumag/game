@@ -57,7 +57,7 @@ class Services::AtBankTransactionService
         .includes(:at_transaction_category)
         .find_by(at_user_bank_transaction_id: transaction.id)
 
-    # TODO:動作確認問題なければこの処理を削除
+    # TODO: BS PL 利用明細から参照されるため、参照元に合わせて処理する必要がある。
     # distributed = Entities::UserDistributedTransaction.find_by(at_user_bank_transaction_id: transaction.id) unless @is_group === true
     # if bank.share === true
     #   distributed = transaction.user_distributed_transaction

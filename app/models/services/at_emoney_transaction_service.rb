@@ -58,7 +58,7 @@ class Services::AtEmoneyTransactionService
         .includes(:at_transaction_category)
         .find_by(at_user_emoney_transaction_id: transaction.id)
 
-    # TODO:動作確認問題なければこの処理を削除
+    # TODO: BS PL 利用明細から参照されるため、参照元に合わせて処理する必要がある。
     # if @is_group === true
     #   if emoney.share === true
     #     distributed = transaction.user_distributed_transaction
