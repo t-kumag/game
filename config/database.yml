@@ -39,8 +39,11 @@ staging:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: db_test
-#  database: db/test.sqlite3
+  host: <%= ENV.fetch("DB_HOST", 'localhost') %>
+  port: 3306
+  database: test_osdr_db
+  username: testusr
+  password: pass
 
 production:
   <<: *default

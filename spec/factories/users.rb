@@ -15,6 +15,7 @@
 FactoryBot.define do
   factory :user, :class => Entities::User do
     email { "test@test.com" }
+    # ベアラートークン
     token { "test" }
     password_digest { "test" }
     # メール認証
