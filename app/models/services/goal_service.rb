@@ -22,13 +22,8 @@ class Services::GoalService
 
     users = {}
 
-    if goal.user_id == @user.id
-      users[:owner] = @user
-      users[:partner] = @user.partner_user
-    else
-      users[:owner] = @user.partner_user
-      users[:partner] = @user
-    end
+    users[:owner] = @user
+    users[:partner] = @user.partner_user
 
     owner_current_amount = get_user_current_amount(users[:owner], goal.id)
     partner_current_amount = get_user_current_amount(users[:partner], goal.id)
