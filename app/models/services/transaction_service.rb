@@ -138,7 +138,7 @@ class Services::TransactionService
   end
 
   def remove_delete_account_transaction(transactions)
-
+    return {} if transactions.blank?
     delete_bank_account_ids = Entities::AtUserBankAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
     delete_card_account_ids = Entities::AtUserCardAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
     delete_emoney_account_ids = Entities::AtUserEmoneyServiceAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
@@ -179,9 +179,15 @@ class Services::TransactionService
 
   def get_shared_account_ids
     shared = {}
-    shared[:bank_account_ids] = @user.at_user.at_user_bank_accounts.where(share: true).pluck(:id)
-    shared[:card_account_ids] =  @user.at_user.at_user_card_accounts.where(share: true).pluck(:id)
-    shared[:emoney_account_ids] = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
+    if @user.try(:at_user).try(:at_user_bank_accounts)
+      shared[:bank_account_ids] = @user.at_user.at_user_bank_accounts.where(share: true).pluck(:id)
+    end
+    if @user.try(:at_user).try(:at_user_card_accounts)
+      shared[:card_account_ids] =  @user.at_user.at_user_card_accounts.where(share: true).pluck(:id)
+    end
+    if @user.try(:at_user).try(:at_user_emoney_service_accounts)
+      shared[:emoney_account_ids] = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
+    end
     shared
   end
 end

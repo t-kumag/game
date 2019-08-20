@@ -7,7 +7,11 @@ class Api::V1::Group::BsController < ApplicationController
     share_off_goal_amount = 0
     share_on_goal_amount = 0
 
-    share_off_bank_accounts = @current_user.try(:at_user).try(:at_user_bank_accounts).where(at_user_bank_accounts: {share: false})
+    # TODO: 一時的な対応 tryの不要な処理を削除する
+    if @current_user.try(:at_user).try(:at_user_bank_accounts)
+      share_off_bank_accounts = @current_user.try(:at_user).try(:at_user_bank_accounts).where(at_user_bank_accounts: {share: false})
+    end
+
     share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
     share_on_emoney_accounts = Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
 
