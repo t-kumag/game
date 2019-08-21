@@ -24,14 +24,14 @@ Entities::PaymentMethod.create(name: 'クレジットカード')
 end
 
 # GoalType
-Entities::GoalType.create(id:1, name: '住宅購入/頭金', img_url: "#{Settings.s3_img_url}/goal_types/1/bg-card-goal-house.png")
-Entities::GoalType.create(id:2, name: '子供教育資金', img_url: "#{Settings.s3_img_url}/goal_types/2/bg-card-goal-education.png")
-Entities::GoalType.create(id:3, name: '結婚/旅行', img_url: "#{Settings.s3_img_url}/goal_types/3/bg-card-goal-married.png")
-Entities::GoalType.create(id:4, name: 'とりあえず貯金', img_url: "#{Settings.s3_img_url}/goal_types/4/bg-card-goal-savings.png")
-Entities::GoalType.create(id:5, name: '老後資金', img_url: "#{Settings.s3_img_url}/goal_types/5/bg-card-goal-pension.png")
-Entities::GoalType.create(id:6, name: '繰り上げ返済', img_url: "#{Settings.s3_img_url}/goal_types/6/bg-card-goal-repayment.png")
-Entities::GoalType.create(id:7, name: '車/バイク', img_url: "#{Settings.s3_img_url}/goal_types/7/bg-card-goal-car.png")
-Entities::GoalType.create(id:8, name: 'その他', img_url: "#{Settings.s3_img_url}/goal_types/8/bg-card-goal-uncategory.png")
+Entities::GoalType.create(id:1, name: '住宅購入/頭金', img_url: "/goal_types/1/bg-card-goal-house.png")
+Entities::GoalType.create(id:2, name: '子供教育資金', img_url: "/goal_types/2/bg-card-goal-education.png")
+Entities::GoalType.create(id:3, name: '結婚/旅行', img_url: "/goal_types/3/bg-card-goal-married.png")
+Entities::GoalType.create(id:4, name: 'とりあえず貯金', img_url: "/goal_types/4/bg-card-goal-savings.png")
+Entities::GoalType.create(id:5, name: '老後資金', img_url: "/goal_types/5/bg-card-goal-pension.png")
+Entities::GoalType.create(id:6, name: '繰り上げ返済', img_url: "/goal_types/6/bg-card-goal-repayment.png")
+Entities::GoalType.create(id:7, name: '車/バイク', img_url: "/goal_types/7/bg-card-goal-car.png")
+Entities::GoalType.create(id:8, name: 'その他', img_url: "/goal_types/8/bg-card-goal-uncategory.png")
 
 # at_groupted_category
 Entities::AtGroupedCategory.create(id:1, category_name: '未分類')
