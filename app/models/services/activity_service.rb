@@ -1,9 +1,9 @@
 class Services::ActivityService
 
-  def self.get_activity_data(user, activity_type)
+  def self.get_activity_data(user_id, group_id, activity_type)
     {
-        user_id: user.id,
-        group_id: user.group_id,
+        user_id: user_id,
+        group_id: group_id,
         count: 0,
         activity_type: activity_type,
         date: Time.zone.now
