@@ -13,7 +13,7 @@ namespace :accumulation do
           next unless gs.at_user_bank_account.present?
           next unless check_balance?(g, gs, gs.at_user_bank_account) || check_goal_amount?(g)
           goal_logs << Services::GoalLogService.get_user_goal_log(g, gs)
-          goals << Services::GoalService..get_update_goal_data(g, gs)
+          goals << Services::GoalService.get_update_goal_data(g, gs)
           activities << Services::ActivityService.get_activity_data(gs.user_id, g.group_id, 'goal_add_money')
         end
       rescue ActiveRecord::RecordInvalid => db_err
