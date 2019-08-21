@@ -12,7 +12,6 @@ namespace :accumulation do
         goal = Services::GoalService.new(user).get_goal_user(user.group_id)
 
         user.at_user.at_user_bank_accounts.each do |at_user_bank_account|
-          binding.pry
           at_user_bank_account.goal_settings.each do |gs|
             next unless check_balance(at_user_bank_account, gs, goal) || check_goal_amount(goal)
             goal_logs << Services::GoalLogService.get_user_goal_log(goal, gs)
