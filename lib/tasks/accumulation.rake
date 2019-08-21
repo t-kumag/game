@@ -7,17 +7,14 @@ namespace :accumulation do
     goals = []
     activities = []
 
-    Entities::User.find_each do |user|
+    Entities::Goal.find_each do |g|
       begin
-        goal = Services::GoalService.new(user).get_goal_user(user.group_id)
-
-        user.at_user.at_user_bank_accounts.each do |at_user_bank_account|
-          at_user_bank_account.goal_settings.each do |gs|
-            next unless check_balance(at_user_bank_account, gs, goal) || check_goal_amount(goal)
-            goal_logs << Services::GoalLogService.get_user_goal_log(goal, gs)
-            goals << Services::GoalService.new(user).get_update_goal_data(goal, gs)
-            activities << Services::ActivityService.get_activity_data(user, 'goal_add_money')
-          end
+        g.goal_settings.each do |gs|
+          next unless gs.at_user_bank_account.present?
+          next unless check_balance?(g, gs, gs.at_user_bank_account) || check_goal_amount?(g)
+          goal_logs << Services::GoalLogService.get_user_goal_log(g, gs)
+          goals << Services::GoalService..get_update_goal_data(g, gs)
+          activities << Services::ActivityService.get_activity_data(gs.user_id, g.group_id, 'goal_add_money')
         end
       rescue ActiveRecord::RecordInvalid => db_err
         raise db_err
@@ -31,7 +28,7 @@ namespace :accumulation do
   end
 
   private
-  def check_balance(at_user_bank_account, goal_setting, goal)
+  def check_balance?(goal, goal_setting, at_user_bank_account)
 
     balance_minus_goal = at_user_bank_account.balance - goal.current_amount
 
@@ -41,7 +38,7 @@ namespace :accumulation do
     false
   end
 
-  def check_goal_amount(goal)
+  def check_goal_amount?(goal)
 
     # 目標金額 > 現在の貯金額
     return true if goal.goal_amount > goal.current_amount
