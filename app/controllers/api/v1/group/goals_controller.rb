@@ -48,10 +48,8 @@ class Api::V1::Group::GoalsController < ApplicationController
         end
       end
 
-      Services::ActivityService.create_user_manually_activity(@current_user.id,
-                                                              @current_user.group_id,
-                                                              Time.zone.now,
-                                                              :goal_created)
+      create_goal_activity_log
+
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
     rescue => exception
@@ -252,6 +250,19 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def calculate_float_value_result(amount1, amount2)
     (amount1.to_f / amount2.to_f).to_s
+  end
+
+  def create_goal_activity_log
+
+    Services::ActivityService.create_user_manually_activity(@current_user.id,
+                                                            @current_user.group_id,
+                                                            Time.zone.now,
+                                                            :goal_created)
+
+    Services::ActivityService.create_user_manually_activity(@current_user.partner_user.id,
+                                                            @current_user.group_id,
+                                                            Time.zone.now,
+                                                            :goal_created)
   end
 
 end
