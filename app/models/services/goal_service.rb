@@ -12,23 +12,14 @@ class Services::GoalService
     amount
   end
 
-  def get_goal_user(group_id)
-    Entities::Goal.find_by(user_id: @user.id, group_id: group_id)
-  end
-
   def get_goal_one(id)
     goal = Entities::Goal.find_by(id: id, group_id: @user.group_id)
     return {} if goal.blank?
 
     users = {}
 
-    if goal.user_id == @user.id
-      users[:owner] = @user
-      users[:partner] = @user.partner_user
-    else
-      users[:owner] = @user.partner_user
-      users[:partner] = @user
-    end
+    users[:owner] = @user
+    users[:partner] = @user.partner_user
 
     owner_current_amount = get_user_current_amount(users[:owner], goal.id)
     partner_current_amount = get_user_current_amount(users[:partner], goal.id)
@@ -48,7 +39,7 @@ class Services::GoalService
     }
   end
 
-  def get_update_goal_data(goal, goal_setting)
+  def self.get_update_goal_data(goal, goal_setting)
     {
         id: goal.id,
         goal_type_id: goal.goal_type_id,

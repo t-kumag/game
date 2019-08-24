@@ -12,18 +12,13 @@ class Services::ParingService
     # 自分含め同グループの UserDistributedTransaction の share フラグを false へ
     all_user_ids = others + [@user.id]
     bulk = []
-    all_user_ids.each do |user_id|
-      bulk += Entities::UserDistributedTransaction.where(user_id: user_id, share: true).map do |transaction|
-        {
-          id: transaction.id,
-          used_date: transaction.used_date,
-          share: false
-        }
-      end
+    Entities::UserDistributedTransaction.where(user_id: all_user_ids, share: true).each do |transaction|
+      transaction.group_id = nil
+      transaction.share = false
+      bulk << transaction
     end
-    Entities::UserDistributedTransaction.import [:id, :share, :used_date],
-                                                bulk,
-                                                on_duplicate_key_update: [:id, :share]
+
+    Entities::UserDistributedTransaction.import bulk, on_duplicate_key_update: [:share]
 
     # グループに紐づく目標を削除
     Entities::Goal.where(group_id: groups).destroy_all
@@ -31,9 +26,9 @@ class Services::ParingService
     # グループに所属するユーザーの共有口座削除
     all_user_ids.each do |user_id|
       user = Entities::User.find_by(id: user_id)
-      at_user_bank_account_ids = user&.at_user&.at_user_bank_accounts&.where(share: true)&.pluck(:id)
-      at_user_card_account_ids = user&.at_user&.at_user_card_accounts&.where(share: true)&.pluck(:id)
-      at_user_emoney_service_account_ids = user&.at_user&.at_user_emoney_service_accounts&.where(share: true)&.pluck(:id)
+      at_user_bank_account_ids = user.try(:at_user).try(:at_user_bank_accounts).try(:where, share: true).try(:pluck, :id)
+      at_user_card_account_ids = user.try(:at_user).try(:at_user_card_accounts).try(:where, share: true).try(:pluck, :id)
+      at_user_emoney_service_account_ids = user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share: true).try(:pluck, :id)
 
       if at_user_bank_account_ids.present?
         Services::AtUserService.new(user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_ids)

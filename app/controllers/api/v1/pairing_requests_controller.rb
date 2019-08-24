@@ -23,7 +23,7 @@ class Api::V1::PairingRequestsController < ApplicationController
           status: 1
         )
         unless @pairing_request
-          return render json: { errors: { code: '', message: 'pairing token not found.' } }
+          return render json: { errors: { code: '', message: 'pairing token not found.' } }, status: 422
         end
 
         return render json: { errors: { code: '', message: 'paring user not found or invalid token.' } }, status: 422 if DateTime.now > @pairing_request.token_expires_at

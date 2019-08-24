@@ -30,10 +30,15 @@ class Entities::User < ApplicationRecord
 
   # email はメールアドレスとしての整合性と、仕様上の最大長をチェックする
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+  VALID_PASSWORD_REGEX = /\A[a-z0-9]+\z/i
   validates :email, presence: true,
                     uniqueness: true,
                     format: { with: VALID_EMAIL_REGEX },
                     length: { maximum: 256 }
+  
+  validates :password, allow_blank: true,
+                       format: { with: VALID_PASSWORD_REGEX }, 
+                       length: { in: 8..16 }
 
   enum rank: { free: 0, premium: 1 }
 
