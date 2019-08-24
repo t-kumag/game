@@ -39,10 +39,10 @@ staging:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  host: <%= ENV.fetch("DB_HOST", 'localhost') %>
+  host: db
   port: 3306
   database: test_osdr_db
-  username: testusr
+  username: devusr
   password: pass
 
 production:
