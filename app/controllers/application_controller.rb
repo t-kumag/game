@@ -202,7 +202,7 @@ class ApplicationController < ActionController::Base
   end
 
   def disallowed_at_bank_transaction_ids?(bank_id, bank_transaction_ids, with_group=false)
-    user_bank = @current_user.at_user.at_user_bank_accounts.find_by(id: bank_id)
+    user_bank = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:find_by, id: bank_id)
     at_user_bank_transaction_ids = []
     at_user_bank_transaction_ids << user_bank.try(:at_user_bank_transactions).pluck(:id) if user_bank.try(:at_user_bank_transactions).present?
 
