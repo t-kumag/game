@@ -154,7 +154,7 @@ class ApplicationController < ActionController::Base
   # 参照可能な口座ID
   # cardやemoneyも同様の処理が必要な場合はサービスに移行する
   def disallowed_at_bank_ids?(bank_ids, with_group=false)
-    at_user_id         =  @current_user.at_user.id
+    at_user_id         =  @current_user.try(:at_user).try(:id)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     at_user_bank_ids = Entities::AtUserBankAccount.where(at_user_id: at_user_id).pluck(:id)
@@ -170,7 +170,7 @@ class ApplicationController < ActionController::Base
   end
 
   def disallowed_at_card_ids?(card_ids, with_group=false)
-    at_user_id         =  @current_user.at_user.id
+    at_user_id         =  @current_user.try(:at_user).try(:id)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     at_user_card_ids = Entities::AtUserCardAccount.where(at_user_id: at_user_id).pluck(:id)
@@ -186,7 +186,7 @@ class ApplicationController < ActionController::Base
   end
 
   def disallowed_at_emoney_ids?(emoney_ids, with_group=false)
-    at_user_id         =  @current_user.at_user.id
+    at_user_id         =  @current_user.try(:at_user).try(:id)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     at_user_emoney_ids = Entities::AtUserEmoneyServiceAccount.where(at_user_id: at_user_id).pluck(:id)
