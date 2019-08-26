@@ -126,6 +126,14 @@ class Api::V1::UsersController < ApplicationController
   def destroy
     cancel_reason = delete_user_params[:user_cancel_reason]
     cancel_checklists = delete_user_params[:user_cancel_checklists]
+
+    unless @current_user.try(:at_user).present?
+      # 退会理由を記載する
+      register_cancel_reasons(cancel_checklists, cancel_reason)
+      @current_user.delete
+      return render json: {}, status: 200
+    end
+
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
     at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
@@ -149,8 +157,9 @@ class Api::V1::UsersController < ApplicationController
         end
 
         begin
-          Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
-          Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
+
+          # 退会理由を記載する
+          register_cancel_reasons(cancel_checklists, cancel_reason)
 
           # 削除対象のテーブル
           # at_users users
@@ -213,7 +222,11 @@ class Api::V1::UsersController < ApplicationController
       number_of_account += at_user_emoney_service_account_ids.count
     end
     @current_user.free? && number_of_account < Settings.at_user_limit_free_account
+  end
 
+  def register_cancel_reasons(cancel_checklists, cancel_reason)
+    Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
+    Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
   end
 
 end
