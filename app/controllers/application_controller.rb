@@ -207,7 +207,7 @@ class ApplicationController < ActionController::Base
     at_user_bank_transaction_ids << user_bank.try(:at_user_bank_transactions).pluck(:id) if user_bank.try(:at_user_bank_transactions).present?
 
     if with_group
-      partner_bank = @current_user.try(:partner_user).try(:at_user).try(:at_user_bank_accounts).find_by(id: bank_id)
+      partner_bank = @current_user.try(:partner_user).try(:at_user).try(:at_user_bank_accounts).try(:find_by, id: bank_id)
       at_user_bank_transaction_ids << partner_bank.try(:at_user_bank_transactions).pluck(:id) if partner_bank..try(:at_user_bank_transactions).present?
     end
 
@@ -227,17 +227,17 @@ class ApplicationController < ActionController::Base
   end
 
   def disallowed_at_card_transaction_ids?(card_id, card_transaction_ids, with_group=false)
-    user_card = @current_user.at_user.at_user_card_accounts.find_by(id: card_id)
+    user_card = @current_user.try(:at_user).try(:at_user_card_accounts).try(:find_by, id: card_id)
     at_user_card_transaction_ids = []
     at_user_card_transaction_ids << user_card.try(:at_user_card_transactions).pluck(:id) if user_card.try(:at_user_card_transactions).present?
-    
+
     if with_group
-      partner_card = @current_user.try(:partner_user).try(:at_user).try(:at_user_card_accounts).find_by(id: card_id)
+      partner_card = @current_user.try(:partner_user).try(:at_user).try(:at_user_card_accounts).try(:find_by, id: card_id)
       at_user_card_transaction_ids << partner_card.try(:at_user_card_transactions).pluck(:id) if partner_card.try(:at_user_card_transactions).present?
     end
     return true if at_user_card_transaction_ids.blank?
     at_user_card_transaction_ids.flatten!
-    
+
     card_transaction_ids.each do |id|
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless at_user_card_transaction_ids.include?(id)
@@ -251,12 +251,12 @@ class ApplicationController < ActionController::Base
   end
 
   def disallowed_at_emoney_transaction_ids?(emoney_id, emoney_transaction_ids, with_group=false)
-    user_emoney = @current_user.at_user.at_user_emoney_service_accounts.find_by(id: emoney_id)
+    user_emoney = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:find_by, id: emoney_id)
     at_user_emoney_transaction_ids = []
     at_user_emoney_transaction_ids << user_emoney.try(:at_user_emoney_transactions).pluck(:id) if user_emoney.try(:at_user_emoney_transactions).present?
     
     if with_group
-      partner_emoney = @current_user.try(:partner_user).try(:at_user).try(:at_user_emoney_service_accounts).find_by(id: emoney_id)
+      partner_emoney = @current_user.try(:partner_user).try(:at_user).try(:at_user_emoney_service_accounts).try(:find_by, id: emoney_id)
       at_user_emoney_transaction_ids << partner_emoney.try(:at_user_emoney_transactions).pluck(:id) if partner_emoney.try(:at_user_emoney_transactions).present?
     end
     return true if at_user_emoney_transaction_ids.blank?

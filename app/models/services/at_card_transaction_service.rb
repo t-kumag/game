@@ -43,7 +43,7 @@ class Services::AtCardTransactionService
 
   def get_distributed_transaction(account_id, transaction_id)
     if @is_group === true
-      card = Entities::AtUserCardAccount.find_by(id: account_id, at_user_id: [@user.at_user.id, @user.partner_user.try(:at_user).try(:id)])
+      card = Entities::AtUserCardAccount.find_by(id: account_id, at_user_id: [@user.try(:at_user).try(:id), @user.partner_user.try(:at_user).try(:id)])
     else
       card = Entities::AtUserCardAccount.find_by(id: account_id, at_user_id: @user.at_user.id, share: false)
     end
