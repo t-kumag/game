@@ -70,12 +70,12 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
   def find_transaction
     # パラメータの明細IDが自身の明細の場合、明細のシェア関係なく返す
-    transacticon = Entities::UserManuallyCreatedTransaction.find_by(id: params[:id], user_id: @current_user.id)
+    transacticon = Entities::UserManuallyCreatedTransaction.try(:find_by,  id: params[:id], user_id: @current_user.id)
     if transacticon.blank? && @current_user.group_id.present?
       # パラメータの明細IDがパートナーの明細の場合、シェアされている明細を返す
-      transacticon = Entities::UserManuallyCreatedTransaction.find_by(id: params[:id], user_id: @current_user.partner_user.id)
+      transacticon = Entities::UserManuallyCreatedTransaction.try(:find_by, id: params[:id], user_id: @current_user.try(:partner_user).try(:id))
       # シェアしていない明細は、422を返す
-      transacticon = nil unless transacticon.user_distributed_transaction.share
+      transacticon = nil unless transacticon.try(:user_distributed_transaction).try(:share)
     end
     
     transacticon
