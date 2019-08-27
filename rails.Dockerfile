@@ -44,4 +44,4 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 EXPOSE 3000
 
 # CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma/production.rb"]
-CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma/development.rb"]
+CMD [“bundle”, “exec”, “puma”, “-t”, “5:5”, “-p”, “3000”, “-e”, “development”, “-C”, “config/puma/development.rb”]
