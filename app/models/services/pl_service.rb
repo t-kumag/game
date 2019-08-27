@@ -394,7 +394,6 @@ class Services::PlService
     card_ids = pl_card.pluck("at_user_card_account_id").uniq
     debit_card = debit_card(card_ids)
 
-    binding.pry
     debit_card.each do |debit_card_id|
       bank_ids.each do |bank_id|
         debit_card = Entities::AtUserCardAccount.find_by(id: debit_card_id, at_user_id: at_user_ids)
