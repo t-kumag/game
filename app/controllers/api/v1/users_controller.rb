@@ -127,12 +127,6 @@ class Api::V1::UsersController < ApplicationController
     cancel_reason = delete_user_params[:user_cancel_reason]
     cancel_checklists = delete_user_params[:user_cancel_checklists]
 
-    unless @current_user.try(:at_user).present?
-      # 退会理由を記載する
-      register_cancel_reasons(cancel_checklists, cancel_reason)
-      @current_user.delete
-      return render json: {}, status: 200
-    end
 
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
@@ -147,6 +141,13 @@ class Api::V1::UsersController < ApplicationController
         begin
           # 口座アカウント削除 ATの共有している口座の削除 ペアリングの解除の処理を行う
           Services::ParingService.new(@current_user).cancel
+
+          unless @current_user.try(:at_user).present?
+            # 退会理由を記載する
+            register_cancel_reasons(cancel_checklists, cancel_reason)
+            @current_user.delete
+            return render json: {}, status: 200
+          end
           # ATの共有していない口座の削除
           delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
           # ATのユーザーアカウント削除（退会）

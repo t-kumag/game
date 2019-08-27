@@ -221,7 +221,7 @@ class Services::AtUserService
 
   def delete_user
     params = {
-      token: @user.at_user.token
+      token: @user.try(:at_user).ty(:token)
     }
     request  = AtAPIRequest::AtUser::DeleteAtUser.new(params)
     AtAPIClient.new(request).request
