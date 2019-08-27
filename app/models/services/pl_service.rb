@@ -211,7 +211,7 @@ class Services::PlService
   end
 
   def at_user_ids
-    at_user_ids = [@user.try(:at_user).try(:id)]
+    at_user_ids = @user.try(:at_user).try(:id) ? [@user.at_user.id] : []
     if @with_group && @user.try(:partner_user).try(:at_user).try(:id)
       return at_user_ids << @user.partner_user.at_user.id
     end
@@ -394,6 +394,7 @@ class Services::PlService
     card_ids = pl_card.pluck("at_user_card_account_id").uniq
     debit_card = debit_card(card_ids)
 
+    binding.pry
     debit_card.each do |debit_card_id|
       bank_ids.each do |bank_id|
         debit_card = Entities::AtUserCardAccount.find_by(id: debit_card_id, at_user_id: at_user_ids)
