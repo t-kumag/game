@@ -41,7 +41,6 @@ class Services::AtCardTransactionService
     distributed.save!
   end
 
-
   # TODO: リファクタする @user.try(:at_user).try(:id), @user.partner_user.try(:at_user).try(:id)])
   # TODO: nil検索しない
   def get_distributed_transaction(account_id, transaction_id)
