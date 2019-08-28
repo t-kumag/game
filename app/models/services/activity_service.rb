@@ -14,7 +14,7 @@ class Services::ActivityService
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_user_manually_activity(user_id, group_id, used_date, activity_type)
+  def self.create_user_activity(user_id, group_id, used_date, activity_type)
     Entities::Activity.find_or_create_by(user_id: user_id, date: used_date, activity_type: activity_type) do |activity|
       activity.user_id = user_id
       activity.group_id = group_id
