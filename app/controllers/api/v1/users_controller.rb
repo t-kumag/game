@@ -126,8 +126,6 @@ class Api::V1::UsersController < ApplicationController
   def destroy
     cancel_reason = delete_user_params[:user_cancel_reason]
     cancel_checklists = delete_user_params[:user_cancel_checklists]
-
-
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
     at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
