@@ -149,21 +149,22 @@ class Api::V1::UsersController < ApplicationController
           # ATの共有していない口座の削除
           delete_at_user_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
           # ATのユーザーアカウント削除（退会）
-          Services::AtUserService.new(@current_user).delete_user
+          Services::AtUserService.new(@current_user).delete_user  if @user.try(:at_user).try(:token).present?
         rescue AtAPIStandardError => at_err
           # TODO クラッシュレポートの仕組みを入れるアラートメールなどで通知する
           p at_err
         end
 
         begin
-
           # 退会理由を記載する
           register_cancel_reasons(cancel_checklists, cancel_reason)
-
           # 削除対象のテーブル
-          # at_users users
-          @current_user.at_user.at_user_tokens.destroy_all
-          @current_user.at_user.destroy
+          # at_user_tokens at_users users
+          if @user.try(:at_user).try(:token).present?
+            @current_user.at_user.at_user_tokens.destroy_all
+            @current_user.at_user.destroy
+          end
+
           @current_user.delete
           @current_user = nil
 
