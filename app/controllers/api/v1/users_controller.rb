@@ -11,6 +11,14 @@ class Api::V1::UsersController < ApplicationController
       @user.email_authenticated = false
       @user.reset_token
       @user.save!
+
+      Entities::UserProfile.new({
+        user_id: @user.id,
+        gender: nil,
+        birthday: nil,
+        has_child: 0
+      }).save!
+      
       MailDelivery.user_registration(@user).deliver
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
