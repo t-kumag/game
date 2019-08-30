@@ -75,7 +75,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       # パラメータの明細IDがパートナーの明細の場合、シェアされている明細を返す
       transacticon = Entities::UserManuallyCreatedTransaction.find_by(id: params[:id], user_id: @current_user.partner_user.id)
       # シェアしていない明細は、422を返す
-      transacticon = nil unless transacticon.user_distributed_transaction.share
+      transacticon = nil unless transacticon.try(:user_distributed_transaction).try(:share)
     end
     
     transacticon
@@ -93,10 +93,9 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
 
-    Services::ActivityService.create_user_manually_activity(@current_user.id,
-                                                            @current_user.group_id,
-                                                            save_params[:used_date],
-                                                            'individual_manual_outcome')
+    Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
+                                                   save_params[:used_date], 'individual_manual_outcome')
+
     Entities::UserManuallyCreatedTransaction.create!(save_params)
 
   end
@@ -112,10 +111,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     )
 
     transaction.update!(update_param(save_params, transaction))
-    Services::ActivityService.create_user_manually_activity(@current_user.id,
-                                                            @current_user.group_id,
-                                                            transaction[:used_date],
-                                                            'individual_manual_outcome')
+    Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
+                                                   transaction[:used_date], 'individual_manual_outcome')
     transaction
   end
 

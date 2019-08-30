@@ -78,6 +78,10 @@ services:
       context: .
       dockerfile: mysql.Dockerfile
     environment:
+      MYSQL_ROOT_PASSWORD: pwd
+      MYSQL_USER: devusr
+      MYSQL_PASSWORD: pass
+      MYSQL_DATABASE: dev_osdr_db
       TZ: "Asia/Tokyo"
     ports:
       - 3307:3306

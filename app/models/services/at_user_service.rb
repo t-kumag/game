@@ -220,6 +220,7 @@ class Services::AtUserService
   end
 
   def delete_user
+    return unless @user.try(:at_user).try(:token).present?
     params = {
       token: @user.at_user.token
     }

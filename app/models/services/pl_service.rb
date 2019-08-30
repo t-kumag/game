@@ -211,7 +211,7 @@ class Services::PlService
   end
 
   def at_user_ids
-    at_user_ids = [@user.at_user.id]
+    at_user_ids = @user.try(:at_user).try(:id) ? [@user.at_user.id] : []
     if @with_group && @user.try(:partner_user).try(:at_user).try(:id)
       return at_user_ids << @user.partner_user.at_user.id
     end
