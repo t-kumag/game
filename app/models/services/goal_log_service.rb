@@ -38,7 +38,6 @@ class Services::GoalLogService
         at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
         add_amount: 0,
         monthly_amount: goal_setting.monthly_amount,
-        first_amount: goal_setting.first_amount,
         before_current_amount: goal.current_amount,
         after_current_amount: goal.current_amount + goal_setting.monthly_amount,
         user_id: goal_setting.user_id,

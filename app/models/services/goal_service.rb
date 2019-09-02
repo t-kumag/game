@@ -52,6 +52,20 @@ class Services::GoalService
     }
   end
 
+  def first_amount(goal, goal_setting, add_amount)
+    begin
+      ActiveRecord::Base.transaction do
+        Services::GoalLogService.add_first_amount_insert(goal, goal_setting)
+        goal.current_amount += add_amount
+        goal.save!
+      end
+    rescue ActiveRecord::RecordInvalid => db_err
+      raise db_err
+    rescue => exception
+      raise exception
+    end
+  end
+
   def add_money(goal, goal_setting, add_amount)
     begin
       ActiveRecord::Base.transaction do
