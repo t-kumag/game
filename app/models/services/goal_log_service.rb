@@ -47,8 +47,7 @@ class Services::GoalLogService
     }
   end
 
-  def self.alreday_exist_first_amount(goal_id, at_user_bank_account_id)
-    Entities::GoalLog.where(goal_id: goal_id, at_user_bank_account_id: at_user_bank_account_id).pluck(:first_amount).present?
+  def self.alreday_exist_first_amount(goal_id, user_id)
+    Entities::GoalLog.where(goal_id: goal_id, user_id: user_id).pluck(:first_amount).present?
   end
-
 end
