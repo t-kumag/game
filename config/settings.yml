@@ -9,6 +9,7 @@ defaults: &defaults
   at_user_limit_free_goal: 5
   mail_setting_from: OsidOri <info@osidori.co>
   mail_content_type: multipart/alternative
+  mail_charset: ISO-2022-JP
   pairing_token_salt: 2dhp2fw5gra4aks
   s3_img_url: https://osdr-img-test.s3-ap-northeast-1.amazonaws.com
 
