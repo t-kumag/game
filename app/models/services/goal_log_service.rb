@@ -48,7 +48,7 @@ class Services::GoalLogService
     Entities::GoalLog.create!(params)
   end
 
-  def self.get_user_goal_log(goal, goal_setting)
+  def self.get_goal_log(goal, goal_setting)
     {
         goal_id: goal_setting.goal_id,
         at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
@@ -62,7 +62,21 @@ class Services::GoalLogService
     }
   end
 
-  def self.alreday_exist_first_amount(goal_id, user_id)
+  def self.update_goal_log(goal, goal_setting, old_goal_log)
+    {
+        goal_id: goal_setting[:goal_id],
+        at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
+        add_amount: 0,
+        monthly_amount: goal_setting.monthly_amount,
+        before_current_amount: old_goal_log[:after_current_amount],
+        after_current_amount: old_goal_log[:after_current_amount] + goal_setting.monthly_amount,
+        user_id: goal_setting.user_id,
+        add_date: DateTime.now,
+        goal_amount: goal[:goal_amount]
+    }
+  end
+
+  def alreday_exist_first_amount(goal_id, user_id)
     Entities::GoalLog.where(goal_id: goal_id, user_id: user_id).pluck(:first_amount).present?
   end
 end

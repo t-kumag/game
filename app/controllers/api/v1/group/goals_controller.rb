@@ -46,7 +46,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
         # 目標ログの登録
         goal.goal_settings.each do |gs|
-          goal_service.first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
+          goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
         end
       end
       create_goal_activity_log
@@ -81,8 +81,8 @@ class Api::V1::Group::GoalsController < ApplicationController
       ActiveRecord::Base.transaction do
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
-        unless check_already_insert_first_amount(params[:id], @current_user.id)
-          goal_service.first_amount(goal, goal_setting, goal_setting.first_amount)
+        unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
+          goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
         end
       end
     rescue ActiveRecord::RecordInvalid => db_err
@@ -259,9 +259,5 @@ class Api::V1::Group::GoalsController < ApplicationController
   def create_goal_activity_log
     Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created)
     Services::ActivityService.create_user_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created)
-  end
-
-  def check_already_insert_first_amount(goal_id, user_id)
-    Services::GoalLogService.alreday_exist_first_amount(goal_id, user_id)
   end
 end

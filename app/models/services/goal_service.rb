@@ -39,7 +39,7 @@ class Services::GoalService
     }
   end
 
-  def self.get_update_goal_data(goal, goal_setting)
+  def self.get_goal(goal, goal_setting)
     {
         id: goal.id,
         goal_type_id: goal.goal_type_id,
@@ -52,9 +52,22 @@ class Services::GoalService
     }
   end
 
+  def self.update_goal(goal, goal_setting, old_goal_log)
+    {
+        id: goal[:id],
+        goal_type_id: goal[:goal_type_id],
+        group_id: goal[:group_id],
+        user_id: goal[:user_id],
+        name: goal[:name],
+        img_url: goal[:img_url],
+        goal_amount: goal[:goal_amount],
+        current_amount: old_goal_log[:after_current_amount] + goal_setting.monthly_amount
+    }
+  end
+
   # TODO: Services::GoalLogService.add_monthly_amount_insertこの処理をcontroller側に回すと効率よくかける
   # TODO: 静的関数にしたほうがいいので、後ほどリファクタリングする
-  def self.monthly_amount(goal, goal_setting, add_amount)
+  def self.add_monthly_amount(goal, goal_setting, add_amount)
     begin
       ActiveRecord::Base.transaction do
         Services::GoalLogService.add_monthly_amount_insert(goal, goal_setting)
@@ -71,7 +84,7 @@ class Services::GoalService
 
   # TODO: Services::GoalLogService.add_first_amount_insert(goal, goal_setting)この処理をcontroller側に回すと効率よくかける
   # TODO: 静的関数にしたほうがいいので、後ほどリファクタリングする
-  def first_amount(goal, goal_setting, add_amount)
+  def add_first_amount(goal, goal_setting, add_amount)
     begin
       ActiveRecord::Base.transaction do
         Services::GoalLogService.add_first_amount_insert(goal, goal_setting)
