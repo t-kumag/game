@@ -18,7 +18,6 @@ namespace :accumulation do
           goal_log =  Services::GoalLogService.get_goal_log(g, gs)
 
           unless old_goal_and_goal_logs.present?
-            old_goal_and_goal_logs[:goal] = goal
             old_goal_and_goal_logs[:goal_logs] = goal_log
           else
             goal = Services::GoalService.update_goal(goal, gs, old_goal_and_goal_logs[:goal_logs])
