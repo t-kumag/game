@@ -52,6 +52,8 @@ class Services::GoalService
     }
   end
 
+  # TODO: Services::GoalLogService.add_monthly_amount_insertこの処理をcontroller側に回すと効率よくかける
+  # TODO: 静的関数にしたほうがいいので、後ほどリファクタリングする
   def self.monthly_amount(goal, goal_setting, add_amount)
     begin
       ActiveRecord::Base.transaction do
@@ -67,6 +69,8 @@ class Services::GoalService
     goal
   end
 
+  # TODO: Services::GoalLogService.add_first_amount_insert(goal, goal_setting)この処理をcontroller側に回すと効率よくかける
+  # TODO: 静的関数にしたほうがいいので、後ほどリファクタリングする
   def first_amount(goal, goal_setting, add_amount)
     begin
       ActiveRecord::Base.transaction do
@@ -81,6 +85,8 @@ class Services::GoalService
     end
   end
 
+  # TODO: Services::GoalLogService.add_amount_insert(goal, goal_setting, add_amount)この処理をcontroller側に回すと効率よくかける
+  # TODO: 静的関数にしたほうがいいので、後ほどリファクタリングする
   def add_money(goal, goal_setting, add_amount)
     begin
       ActiveRecord::Base.transaction do

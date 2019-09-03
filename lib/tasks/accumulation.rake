@@ -12,6 +12,7 @@ namespace :accumulation do
         g.goal_settings.each do |gs|
           next unless gs.at_user_bank_account.present?
           next unless check_balance?(g, gs, gs.at_user_bank_account) || check_goal_amount?(g)
+          # 目標作成者とパートナーがどちらも月額封筒分けできる場合は、一つずつ処理する必要がある
           if g.goal_settings.count >= 2
             g = Services::GoalService.monthly_amount(g, gs, gs.monthly_amount)
           else
