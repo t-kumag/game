@@ -139,9 +139,9 @@ class Services::TransactionService
 
   def remove_delete_account_transaction(transactions)
     return {} if transactions.blank?
-    delete_bank_account_ids = Entities::AtUserBankAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
-    delete_card_account_ids = Entities::AtUserCardAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
-    delete_emoney_account_ids = Entities::AtUserEmoneyServiceAccount.with_deleted.where(at_user_id: @user.at_user.id).where.not(deleted_at: nil).pluck(:id)
+    delete_bank_account_ids = Entities::AtUserBankAccount.with_deleted.where(at_user_id: @user.try(:at_user).try(:id)).where.not(deleted_at: nil).try(:pluck, :id)
+    delete_card_account_ids = Entities::AtUserCardAccount.with_deleted.where(at_user_id: @user.try(:at_user).try(:id)).where.not(deleted_at: nil).try(:pluck, :id)
+    delete_emoney_account_ids = Entities::AtUserEmoneyServiceAccount.with_deleted.where(at_user_id: @user.try(:at_user).try(:id)).where.not(deleted_at: nil).try(:pluck, :id)
 
     transactions.reject do |t|
       if t.try(:at_user_bank_transaction)

@@ -44,21 +44,11 @@ class Api::V1::PairingRequestsController < ApplicationController
         @pairing_request.save!
 
         # group中間テーブル登録
-        Entities::ParticipateGroup.create!(group_id: new_group.id,
-                                           user_id: @pairing_request.from_user_id)
+        Entities::ParticipateGroup.create!(group_id: new_group.id, user_id: @pairing_request.from_user_id)
+        Entities::ParticipateGroup.create!(group_id: new_group.id, user_id: @pairing_request.to_user_id)
 
-        Entities::ParticipateGroup.create!(group_id: new_group.id,
-                                          user_id: @pairing_request.to_user_id)
-
-        Services::ActivityService.create_user_manually_activity(@pairing_request.from_user_id,
-                                                                new_group.id,
-                                                                Time.zone.now,
-                                                                'pairing_created')
-
-        Services::ActivityService.create_user_manually_activity(@pairing_request.to_user_id,
-                                                                new_group.id,
-                                                                Time.zone.now,
-                                                                'pairing_created')
+        Services::ActivityService.create_user_activity(@pairing_request.from_user_id, new_group.id, Time.zone.now, 'pairing_created')
+        Services::ActivityService.create_user_activity(@pairing_request.to_user_id, new_group.id, Time.zone.now, 'pairing_created')
         render json: {}, status: 200
       end
     rescue ActiveRecord::RecordInvalid => db_err
