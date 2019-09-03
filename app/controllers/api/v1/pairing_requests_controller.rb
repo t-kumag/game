@@ -49,6 +49,8 @@ class Api::V1::PairingRequestsController < ApplicationController
 
         Services::ActivityService.create_user_activity(@pairing_request.from_user_id, new_group.id, Time.zone.now, 'pairing_created')
         Services::ActivityService.create_user_activity(@pairing_request.to_user_id, new_group.id, Time.zone.now, 'pairing_created')
+        MailDelivery.user_pairing(@current_user).deliver
+        MailDelivery.user_pairing(@current_user.partner_user).deliver
         render json: {}, status: 200
       end
     rescue ActiveRecord::RecordInvalid => db_err
