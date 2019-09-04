@@ -8,6 +8,7 @@ namespace :accumulation do
     activities = []
 
     Entities::Goal.find_each do |g|
+      Rails.logger.info("start accumulation ===============")
       begin
         old_goal_and_goal_logs = {}
         g.goal_settings.each do |gs|
@@ -36,6 +37,7 @@ namespace :accumulation do
     Entities::Activity.import activities
     Entities::GoalLog.import goal_logs
     Entities::Goal.import goals, on_duplicate_key_update: [:current_amount]
+    Rails.logger.info("end accumulation ===============")
   end
 
   private
