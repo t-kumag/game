@@ -8,6 +8,7 @@ namespace :accumulation do
     activities = []
 
     Entities::Goal.find_each do |g|
+      logger.info("start accumulation ===============")
       begin
         g.goal_settings.each do |gs|
           next unless gs.at_user_bank_account.present?
@@ -25,6 +26,7 @@ namespace :accumulation do
     Entities::Activity.import activities
     Entities::GoalLog.import goal_logs
     Entities::Goal.import goals, on_duplicate_key_update: [:current_amount]
+    logger.info("end accumulation ===============")
   end
 
   private
