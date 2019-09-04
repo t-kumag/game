@@ -15,14 +15,11 @@
 FactoryBot.define do
   factory :user, :class => Entities::User do
     email { "test@test.com" }
-    # ベアラートークン
-    token { "test" }
-    password_digest { "test" }
-    # メール認証
-    email_authenticated { 1 }
+    token { "test" }            # ベアラートークン
+    password_digest { "testtest" }
+    email_authenticated { 1 }   # メール認証
     token_expires_at { "2020/01/01 00:00:00" }
-    # 有料会員
-    rank { 0 }
+    rank { 0 }                  # 有料会員
     deleted_at { nil }
   end
 end
