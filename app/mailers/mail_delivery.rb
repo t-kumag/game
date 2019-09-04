@@ -24,4 +24,10 @@ class MailDelivery < ApplicationMailer
           :subject => '【OsidOri】口座連携エラーのためスクレイピングスキップしました。' )
   end
 
+  def user_pairing(user)
+    @token = user.token
+    mail( :to => user.email,
+          :subject => '【OsidOri】ペアリング完了です！' )
+  end
+
 end

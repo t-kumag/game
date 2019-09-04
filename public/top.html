@@ -1,0 +1,19 @@
+<html>
+<script type="text/javascript">
+
+//カスタムURLスキーム
+let custom_pairing_url = 'osidori://redirect_top';
+
+let osidori_home_url = 'https://www.osidori.co/';
+
+// カスタムURLに飛ばす(GETメソッド)
+location.href = `${custom_pairing_url}`
+
+// アプリを起動処理で未インストールだった場合のタイマー処理
+let timerId = setTimeout(function() {
+    // osidoriのホームページに飛ばす
+    location.href = osidori_home_url;
+}, 5000); 
+
+</script>
+</html>
