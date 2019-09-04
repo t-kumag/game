@@ -20,7 +20,7 @@ namespace :accumulation do
           unless old_goal_and_goal_logs.present?
             old_goal_and_goal_logs[:goal_logs] = goal_log
           else
-            goal = Services::GoalService.update_goal(goal, gs, old_goal_and_goal_logs[:goal_logs])
+            goal = Services::GoalService.update_goal_plus_current_amount(goal, gs, old_goal_and_goal_logs[:goal_logs])
             goal_log = Services::GoalLogService.update_goal_log(goal, gs, old_goal_and_goal_logs[:goal_logs])
           end
           goal_logs << goal_log

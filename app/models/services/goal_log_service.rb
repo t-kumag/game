@@ -77,15 +77,6 @@ class Services::GoalLogService
   end
 
   def self.alreday_exist_first_amount(goal_id, user_id)
-    goal_logs = Entities::GoalLog.where(goal_id: goal_id, user_id: user_id)
-    check_first_amount_value(goal_logs)
+    Entities::GoalLog.where(goal_id: goal_id, user_id: user_id).where("first_amount > 0").present?
   end
-
-  def self.check_first_amount_value(goal_logs)
-    goal_logs.each do |gl|
-      return true if gl.first_amount > 0
-    end
-    false
-  end
-
 end

@@ -52,7 +52,7 @@ class Services::GoalService
     }
   end
 
-  def self.update_goal(goal, goal_setting, old_goal_log)
+  def self.update_goal_plus_current_amount(goal, goal_setting, old_goal_log)
     {
         id: goal[:id],
         goal_type_id: goal[:goal_type_id],
