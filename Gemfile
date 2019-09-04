@@ -110,3 +110,6 @@ gem 'redis-rails'
 # sidekiq
 gem 'sidekiq'
 gem 'redis-namespace'
+
+# mail iso-2022-jp
+gem 'mail-iso-2022-jp'
