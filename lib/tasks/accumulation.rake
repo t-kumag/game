@@ -9,11 +9,22 @@ namespace :accumulation do
 
     Entities::Goal.find_each do |g|
       begin
+        old_goal_and_goal_logs = {}
         g.goal_settings.each do |gs|
           next unless gs.at_user_bank_account.present?
           next unless check_balance?(g, gs, gs.at_user_bank_account) || check_goal_amount?(g)
-          goal_logs << Services::GoalLogService.get_user_goal_log(g, gs)
-          goals << Services::GoalService.get_update_goal_data(g, gs)
+
+          goal = Services::GoalService.get_goal(g, gs)
+          goal_log =  Services::GoalLogService.get_goal_log(g, gs)
+
+          unless old_goal_and_goal_logs.present?
+            old_goal_and_goal_logs[:goal_logs] = goal_log
+          else
+            goal = Services::GoalService.update_goal_plus_current_amount(goal, gs, old_goal_and_goal_logs[:goal_logs])
+            goal_log = Services::GoalLogService.update_goal_log(goal, gs, old_goal_and_goal_logs[:goal_logs])
+          end
+          goal_logs << goal_log
+          goals << goal
           activities << Services::ActivityService.get_activity_data(gs.user_id, g.group_id, 'goal_add_money')
         end
       rescue ActiveRecord::RecordInvalid => db_err
