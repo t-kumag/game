@@ -70,19 +70,25 @@ class Services::AtBankTransactionService
   # TODO: リファクタする @user.try(:at_user).try(:id), @user.partner_user.try(:at_user).try(:id)])
   # TODO: nil検索しない
   def get_distributed_transactions(account_id)
+    transactions = {}
     if @is_group === true
       bank = Entities::AtUserBankAccount.find_by(id: account_id, at_user_id: [@user.try(:at_user).try(:id), @user.partner_user.try(:at_user).try(:id)])
+      transactions[:is_account_shared] = true
     else
       bank = Entities::AtUserBankAccount.find_by(id: account_id, at_user_id: @user.at_user.id, share: false)
+      transactions[:is_account_shared] = false
     end
     return {} if bank.blank?
 
     transaction_ids = bank.at_user_bank_transactions.where(trade_date: @from..@to).pluck(:id)
     return {} if transaction_ids.blank?
-    Entities::UserDistributedTransaction
-        .joins(:at_transaction_category)
-        .includes(:at_transaction_category)
-        .where(at_user_bank_transaction_id: transaction_ids).order(used_date: "DESC")
+    transactions[:user_distributed_transaction] = Entities::UserDistributedTransaction
+                                                      .joins(:at_transaction_category)
+                                                      .includes(:at_transaction_category)
+                                                      .where(at_user_bank_transaction_id: transaction_ids)
+                                                      .order(used_date: "DESC")
+
+    transactions
 
     # TODO:動作確認問題なければこの処理を削除
     # transaction_ids = bank.at_user_bank_transactions.pluck(:id)
