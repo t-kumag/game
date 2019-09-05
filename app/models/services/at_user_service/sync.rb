@@ -56,7 +56,8 @@ class Services::AtUserService::Sync
           # バルクインサート時にUPDATEされるようハッシュにキーを追加する
           data_column.store('error_date', '')
           data_column.store('error_count', '')
-          MailDelivery.account_linkage_error(@user, account).deliver
+          # TODO ミロクの仕様変更によりエラーが更新毎に送信される障害発生 処理を修正する
+          #MailDelivery.account_linkage_error(@user, account).deliver
         end
         accounts << account
       end

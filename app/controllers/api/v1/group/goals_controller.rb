@@ -41,13 +41,14 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal.goal_settings.create!(get_goal_setting_params)
         # 相手の目標設定を登録
         goal.goal_settings.create!(get_partner_goal_setting_params)
+        # 頭金を入金する際に必要
+        goal_service = Services::GoalService.new(@current_user)
 
         # 目標ログの登録
         goal.goal_settings.each do |gs|
-          Services::GoalLogService.add_first_amount_insert(goal, gs) if gs.at_user_bank_account_id.present?
+          goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
         end
       end
-
       create_goal_activity_log
 
     rescue ActiveRecord::RecordInvalid => db_err
@@ -73,10 +74,16 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
     render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return if goal_setting.blank?
 
+    # 頭金を入金する際に必要
+    goal_service = Services::GoalService.new(@current_user)
+
     begin
       ActiveRecord::Base.transaction do
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
+        unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
+          goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
+        end
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
@@ -253,5 +260,4 @@ class Api::V1::Group::GoalsController < ApplicationController
     Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created)
     Services::ActivityService.create_user_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created)
   end
-
 end
