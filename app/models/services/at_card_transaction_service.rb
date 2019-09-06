@@ -9,7 +9,7 @@ class Services::AtCardTransactionService
 
   def list(account_id)
     distributed_transactions = get_distributed_transactions(account_id)
-    return {} if distributed_transactions.blank?
+    return {} if distributed_transactions[:user_distributed_transaction].blank?
 
     distributed_transactions
   end
@@ -17,7 +17,6 @@ class Services::AtCardTransactionService
   def detail(account_id, transaction_id)
     distributed = get_distributed_transaction(account_id, transaction_id)
     return {} if distributed.blank?
-
     {
       amount: distributed[:user_distributed_transaction].amount,
       at_transaction_category_id: distributed[:user_distributed_transaction].at_transaction_category_id,

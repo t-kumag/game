@@ -9,7 +9,7 @@ class Services::AtBankTransactionService
 
   def list(account_id)
     distributed_transactions = get_distributed_transactions(account_id)
-    return {} if distributed_transactions.blank?
+    return {} if distributed_transactions[:user_distributed_transaction].blank?
 
     distributed_transactions
   end
