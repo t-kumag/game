@@ -75,6 +75,7 @@ class Services::AtCardTransactionService
   # TODO: リファクタする @user.try(:at_user).try(:id), @user.partner_user.try(:at_user).try(:id)])
   # TODO: nil検索しない
   def get_distributed_transactions(account_id)
+    transactions = {}
     if @is_group === true
       card = Entities::AtUserCardAccount.find_by(id: account_id, at_user_id: [@user.try(:at_user).try(:id), @user.partner_user.try(:at_user).try(:id)])
     else
@@ -82,12 +83,15 @@ class Services::AtCardTransactionService
     end
     return {} if card.blank?
 
+    transactions[:is_account_shared] = card.share
     transaction_ids = card.at_user_card_transactions.where(used_date: @from..@to).pluck(:id)
+
     return {} if transaction_ids.blank?
-    Entities::UserDistributedTransaction
-        .joins(:at_transaction_category)
-        .includes(:at_transaction_category)
-        .where(at_user_card_transaction_id: transaction_ids).order(used_date: "DESC")
+    transactions[:user_distributed_transaction] = Entities::UserDistributedTransaction
+                                                      .joins(:at_transaction_category)
+                                                      .includes(:at_transaction_category)
+                                                      .where(at_user_card_transaction_id: transaction_ids).order(used_date: "DESC")
+    transactions
 
     # TODO:動作確認問題なければこの処理を削除
     # transaction_ids = card.at_user_card_transactions.pluck(:id)
