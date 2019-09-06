@@ -1,5 +1,5 @@
 json.app do
-  json.array!(@transactions) do |transaction|
+  json.array!(@transactions[:user_distributed_transaction]) do |transaction|
     json.at_user_card_transaction_id transaction.at_user_card_transaction_id
     json.amount transaction.amount
     json.used_date transaction.used_date.strftime('%Y-%m-%d %H:%M:%S')
