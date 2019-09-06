@@ -19,14 +19,14 @@ class Services::AtBankTransactionService
     return {} if distributed.blank?
     {
       amount: distributed[:user_distributed_transaction].amount,
-      user_id: distributed[:user_distributed_transaction].user_id,
       at_transaction_category_id: distributed[:user_distributed_transaction].at_transaction_category_id,
       category_name1: distributed[:user_distributed_transaction].at_transaction_category.category_name1,
       category_name2: distributed[:user_distributed_transaction].at_transaction_category.category_name2,
       used_date: distributed[:user_distributed_transaction].at_user_bank_transaction.trade_date,
       used_location: distributed[:user_distributed_transaction].used_location,
-      is_shared: distributed[:user_distributed_transaction].at_user_bank_transaction.at_user_bank_account.share || distributed[:user_distributed_transaction].share,
+      user_id: distributed[:user_distributed_transaction].user_id,
       is_account_shared: distributed[:is_account_shared],
+      is_shared: distributed[:user_distributed_transaction].at_user_bank_transaction.at_user_bank_account.share || distributed[:user_distributed_transaction].share,
       payment_name: distributed[:user_distributed_transaction].at_user_bank_transaction.at_user_bank_account.fnc_nm + distributed[:user_distributed_transaction].at_user_bank_transaction.at_user_bank_account.brn_nm,
     }
   end
