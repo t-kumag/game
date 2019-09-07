@@ -1,12 +1,12 @@
 require 'rails_helper'
 
-describe 'profiles' do
+describe 'profiles_controller' do
   before(:each) do
     @user = create(:user)
     @headers = { "Authorization" => "Bearer " + @user.token}
   end
 
-  it 'POST#create' do
+  it 'POST #create' do
     params = {
       "gender" => 0,
       "birthday" => "2019-01-01",
@@ -23,7 +23,7 @@ describe 'profiles' do
     expect(response.status).to eq 200
   end
 
-  it 'PUT#update' do
+  it 'PUT #update' do
     create(:user_profile, user_id: @user.id)
 
     params = {
@@ -43,7 +43,7 @@ describe 'profiles' do
     expect(response.status).to eq 200
   end
 
-  it 'GET#show' do
+  it 'GET #show' do
     @user_profile = create(:user_profile, user_id: @user.id)
 
     get "/api/v1/user/profiles", headers: @headers
