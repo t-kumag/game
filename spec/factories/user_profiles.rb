@@ -1,8 +1,9 @@
 FactoryBot.define do
   factory :user_profile, :class => Entities::UserProfile do
-    gender { 0 }
-    birthday { "2019-01-01" }
+    user_id   { 0 }
+    birthday  { "2019-01-01" }
+    gender    { 0 }
     has_child { 0 }
-    push { true }
+    push      { true }
   end
 end
