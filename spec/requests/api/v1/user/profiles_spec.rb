@@ -1,9 +1,12 @@
 require 'rails_helper'
 
 describe 'profiles' do
-  it 'POST #create' do
+  
+  before(:each) do
     @user = create(:user)
+  end
 
+  it 'POST #create' do
     headers = { "Authorization" => "Bearer " + @user.token}
 
     params = {
@@ -23,11 +26,9 @@ describe 'profiles' do
   end
 
   it 'GET #show' do
-    @user = create(:user)
+    headers = { "Authorization" => "Bearer " + @user.token}
 
     @user_profile = create(:user_profile, user_id: @user.id)
-
-    headers = { "Authorization" => "Bearer " + @user.token}
 
     get "/api/v1/user/profiles", headers: headers
     json = JSON.parse(response.body)
