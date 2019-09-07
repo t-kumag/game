@@ -35,13 +35,12 @@ describe 'profiles' do
     
     put "/api/v1/user/profiles", params: params, headers: @headers
     
-    expect(response.status).to eq 200
-
-    @user_profile = Entities::UserProfile.find(@user.id)
-
+    @user_profile = Entities::UserProfile.find_by(user_id: @user.id)
+    
     expect(@user_profile.gender).to eq 1
     expect(@user_profile.has_child).to eq 1
     expect(@user_profile.push).to eq false
+    expect(response.status).to eq 200
   end
 
   it 'GET#show' do
