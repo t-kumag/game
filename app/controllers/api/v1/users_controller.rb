@@ -180,6 +180,10 @@ class Api::V1::UsersController < ApplicationController
     render json: {}, status: 200
   end
 
+  def redirect_top
+    render json: {}, status: 200
+  end
+
   private
   def sign_up_params
     params.permit(:email, :password)
