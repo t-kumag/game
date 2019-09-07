@@ -22,6 +22,7 @@ FactoryBot.define do
     group_id      { nil }
     error_date    { nil }
     error_count   { 0 }
-  end
 
+    at_bank
+  end
 end
