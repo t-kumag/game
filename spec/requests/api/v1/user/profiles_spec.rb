@@ -6,7 +6,7 @@ describe 'profiles' do
     @headers = { "Authorization" => "Bearer " + @user.token}
   end
 
-  it 'POST #create' do
+  it 'POST#create' do
     params = {
       "gender" => 0,
       "birthday" => "2019-01-01",
@@ -23,7 +23,28 @@ describe 'profiles' do
     expect(response.status).to eq 200
   end
 
-  it 'GET #show' do
+  it 'PUT#update' do
+    create(:user_profile, user_id: @user.id)
+
+    params = {
+      "gender" => 1,
+      "birthday" => "2019-01-01",
+      "has_child" => 1,
+      "push" => false,
+    }
+    
+    put "/api/v1/user/profiles", params: params, headers: @headers
+    
+    expect(response.status).to eq 200
+
+    @user_profile = Entities::UserProfile.find(@user.id)
+
+    expect(@user_profile.gender).to eq 1
+    expect(@user_profile.has_child).to eq 1
+    expect(@user_profile.push).to eq false
+  end
+
+  it 'GET#show' do
     @user_profile = create(:user_profile, user_id: @user.id)
 
     get "/api/v1/user/profiles", headers: @headers
