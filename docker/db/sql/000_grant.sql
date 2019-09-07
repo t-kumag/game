@@ -1,1 +1,0 @@
-GRANT ALL ON `test_osdr_db`.* TO 'devusr'@'%';
