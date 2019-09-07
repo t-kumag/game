@@ -1,14 +1,12 @@
 require 'rails_helper'
 
 describe 'profiles' do
-  
   before(:each) do
     @user = create(:user)
+    @headers = { "Authorization" => "Bearer " + @user.token}
   end
 
   it 'POST #create' do
-    headers = { "Authorization" => "Bearer " + @user.token}
-
     params = {
       "gender" => 0,
       "birthday" => "2019-01-01",
@@ -19,18 +17,16 @@ describe 'profiles' do
     expect { 
       post "/api/v1/user/profiles", 
       params: params, 
-      headers: headers 
-    }.to change(Entities::UserProfile, :count).by(1)
+      headers: @headers 
+    }.to change(Entities::UserProfile, :count).by(+1)
     
     expect(response.status).to eq 200
   end
 
   it 'GET #show' do
-    headers = { "Authorization" => "Bearer " + @user.token}
-
     @user_profile = create(:user_profile, user_id: @user.id)
 
-    get "/api/v1/user/profiles", headers: headers
+    get "/api/v1/user/profiles", headers: @headers
     json = JSON.parse(response.body)
 
     expect(json['app']['user_id']).to eq @user.id
