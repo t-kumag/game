@@ -13,12 +13,13 @@ FactoryBot.define do
     user_id    { 0 }
     at_user_id { "test" }
     deleted_at { nil }
-  end
 
-  trait :with_at_user_bank_accounts do
-    after(:create) do |at_user|
-      at_user.at_user_bank_accounts = []
-      at_user.at_user_bank_accounts << create(:at_user_bank_account, at_user_id: at_user.id)
+    trait :with_at_user_bank_accounts do
+      after(:create) do |at_user|
+        at_user.at_user_bank_accounts = []
+        at_user.at_user_bank_accounts << create(:at_user_bank_account, at_user_id: at_user.id)
+      end
     end
+
   end
 end
