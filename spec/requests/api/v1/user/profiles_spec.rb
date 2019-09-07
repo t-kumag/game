@@ -37,9 +37,9 @@ describe 'profiles_controller' do
     
     @user_profile = Entities::UserProfile.find_by(user_id: @user.id)
     
-    expect(@user_profile.gender).to eq 1
-    expect(@user_profile.has_child).to eq 1
-    expect(@user_profile.push).to eq false
+    expect(@user_profile.gender).to eq params["gender"]
+    expect(@user_profile.has_child).to eq params["has_child"]
+    expect(@user_profile.push).to eq params["push"]
     expect(response.status).to eq 200
   end
 

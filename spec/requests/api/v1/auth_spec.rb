@@ -29,8 +29,8 @@ describe 'auth_controller' do
     
     @user = Entities::User.find(@user.id)
 
-    expect(response.status).to eq 200
     expect(@user.token).to eq nil
     expect(@user.token_expires_at).to eq nil
+    expect(response.status).to eq 200
   end
 end
