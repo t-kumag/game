@@ -36,11 +36,9 @@ services:
     depends_on: 
       - db
       - redis
-      - test_db
     links:
       - db
       - redis
-      - test_db
 
   worker:
     container_name: worker
@@ -87,23 +85,6 @@ services:
       - 3307:3306
     volumes:
       - ./tmp/db/mysql_data:/var/lib/mysql # データの永続化
-      - ./docker/db/sql:/docker-entrypoint-initdb.d # 初期データ投入
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --innodb-use-native-aio=0
-
-  test_db:
-    container_name: test_db
-    build:
-      context: .
-      dockerfile: mysql.Dockerfile
-    environment:
-      TZ: "Asia/Tokyo"
-      MYSQL_ROOT_PASSWORD: 'pass'
-      MYSQL_USER: 'testusr'
-      MYSQL_PASSWORD: 'pass'
-      MYSQL_DATABASE: test_osdr_db
-    ports:
-      - 3306:3306
-    volumes:
       - ./docker/db/sql:/docker-entrypoint-initdb.d # 初期データ投入
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --innodb-use-native-aio=0
 
