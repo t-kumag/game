@@ -161,7 +161,7 @@ class Api::V1::UsersController < ApplicationController
           register_cancel_reasons(cancel_checklists, cancel_reason)
           # 削除対象のテーブル
           # at_user_tokens at_users users
-          if @user.try(:at_user).try(:token).present?
+          if @current_user.try(:at_user).try(:token).present?
             @current_user.at_user.at_user_tokens.destroy_all
             @current_user.at_user.destroy
           end
