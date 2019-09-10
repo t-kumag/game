@@ -8,5 +8,6 @@ json.app do
     json.at_transaction_category_id transaction.at_transaction_category_id
     json.category_name1 transaction.at_transaction_category.category_name1
     json.category_name2 transaction.at_transaction_category.category_name2
+    json.transaction_id transaction.at_user_emoney_transaction_id
   end
 end
