@@ -54,14 +54,14 @@ class Services::AtEmoneyTransactionService
     return {} if emoney.blank?
 
     transaction[:is_account_shared] = emoney.share
-    transaction_id = Entities::AtUserEmoneyTransaction.find_by(id: transaction_id, at_user_emoney_service_account_id: emoney.id).id
+    at_user_emoney_transaction = Entities::AtUserEmoneyTransaction.find_by(id: transaction_id, at_user_emoney_service_account_id: emoney.id)
 
     return {} if transaction_id.blank?
 
     transaction[:user_distributed_transaction] = Entities::UserDistributedTransaction
                                                       .joins(:at_transaction_category)
                                                       .includes(:at_transaction_category)
-                                                      .find_by(at_user_emoney_transaction_id: transaction_id)
+                                                      .find_by(at_user_emoney_transaction_id: at_user_emoney_transaction.id)
     transaction
 
     # TODO: BS PL 利用明細から参照されるため、参照元に合わせて処理する必要がある。

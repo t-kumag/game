@@ -51,14 +51,14 @@ class Services::AtBankTransactionService
     end
     return {} if bank.blank?
 
-    transaction_id = Entities::AtUserBankTransaction.find_by(id: transaction_id, at_user_bank_account_id: bank.id).id
+    at_user_bank_transaction = Entities::AtUserBankTransaction.find_by(id: transaction_id, at_user_bank_account_id: bank.id)
     return {} if transaction_id.blank?
 
     transaction[:is_account_shared] = bank.share
     transaction[:user_distributed_transaction] =  Entities::UserDistributedTransaction
                                                       .joins(:at_transaction_category)
                                                       .includes(:at_transaction_category)
-                                                      .find_by(at_user_bank_transaction_id: transaction_id)
+                                                      .find_by(at_user_bank_transaction_id: at_user_bank_transaction.id)
     transaction
 
     # TODO: BS PL 利用明細から参照されるため、参照元に合わせて処理する必要がある。
