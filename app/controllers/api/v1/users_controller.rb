@@ -160,7 +160,7 @@ class Api::V1::UsersController < ApplicationController
           # 退会理由を記載する
           register_cancel_reasons(cancel_checklists, cancel_reason)
           # 削除対象のテーブル
-          # DB_TABLE: at_user_tokens at_users users
+          # at_user_tokens at_users users
           if @current_user.try(:at_user).try(:token).present?
             @current_user.at_user.at_user_tokens.destroy_all
             @current_user.at_user.destroy
