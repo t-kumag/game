@@ -54,13 +54,13 @@ class Services::AtCardTransactionService
     return {} if card.blank?
 
     transaction[:is_account_shared] = card.share
-    at_user_card_trannsaction = Entities::AtUserCardTransaction.find_by(id: transaction_id, at_user_card_account_id: card.id)
+    at_user_card_transaction = Entities::AtUserCardTransaction.find_by(id: transaction_id, at_user_card_account_id: card.id)
     return {} if transaction_id.blank?
 
     transaction[:user_distributed_transaction] = Entities::UserDistributedTransaction
                                                      .joins(:at_transaction_category)
                                                      .includes(:at_transaction_category)
-                                                     .find_by(at_user_card_transaction_id: at_user_card_trannsaction.id)
+                                                     .find_by(at_user_card_transaction_id: at_user_card_transaction.id)
     transaction
     # TODO: BS PL 利用明細から参照されるため、参照元に合わせて処理する必要がある。
     # if @is_group === true
