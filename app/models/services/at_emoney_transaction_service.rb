@@ -30,6 +30,7 @@ class Services::AtEmoneyTransactionService
       is_shared: distributed[:user_distributed_transaction].at_user_emoney_transaction.at_user_emoney_service_account.share || distributed[:user_distributed_transaction].share,
       # emoney の場合 brn_nm は存在せず、fnc_nm のみ
       payment_name: distributed[:user_distributed_transaction].at_user_emoney_transaction.at_user_emoney_service_account.fnc_nm,
+      transaction_id: distributed[:user_distributed_transaction].at_user_emoney_transaction_id,
     }
   end
 

@@ -28,6 +28,7 @@ class Services::AtBankTransactionService
       is_account_shared: distributed[:is_account_shared],
       is_shared: distributed[:user_distributed_transaction].at_user_bank_transaction.at_user_bank_account.share || distributed[:user_distributed_transaction].share,
       payment_name: distributed[:user_distributed_transaction].at_user_bank_transaction.at_user_bank_account.fnc_nm + distributed[:user_distributed_transaction].at_user_bank_transaction.at_user_bank_account.brn_nm,
+      transaction_id: distributed[:user_distributed_transaction].at_user_bank_transaction_id,
     }
   end
 
