@@ -138,7 +138,10 @@ class Api::V1::UsersController < ApplicationController
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
     at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
 
-    return render_400_invalid_validation([{ "field": 'user_cancel_reason', "code": 'blank' }]) unless cancel_checklists.present?
+    # @TODO 2019/09 時点の仕様で退会理由のテキストフォームのみとなり
+    # 将来はチェックボックスになる予定のため処理は残す
+    # return render_400_invalid_validation([{ "field": 'user_cancel_reason', "code": 'blank' }]) unless cancel_checklists.present?
+    return render_400_invalid_validation([{ "field": 'user_cancel_reason', "code": 'blank' }]) unless cancel_reason.present?
 
     # 削除対象のテーブル
     # at_users, at_user_tokens, at_user_xxxx_accounts, users
@@ -161,7 +164,7 @@ class Api::V1::UsersController < ApplicationController
           register_cancel_reasons(cancel_checklists, cancel_reason)
           # 削除対象のテーブル
           # at_user_tokens at_users users
-          if @user.try(:at_user).try(:token).present?
+          if @current_user.try(:at_user).try(:token).present?
             @current_user.at_user.at_user_tokens.destroy_all
             @current_user.at_user.destroy
           end
@@ -230,8 +233,10 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def register_cancel_reasons(cancel_checklists, cancel_reason)
-    Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
-    Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason) if cancel_reason.present?
+    # @TODO 2019/09 時点の仕様で退会理由のテキストフォームのみとなり
+    # 将来はチェックボックスになる予定のため処理は残す
+    # Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
+    Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason)
   end
 
 end

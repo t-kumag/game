@@ -1,0 +1,23 @@
+
+口座連携エラーのためスクレイピングスキップしました。
+
+エラー発生日時　<%= @account.error_date.strftime("%Y年%m月%d日 %H時%M分") %>
+
+エラー回数　<%= @account.error_count %>回
+
+エラー発生した金融機関は、<%= @account.fnc_nm %>になります
+
+（注）
+このメールは、登録メールアドレス宛に自動的にお送りしています。ご登録された覚えのない場合はお手数ですが以下お問い合わせ先までご連絡ください。
+  なお、このメールは送信専用となり返信できません。
+
+==============
+OsidOri（オシドリ）
+https://www.osidori.co/
+お問い合わせ先
+https://www.osidori.co/faq
+利用規約
+https://www.osidori.co/terms
+プライバシーポリシー
+https://www.osidori.co/privacy
+(C) OsidOri.inc

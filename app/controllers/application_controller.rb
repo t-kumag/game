@@ -208,7 +208,7 @@ class ApplicationController < ActionController::Base
 
     if with_group
       partner_bank = @current_user.try(:partner_user).try(:at_user).try(:at_user_bank_accounts).try(:find_by, id: bank_id)
-      at_user_bank_transaction_ids << partner_bank.try(:at_user_bank_transactions).pluck(:id) if partner_bank..try(:at_user_bank_transactions).present?
+      at_user_bank_transaction_ids << partner_bank.try(:at_user_bank_transactions).pluck(:id) if partner_bank.try(:at_user_bank_transactions).present?
     end
 
     return true if at_user_bank_transaction_ids.blank?
@@ -254,7 +254,7 @@ class ApplicationController < ActionController::Base
     user_emoney = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:find_by, id: emoney_id)
     at_user_emoney_transaction_ids = []
     at_user_emoney_transaction_ids << user_emoney.try(:at_user_emoney_transactions).pluck(:id) if user_emoney.try(:at_user_emoney_transactions).present?
-    
+
     if with_group
       partner_emoney = @current_user.try(:partner_user).try(:at_user).try(:at_user_emoney_service_accounts).try(:find_by, id: emoney_id)
       at_user_emoney_transaction_ids << partner_emoney.try(:at_user_emoney_transactions).pluck(:id) if partner_emoney.try(:at_user_emoney_transactions).present?
