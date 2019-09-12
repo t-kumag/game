@@ -28,6 +28,49 @@ SELECT
 
 
   COALESCE(max_step_teble.budget_question_id, 0) AS 診断タイプ,
+  
+    (
+    SELECT
+      CASE 
+        WHEN q3.budget_question_id = 3 THEN
+          CASE
+            WHEN prev_question_id = 2 THEN "2人が一定額を出しあい、そこから支出"
+            ELSE "2人の収入をすべて合算し、そこから支出"
+          END
+        WHEN q3.budget_question_id = 4 THEN
+          CASE
+            WHEN prev_question_id = 2 THEN "2人が一定額を出しあい、そこから支出"
+            ELSE "家賃・食費などの項目をそれぞれが担当し支出"
+          END
+        ELSE 0
+      END
+  ) AS Q1,
+
+  (
+    SELECT
+      CASE
+        WHEN q3.budget_question_id = 3 THEN
+          CASE
+            WHEN prev_question_id = 2 THEN "共用口座が有る"
+            ELSE "スキップ"
+          END
+        WHEN q3.budget_question_id = 4 THEN
+          CASE
+            WHEN prev_question_id = 2 THEN "共用口座が無い" 
+            ELSE "スキップ" 
+          END
+        ELSE 0
+      END
+  ) as Q2,
+  
+  CASE 
+    WHEN COALESCE(max_step_teble.budget_question_id, 0) = 5 THEN "貯金用の口座で2人で貯金"
+    WHEN COALESCE(max_step_teble.budget_question_id, 0) = 6 THEN "家計用と同じ口座で2人で貯金"
+    WHEN COALESCE(max_step_teble.budget_question_id, 0) = 7 THEN "それぞれが個人口座で貯金"
+    WHEN COALESCE(max_step_teble.budget_question_id, 0) = 8 THEN "貯金用の口座で2人で貯金"
+    WHEN COALESCE(max_step_teble.budget_question_id, 0) = 9 THEN "それぞれが個人口座で貯金"
+    ELSE 0
+  END AS Q3,
 
 
   CASE
@@ -832,5 +875,39 @@ LEFT JOIN
   ) AS numbered_goal_settings_at_user_bank_account
 ON 
   numbered_goal_settings_at_user_bank_account.id = u.id
+
+LEFT JOIN
+  (
+    SELECT
+      tmp.user_id,
+      step,
+      budget_question_id,
+      (
+        SELECT 
+          budget_question_id 
+        FROM
+          user_budget_questions
+        WHERE
+          user_budget_questions.user_id = tmp.user_id
+          AND user_budget_questions.step = tmp.step - 1
+      ) AS prev_question_id
+    FROM
+      user_budget_questions AS tmp
+    WHERE
+      budget_question_id IN (3,4)
+      AND NOT EXISTS 
+      (
+        SELECT
+          1
+        FROM
+          user_budget_questions AS tmp2
+        WHERE
+          tmp.user_id = tmp2.user_id
+          AND tmp.step < tmp2.step
+          AND tmp2.budget_question_id IN (3,4)
+      )
+  ) AS q3
+ON
+  q3.user_id = u.id
 
 ORDER BY u.id
