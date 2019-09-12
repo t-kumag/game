@@ -90,7 +90,6 @@ class Services::AtBankTransactionService
     # TODO: 現在の日付からもっとも近い取引ログを取得し、変数に格納する
     # TODO: 変数名はtransactions[:prev_from_date]
     # TODO: 現在はとりあえず@fromを入れてますが、正しい数値を入れるようにする
-
     transactions[:prev_from_date] = @from
 
     return {} if transaction_ids.blank?

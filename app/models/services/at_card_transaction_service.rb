@@ -90,6 +90,12 @@ class Services::AtCardTransactionService
     transactions[:is_account_shared] = card.share
     transaction_ids = card.at_user_card_transactions.where(used_date: @from..@to).pluck(:id)
 
+    # TODO: ここで@fromより前のデータがあるかat_transaction_monthly_date_logsで確認
+    # TODO: 現在の日付からもっとも近い取引ログを取得し、変数に格納する
+    # TODO: 変数名はtransactions[:prev_from_date]
+    # TODO: 現在はとりあえず@fromを入れてますが、正しい数値を入れるようにする
+    transactions[:prev_from_date] = @from
+
     return {} if transaction_ids.blank?
     transactions[:user_distributed_transaction] = Entities::UserDistributedTransaction
                                                       .joins(:at_transaction_category)
