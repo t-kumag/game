@@ -103,3 +103,14 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - .docker/redis/data:/data
+
+  blueprint:
+    container_name: blueprint
+    build: 
+      context: .
+      dockerfile: blueprint.Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./docker/blueprint/docs:/blueprint/docs
+      - ./docker/blueprint/output:/blueprint/output
