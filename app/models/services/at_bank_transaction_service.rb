@@ -87,13 +87,15 @@ class Services::AtBankTransactionService
     transaction_ids = bank.at_user_bank_transactions.where(trade_date: @from..@to).pluck(:id)
 
     at_sync_transaction_monthly_logs = Services::AtSyncTransactionMonthlyDateLogService
-                                           .latest_transaction_monthly_date(account_id, @to, "at_user_bank_account")
+                                           .all_transaction_monthly_date(account_id, @to, "at_user_bank_account")
     prev_transaction = nil
     at_sync_transaction_monthly_logs.each do |astml|
       if astml < @from
         prev_from_transaction_date = @from.beginning_of_month.beginning_of_day
-        minus_one_sencod_before_from = @from - 1
-        prev_transaction = bank.at_user_bank_transactions.order(trade_date: :desc).where(trade_date: prev_from_transaction_date..minus_one_sencod_before_from).first
+        # 1秒マイナスすることで、重複データを取得しないようにしています。
+        minus_one_second_before_from = @from - 1
+        prev_transaction = bank.at_user_bank_transactions.order(trade_date: :desc)
+                               .where(trade_date: prev_from_transaction_date..minus_one_second_before_from).first
         break if prev_transaction.present?
       end
     end
