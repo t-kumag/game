@@ -90,14 +90,13 @@ class Services::AtBankTransactionService
                                            .fetch_monthly_transaction_date_from_specified_date(account_id, @from, "at_user_bank_account")
     prev_transaction = nil
     at_sync_transaction_monthly_logs.each do |astml|
-      if astml < @from
-        prev_from_transaction_date = @from.beginning_of_month.beginning_of_day
-        # 1秒マイナスすることで、重複データを取得しないようにしています。
-        minus_one_second_before_from = @from - 1
-        prev_transaction = bank.at_user_bank_transactions.order(trade_date: :desc)
-                               .where(trade_date: prev_from_transaction_date..minus_one_second_before_from).first
-        break if prev_transaction.present?
-      end
+      next unless  astml < @from
+      prev_from_transaction_date = astml.beginning_of_month.beginning_of_day
+      # 1秒マイナスすることで、重複データを取得しないようにしています。
+      minus_one_second_before_from = @from - 1
+      prev_transaction = bank.at_user_bank_transactions.order(trade_date: :desc)
+                             .where(trade_date: prev_from_transaction_date..minus_one_second_before_from).first
+      break if prev_transaction.present?
     end
 
     transactions[:prev_from_date] = prev_transaction.try(:trade_date)
