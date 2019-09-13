@@ -86,11 +86,19 @@ class Services::AtBankTransactionService
     transactions[:is_account_shared] = bank.share
     transaction_ids = bank.at_user_bank_transactions.where(trade_date: @from..@to).pluck(:id)
 
-    # TODO: ここで@fromより前のデータがあるかat_transaction_monthly_date_logsで確認
-    # TODO: 現在の日付からもっとも近い取引ログを取得し、変数に格納する
-    # TODO: 変数名はtransactions[:prev_from_date]
-    # TODO: 現在はとりあえず@fromを入れてますが、正しい数値を入れるようにする
-    transactions[:prev_from_date] = @from
+    at_sync_transaction_monthly_logs = Services::AtSyncTransactionMonthlyDateLogService
+                                           .latest_transaction_monthly_date(account_id, @to, "at_user_bank_account")
+    prev_transaction = nil
+    at_sync_transaction_monthly_logs.each do |astml|
+      if astml < @from
+        prev_from_transaction_date = @from.beginning_of_month.beginning_of_day
+        minus_one_sencod_before_from = @from - 1
+        prev_transaction = bank.at_user_bank_transactions.order(trade_date: :desc).where(trade_date: prev_from_transaction_date..minus_one_sencod_before_from).first
+        break if prev_transaction.present?
+      end
+    end
+
+    transactions[:prev_from_date] = prev_transaction.try(:trade_date)
 
     return {} if transaction_ids.blank?
     transactions[:user_distributed_transaction] = Entities::UserDistributedTransaction
