@@ -99,7 +99,7 @@ class Services::AtBankTransactionService
       break if prev_transaction.present?
     end
 
-    transactions[:prev_from_date] = prev_transaction.try(:trade_date)
+    transactions[:prev_from_date] = prev_transaction.try(:trade_date) ? prev_transaction.trade_date.strftime('%Y-%m-%d %H:%M:%S') : nil
 
     return {} if transaction_ids.blank?
     transactions[:user_distributed_transaction] = Entities::UserDistributedTransaction

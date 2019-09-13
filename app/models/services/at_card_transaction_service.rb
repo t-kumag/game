@@ -103,7 +103,7 @@ class Services::AtCardTransactionService
       break if prev_transaction.present?
     end
 
-    transactions[:prev_from_date] = prev_transaction.try(:used_date)
+    transactions[:prev_from_date] = prev_transaction.try(:used_date) ? prev_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S') : nil
     return {} if transaction_ids.blank?
     transactions[:user_distributed_transaction] = Entities::UserDistributedTransaction
                                                       .joins(:at_transaction_category)
