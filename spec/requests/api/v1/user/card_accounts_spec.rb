@@ -23,7 +23,7 @@ describe 'card_accounts_controller' do
   end
 
   it 'DELETE #destroy' do
-  at_user_card_account = create(:at_user_card_account, at_user_id: @user.at_user.id)
+    at_user_card_account = create(:at_user_card_account, at_user_id: @user.at_user.id)
     id = at_user_card_account.id
     
     delete "/api/v1/user/card-accounts/#{id}", headers: @headers
