@@ -26,5 +26,12 @@ FactoryBot.define do
       end
     end
 
+    trait :with_at_user_card_accounts do
+      after(:create) do |at_user|
+        at_user.at_user_card_accounts = []
+        at_user.at_user_card_accounts << create(:at_user_card_account, at_user_id: at_user.id)
+      end
+    end
+
   end
 end
