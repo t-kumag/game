@@ -33,5 +33,12 @@ FactoryBot.define do
       end
     end
 
+    trait :with_at_user_emoney_accounts do
+      after(:create) do |at_user|
+        at_user.at_user_emoney_service_accounts = []
+        at_user.at_user_emoney_service_accounts << create(:at_user_emoney_service_account, at_user_id: at_user.id)
+      end
+    end
+
   end
 end
