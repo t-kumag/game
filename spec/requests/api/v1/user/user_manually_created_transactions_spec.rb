@@ -62,15 +62,15 @@ describe 'user_manually_created_transactions_controller' do
   it 'DELETE #destroy' do
     create(:at_grouped_category)
     create(:at_transaction_category)
-    @user_manually_created_transaction = create(:user_manually_created_transaction, :with_user_distributed_transaction, user_id: @user.id)
+    user_manually_created_transaction = create(:user_manually_created_transaction, :with_user_distributed_transaction, user_id: @user.id)
     
-    id = @user_manually_created_transaction.id
+    id = user_manually_created_transaction.id
 
     delete "/api/v1/user/user-manually-created-transactions/#{id}", headers: @headers
     
-    expect(Entities::UserManuallyCreatedTransaction.where(user_id: @user.id)).to_not exist
-    expect(Entities::UserDistributedTransaction.where(user_id: @user.id)).to_not exist
-    expect(Entities::Activity.where(user_id: @user.id)).to_not exist
+    expect(Entities::UserManuallyCreatedTransaction.find_by(user_id: @user.id)).to eq nil
+    expect(Entities::UserDistributedTransaction.find_by(user_id: @user.id)).to eq nil
+    expect(Entities::Activity.find_by(user_id: @user.id)).to eq nil
     expect(response.status).to eq 200
   end
 end
