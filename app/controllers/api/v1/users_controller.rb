@@ -134,9 +134,9 @@ class Api::V1::UsersController < ApplicationController
   def destroy
     cancel_reason = delete_user_params[:user_cancel_reason]
     cancel_checklists = delete_user_params[:user_cancel_checklists]
-    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
-    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
-    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
+    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share: false).try(:pluck ,:id)
+    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:where, share: false).try(:pluck ,:id)
+    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share: false).try(:pluck, :id)
 
     # @TODO 2019/09 時点の仕様で退会理由のテキストフォームのみとなり
     # 将来はチェックボックスになる予定のため処理は残す
