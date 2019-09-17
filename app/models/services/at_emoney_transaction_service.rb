@@ -93,16 +93,15 @@ class Services::AtEmoneyTransactionService
     transaction_ids = emoney.at_user_emoney_transactions.where(used_date: @from..@to).pluck(:id)
 
     at_sync_transaction_monthly_logs = Services::AtSyncTransactionMonthlyDateLogService
-                                           .fetch_monthly_transaction_date_from_specified_date(account_id, @from, "at_user_emoney_service_account")
+                                           .fetch_monthly_transaction_date_from_specified_date_first(account_id, @from, "at_user_emoney_service_account")
     prev_transaction = nil
-    at_sync_transaction_monthly_logs.each do |astml|
-      next unless  astml < @from
-      prev_from_transaction_date = astml.beginning_of_month.beginning_of_day
-      # 1秒マイナスすることで、重複データを取得しないようにしています。
-      minus_one_second_before_from = @from - 1
+    if at_sync_transaction_monthly_logs < @from
+      # 基本的に2019-08-21 00:00:00 のよう形でデータが取得できるため、23:59:59など細かい秒数は取得する必要がない。
+      # そのため、一日前の取得になっている。
+      one_day_before_from = @from.yesterday
       prev_transaction = emoney.at_user_emoney_transactions.order(used_date: :desc)
-                             .where(used_date: prev_from_transaction_date..minus_one_second_before_from).first
-      break if prev_transaction.present?
+                             .where("used_date < :one_day_before_from", one_day_before_from: one_day_before_from).first
+
     end
 
     transactions[:prev_from_date] = prev_transaction.try(:used_date) ? prev_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S') : nil

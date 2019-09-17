@@ -87,7 +87,7 @@ class Services::AtBankTransactionService
     transaction_ids = bank.at_user_bank_transactions.where(trade_date: @from..@to).pluck(:id)
 
     at_sync_transaction_monthly_logs = Services::AtSyncTransactionMonthlyDateLogService
-                                           .fetch_monthly_transaction_date_from_specified_date(account_id, @from, "at_user_bank_account")
+                                           .fetch_monthly_transaction_date_from_specified_date_first(account_id, @from, "at_user_bank_account")
     prev_transaction = nil
     at_sync_transaction_monthly_logs.each do |astml|
       next unless  astml < @from
