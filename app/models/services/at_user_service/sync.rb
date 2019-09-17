@@ -103,6 +103,7 @@ class Services::AtUserService::Sync
 
       src_trans = []
       activities = []
+      monthly_trans = []
       if res.key?(rec_key) && !res[rec_key].blank?
         res[rec_key].each do |i|
           # 文字をintに、空文字の場合は0に変換
@@ -133,6 +134,7 @@ class Services::AtUserService::Sync
           src_trans << tran
 
           activity = get_activity(financier_account_type_key, tran, a, activities)
+          monthly_tran = fetch_monthly_tran(financier_account_type_key, tran, a, monthly_trans)
           activities << activity if activity.present?
         end
       end
@@ -312,5 +314,10 @@ class Services::AtUserService::Sync
     check_difference_date = latest_sync_date.present? && latest_sync_date < activity[:date] ? true : false
 
     return activity if check_duplicate_activity && check_difference_date
+  end
+
+  def fetch_monthly_tran(financier_account_type_key, tran, account, monthly_trans)
+    Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran, account, monthly_trans)
+
   end
 end
