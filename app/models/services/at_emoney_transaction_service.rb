@@ -100,8 +100,7 @@ class Services::AtEmoneyTransactionService
       # そのため、一日前の取得になっている。
       one_day_before_from = @from.yesterday
       prev_transaction = emoney.at_user_emoney_transactions.order(used_date: :desc)
-                             .where("used_date < :one_day_before_from", one_day_before_from: one_day_before_from).first
-
+                             .where("used_date <= :one_day_before_from", one_day_before_from: one_day_before_from).first
     end
 
     transactions[:prev_from_date] = prev_transaction.try(:used_date) ? prev_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S') : nil

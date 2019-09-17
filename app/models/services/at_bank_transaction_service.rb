@@ -94,7 +94,7 @@ class Services::AtBankTransactionService
       # そのため、一日前の取得になっている。
       one_day_before_from = @from.yesterday
       prev_transaction = bank.at_user_bank_transactions.order(trade_date: :desc)
-                             .where("trade_date < :one_day_before_from", one_day_before_from: one_day_before_from).first
+                             .where("trade_date <= :one_day_before_from", one_day_before_from: one_day_before_from).first
     end
 
     transactions[:prev_from_date] = prev_transaction.try(:trade_date) ? prev_transaction.trade_date.strftime('%Y-%m-%d %H:%M:%S') : nil
