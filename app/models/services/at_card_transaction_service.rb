@@ -89,16 +89,16 @@ class Services::AtCardTransactionService
 
     transactions[:is_account_shared] = card.share
     transaction_ids = card.at_user_card_transactions.where(used_date: @from..@to).pluck(:id)
+    # 基本的に2019-08-21 00:00:00 のよう形でデータが取得できるため、23:59:59など細かい秒数は取得する必要がない。
+    # そのため、一日前の取得になっている。
+    one_day_before_from = @from.yesterday
 
     at_sync_transaction_monthly_logs = Services::AtSyncTransactionMonthlyDateLogService
-                                           .fetch_monthly_transaction_date_from_specified_date_first(account_id, @from, "at_user_card_account")
+                                           .fetch_monthly_transaction_date_from_specified_date_first(account_id, one_day_before_from, "at_user_card_account")
     prev_transaction = nil
-    if at_sync_transaction_monthly_logs < @from
-      # 基本的に2019-08-21 00:00:00 のよう形でデータが取得できるため、23:59:59など細かい秒数は取得する必要がない。
-      # そのため、一日前の取得になっている。
-      one_day_before_from = @from.yesterday
+    if at_sync_transaction_monthly_logs.present?
       prev_transaction = card.at_user_card_transactions.order(used_date: :desc)
-                             .where("used_date <= :one_day_before_from", one_day_before_from: one_day_before_from).first
+                             .where(used_date: at_sync_transaction_monthly_logs..one_day_before_from).first
     end
 
     transactions[:prev_from_date] = prev_transaction.try(:used_date) ? prev_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S') : nil
