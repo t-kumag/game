@@ -8,8 +8,8 @@ RUN mkdir $WORKSPACE
 WORKDIR $WORKSPACE
 
 RUN npm init -y
-RUN npm install gulp -g
-RUN npm install gulp gulp-aglio
+RUN npm install gulp -g --no-optional
+RUN npm install gulp gulp-aglio --no-optional
 
 COPY ./docker/blueprint/entrypoint.sh entrypoint.sh
 COPY ./docker/blueprint/gulpfile.js gulpfile.js
