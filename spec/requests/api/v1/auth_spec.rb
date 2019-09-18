@@ -2,11 +2,11 @@ require 'rails_helper'
 
 RSpec.describe 'auth_controller' do
   let(:headers) { { Authorization: 'Bearer ' + user.token } } 
-  let(:user_after_posting) { Entities::User.find(user.id) }
+  let(:user_after_logout) { Entities::User.find(user.id) }
+  let(:params) { { email: user.email, password: user.password } } 
 
   describe '#login' do
     let(:user) { create(:user, password: 'testtest') } 
-    let(:params) { { email: user.email, password: user.password } } 
     
     context 'success' do
       it 'response 200' do
@@ -17,7 +17,7 @@ RSpec.describe 'auth_controller' do
       it 'token is updated' do
         post '/api/v1/auth/login', params: params, headers: headers 
         json = JSON.parse(response.body)
-        expect(json['app']['access_token']).to eq user_after_posting.token
+        expect(json['app']['access_token']).to eq user_after_logout.token
       end
     end
   end
@@ -33,12 +33,12 @@ RSpec.describe 'auth_controller' do
 
       it 'token is nil' do
         delete '/api/v1/auth/logout', headers: headers
-        expect(user_after_posting.token).to eq nil
+        expect(user_after_logout.token).to eq nil
       end
 
       it 'token_expires_at is nil' do
         delete '/api/v1/auth/logout', headers: headers
-        expect(user_after_posting.token_expires_at).to eq nil
+        expect(user_after_logout.token_expires_at).to eq nil
       end
     end
   end
