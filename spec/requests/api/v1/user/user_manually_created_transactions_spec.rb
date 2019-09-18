@@ -62,7 +62,6 @@ RSpec.describe 'user_manually_created_transactions_controller' do
       share: false
     } }
 
-
     it 'response 200' do
       put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
         params: params, 
