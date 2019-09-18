@@ -3,8 +3,17 @@ require 'rails_helper'
 RSpec.describe 'user_manually_created_transactions_controller' do
   let(:user) { create(:user) } 
   let(:headers) { { Authorization: 'Bearer ' + user.token } } 
+  let(:params) { { 
+    at_transaction_category_id: 1,
+    payment_method_id: nil,
+    used_date: '2019/12/31',
+    title: nil,
+    amount: 10000,
+    used_location: 'test',
+    share: false
+  } }
   let!(:at_grouped_category) { create(:at_grouped_category) } 
-  let!(:at_transaction_category) { create(:at_transaction_category) } 
+  let!(:at_transaction_category) { create(:at_transaction_category) }
   let(:user_manually_created_transaction) { 
     create(:user_manually_created_transaction, 
       :with_user_distributed_transaction,
@@ -18,16 +27,6 @@ RSpec.describe 'user_manually_created_transactions_controller' do
   }
 
   describe '#create' do
-    let(:params) { { 
-      at_transaction_category_id: 1,
-      payment_method_id: nil,
-      used_date: '2019/12/31',
-      title: nil,
-      amount: 10000,
-      used_location: 'test',
-      share: false
-    } }
-
     context 'success' do
       it 'response 200' do
         post '/api/v1/user/user-manually-created-transactions', params: params, headers: headers

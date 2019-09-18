@@ -9,7 +9,6 @@ RSpec.describe 'profiles_controller' do
     has_child: 0, 
     push: true
   } } 
-  let(:user_profile_after_update) { Entities::UserProfile.find_by(user_id: user.id) }
   
   describe '#create' do
     context 'success' do
@@ -33,6 +32,7 @@ RSpec.describe 'profiles_controller' do
       push: false
     } }
     let!(:user_profile) { create(:user_profile, user_id: user.id) }
+    let(:user_profile_after_update) { Entities::UserProfile.find_by(user_id: user.id) }
 
     context 'success' do
       it 'response 200' do

@@ -5,8 +5,6 @@ RSpec.describe 'icon_controller' do
   let(:headers) { { Authorization: 'Bearer ' + user.token } } 
   let(:params) { { img_url: 'test.jpg' } } 
   
-  let(:user_icon_after_update) { Entities::UserIcon.find_by(user_id: user.id) } 
-
   describe '#create' do
     context 'success' do
       it 'response 200' do
@@ -22,6 +20,8 @@ RSpec.describe 'icon_controller' do
   end
   
   describe '#update' do
+    let(:user_icon_after_update) { Entities::UserIcon.find_by(user_id: user.id) }
+
     context 'success' do
       let(:params) { { img_url: 'sample.jpg' } } 
       let!(:user_icon) { create(:user_icon, user_id: user.id) } 

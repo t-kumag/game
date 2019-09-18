@@ -1,9 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'auth_controller' do
+  let(:user) { create(:user) } 
   let(:headers) { { Authorization: 'Bearer ' + user.token } } 
-  let(:user_after_logout) { Entities::User.find(user.id) }
   let(:params) { { email: user.email, password: user.password } } 
+  let(:user_after_logout) { Entities::User.find(user.id) }
 
   describe '#login' do
     let(:user) { create(:user, password: 'testtest') } 
@@ -23,8 +24,6 @@ RSpec.describe 'auth_controller' do
   end
 
   describe '#logout' do
-    let(:user) { create(:user) } 
-    
     context 'success' do
       it 'response 200' do
         delete '/api/v1/auth/logout', headers: headers
