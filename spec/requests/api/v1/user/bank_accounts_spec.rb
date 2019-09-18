@@ -4,10 +4,11 @@ RSpec.describe 'bank_accounts_controller' do
   let(:user) { create(:user, :with_at_user) }
   let(:headers) { { "Authorization" => "Bearer " + user.token} }
   let(:params) { { share: false} }
-  let!(:at_user_bank_account) { create(:at_user_bank_account, at_user_id: user.at_user.id, share: true) }
-  let(:at_user_bank_account_after_update) { Entities::AtUserBankAccount.find(at_user_bank_account.id) }
+  let(:at_user_bank_account) { create(:at_user_bank_account, at_user_id: user.at_user.id, share: true) }
   
   describe '#update' do
+    let(:at_user_bank_account_after_update) { Entities::AtUserBankAccount.find(at_user_bank_account.id) }
+
     context 'success' do
       it 'response 200' do
         put "/api/v1/user/bank-accounts/#{at_user_bank_account.id}", params: params, headers: headers
