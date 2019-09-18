@@ -139,7 +139,9 @@ class Services::AtUserService::Sync
           activities << activity if activity.present?
         end
       end
-      Services::AtSyncTransactionMonthlyDateLogService.save_set_at_sync_tran_monthly_date_log(monthly_trans)
+
+      monthly_trans.compact!
+      Services::AtSyncTransactionMonthlyDateLogService.save_set_at_sync_tran_monthly_date_log(monthly_trans) if monthly_trans.present?
       transaction_entity.import src_trans, on_duplicate_key_update: data_column.map { |k, _v| k }, validate: false
       Services::ActivityService.save_activities(activities)
       Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
@@ -320,6 +322,7 @@ class Services::AtUserService::Sync
 
   def fetch_monthly_tran(financier_account_type_key, tran, last_tran_sync_monthly_date)
     at_sync_tran_monthly_date_log = Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran)
-    at_sync_tran_monthly_date_log unless last_tran_sync_monthly_date.present? && last_tran_sync_monthly_date < at_sync_tran_monthly_date_log[:monthly_date] ? true : false
+    return at_sync_tran_monthly_date_log unless last_tran_sync_monthly_date.present?
+    at_sync_tran_monthly_date_log unless  at_sync_tran_monthly_date_log[:monthly_date] <= last_tran_sync_monthly_date.strftime('%Y-%m-01 %H:%M:%S') ? true : false
   end
 end
