@@ -11,9 +11,9 @@ class Services::AtSyncTransactionMonthlyDateLogService
     end
   end
 
-  def self.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran, from, at_user_type)
+  def self.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran)
 
-    at_sync_tran_monthly_date_log = Entities::AtSyncTransactionMonthlyDateLog.new
+    at_sync_tran_monthly_date_log = {}
     at_sync_tran_monthly_date_log[:at_user_bank_account_id] = nil
     at_sync_tran_monthly_date_log[:at_user_card_account_id] = nil
     at_sync_tran_monthly_date_log[:at_user_emoney_service_account_id] = nil
@@ -32,10 +32,29 @@ class Services::AtSyncTransactionMonthlyDateLogService
       end
     end
     at_sync_tran_monthly_date_log
-    binding.pry
+  end
+
+  def self.save_set_at_sync_tran_monthly_date_loa(monthly_trans)
+    is_uniqued_monthly_trans = is_uniqed_data(monthly_trans)
+    Entities::AtSyncTransactionMonthlyDateLogService.import is_uniqued_monthly_trans, :on_duplicate_key_update =>
+        [:monthly_date, :at_user_card_account_id, :at_user_emoney_service_account_id, :at_user_bank_account_id], :validate => false
   end
 
   private
+
+  def self.is_uniqed_data(monthly_trans)
+    is_uniqued = monthly_trans.uniq
+
+    is_uniqued_monthly_trans = is_uniqued.map { |iu|
+      at_sync_tran_monthly_date_log = Entities::AtSyncTransactionMonthlyDateLog.new
+      at_sync_tran_monthly_date_log.monthly_date                      = iu[:monthly_date]
+      at_sync_tran_monthly_date_log.at_user_card_account_id           = iu[:at_user_card_account_id]
+      at_sync_tran_monthly_date_log.at_user_emoney_service_account_id = iu[:at_user_emoney_service_account_id]
+      at_sync_tran_monthly_date_log.at_user_bank_account_id           = iu[:at_user_bank_account_id]
+      at_sync_tran_monthly_date_log
+    }
+    is_uniqued_monthly_trans
+  end
 
   def self.get_finance_data_column(financier_account_type_key)
     case financier_account_type_key

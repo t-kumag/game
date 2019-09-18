@@ -134,10 +134,11 @@ class Services::AtUserService::Sync
           src_trans << tran
 
           activity = get_activity(financier_account_type_key, tran, a, activities)
-          monthly_tran = fetch_monthly_tran(financier_account_type_key, tran, a, monthly_trans)
+          monthly_trans << fetch_monthly_tran(financier_account_type_key, tran, a, monthly_trans)
           activities << activity if activity.present?
         end
       end
+      Services::AtSyncTransactionMonthlyDateLogService.save_set_at_sync_tran_monthly_date_loa(monthly_trans)
       transaction_entity.import src_trans, on_duplicate_key_update: data_column.map { |k, _v| k }, validate: false
       Services::ActivityService.save_activities(activities)
       Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
@@ -316,8 +317,7 @@ class Services::AtUserService::Sync
     return activity if check_duplicate_activity && check_difference_date
   end
 
-  def fetch_monthly_tran(financier_account_type_key, tran, account, monthly_trans)
-    Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran, account, monthly_trans)
-
+  def fetch_monthly_tran(financier_account_type_key, tran)
+    Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran)
   end
 end
