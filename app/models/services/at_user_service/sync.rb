@@ -323,6 +323,6 @@ class Services::AtUserService::Sync
   def fetch_monthly_tran(financier_account_type_key, tran, last_tran_sync_monthly_date)
     at_sync_tran_monthly_date_log = Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran)
     return at_sync_tran_monthly_date_log unless last_tran_sync_monthly_date.present?
-    at_sync_tran_monthly_date_log unless  at_sync_tran_monthly_date_log[:monthly_date] <= last_tran_sync_monthly_date.strftime('%Y-%m-01 %H:%M:%S') ? true : false
+    at_sync_tran_monthly_date_log unless at_sync_tran_monthly_date_log[:monthly_date] <= last_tran_sync_monthly_date.strftime('%Y-%m-01 %H:%M:%S') ? true : false
   end
 end
