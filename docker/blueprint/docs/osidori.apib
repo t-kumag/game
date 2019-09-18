@@ -1,0 +1,31 @@
+# Group ユーザー系
+/api/v1/user/xxx系
+
+## Profiles [/api/v1/user/profiles]
+Resource of Profiles
+
+### プロフィール取得 [GET]
++ Request Get user profile (application/json)
+    + Headers
+        Authorization: "Bearer user token"
+
++ Response 200 (application/json)
+    + Body
+        ```json
+        {
+          app: {
+            user_id: 1,
+            gender: 0,
+            birthday: "2019/01/01",
+            has_child: 0,
+            push: 0,
+            img_url: "sample.png"
+          }
+        }
+        ```
+
+# Group グループ系
+/api/v1/group/xxx系
+
+# Group その他
+/api/v1/xxx系
