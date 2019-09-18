@@ -104,6 +104,7 @@ class Services::AtUserService::Sync
       src_trans = []
       activities = []
       monthly_trans = []
+      last_tran_sync_monthly_date = Services::AtSyncTransactionMonthlyDateLogService.fetch_last_one(financier_account_type_key, a)
       if res.key?(rec_key) && !res[rec_key].blank?
         res[rec_key].each do |i|
           # 文字をintに、空文字の場合は0に変換
@@ -134,11 +135,11 @@ class Services::AtUserService::Sync
           src_trans << tran
 
           activity = get_activity(financier_account_type_key, tran, a, activities)
-          monthly_trans << fetch_monthly_tran(financier_account_type_key, tran, a, monthly_trans)
+          monthly_trans << fetch_monthly_tran(financier_account_type_key, tran, last_tran_sync_monthly_date)
           activities << activity if activity.present?
         end
       end
-      Services::AtSyncTransactionMonthlyDateLogService.save_set_at_sync_tran_monthly_date_loa(monthly_trans)
+      Services::AtSyncTransactionMonthlyDateLogService.save_set_at_sync_tran_monthly_date_log(monthly_trans)
       transaction_entity.import src_trans, on_duplicate_key_update: data_column.map { |k, _v| k }, validate: false
       Services::ActivityService.save_activities(activities)
       Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
@@ -317,7 +318,8 @@ class Services::AtUserService::Sync
     return activity if check_duplicate_activity && check_difference_date
   end
 
-  def fetch_monthly_tran(financier_account_type_key, tran)
-    Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran)
+  def fetch_monthly_tran(financier_account_type_key, tran, last_tran_sync_monthly_date)
+    at_sync_tran_monthly_date_log = Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran)
+    at_sync_tran_monthly_date_log unless last_tran_sync_monthly_date.present? && last_tran_sync_monthly_date < at_sync_tran_monthly_date_log[:monthly_date] ? true : false
   end
 end
