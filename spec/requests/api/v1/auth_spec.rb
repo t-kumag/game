@@ -1,11 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe 'auth_controller' do
+  let(:headers) { { Authorization: 'Bearer ' + user.token } } 
+  let(:user_after_posting) { Entities::User.find(user.id) }
+
   describe '#login' do
     let(:user) { create(:user, password: 'testtest') } 
-    let(:headers) { { Authorization: 'Bearer ' + user.token } } 
     let(:params) { { email: user.email, password: user.password } } 
-    let(:user_after_posting) { Entities::User.find(user.id) }
     
     context 'success' do
       it 'response 200' do
@@ -23,8 +24,6 @@ RSpec.describe 'auth_controller' do
 
   describe '#logout' do
     let(:user) { create(:user) } 
-    let(:headers) { { Authorization: 'Bearer ' + user.token } } 
-    let(:user_after_posting) { Entities::User.find(user.id) }
     
     context 'success' do
       it 'response 200' do
