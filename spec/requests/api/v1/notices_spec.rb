@@ -12,7 +12,7 @@ RSpec.describe 'notices_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'increase one record' do
+      it 'increase one record of notices' do
         expect { 
           post '/api/v1/notices', 
           params: params, 
