@@ -14,11 +14,11 @@ class Services::AtSyncTransactionMonthlyDateLogService
   def self.fetch_last_one(financier_account_type_key, account)
     case financier_account_type_key
     when "at_user_card_account_id"
-      Entities::AtSyncTransactionMonthlyDateLog.order(id: :asc).where(at_user_card_account_id: account.id).pluck("monthly_date").first
+      Entities::AtSyncTransactionMonthlyDateLog.order(id: :asc).where(at_user_card_account_id: account.id).first
     when "at_user_bank_account_id"
-      Entities::AtSyncTransactionMonthlyDateLog.order(id: :asc).where(at_user_bank_account_id: account.id).pluck("monthly_date").first
+      Entities::AtSyncTransactionMonthlyDateLog.order(id: :asc).where(at_user_bank_account_id: account.id).first
     when "at_user_emoney_service_account_id"
-      Entities::AtSyncTransactionMonthlyDateLog.order(id: :asc).where(at_user_emoney_service_account_id: account.id).pluck("monthly_date").first
+      Entities::AtSyncTransactionMonthlyDateLog.order(id: :asc).where(at_user_emoney_service_account_id: account.id).first
     end
   end
 
@@ -47,7 +47,7 @@ class Services::AtSyncTransactionMonthlyDateLogService
   end
 
   def self.save_at_sync_tran_monthly_date_log(monthly_trans)
-    return if monthly_trans.present?
+    return unless monthly_trans.present?
     is_uniqued_monthly_trans = monthly_trans.uniq
     Entities::AtSyncTransactionMonthlyDateLog.import is_uniqued_monthly_trans
   end
