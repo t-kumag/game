@@ -85,16 +85,17 @@ class Services::AtBankTransactionService
 
     transactions[:is_account_shared] = bank.share
     transaction_ids = bank.at_user_bank_transactions.where(trade_date: @from..@to).pluck(:id)
+
+    at_sync_transaction_monthly_log = Services::AtSyncTransactionMonthlyDateLogService
+                                           .fetch_monthly_tran_date_from_spec_date(account_id, @from, "at_user_bank_account")
+
     # 基本的に2019-08-21 00:00:00 のよう形でデータが取得できるため、23:59:59など細かい秒数は取得する必要がない。
     # そのため、一日前の取得になっている。
     one_day_before_from = @from.yesterday
-
-    at_sync_transaction_monthly_logs = Services::AtSyncTransactionMonthlyDateLogService
-                                           .fetch_monthly_transaction_date_from_specified_date_first(account_id, one_day_before_from, "at_user_bank_account")
     prev_transaction = nil
-    if at_sync_transaction_monthly_logs.present?
+    if at_sync_transaction_monthly_log.present?
       prev_transaction = bank.at_user_bank_transactions.order(trade_date: :desc)
-                             .where(trade_date: at_sync_transaction_monthly_logs..one_day_before_from).first
+                             .where(trade_date: at_sync_transaction_monthly_log.monthly_date..one_day_before_from).first
     end
 
     transactions[:prev_from_date] = prev_transaction.try(:trade_date) ? prev_transaction.trade_date.strftime('%Y-%m-%d %H:%M:%S') : nil

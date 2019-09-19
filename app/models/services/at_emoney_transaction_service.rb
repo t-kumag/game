@@ -91,17 +91,18 @@ class Services::AtEmoneyTransactionService
 
     transactions[:is_account_shared] = emoney.share
     transaction_ids = emoney.at_user_emoney_transactions.where(used_date: @from..@to).pluck(:id)
+
+    at_sync_transaction_monthly_log = Services::AtSyncTransactionMonthlyDateLogService
+                                           .fetch_monthly_tran_date_from_spec_date(account_id, @from, "at_user_emoney_service_account")
+
     # 基本的に2019-08-21 00:00:00 のよう形でデータが取得できるため、23:59:59など細かい秒数は取得する必要がない。
     # そのため、一日前の取得になっている。
     one_day_before_from = @from.yesterday
 
-    at_sync_transaction_monthly_logs = Services::AtSyncTransactionMonthlyDateLogService
-                                           .fetch_monthly_transaction_date_from_specified_date_first(account_id, one_day_before_from, "at_user_emoney_service_account")
-
     prev_transaction = nil
-    if at_sync_transaction_monthly_logs.present?
+    if at_sync_transaction_monthly_log.present?
       prev_transaction = emoney.at_user_emoney_transactions.order(used_date: :desc)
-                             .where(used_date: at_sync_transaction_monthly_logs..one_day_before_from).first
+                             .where(used_date: at_sync_transaction_monthly_log.monthly_date..one_day_before_from).first
     end
 
     transactions[:prev_from_date] = prev_transaction.try(:used_date) ? prev_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S') : nil
