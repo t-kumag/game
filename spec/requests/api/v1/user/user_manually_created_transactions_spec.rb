@@ -15,10 +15,12 @@ RSpec.describe 'user_manually_created_transactions_controller' do
   let!(:at_grouped_category) { create(:at_grouped_category) } 
   let!(:at_transaction_category) { create(:at_transaction_category) }
   let(:user_manually_created_transaction) { 
-    create(:user_manually_created_transaction, 
+    create(
+      :user_manually_created_transaction, 
       :with_user_distributed_transaction,
-      user_id: user.id
-  )}
+      user_id: user.id 
+    )
+  }
   let(:user_manually_created_transaction_after_update) { 
     Entities::UserManuallyCreatedTransaction.find_by(user_id: user.id) 
   } 

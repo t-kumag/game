@@ -24,5 +24,17 @@ FactoryBot.define do
     error_count   { 0 }
 
     at_bank
+
+    trait :with_at_user_bank_transactions do
+      after(:create) do |at_user_bank_account|
+        at_user_bank_account.at_user_bank_transactions = []
+        at_user_bank_account.at_user_bank_transactions << 
+        create(
+          :at_user_bank_transaction, 
+          :with_at_user_bank_transactions, 
+          at_user_bank_account_id: at_user_bank_account.id
+        )
+      end
+    end
   end
 end

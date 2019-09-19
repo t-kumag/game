@@ -15,5 +15,14 @@ FactoryBot.define do
     at_transaction_category_id { 1 }
     confirm_type               { nil }
 
+    trait :with_at_user_bank_transactions do
+      after(:create) do |at_user_bank_transaction|
+        at_user_bank_transaction.user_distributed_transaction = 
+          create(
+            :user_distributed_transaction, 
+            at_user_bank_transaction_id: at_user_bank_transaction.id
+          )
+      end
+    end
   end
 end
