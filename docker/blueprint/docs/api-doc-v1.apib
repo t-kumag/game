@@ -1,0 +1,128 @@
+# Group ユーザー系
+/api/v1/user/xxx系
+
+## Profiles [/api/v1/user/profiles]
+Resource of Profiles
+
+### ユーザプロフィール取得 [GET]
+
++ Request ユーザプロフィール取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": {
+                    "user_id": 1,
+                    "gender": 0,
+                    "birthday": "2019-01-01",
+                    "has_child": 0,
+                    "push": 0,
+                    "img_url": "osidori.png"
+                }
+            }
+
+
+### ユーザプロフィール登録 [POST]
+
++ Request ユーザプロフィール登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+    
+    + Body
+
+            {
+                "gender": 0,
+                "birthday": "2019-01-01",
+                "has_child": 0,
+                "push": false
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
+### ユーザプロフィール更新 [PUT]
+
++ Request ユーザプロフィール更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+            
+    + Body
+
+        
+            {
+                "gender": 0,
+                "birthday": "2019-01-01",
+                "has_child": 0,
+                "push": false
+            }
+
+        
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+        
+# Group グループ系
+/api/v1/group/xxx系
+
+# Group その他
+/api/v1/xxx系
+
+## Auth [/api/v1/auth/login]
+
+### ログイン [POST]
+
++ Request ログイン (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+    
+    + Body
+
+            {
+                "email": "osidori@email.com",
+                "password": "password"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": {
+                    "access_token": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+                    "access_token_expires_at": "2019-01-01T01:00:00.000+09:00"
+                }
+            }
+
+
+## Auth [/api/v1/auth/logout]
+
+### ログアウト [DELETE]
+
++ Request ログアウト (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+    
++ Response 200 (application/json)
+
+    + Body
+
+            {}
