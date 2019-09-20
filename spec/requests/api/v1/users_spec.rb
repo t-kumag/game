@@ -1,33 +1,38 @@
 require 'rails_helper'
 
-describe 'users_controller' do
-  it 'POST #create' do
-    params = {
-      "email" => "test1@example.com",
-      "password" => "testtest"
-    }
+RSpec.describe 'users_controller' do
+  describe '#create' do
+    let(:params) { { email: 'test1@example.com', password: 'testtest' } } 
+    let(:user_after_create) { Entities::User.find_by(email: params[:email]) }
 
-    expect { 
-      post "/api/v1/users", 
-      params: params,
-      headers: @headers 
-    }.to change(Entities::User, :count).by(+1)
+    context 'success' do
+      it 'response 200' do
+        post '/api/v1/users', params: params 
+        expect(response.status).to eq 200
+      end
 
-    @user = Entities::User.find_by(email: params["email"])
-    expect(Entities::UserProfile.where(user_id: @user.id)).to exist
-    expect(response.status).to eq 200
+      it 'increase one record of users' do
+        post '/api/v1/users', params: params
+        expect(Entities::User.where(id: user_after_create.id)).to exist
+      end
+
+      it 'increase one record of user_profiles' do
+        post '/api/v1/users', params: params
+        expect(Entities::UserProfile.where(user_id: user_after_create.id)).to exist
+      end
+    end
   end
 
-  it 'POST #resend' do
-    @user = create(:user, email_authenticated: 0)
-    @headers = { "Authorization" => "Bearer " + @user.token}
+  describe '#resend' do
+    let(:user) { create(:user, email_authenticated: 0) }
+    let(:headers) { { Authorization: 'Bearer ' + user.token } }
+    let(:params) { { email: 'test1@example.com'} } 
 
-    params = {
-      "email" => @user.email
-    }
-    
-    post "/api/v1/user/resend", params: params, headers: @headers 
-    expect(response.status).to eq 200
+    context 'success' do
+      it 'response 200' do
+        post '/api/v1/user/resend', params: params, headers: headers 
+        expect(response.status).to eq 200
+      end
+    end
   end
-
 end

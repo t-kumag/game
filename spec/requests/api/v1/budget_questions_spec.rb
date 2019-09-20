@@ -1,38 +1,37 @@
 require 'rails_helper'
 
-describe 'budget_questions_controller' do
-  before(:each) do
-    @user = create(:user)
-    @headers = { "Authorization" => "Bearer " + @user.token}
+RSpec.describe 'budget_questions_controller' do
+  let(:user) { create(:user) }
+  let(:headers) { { Authorization: 'Bearer ' + user.token } }
+  let(:params) { {
+    budget_questions: [
+      {
+        budget_question_id: 1,
+        step: 1
+      },
+      {
+        budget_question_id: 3,
+        step: 2
+      },
+      {
+        budget_question_id: 5,
+        step: 3
+      }
+    ]
+  } }
+  let!(:budget_questions) { create_list(:budget_question, 10) }
+  
+  describe '#create' do
+    context 'success' do
+      it 'response 200' do
+        post '/api/v1/budget-questions', params: params, headers: headers 
+        expect(response.status).to eq 200
+      end
+
+      it 'increase three record of user_budget_questions' do
+        post '/api/v1/budget-questions', params: params, headers: headers 
+        expect(Entities::UserBudgetQuestion.where(user_id: user.id).count).to eq 3
+      end
+    end
   end
-
-  it 'POST #create' do
-    create_list(:budget_question, 10)
-    
-    params = {
-      budget_questions: [
-        {
-          budget_question_id: 1,
-          step: 1
-        },
-        {
-          budget_question_id: 3,
-          step: 2
-        },
-        {
-          budget_question_id: 5,
-          step: 3
-        }
-      ]
-    }
-
-    expect { 
-      post "/api/v1/budget-questions", 
-      params: params, 
-      headers: @headers 
-    }.to change(Entities::UserBudgetQuestion, :count).by(+3)
-
-    expect(response.status).to eq 200
-  end
-
 end
