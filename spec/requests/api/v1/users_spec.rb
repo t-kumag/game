@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'users_controller' do
+RSpec.describe Api::V1::UsersController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token } }
   let(:params) { { email: user.email } } 
@@ -16,12 +16,12 @@ RSpec.describe 'users_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'increase one record of users' do
+      it 'created a users record' do
         post '/api/v1/users', params: params
         expect(Entities::User.where(id: user_after_create.id)).to exist
       end
 
-      it 'increase one record of user_profiles' do
+      it 'created a user_proifiles record' do
         post '/api/v1/users', params: params
         expect(Entities::UserProfile.where(user_id: user_after_create.id)).to exist
       end
@@ -46,7 +46,7 @@ RSpec.describe 'users_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'user_after_create.token is not equal user.token' do
+      it 'token is updated' do
         post '/api/v1/users/change_password_request', params: params, headers: headers
         expect(user_after_create.token).not_to eq user.token
       end
@@ -74,4 +74,16 @@ RSpec.describe 'users_controller' do
       end
     end
   end
+
+  # #510をマージ後に動作検証
+  # describe '#at_url' do
+  #   let(:user) { create(:user, :with_at_user_all_accounts) } 
+
+  #   context 'success' do
+  #     it 'response 200' do
+  #       get '/api/v1/users/change_password', headers: headers 
+  #       expect(response.status).to eq 200
+  #     end
+  #   end
+  # end
 end
