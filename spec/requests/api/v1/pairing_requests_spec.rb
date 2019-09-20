@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe 'pairing_requests_controller' do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token } }
-
-  xdescribe '#generate_pairing_token' do
+  
+  describe '#generate_pairing_token' do
     let(:pairing_request_after_generate) { Entities::PairingRequest.find_by(from_user_id: user.id) } 
 
     context 'success' do
