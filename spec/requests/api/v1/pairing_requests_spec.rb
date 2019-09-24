@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'pairing_requests_controller' do
+RSpec.describe Api::V1::PairingRequestsController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token } }
   
