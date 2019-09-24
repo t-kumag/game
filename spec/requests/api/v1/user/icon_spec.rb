@@ -1,38 +1,40 @@
 require 'rails_helper'
 
-describe 'icon_controller' do
-  before(:each) do
-    @user = create(:user)
-    @headers = { "Authorization" => "Bearer " + @user.token}
+RSpec.describe 'icon_controller' do
+  let(:user) { create(:user) } 
+  let(:headers) { { Authorization: 'Bearer ' + user.token } } 
+  let(:params) { { img_url: 'test.jpg' } } 
+  
+  describe '#create' do
+    context 'success' do
+      it 'response 200' do
+        post '/api/v1/user/icon', params: params, headers: headers
+        expect(response.status).to eq 200
+      end
+  
+      it 'increase one record of user_icons' do
+        post '/api/v1/user/icon', params: params, headers: headers
+        expect(Entities::UserIcon.where(user_id: user.id)).to exist
+      end
+    end
   end
+  
+  describe '#update' do
+    let(:user_icon_after_update) { Entities::UserIcon.find_by(user_id: user.id) }
 
-  it 'POST #create' do
-    params = {
-      "img_url" => "test.jpg",
-    }
-    
-    expect { 
-      post "/api/v1/user/icon",
-      params: params, 
-      headers: @headers
-    }.to change(Entities::UserIcon, :count).by(+1)
-    
-    expect(response.status).to eq 200
+    context 'success' do
+      let(:params) { { img_url: 'sample.jpg' } } 
+      let!(:user_icon) { create(:user_icon, user_id: user.id) } 
+
+      it 'response 200' do
+        put '/api/v1/user/icon', params: params, headers: headers
+        expect(response.status).to eq 200
+      end
+
+      it 'img_url is updated' do
+        put '/api/v1/user/icon', params: params, headers: headers
+        expect(user_icon_after_update.img_url).to eq params[:img_url]
+      end
+    end
   end
-
-  it 'PUT #update' do
-    create(:user_icon, user_id: @user.id)
-
-    params = {
-      "img_url" => "after.jpg",
-    }
-    
-    put "/api/v1/user/icon", params: params, headers: @headers
-    
-    @user_icon = Entities::UserIcon.find_by(user_id: @user.id)
-    
-    expect(@user_icon.img_url).to eq params["img_url"]
-    expect(response.status).to eq 200
-  end
-
 end

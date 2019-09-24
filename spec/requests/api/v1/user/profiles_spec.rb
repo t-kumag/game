@@ -1,58 +1,94 @@
 require 'rails_helper'
 
-describe 'profiles_controller' do
-  before(:each) do
-    @user = create(:user)
-    @headers = { "Authorization" => "Bearer " + @user.token}
+RSpec.describe 'profiles_controller' do
+  let(:user) { create(:user) } 
+  let(:headers) { { Authorization: 'Bearer ' + user.token } } 
+  let(:params) { { 
+    gender: 0, 
+    birthday: '2019-01-01',
+    has_child: 0, 
+    push: true
+  } } 
+  
+  describe '#create' do
+    context 'success' do
+      it 'response 200' do
+        post '/api/v1/user/profiles', params: params, headers: headers 
+        expect(response.status).to eq 200
+      end
+
+      it 'increase one record of profile' do
+        post '/api/v1/user/profiles', params: params, headers: headers 
+        expect(Entities::UserProfile.where(user_id: user.id)).to exist
+      end
+    end
   end
 
-  it 'POST #create' do
-    params = {
-      "gender" => 0,
-      "birthday" => "2019-01-01",
-      "has_child" => 0,
-      "push" => true,
-    }
-    
-    expect { 
-      post "/api/v1/user/profiles", 
-      params: params, 
-      headers: @headers 
-    }.to change(Entities::UserProfile, :count).by(+1)
-    
-    expect(response.status).to eq 200
+  describe '#update' do
+    let(:params) { { 
+      gender: 1, 
+      birthday: '2019-01-01',
+      has_child: 1, 
+      push: false
+    } }
+    let!(:user_profile) { create(:user_profile, user_id: user.id) }
+    let(:user_profile_after_update) { Entities::UserProfile.find_by(user_id: user.id) }
+
+    context 'success' do
+      it 'response 200' do
+        put '/api/v1/user/profiles', params: params, headers: headers
+        expect(response.status).to eq 200
+      end
+
+      it 'gender is updated' do
+        put '/api/v1/user/profiles', params: params, headers: headers
+        expect(user_profile_after_update.gender).to eq params[:gender]
+      end
+
+      it 'has_child is updated' do
+        put '/api/v1/user/profiles', params: params, headers: headers
+        expect(user_profile_after_update.has_child).to eq params[:has_child]
+      end
+      
+      it 'push is updated' do
+        put '/api/v1/user/profiles', params: params, headers: headers
+        expect(user_profile_after_update.push).to eq params[:push]
+      end
+    end
   end
 
-  it 'PUT #update' do
-    create(:user_profile, user_id: @user.id)
+  describe '#show' do
+    let!(:user_profile) { create(:user_profile, user_id: user.id) }
 
-    params = {
-      "gender" => 1,
-      "birthday" => "2019-01-01",
-      "has_child" => 1,
-      "push" => false,
-    }
-    
-    put "/api/v1/user/profiles", params: params, headers: @headers
-    
-    @user_profile = Entities::UserProfile.find_by(user_id: @user.id)
-    
-    expect(@user_profile.gender).to eq params["gender"]
-    expect(@user_profile.has_child).to eq params["has_child"]
-    expect(@user_profile.push).to eq params["push"]
-    expect(response.status).to eq 200
-  end
+    context 'success' do
+      it 'response 200' do
+        get '/api/v1/user/profiles', headers: headers
+        expect(response.status).to eq 200
+      end
 
-  it 'GET #show' do
-    @user_profile = create(:user_profile, user_id: @user.id)
+      it 'user_id is user.id' do
+        get '/api/v1/user/profiles', headers: headers
+        json = JSON.parse(response.body)
+        expect(json['app']['user_id']).to eq user.id
+      end
 
-    get "/api/v1/user/profiles", headers: @headers
-    json = JSON.parse(response.body)
+      it 'gender is user_profile.gender' do
+        get '/api/v1/user/profiles', headers: headers
+        json = JSON.parse(response.body)
+        expect(json['app']['gender']).to eq user_profile.gender
+      end
+      
+      it 'has_child is user_profile.has_child' do
+        get '/api/v1/user/profiles', headers: headers
+        json = JSON.parse(response.body)
+        expect(json['app']['has_child']).to eq user_profile.has_child
+      end
 
-    expect(json['app']['user_id']).to eq @user.id
-    expect(json['app']['gender']).to eq @user_profile.gender
-    expect(json['app']['has_child']).to eq @user_profile.has_child
-    expect(json['app']['push']).to eq @user_profile.push
-    expect(response.status).to eq 200
+      it 'push is user_profile.push' do
+        get '/api/v1/user/profiles', headers: headers
+        json = JSON.parse(response.body)
+        expect(json['app']['push']).to eq user_profile.push
+      end
+    end
   end
 end
