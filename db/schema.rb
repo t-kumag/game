@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_08_14_021458) do
+ActiveRecord::Schema.define(version: 2019_09_12_125220) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -77,6 +77,18 @@ ActiveRecord::Schema.define(version: 2019_08_14_021458) do
     t.datetime "updated_at", null: false
     t.index ["at_user_bank_account_id"], name: "index_at_sync_transaction_logs_on_at_user_bank_account_id"
     t.index ["at_user_card_account_id"], name: "index_at_sync_transaction_logs_on_at_user_card_account_id"
+    t.index ["at_user_emoney_service_account_id"], name: "index_a_s_t_l_on_at_user_emoney_service_account_id"
+  end
+
+  create_table "at_sync_transaction_monthly_date_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.datetime "monthly_date", null: false
+    t.bigint "at_user_bank_account_id"
+    t.bigint "at_user_card_account_id"
+    t.bigint "at_user_emoney_service_account_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_bank_account_id"], name: "index_a_s_t_l_on_at_user_bank_account_id"
+    t.index ["at_user_card_account_id"], name: "index_a_s_t_l_on_at_user_card_account_id"
     t.index ["at_user_emoney_service_account_id"], name: "index_a_s_t_l_on_at_user_emoney_service_account_id"
   end
 
@@ -516,6 +528,9 @@ ActiveRecord::Schema.define(version: 2019_08_14_021458) do
   add_foreign_key "at_sync_transaction_logs", "at_user_bank_accounts"
   add_foreign_key "at_sync_transaction_logs", "at_user_card_accounts"
   add_foreign_key "at_sync_transaction_logs", "at_user_emoney_service_accounts"
+  add_foreign_key "at_sync_transaction_monthly_date_logs", "at_user_bank_accounts"
+  add_foreign_key "at_sync_transaction_monthly_date_logs", "at_user_card_accounts"
+  add_foreign_key "at_sync_transaction_monthly_date_logs", "at_user_emoney_service_accounts"
   add_foreign_key "at_user_bank_accounts", "at_banks"
   add_foreign_key "at_user_bank_accounts", "at_users"
   add_foreign_key "at_user_bank_transactions", "at_transaction_categories"
