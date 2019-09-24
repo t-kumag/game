@@ -81,7 +81,7 @@ RSpec.describe Api::V1::UsersController do
 
   #   context 'success' do
   #     it 'response 200' do
-  #       get '/api/v1/users/change_password', headers: headers 
+  #       get '/api/v1/users/at-url', headers: headers 
   #       expect(response.status).to eq 200
   #     end
   #   end
