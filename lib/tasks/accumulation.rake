@@ -13,7 +13,7 @@ namespace :accumulation do
         old_goal_and_goal_logs = {}
         g.goal_settings.each do |gs|
           next unless gs.at_user_bank_account.present?
-          next unless check_balance?(g, gs, gs.at_user_bank_account) || check_goal_amount?(g)
+          next unless check_balance?(g, gs, gs.at_user_bank_account) && check_goal_amount?(g)
 
           goal = Services::GoalService.get_goal(g, gs)
           goal_log =  Services::GoalLogService.get_goal_log(g, gs)
