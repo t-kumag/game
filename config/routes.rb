@@ -127,36 +127,36 @@ Rails.application.routes.draw do
     namespace :v2 do
       # 個人用
       namespace :user do
-        resources :bank_accounts, :path => '/bank-accounts' do
-          resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
+        resources :bank_accounts, path: '/bank-accounts' do
+          resources :bank_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
 
-        resources :card_accounts, :path => '/card-accounts' do
-          resources :card_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
+        resources :card_accounts, path: '/card-accounts' do
+          resources :card_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
 
-        resources :emoney_accounts, :path => '/emoney-accounts'do
-          resources :emoney_transactions, :path => '/transactions', on: :member, :only => [:index, :show, :update] do
+        resources :emoney_accounts, path: '/emoney-accounts'do
+          resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
       end
 
       # 共有用
       namespace :group do
-        resources :bank_accounts, :path => '/bank-accounts' do
-          resources :bank_transactions, :path => '/transactions', on: :member, :only => [:index] do
+        resources :bank_accounts, path: '/bank-accounts' do
+          resources :bank_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
 
-        resources :card_accounts, :path => '/card-accounts' do
-          resources :card_transactions, :path => '/transactions', on: :member, :only => [:index] do
+        resources :card_accounts, path: '/card-accounts' do
+          resources :card_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
 
-        resources :emoney_accounts, :path => '/emoney-accounts' do
-          resources :emoney_transactions, :path => '/transactions', on: :member, :only => [:index] do
+        resources :emoney_accounts, path: '/emoney-accounts' do
+          resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
       end
