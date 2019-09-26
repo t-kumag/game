@@ -17,5 +17,4 @@ class Api::V2::Group::CardTransactionsController < ApplicationController
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
-
 end
