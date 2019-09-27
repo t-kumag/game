@@ -99,13 +99,13 @@ class Services::AtEmoneyTransactionService
     # そのため、一日前の取得になっている。
     one_day_before_from = @from.yesterday
 
-    prev_transaction = nil
+    next_transaction_used_date = nil
     if at_sync_transaction_monthly_log.present?
-      prev_transaction = emoney.at_user_emoney_transactions.order(used_date: :desc)
+      next_transaction_used_date = emoney.at_user_emoney_transactions.order(used_date: :desc)
                              .where(used_date: at_sync_transaction_monthly_log.monthly_date..one_day_before_from).first
     end
 
-    transactions[:prev_from_date] = prev_transaction.try(:used_date) ? prev_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S') : nil
+    transactions[:next_transaction_used_date] = next_transaction_used_date.try(:used_date) ? next_transaction_used_date.used_date.strftime('%Y-%m-%d %H:%M:%S') : nil
 
     return {} if transaction_ids.blank?
 

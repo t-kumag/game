@@ -13,4 +13,4 @@ json.transactions do
     json.transaction_id transaction.at_user_card_transaction_id
   end
 end
-json.next_transaction_used_date @transactions[:prev_from_date]
+json.next_transaction_used_date @transactions[:next_transaction_used_date]
