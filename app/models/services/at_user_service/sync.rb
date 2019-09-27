@@ -103,6 +103,8 @@ class Services::AtUserService::Sync
 
       src_trans = []
       activities = []
+      monthly_trans = []
+      last_at_sync_tran_monthly_date = Services::AtSyncTransactionMonthlyDateLogService.fetch_last_one(financier_account_type_key, a)
       if res.key?(rec_key) && !res[rec_key].blank?
         res[rec_key].each do |i|
           # 文字をintに、空文字の場合は0に変換
@@ -133,9 +135,13 @@ class Services::AtUserService::Sync
           src_trans << tran
 
           activity = get_activity(financier_account_type_key, tran, a, activities)
+          monthly_trans << fetch_monthly_tran(financier_account_type_key, tran, last_at_sync_tran_monthly_date)
           activities << activity if activity.present?
         end
       end
+
+      monthly_trans.compact!
+      Services::AtSyncTransactionMonthlyDateLogService.save_at_sync_tran_monthly_date_log(monthly_trans)
       transaction_entity.import src_trans, on_duplicate_key_update: data_column.map { |k, _v| k }, validate: false
       Services::ActivityService.save_activities(activities)
       Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
@@ -312,5 +318,15 @@ class Services::AtUserService::Sync
     check_difference_date = latest_sync_date.present? && latest_sync_date < activity[:date] ? true : false
 
     return activity if check_duplicate_activity && check_difference_date
+  end
+
+  def fetch_monthly_tran(financier_account_type_key, tran, last_at_sync_tran_monthly_date)
+    at_sync_tran_monthly_date_log = Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran)
+    return at_sync_tran_monthly_date_log unless last_at_sync_tran_monthly_date.present?
+    # time関数の表記とDBとでは時間の表示のずれがありこの処理を追加
+    # Sun, 01 Sep 2019 00:00:00 JST +09:00
+    # :monthly_date=>"2019-09-01 00:00:00" 　→　こちらで統一
+    last_at_sync_tran_monthly_date = last_at_sync_tran_monthly_date.monthly_date.strftime('%Y-%m-01 %H:%M:%S')
+    at_sync_tran_monthly_date_log unless at_sync_tran_monthly_date_log[:monthly_date]  <= last_at_sync_tran_monthly_date ? true : false
   end
 end

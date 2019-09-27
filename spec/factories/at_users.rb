@@ -14,10 +14,65 @@ FactoryBot.define do
     at_user_id { "test" }
     deleted_at { nil }
 
+    after(:create) do |at_user|
+      at_user.at_user_tokens = []
+      at_user.at_user_tokens << create(:at_user_token, at_user_id: at_user.id)
+    end
+
     trait :with_at_user_bank_accounts do
       after(:create) do |at_user|
         at_user.at_user_bank_accounts = []
         at_user.at_user_bank_accounts << create(:at_user_bank_account, at_user_id: at_user.id)
+      end
+    end
+
+    trait :with_at_user_bank_transactions do
+      after(:create) do |at_user|
+        at_user.at_user_bank_accounts = []
+        at_user.at_user_bank_accounts << 
+        create(
+          :at_user_bank_account, 
+          :with_at_user_bank_transactions, 
+          at_user_id: at_user.id
+        )
+      end
+    end
+
+    trait :with_at_user_card_accounts do
+      after(:create) do |at_user|
+        at_user.at_user_card_accounts = []
+        at_user.at_user_card_accounts << create(:at_user_card_account, at_user_id: at_user.id)
+      end
+    end
+
+    trait :with_at_user_card_transactions do
+      after(:create) do |at_user|
+        at_user.at_user_card_accounts = []
+        at_user.at_user_card_accounts << 
+        create(
+          :at_user_card_account, 
+          :with_at_user_card_transactions, 
+          at_user_id: at_user.id
+        )
+      end
+    end
+
+    trait :with_at_user_emoney_accounts do
+      after(:create) do |at_user|
+        at_user.at_user_emoney_service_accounts = []
+        at_user.at_user_emoney_service_accounts << create(:at_user_emoney_service_account, at_user_id: at_user.id)
+      end
+    end
+
+    trait :with_at_user_emoney_transactions do
+      after(:create) do |at_user|
+        at_user.at_user_emoney_service_accounts = []
+        at_user.at_user_emoney_service_accounts << 
+        create(
+          :at_user_emoney_service_account, 
+          :with_at_user_emoney_transactions, 
+          at_user_id: at_user.id
+        )
       end
     end
 

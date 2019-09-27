@@ -8,12 +8,12 @@
 #  expires_at :datetime
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#
 
-# FactoryBot.define do
-#   factory :at_user_token do
-#     at_user nil
-#     token "MyString"
-#     expires_at "2018-09-04 06:49:35"
-#   end
-# end
+FactoryBot.define do
+  factory :at_user_token, :class => Entities::AtUserToken do
+    at_user_id { nil } 
+    token      { "test" }
+    expires_at { nil } 
+    deleted_at { nil }
+  end
+end
