@@ -163,8 +163,8 @@ class Api::V1::Group::GoalsController < ApplicationController
   def get_partner_goal_setting_params
     params.require(:partner_goal_settings).permit(
         :at_user_bank_account_id,
-        :first_amount,
         :monthly_amount,
+        :first_amount
     ).merge(user_id: @current_user.partner_user.id)
   end
 
