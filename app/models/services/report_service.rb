@@ -1,46 +1,56 @@
 =begin
 課金仕様 p.21
 Usage:
-Services::ReportService.new(user) 自分
-Services::ReportService(partner) パートナー
-Services::ReportService(user, partner) 自分かつパートナー
+Services::ReportService.new(user, nil, '2019-06-01', '2019-09-30') 自分
+Services::ReportService(partner, nil, '2019-06-01', '2019-09-30') パートナー
+Services::ReportService(user, partner, nil, '2019-06-01', '2019-09-30') 自分かつパートナー
 
 構成する要素ごとにObjectを生成する
-report_element1 = Services::ReportService.new(user) 自分
-report_element2 = Services::ReportService.new(partner) パートナー
+report_element1 = Services::ReportService.new(user, nil, '2019-06-01', '2019-09-30' ) 自分
+report_element2 = Services::ReportService.new(partner, nil, '2019-06-01', '2019-09-30') パートナー
 =end
 
 class Services::ReportService
-  attr_reader :user, :partner, :with_partner
+  attr_reader :user, :partner, :from, :to
 
   # userには自分自身か相手のどちらかを指定する
   # partner
-  def initialize(user, partner=nil)
+  def initialize(user, partner=nil, from, to)
     @user = user
     @partner = partner
-    @with_partner = with_partner
-    @from #月初
-    @to #月末
+    @from = from ? Time.parse(from).beginning_of_day : Time.zone.today.beginning_of_month.beginning_of_day
+    @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
   end
 
+  #TODO: WrapperClassを用意する Entities::Finance
+  def bank_ids
+    return [] unless @user.try()
+    if @partner
+
+    end
+  end
   # 指定した月の銀行残高 from toで範囲指定なので必要なければ削除
   # Entities::BalanceLog
-  def bank_balance
+  def sum_bank_balance
+    Entities::BalanceLog.bank_balances(ids, from, to)
   end
 
   # 指定した月の電子マネー残高 from toで範囲指定なので必要なければ削除
   # Entities::BalanceLog
-  def emoney_balance
+  def sum_emoney_balance
+    Entities::BalanceLog.emoney_balances(ids, from, to)
   end
 
   # 指定した月の銀行残高一覧 資産推移グラフ ３ヶ月などまとまった単位で必要
   # Entities::BalanceLog
   def bank_balances
+    Entities::BalanceLog.bank_balances(ids, from, to)
   end
 
   # 指定した月の電子マネー残高一覧 資産推移グラフ ３ヶ月などまとまった単位で必要
   # Entities::BalanceLog
   def emoney_balances
+    Entities::BalanceLog.emoney_balances(ids, from, to)
   end
 
   # 振り分け金額合計
