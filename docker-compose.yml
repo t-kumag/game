@@ -13,7 +13,9 @@ services:
       - DB_HOST=db # osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
       - DB_PORT=3306
       - DB_NAME=dev_osdr_db
+      - DB_TEST_NAME=test_osdr_db
       - DB_USER=devusr
+      - DB_TEST_USER=testusr
       - DB_PWD=pass
       - TZ=Asia/Tokyo
       - REDIS_HOST=redis
@@ -78,8 +80,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: pwd
       MYSQL_USER: devusr
+      MYSQL_TEST_USER: testusr
       MYSQL_PASSWORD: pass
       MYSQL_DATABASE: dev_osdr_db
+      MYSQL_TEST_DATABASE: test_osdr_db
       TZ: "Asia/Tokyo"
     ports:
       - 3307:3306
@@ -99,3 +103,14 @@ services:
     command: redis-server --appendonly yes
     volumes:
       - .docker/redis/data:/data
+
+  blueprint:
+    container_name: blueprint
+    build: 
+      context: .
+      dockerfile: blueprint.Dockerfile
+    ports:
+      - 8000:8000
+    volumes:
+      - ./docker/blueprint/docs:/blueprint/docs
+      - ./docker/blueprint/output:/blueprint/output
