@@ -73,8 +73,10 @@ class Api::V1::Group::GoalsController < ApplicationController
     render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if goal.blank?
     goal_setting = is_checked_goal_settings(goal, params[:goal_settings])
     partner_goal_setting = is_checked_goal_settings(goal, params[:partner_goal_settings])
-    render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return if goal_setting.blank? ||
-        partner_goal_setting.blank?
+
+    if goal_setting.blank? || partner_goal_setting.blank?
+      render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return
+    end
 
     # 頭金を入金する際に必要
     goal_service = Services::GoalService.new(@current_user)
@@ -162,9 +164,9 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def get_partner_goal_setting_params
     params.require(:partner_goal_settings).permit(
-        :at_user_bank_account_id,
-        :monthly_amount,
-        :first_amount
+      :at_user_bank_account_id,
+      :monthly_amount,
+      :first_amount
     ).merge(user_id: @current_user.partner_user.id)
   end
 
@@ -268,7 +270,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   def is_checked_goal_settings(goal, goal_settings)
     goal_setting = nil
     goal.goal_settings.each do |gs|
-     goal_setting = gs if gs.id == goal_settings[:goal_setting_id]
+      goal_setting = gs if gs.id == goal_settings[:goal_setting_id]
     end
     goal_setting
   end
