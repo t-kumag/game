@@ -1,4 +1,4 @@
-json.app do
+json.transactions do
   json.array!(@transactions[:user_distributed_transaction]) do |transaction|
     json.at_user_emoney_transaction_id transaction.at_user_emoney_transaction_id
     json.amount transaction.amount
@@ -13,3 +13,4 @@ json.app do
     json.transaction_id transaction.at_user_emoney_transaction_id
   end
 end
+json.next_transaction_used_date @transactions[:next_transaction_used_date]

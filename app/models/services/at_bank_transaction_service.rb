@@ -92,13 +92,13 @@ class Services::AtBankTransactionService
     # 基本的に2019-08-21 00:00:00 のよう形でデータが取得できるため、23:59:59など細かい秒数は取得する必要がない。
     # そのため、一日前の取得になっている。
     one_day_before_from = @from.yesterday
-    prev_transaction = nil
+    next_transaction = nil
     if at_sync_transaction_monthly_log.present?
-      prev_transaction = bank.at_user_bank_transactions.order(trade_date: :desc)
+      next_transaction = bank.at_user_bank_transactions.order(trade_date: :desc)
                              .where(trade_date: at_sync_transaction_monthly_log.monthly_date..one_day_before_from).first
     end
 
-    transactions[:prev_from_date] = prev_transaction.try(:trade_date) ? prev_transaction.trade_date.strftime('%Y-%m-%d %H:%M:%S') : nil
+    transactions[:next_transaction_used_date] = next_transaction.try(:trade_date) ? next_transaction.trade_date.strftime('%Y-%m-%d %H:%M:%S') : nil
 
     return {} if transaction_ids.blank?
     transactions[:user_distributed_transaction] = Entities::UserDistributedTransaction
@@ -106,7 +106,6 @@ class Services::AtBankTransactionService
                                                       .includes(:at_transaction_category)
                                                       .where(at_user_bank_transaction_id: transaction_ids)
                                                       .order(used_date: "DESC")
-
 
     transactions
 
