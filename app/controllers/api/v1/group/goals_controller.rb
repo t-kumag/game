@@ -71,8 +71,11 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if goal.blank?
-    goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
-    render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return if goal_setting.blank?
+    # goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
+    goal_setting = is_checked_goal_settings(goal, params[:goal_settings])
+    partner_goal_setting = is_checked_goal_settings(goal, params[:partner_goal_settings])
+    render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return if goal_setting.blank? ||
+        partner_goal_setting.blank?
 
     # 頭金を入金する際に必要
     goal_service = Services::GoalService.new(@current_user)
@@ -81,6 +84,7 @@ class Api::V1::Group::GoalsController < ApplicationController
       ActiveRecord::Base.transaction do
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
+        partner_goal_setting.update!(get_partner_goal_setting_params(false))
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
         end
@@ -157,11 +161,17 @@ class Api::V1::Group::GoalsController < ApplicationController
     ).merge(user_id: @current_user.id)
   end
 
-  def get_partner_goal_setting_params
-    params.require(:partner_goal_settings).permit(
-      :monthly_amount,
-      :first_amount
+  def goal_setting_params_first_amount_merge(goal_setting_params)
+    goal_setting_params.merge(first_amount: goal_params[:first_amount])
+  end
+
+  def get_partner_goal_setting_params(merge=true)
+    partner_goal_setting = params.require(:partner_goal_settings).permit(
+        :at_user_bank_account_id,
+        :monthly_amount,
     ).merge(user_id: @current_user.partner_user.id)
+    return goal_setting_params_first_amount_merge(partner_goal_setting) if merge
+    partner_goal_setting
   end
 
   def goal_params_merge(goal_params)
@@ -259,5 +269,13 @@ class Api::V1::Group::GoalsController < ApplicationController
   def create_goal_activity_log
     Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created)
     Services::ActivityService.create_user_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created)
+  end
+
+  def is_checked_goal_settings(goal, goal_settings)
+    goal_setting = nil
+    goal.goal_settings.each do |gs|
+     goal_setting = gs if gs.id == goal_settings[:goal_setting_id]
+    end
+    goal_setting
   end
 end
