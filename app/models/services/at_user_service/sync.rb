@@ -40,6 +40,8 @@ class Services::AtUserService::Sync
         )
         account[financier_type_key] = financier.id
         data_column.each do |k, v|
+          # AT からのレスポンスに含まれないカラムはスキップする
+          next if k == 'error_date' || k == 'error_count'
           if v[:opt].blank?
             account[k] = i[v[:col]]
           elsif v[:opt] == 'time_parse'
@@ -50,9 +52,15 @@ class Services::AtUserService::Sync
         lastAccount = account_entity.find_by(fnc_id: account['fnc_id'])
         # error_count が 1以上の場合はスクレイピングしないが、バッファされたRESULT_CODEでEが返るため
         # error_count が 1未満の場合のみエラーとして扱う
-        if ((account['last_rslt_cd'] === 'E' || account['last_rslt_cd'] === 'A') && lastAccount['error_count'] < 1)
-          account['error_date'] = lastAccount.present? && lastAccount['error_date'].blank? ? DateTime.now : lastAccount['error_date']
-          account['error_count'] = lastAccount['error_count'] + 1
+        if account['last_rslt_cd'] === 'E' || account['last_rslt_cd'] === 'A'
+          # 初回エラー発生時もエラーとしてカウントする
+          if lastAccount.nil?
+            account['error_date'] = DateTime.now
+            account['error_count'] = 1
+          elsif lastAccount['error_count'] < 1
+            account['error_date'] = lastAccount.present? && lastAccount['error_date'].blank? ? DateTime.now : lastAccount['error_date']
+            account['error_count'] = lastAccount['error_count'] + 1
+          end
           # バルクインサート時にUPDATEされるようハッシュにキーを追加する
           data_column.store('error_date', '')
           data_column.store('error_count', '')
