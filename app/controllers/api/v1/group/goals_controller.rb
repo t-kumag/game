@@ -71,8 +71,8 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if goal.blank?
-    goal_setting = is_checked_goal_settings(goal, params[:goal_settings])
-    partner_goal_setting = is_checked_goal_settings(goal, params[:partner_goal_settings])
+    goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
+    partner_goal_setting = Entities::GoalSetting.find_by(id: params[:partner_goal_settings][:goal_setting_id])
 
     if goal_setting.blank? || partner_goal_setting.blank?
       render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return
@@ -265,13 +265,5 @@ class Api::V1::Group::GoalsController < ApplicationController
   def create_goal_activity_log
     Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created)
     Services::ActivityService.create_user_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created)
-  end
-
-  def is_checked_goal_settings(goal, goal_settings)
-    goal_setting = nil
-    goal.goal_settings.each do |gs|
-      goal_setting = gs if gs.id == goal_settings[:goal_setting_id]
-    end
-    goal_setting
   end
 end
