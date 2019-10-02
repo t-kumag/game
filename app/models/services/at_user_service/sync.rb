@@ -58,7 +58,7 @@ class Services::AtUserService::Sync
             account['error_date'] = DateTime.now
             account['error_count'] = 1
           elsif lastAccount['error_count'] < 1
-            account['error_date'] = lastAccount.present? && lastAccount['error_date'].blank? ? DateTime.now : lastAccount['error_date']
+            account['error_date'] = lastAccount['error_date'].blank? ? DateTime.now : lastAccount['error_date']
             account['error_count'] = lastAccount['error_count'] + 1
           end
           # バルクインサート時にUPDATEされるようハッシュにキーを追加する
