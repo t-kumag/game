@@ -54,12 +54,9 @@ class Services::AtUserService::Sync
         # error_count が 1未満の場合のみエラーとして扱う
         if account['last_rslt_cd'] === 'E' || account['last_rslt_cd'] === 'A'
           # 初回エラー発生時もエラーとしてカウントする
-          if lastAccount.nil?
+          if lastAccount.nil? || lastAccount['error_count'] < 1
             account['error_date'] = DateTime.now
             account['error_count'] = 1
-          elsif lastAccount['error_count'] < 1
-            account['error_date'] = DateTime.now
-            account['error_count'] = lastAccount['error_count'] + 1
           end
           # バルクインサート時にUPDATEされるようハッシュにキーを追加する
           data_column.store('error_date', '')
