@@ -16,7 +16,7 @@ class Services::ActivityService
 
   def self.create_user_activity(user_id, group_id, used_date, activity_type)
     # 関数を作成しURLと対象の文言を取り出し
-    # message_and_url = fetch_activity_message_and_dest_url(activity_type)
+    # message_and_url = fetch_activity_message_and_url(activity_type)
 
     # DBは拡張する予定なので、保存する領域を増やす。
     # activity.url, activity.message,
@@ -100,6 +100,6 @@ class Services::ActivityService
   end
 
   # ここに関数を作成。アクティビティタイプを使って、文言を振り分ける。
-  # fetch_activity_message_and_dest_url(activity_type)
+  # fetch_activity_message_and_url(activity_type)
   # 一つの関数では一つの機能を守るように遵守する。
 end
