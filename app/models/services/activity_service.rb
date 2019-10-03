@@ -102,4 +102,27 @@ class Services::ActivityService
   # ここに関数を作成。アクティビティタイプを使って、文言を振り分ける。
   # fetch_activity_message_and_url(activity_type)
   # 一つの関数では一つの機能を守るように遵守する。
+
+  # 文言の取得方法について
+  # config/initializers/activity.rbに定義した定数を取得
+  # 定数は連想配列で定義され、引数によって文字を変換することができる
+  # その定数からtypeをキーにオブジェクトを取得
+  #
+  # オブジェクトの形は下記を想定
+  #
+  # 例１) ペアリングの場合
+  # {
+  #     message: "ペアリング完了しました。",
+  #     url: ""
+  # }
+  #
+  #
+  # 例１) 目標作成の場合
+  # {
+  #     message: "目標貯金「テスト目標」が作成されました。",
+  #     url: "osidori://"
+  # }
+  #
+  #
+  #
 end
