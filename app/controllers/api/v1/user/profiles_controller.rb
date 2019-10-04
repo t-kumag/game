@@ -34,6 +34,7 @@ class Api::V1::User::ProfilesController < ApplicationController
   def show
     @profile = @current_user.user_profile
     @icon    = @current_user.user_icon
+    @partner = @current_user.partner_user.present? ?  @current_user.partner_user : nil
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
 
