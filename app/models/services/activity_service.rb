@@ -21,7 +21,7 @@ class Services::ActivityService
     if goal.present?
       message_and_url = fetch_activity_goal_message_and_url(activity_type, goal)
     elsif transaction_id.present?
-      message_and_url = fetch_activity_message_and_url(activity_type)
+      message_and_url = fetch_activity_transaction_message_and_url(activity_type, transaction_id)
     else
       message_and_url = fetch_activity_message_and_url(activity_type)
     end
@@ -118,18 +118,18 @@ class Services::ActivityService
 
   end
 
-  #def self.fetch_activity_goal_message_and_url(activity_type, transaction)
-  #  activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
-  #  activity_message_and_url[:message] = printf(activity_message_and_url[:message], goal.name)
-  #  activity_message_and_url[:message] = printf(activity_message_and_url[:message], goal.name)
-  #  activity_message_and_url
-  #end
-
   def self.fetch_activity_goal_message_and_url(activity_type, goal)
     activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
     activity_message_and_url[:message] = printf(activity_message_and_url[:message], goal.name)
     activity_message_and_url
   end
+
+  def self.fetch_activity_transaction_message_and_url(activity_type, transaction)
+    activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
+    activity_message_and_url[:url] = printf(activity_message_and_url[:url], transaction.id)
+    activity_message_and_url
+  end
+
 
   # 一つの関数では一つの機能を守るように遵守する。
 

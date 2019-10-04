@@ -21,7 +21,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         end
         user_manually_create = Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
         Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
-                                                       transaction[:used_date], 'individual_manual_outcome', nil, user_manually_create.id)
+                                                       transaction[:used_date], 'individual_manual_outcome', nil, user_manually_create)
       end
 
     rescue => exception
