@@ -2,6 +2,9 @@ json.app do
   if @current_user.present?
     json.user_id  @current_user.id
   end
+  if @current_user.partner_user.present?
+    json.partner_id  @current_user.partner_user.id
+  end
   if @profile.present?
     json.gender  @profile.gender
     json.birthday  @profile.birthday
