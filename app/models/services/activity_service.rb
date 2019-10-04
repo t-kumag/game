@@ -14,19 +14,19 @@ class Services::ActivityService
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_user_activity(user_id, group_id, used_date, activity_type)
-    # 関数を作成しURLと対象の文言を取り出し
-    # message_and_url = fetch_activity_message_and_url(activity_type)
+  def self.create_user_activity(user_id, group_id, used_date, activity_type, goal=nil, transaction_id=nil)
 
-    # DBは拡張する予定なので、保存する領域を増やす。
-    # activity.url, activity.message,
-    Entities::Activity.find_or_create_by(user_id: user_id, date: used_date, activity_type: activity_type) do |activity|
-      activity.user_id = user_id
-      activity.group_id = group_id
-      activity.count = 0
-      activity.activity_type = activity_type
-      activity.date = used_date
+    message_and_url = nil
+
+    if goal.present?
+      message_and_url = fetch_activity_goal_message_and_url(activity_type, goal)
+    elsif transaction_id.present?
+      message_and_url = fetch_activity_message_and_url(activity_type)
+    else
+      message_and_url = fetch_activity_message_and_url(activity_type)
     end
+
+    activity_find_or_create(user_id, group_id, used_date, activity_type, message_and_url)
   end
 
   def self.set_activity_list(financier_account_type_key, tran, account, user)
@@ -99,8 +99,38 @@ class Services::ActivityService
     }
   end
 
-  # ここに関数を作成。アクティビティタイプを使って、文言を振り分ける。
-  # fetch_activity_message_and_url(activity_type)
+  def self.activity_find_or_create(user_id, group_id, used_date, activity_type, message_and_url)
+    # DBは拡張する予定なので、保存する領域を増やす。
+    # activity.url, activity.message,
+    Entities::Activity.find_or_create_by(user_id: user_id, date: used_date, activity_type: activity_type) do |activity|
+      activity.user_id = user_id
+      activity.group_id = group_id
+      activity.url = message_and_url[:url]
+      activity.count = 0
+      activity.activity_type = activity_type
+      activity.message = message_and_url[:message]
+      activity.date = used_date
+    end
+  end
+
+  def self.fetch_activity_message_and_url(activity_type)
+    ACTIVITY_TYPE::NAME[activity_type]
+
+  end
+
+  #def self.fetch_activity_goal_message_and_url(activity_type, transaction)
+  #  activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
+  #  activity_message_and_url[:message] = printf(activity_message_and_url[:message], goal.name)
+  #  activity_message_and_url[:message] = printf(activity_message_and_url[:message], goal.name)
+  #  activity_message_and_url
+  #end
+
+  def self.fetch_activity_goal_message_and_url(activity_type, goal)
+    activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
+    activity_message_and_url[:message] = printf(activity_message_and_url[:message], goal.name)
+    activity_message_and_url
+  end
+
   # 一つの関数では一つの機能を守るように遵守する。
 
   # 文言の取得方法について

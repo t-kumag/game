@@ -10,13 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_12_125220) do
+ActiveRecord::Schema.define(version: 2019_10_03_174339) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "group_id"
     t.integer "count", default: 0, null: false
     t.string "activity_type", null: false
+    t.string "url"
+    t.string "message"
     t.datetime "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -273,6 +275,17 @@ ActiveRecord::Schema.define(version: 2019_09_12_125220) do
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_at_users_on_deleted_at"
     t.index ["user_id"], name: "index_at_users_on_user_id"
+  end
+
+  create_table "balance_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_bank_account_id"
+    t.bigint "at_user_emoney_service_account_id"
+    t.integer "amount", default: 0, null: false
+    t.datetime "date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_bank_account_id"], name: "index_b_l_on_at_user_bank_account_id"
+    t.index ["at_user_emoney_service_account_id"], name: "index_b_l_on_at_user_emoney_service_account_id"
   end
 
   create_table "budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -545,6 +558,8 @@ ActiveRecord::Schema.define(version: 2019_09_12_125220) do
   add_foreign_key "at_user_emoney_transactions", "at_user_emoney_service_accounts"
   add_foreign_key "at_user_tokens", "at_users"
   add_foreign_key "at_users", "users"
+  add_foreign_key "balance_logs", "at_user_bank_accounts"
+  add_foreign_key "balance_logs", "at_user_emoney_service_accounts"
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
   add_foreign_key "goal_logs", "at_user_bank_accounts"
   add_foreign_key "goal_logs", "goals"
