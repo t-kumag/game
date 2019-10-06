@@ -115,7 +115,6 @@ class Services::ActivityService
 
   def self.fetch_activity_message_and_url(activity_type)
     ACTIVITY_TYPE::NAME[activity_type]
-
   end
 
   def self.fetch_activity_goal_message_and_url(activity_type, goal)
