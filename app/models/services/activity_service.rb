@@ -53,6 +53,10 @@ class Services::ActivityService
     check_duplication_old_act(latest_one, activity, activity_data_column)
   end
 
+  def self.fetch_activities(current_user, page)
+    Entities::Activity.where(user_id: current_user.id).order(created_at: "DESC").page(page)
+  end
+
   private
   def self.get_activity_data_column(financier_account_type_key)
     case financier_account_type_key

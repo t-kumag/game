@@ -3,9 +3,10 @@ json.meta do
 end
 json.activities do
   json.array!(@activities) do |n|
-    json.day n[:day]
-    json.type n[:type]
-    json.message n[:message]
+    json.day n.created_at.strftime('%Y-%m-%d')
+    json.type ""
+    json.url n.url
+    json.message n.message
   end
 end
 
