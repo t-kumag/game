@@ -90,4 +90,17 @@ RSpec.describe Api::V1::Group::GoalsController do
       end
     end
   end
+
+  describe '#add_money' do
+    let(:goal) { create(:goal, :with_goal_settings, user_id: user.id, group_id: user.group_id) }
+    let(:params) { { add_amount: 100000 } }
+
+    context 'success' do
+      it 'response 200' do
+        post "/api/v1/group/goals/#{goal.id}/add_money", params: params, as: :json, headers: headers
+        expect(response.status).to eq 200
+      end
+    end
+  end
+
 end
