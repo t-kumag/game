@@ -87,6 +87,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
         partner_goal_setting.update!(get_partner_goal_setting_params)
+        update_goal_activity_log(goal)
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
         end
@@ -266,5 +267,10 @@ class Api::V1::Group::GoalsController < ApplicationController
   def create_goal_activity_log(goal)
     Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id, Time.zone.now, "goal_created", goal)
     Services::ActivityService.create_user_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, "goal_created_partner", goal)
+  end
+
+  def update_goal_activity_log(goal)
+    Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id, Time.zone.now, "goal_updated", goal)
+    Services::ActivityService.create_user_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, "goal_updated", goal)
   end
 end
