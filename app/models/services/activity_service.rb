@@ -102,15 +102,16 @@ class Services::ActivityService
   def self.activity_find_or_create(user_id, group_id, used_date, activity_type, message_and_url)
     # DBは拡張する予定なので、保存する領域を増やす。
     # activity.url, activity.message,
-    Entities::Activity.find_or_create_by(user_id: user_id, date: used_date, activity_type: activity_type) do |activity|
-      activity.user_id = user_id
-      activity.group_id = group_id
-      activity.url = message_and_url[:url]
-      activity.count = 0
-      activity.activity_type = activity_type
-      activity.message = message_and_url[:message]
-      activity.date = used_date
-    end
+    #Entities::Activity.find_or_create_by(user_id: user_id, date: used_date, activity_type: activity_type) do |activity|
+    Entities::Activity.create!(
+        user_id: user_id,
+        group_id: group_id,
+        url: message_and_url[:url],
+        count:  0,
+        activity_type:  activity_type,
+        message: message_and_url[:message],
+        date: used_date
+    )
   end
 
   def self.fetch_activity_message_and_url(activity_type)
@@ -119,13 +120,13 @@ class Services::ActivityService
 
   def self.fetch_activity_goal_message_and_url(activity_type, goal)
     activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
-    activity_message_and_url[:message] = printf(activity_message_and_url[:message], goal.name)
+    activity_message_and_url[:message] = sprintf(activity_message_and_url[:message], goal.name)
     activity_message_and_url
   end
 
   def self.fetch_activity_transaction_message_and_url(activity_type, transaction)
     activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
-    activity_message_and_url[:url] = printf(activity_message_and_url[:url], transaction.id)
+    activity_message_and_url[:url] = sprintf(activity_message_and_url[:url], transaction.id)
     activity_message_and_url
   end
 
