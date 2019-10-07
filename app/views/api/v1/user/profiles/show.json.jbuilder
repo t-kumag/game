@@ -1,7 +1,7 @@
 json.app do
   if @current_user.present?
     json.user_id  @current_user.id
-    json.partner_id  @partner_id
+    json.partner_user_id  @partner_user_id
   end
   if @profile.present?
     json.gender  @profile.gender
