@@ -70,12 +70,22 @@ RSpec.describe Api::V1::Group::GoalsController do
         goal_setting_id: goal.goal_settings.find_by(user_id: user.partner_user.id).id
       }
     } }
-
     let(:goal) { create(:goal, :with_goal_settings, user_id: user.id, group_id: user.group_id) }
 
     context 'success' do
       it 'response 200' do
         put "/api/v1/group/goals/#{goal.id}", params: params, as: :json, headers: headers
+        expect(response.status).to eq 200
+      end
+    end
+  end
+
+  describe '#destroy' do
+    let(:goal) { create(:goal, :with_goal_settings, user_id: user.id, group_id: user.group_id) }
+
+    context 'success' do
+      it 'response 200' do
+        delete "/api/v1/group/goals/#{goal.id}", as: :json, headers: headers
         expect(response.status).to eq 200
       end
     end
