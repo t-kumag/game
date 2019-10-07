@@ -19,9 +19,11 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         else
           options = {}
         end
-        user_manually_create = Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
-        Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
-                                                       transaction[:used_date], 'individual_manual_outcome', nil, user_manually_create)
+        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
+        # TODO: 夫婦と個人を判断するメソッドがないので、現時点で保留とする
+        #user_manually_create = Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
+        #Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
+        #                                               transaction[:used_date], 'individual_manual_outcome', nil, user_manually_create)
       end
 
     rescue => exception
