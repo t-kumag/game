@@ -6,14 +6,14 @@ RSpec.describe Api::V1::Group::GoalsController do
   let(:params) { { 
     goals: {
       goal_type_id: 1,
-      name: '住宅/頭金',
+      name: 'ラスベガス旅行資金',
       img_url: 'test.png',
       goal_amount: 1000000,
       start_date: '2019-01-01',
       end_date: '2019-12-31'
     },
     goal_settings: {
-      at_user_bank_account_id: 1,
+      at_user_bank_account_id: user.at_user.at_user_bank_accounts.first.id,
       monthly_amount: 100000,
       first_amount: 150000
     },
@@ -44,6 +44,39 @@ RSpec.describe Api::V1::Group::GoalsController do
       it 'increase two record of activity' do
         post '/api/v1/group/goals', params: params, as: :json, headers: headers
         expect(Entities::Activity.where(group_id: user.group_id).count).to eq 2
+      end
+    end
+  end
+
+  describe '#update' do
+    let(:params) { { 
+      goals: {
+        goal_type_id: 1,
+        name: 'ハワイ旅行資金',
+        img_url: 'test.png',
+        goal_amount: 1000000,
+        start_date: '2019-01-01',
+        end_date: '2019-12-31'
+      },
+      goal_settings: {
+        at_user_bank_account_id: user.at_user.at_user_bank_accounts.first.id,
+        monthly_amount: 100000,
+        first_amount: 150000,
+        goal_setting_id: goal.goal_settings.find_by(user_id: user.id).id
+      },
+      partner_goal_settings: {
+        monthly_amount: 100000,
+        first_amount: 150000,
+        goal_setting_id: goal.goal_settings.find_by(user_id: user.partner_user.id).id
+      }
+    } }
+
+    let(:goal) { create(:goal, :with_goal_settings, user_id: user.id, group_id: user.group_id) }
+
+    context 'success' do
+      it 'response 200' do
+        put "/api/v1/group/goals/#{goal.id}", params: params, as: :json, headers: headers
+        expect(response.status).to eq 200
       end
     end
   end
