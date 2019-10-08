@@ -38,6 +38,7 @@ RSpec.describe Api::V1::PairingRequestsController do
   end
 
   describe '#receive_pairing_request' do
+    let(:headers) { { Authorization: 'Bearer ' + partner_user.token } }
     let(:params) { { 
       pairing_token: pairing_request.token
     } } 
