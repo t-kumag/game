@@ -116,7 +116,7 @@ class Api::V1::UsersController < ApplicationController
     # 口座登録が正常に行われているものはスクレイピング必要ないためコメント
     # リアルタイムで明細を取得したい場合に必要となるため、のちの課金対応で修正する
     # http://redmine.369webcash.com/issues/2916
-    # at_user_service.exec_scraping
+    at_user_service.exec_scraping
 
     at_user_service.sync
 
