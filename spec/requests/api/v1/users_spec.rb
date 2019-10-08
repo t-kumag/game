@@ -98,4 +98,13 @@ RSpec.describe Api::V1::UsersController do
     end
   end
 
+  describe '#at_token' do
+    context 'success' do
+      it 'response 200' do
+        get '/api/v1/user/at-token', headers: headers, params: params
+        expect(response.status).to eq 200
+      end
+    end
+  end
+
 end
