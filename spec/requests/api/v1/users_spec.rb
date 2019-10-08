@@ -85,4 +85,17 @@ RSpec.describe Api::V1::UsersController do
       end
     end
   end
+
+  describe '#activate' do
+    let(:user) { create(:user, email_authenticated: 0) } 
+    let(:params) { { token: user.token } } 
+
+    context 'success' do
+      it 'response 200' do
+        get '/api/v1/user/activate', headers: headers, params: params
+        expect(response.status).to eq 200
+      end
+    end
+  end
+
 end
