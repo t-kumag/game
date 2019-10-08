@@ -14,19 +14,12 @@ class Services::ActivityService
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_user_activity(user_id, group_id, used_date, activity_type, goal=nil, transaction_id=nil)
+  def self.create_user_activity(user_id, group_id, used_date, activity_type, options = {})
+    message_and_url = fetch_activity_goal_message_and_url(activity_type, options[:goal]) if options[:goal].present?
+    message_and_url = fetch_activity_transaction_message_and_url(activity_type, options[:transaction_id]) if options[:transaction_id].present?
+    message_and_url = fetch_activity(activity_type) if options[:goal].present? == false && options[:transaction_id].present? == false
 
-    message_and_url = nil
-
-    if goal.present?
-      message_and_url = fetch_activity_goal_message_and_url(activity_type, goal)
-    elsif transaction_id.present?
-      message_and_url = fetch_activity_transaction_message_and_url(activity_type, transaction_id)
-    else
-      message_and_url = fetch_activity_message_and_url(activity_type)
-    end
-
-    activity_find_or_create(user_id, group_id, used_date, activity_type, message_and_url)
+    activity_create(user_id, group_id, used_date, activity_type, message_and_url)
   end
 
   def self.set_activity_list(financier_account_type_key, tran, account, user)
@@ -103,10 +96,7 @@ class Services::ActivityService
     }
   end
 
-  def self.activity_find_or_create(user_id, group_id, used_date, activity_type, message_and_url)
-    # DBは拡張する予定なので、保存する領域を増やす。
-    # activity.url, activity.message,
-    #Entities::Activity.find_or_create_by(user_id: user_id, date: used_date, activity_type: activity_type) do |activity|
+  def self.activity_create(user_id, group_id, used_date, activity_type, message_and_url)
     Entities::Activity.create!(
         user_id: user_id,
         group_id: group_id,
@@ -118,7 +108,7 @@ class Services::ActivityService
     )
   end
 
-  def self.fetch_activity_message_and_url(activity_type)
+  def self.fetch_activity(activity_type)
     ACTIVITY_TYPE::NAME[activity_type]
   end
 
