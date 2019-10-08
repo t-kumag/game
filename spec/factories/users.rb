@@ -15,7 +15,7 @@
 FactoryBot.define do
   factory :user, :class => Entities::User do
     sequence(:email)    { |n| "test#{n}@example.com"}
-    token               { "test" } # ベアラートークン
+    token               { |n| "test#{n}" } # ベアラートークン
     password_digest     { "testtest" }
     email_authenticated { 1 } # メール認証
     token_expires_at    { "2020/01/01 00:00:00" }
@@ -88,7 +88,19 @@ FactoryBot.define do
       end
     end
 
-    factory :pairing_user, traits: [:with_partner_user, :with_at_user_bank_accounts]
+    trait :with_partner_at_user_bank_accounts do
+      after(:create) do |user|
+        partner_user = user.partner_user
+        partner_user.at_user = create(:at_user, 
+          :with_at_user_bank_accounts, 
+          user_id: partner_user.id
+        )
+      end
+    end
+
+    factory :pairing_user_at_user_bank_accounts, traits: [:with_partner_user, :with_at_user_bank_accounts]
+    
+    factory :pairing_user_partner_at_user_bank_accounts, traits: [:with_partner_user, :with_at_user_bank_accounts, :with_partner_at_user_bank_accounts]
 
   end
 end
