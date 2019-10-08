@@ -87,4 +87,15 @@ RSpec.describe Api::V1::PairingRequestsController do
       end
     end
   end
+
+  describe '#destroy' do
+    let(:user) { create(:user, :with_partner_user) }
+
+    context 'success' do
+      it 'response 200' do
+        delete '/api/v1/pairing-requests', headers: headers 
+        expect(response.status).to eq 200
+      end
+    end
+  end
 end
