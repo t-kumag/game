@@ -279,7 +279,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   def create_activity_options(goal)
     options = {}
     options[:goal] = goal
-    options[:transaction_id] = nil
+    options[:transaction] = nil
     options
   end
 end

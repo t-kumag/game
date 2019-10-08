@@ -15,9 +15,10 @@ class Services::ActivityService
   end
 
   def self.create_user_activity(user_id, group_id, used_date, activity_type, options = {})
-    message_and_url = fetch_activity_goal_message_and_url(activity_type, options[:goal]) if options[:goal].present?
-    message_and_url = fetch_activity_transaction_message_and_url(activity_type, options[:transaction_id]) if options[:transaction_id].present?
-    message_and_url = fetch_activity(activity_type) if options[:goal].present? == false && options[:transaction_id].present? == false
+
+    message_and_url = fetch_activity(activity_type)
+    message_and_url = activity_message_replace_with_suitable_message(options[:goal], message_and_url) if options[:goal].present?
+    message_and_url = activity_url_replace_with_suitable_url(options[:transaction], message_and_url) if options[:transaction].present?
 
     activity_create(user_id, group_id, used_date, activity_type, message_and_url)
   end
@@ -112,15 +113,13 @@ class Services::ActivityService
     ACTIVITY_TYPE::NAME[activity_type]
   end
 
-  def self.fetch_activity_goal_message_and_url(activity_type, goal)
-    activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
-    activity_message_and_url[:message] = sprintf(activity_message_and_url[:message], goal.name)
-    activity_message_and_url
+  def self.activity_message_replace_with_suitable_message(goal, message_and_url)
+    message_and_url[:message] = sprintf(message_and_url[:message], goal.name)
+    message_and_url
   end
 
-  def self.fetch_activity_transaction_message_and_url(activity_type, transaction)
-    activity_message_and_url = ACTIVITY_TYPE::NAME[activity_type]
-    activity_message_and_url[:url] = sprintf(activity_message_and_url[:url], transaction.id)
-    activity_message_and_url
+  def self.activity_url_replace_with_suitable_url(transaction, message_and_url)
+    message_and_url[:url] = sprintf(message_and_url[:url], transaction.id)
+    message_and_url
   end
 end
