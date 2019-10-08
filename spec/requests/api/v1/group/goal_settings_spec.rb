@@ -19,5 +19,21 @@ RSpec.describe Api::V1::Group::GoalSettingsController do
       end
     end
   end
-
+  
+  describe '#update' do
+    let(:headers) { { Authorization: 'Bearer ' + user.token } } 
+    let(:params) { { 
+      at_user_bank_account_id: user.at_user.at_user_bank_accounts.first.id,
+      monthly_amount: 500000,
+      first_amount: 0
+    } }
+    let(:goal_setting) { Entities::GoalSetting.find_by(user_id: user.id) }
+    
+    context 'success' do
+      it 'response 200' do
+        put "/api/v1/group/goals/#{goal.id}/goal-settings/#{goal_setting.id}", params: params, as: :json, headers: headers
+        expect(response.status).to eq 200
+      end
+    end
+  end
 end
