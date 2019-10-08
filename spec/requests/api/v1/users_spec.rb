@@ -107,4 +107,13 @@ RSpec.describe Api::V1::UsersController do
     end
   end
 
+  describe '#at_sync' do
+    context 'success' do
+      it 'response 200' do
+        get '/api/v1/user/at-sync', headers: headers
+        expect(response.status).to eq 200
+      end
+    end
+  end
+
 end
