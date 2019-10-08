@@ -98,8 +98,8 @@ FactoryBot.define do
       end
     end
 
+    factory :at_user_all_accounts, traits: [:with_at_user_bank_accounts, :with_at_user_card_accounts, :with_at_user_emoney_accounts]
     factory :pairing_user_at_user_bank_accounts, traits: [:with_partner_user, :with_at_user_bank_accounts]
-    
     factory :pairing_user_partner_at_user_bank_accounts, traits: [:with_partner_user, :with_at_user_bank_accounts, :with_partner_at_user_bank_accounts]
 
   end
