@@ -17,8 +17,8 @@ class Services::ActivityService
   def self.create_activity(user_id, group_id, used_date, activity_type, options = {})
 
     message_and_url = fetch_activity(activity_type)
-    message_and_url = activity_message_replace_with_suitable_message(options[:goal], message_and_url) if options[:goal].present?
-    message_and_url = activity_url_replace_with_suitable_url(options[:transaction], message_and_url) if options[:transaction].present?
+    message_and_url = activity_message_replace_with_suitable_goal_message(options[:goal], message_and_url) if options[:goal].present?
+    message_and_url = activity_url_replace_with_suitable_transactioi_url(options[:transaction], message_and_url) if options[:transaction].present?
 
     create_activity_data(user_id, group_id, used_date, activity_type, message_and_url)
   end
@@ -113,12 +113,12 @@ class Services::ActivityService
     ACTIVITY_TYPE::NAME[activity_type]
   end
 
-  def self.activity_message_replace_with_suitable_message(goal, message_and_url)
+  def self.activity_message_replace_with_suitable_goal_message(goal, message_and_url)
     message_and_url[:message] = sprintf(message_and_url[:message], goal.name)
     message_and_url
   end
 
-  def self.activity_url_replace_with_suitable_url(transaction, message_and_url)
+  def self.activity_url_replace_with_suitable_transactioi_url(transaction, message_and_url)
     message_and_url[:url] = sprintf(message_and_url[:url], transaction.id)
     message_and_url
   end
