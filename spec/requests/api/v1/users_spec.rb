@@ -75,15 +75,14 @@ RSpec.describe Api::V1::UsersController do
     end
   end
 
-  # #510をマージ後に動作検証
-  # describe '#at_url' do
-  #   let(:user) { create(:user, :with_at_user_all_accounts) } 
+  describe '#at_url' do
+    let(:user) { create(:at_user_all_accounts) } 
 
-  #   context 'success' do
-  #     it 'response 200' do
-  #       get '/api/v1/users/at-url', headers: headers 
-  #       expect(response.status).to eq 200
-  #     end
-  #   end
-  # end
+    context 'success' do
+      it 'response 200' do
+        get '/api/v1/user/at-url', headers: headers 
+        expect(response.status).to eq 200
+      end
+    end
+  end
 end
