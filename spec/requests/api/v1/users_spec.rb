@@ -116,4 +116,17 @@ RSpec.describe Api::V1::UsersController do
     end
   end
 
+  describe '#destroy' do
+    let(:params) { { 
+      user_cancel_reason: 'test',
+      user_cancel_checklists: [1]
+    } } 
+    context 'success' do
+      it 'response 200' do
+        delete '/api/v1/users', headers: headers, params: params
+        expect(response.status).to eq 200
+      end
+    end
+  end
+
 end
