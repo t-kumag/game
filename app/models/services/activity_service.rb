@@ -14,13 +14,13 @@ class Services::ActivityService
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_user_activity(user_id, group_id, used_date, activity_type, options = {})
+  def self.create_activity(user_id, group_id, used_date, activity_type, options = {})
 
     message_and_url = fetch_activity(activity_type)
     message_and_url = activity_message_replace_with_suitable_message(options[:goal], message_and_url) if options[:goal].present?
     message_and_url = activity_url_replace_with_suitable_url(options[:transaction], message_and_url) if options[:transaction].present?
 
-    activity_create(user_id, group_id, used_date, activity_type, message_and_url)
+    create_activity_data(user_id, group_id, used_date, activity_type, message_and_url)
   end
 
   def self.set_activity_list(financier_account_type_key, tran, account, user)
@@ -97,7 +97,7 @@ class Services::ActivityService
     }
   end
 
-  def self.activity_create(user_id, group_id, used_date, activity_type, message_and_url)
+  def self.create_activity_data(user_id, group_id, used_date, activity_type, message_and_url)
     Entities::Activity.create!(
         user_id: user_id,
         group_id: group_id,

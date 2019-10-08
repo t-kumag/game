@@ -47,8 +47,8 @@ class Api::V1::PairingRequestsController < ApplicationController
         Entities::ParticipateGroup.create!(group_id: new_group.id, user_id: @pairing_request.from_user_id)
         Entities::ParticipateGroup.create!(group_id: new_group.id, user_id: @pairing_request.to_user_id)
 
-        Services::ActivityService.create_user_activity(@pairing_request.from_user_id, new_group.id, Time.zone.now, :pairing_created)
-        Services::ActivityService.create_user_activity(@pairing_request.to_user_id, new_group.id, Time.zone.now, :pairing_created)
+        Services::ActivityService.create_activity(@pairing_request.from_user_id, new_group.id, Time.zone.now, :pairing_created)
+        Services::ActivityService.create_activity(@pairing_request.to_user_id, new_group.id, Time.zone.now, :pairing_created)
         MailDelivery.user_pairing(@current_user).deliver
         MailDelivery.user_pairing(@current_user.partner_user).deliver
         render json: {}, status: 200
