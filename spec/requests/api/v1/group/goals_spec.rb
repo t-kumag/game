@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::Group::GoalsController do
-  let(:user) { create(:pairing_user) }
+  let(:user) { create(:pairing_user_at_user_bank_accounts) }
   let(:headers) { { Authorization: 'Bearer ' + user.token } } 
   let(:params) { { 
     goals: {
