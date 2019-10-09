@@ -17,8 +17,8 @@ class Services::ActivityService
   def self.create_activity(user_id, group_id = nil, used_date, activity_type, options)
 
     defiend_activity = fetch_activity(activity_type)
-    activity_suitable_word = activity_message_replace_with_suitable_goal_message(options[:goal], activity_word) if options[:goal].present?
-    activity_suitable_word = activity_url_replace_with_suitable_transactioi_url(options[:transaction], activity_word) if options[:transaction].present?
+    defiend_activity = activity_message_replace_with_suitable_goal_message(options[:goal], activity_word) if options[:goal].present?
+    defiend_activity = activity_url_replace_with_suitable_transactioi_url(options[:transaction], activity_word) if options[:transaction].present?
 
     create_activity_data(user_id, group_id, used_date, activity_type, activity_suitable_words)
   end
