@@ -14,7 +14,7 @@ class Services::ActivityService
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_activity(user_id, group_id=nil, used_date, activity_type, options = {})
+  def self.create_activity(user_id, group_id = nil, used_date=nil, activity_type, options)
 
     message_and_url = fetch_activity(activity_type)
     message_and_url = activity_message_replace_with_suitable_goal_message(options[:goal], message_and_url) if options[:goal].present?
