@@ -14,13 +14,13 @@ class Services::ActivityService
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_activity(user_id, group_id = nil, used_date, activity_type, options)
+  def self.create_activity(user_id, group_id, used_date, activity_type, options={})
 
-    defiend_activity = fetch_activity(activity_type)
-    defiend_activity = activity_message_replace_with_suitable_goal_message(options[:goal], defiend_activity) if options[:goal].present?
-    defiend_activity = activity_url_replace_with_suitable_transactioi_url(options[:transaction], defiend_activity) if options[:transaction].present?
+    activity = ACTIVITY_TYPE::NAME[activity_type]
+    activity = convert_message(options[:goal], defiend_activity) if options[:goal].present?
+    activity = convert_url(options[:transaction], defiend_activity) if options[:transaction].present?
 
-    create_activity_data(user_id, group_id, used_date, activity_type, defiend_activity)
+    create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
 
   def self.set_activity_list(financier_account_type_key, tran, account, user)
@@ -97,15 +97,15 @@ class Services::ActivityService
     }
   end
 
-  def self.create_activity_data(user_id, group_id, used_date, activity_type, defiend_activity)
+  def self.create_activity_data(user_id, group_id, used_date, activity_type, activity)
     begin
       Entities::Activity.create!(
           user_id: user_id,
           group_id: group_id,
-          url: defiend_activity[:url],
+          url: activity[:url],
           count:  0,
           activity_type:  activity_type,
-          message: defiend_activity[:message],
+          message: activity[:message],
           date: used_date
       )
     rescue => exception
@@ -115,16 +115,13 @@ class Services::ActivityService
     end
   end
 
-  def self.fetch_activity(activity_type)
-    ACTIVITY_TYPE::NAME[activity_type]
-  end
-
-  def self.activity_message_replace_with_suitable_goal_message(goal, defined_activity)
+  private
+  def convert_message(goal, defined_activity)
     defined_activity[:message] = sprintf(defined_activity[:message], goal.name)
     defined_activity
   end
 
-  def self.activity_url_replace_with_suitable_transactioi_url(transaction, defined_activity)
+  def convert_url(transaction, defined_activity)
     defined_activity[:url] = sprintf(defined_activity[:url], transaction.id)
     defined_activity
   end
