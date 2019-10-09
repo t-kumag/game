@@ -120,12 +120,12 @@ class Services::ActivityService
   end
 
   def self.activity_message_replace_with_suitable_goal_message(goal, defined_activity)
-    defiend_activity[:message] = sprintf(defined_activity[:message], goal.name)
-    defiend_activity
+    defined_activity[:message] = sprintf(defined_activity[:message], goal.name)
+    defined_activity
   end
 
   def self.activity_url_replace_with_suitable_transactioi_url(transaction, defined_activity)
-    defiend_activity[:url] = sprintf(defined_activity[:url], transaction.id)
-    defiend_activity
+    defined_activity[:url] = sprintf(defined_activity[:url], transaction.id)
+    defined_activity
   end
 end
