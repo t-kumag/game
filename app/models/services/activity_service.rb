@@ -14,13 +14,13 @@ class Services::ActivityService
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_activity(user_id, group_id = nil, used_date=nil, activity_type, options)
+  def self.create_activity(user_id, group_id = nil, used_date, activity_type, options)
 
-    message_and_url = fetch_activity(activity_type)
-    message_and_url = activity_message_replace_with_suitable_goal_message(options[:goal], message_and_url) if options[:goal].present?
-    message_and_url = activity_url_replace_with_suitable_transactioi_url(options[:transaction], message_and_url) if options[:transaction].present?
+    defiend_activity = fetch_activity(activity_type)
+    activity_suitable_word = activity_message_replace_with_suitable_goal_message(options[:goal], activity_word) if options[:goal].present?
+    activity_suitable_word = activity_url_replace_with_suitable_transactioi_url(options[:transaction], activity_word) if options[:transaction].present?
 
-    create_activity_data(user_id, group_id, used_date, activity_type, message_and_url)
+    create_activity_data(user_id, group_id, used_date, activity_type, activity_suitable_words)
   end
 
   def self.set_activity_list(financier_account_type_key, tran, account, user)
@@ -97,15 +97,15 @@ class Services::ActivityService
     }
   end
 
-  def self.create_activity_data(user_id, group_id, used_date, activity_type, message_and_url)
+  def self.create_activity_data(user_id, group_id, used_date, activity_type, activity_suitable_word)
     begin
       Entities::Activity.create!(
           user_id: user_id,
           group_id: group_id,
-          url: message_and_url[:url],
+          url: activity_suitable_word[:url],
           count:  0,
           activity_type:  activity_type,
-          message: message_and_url[:message],
+          message: activity_suitable_word[:message],
           date: used_date
       )
     rescue => exception
