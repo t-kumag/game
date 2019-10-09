@@ -17,8 +17,8 @@ class Services::ActivityService
   def self.create_activity(user_id, group_id, used_date, activity_type, options={})
 
     activity = ACTIVITY_TYPE::NAME[activity_type]
-    activity = convert_message(options[:goal], defiend_activity) if options[:goal].present?
-    activity = convert_url(options[:transaction], defiend_activity) if options[:transaction].present?
+    activity = convert_message(options[:goal], activity) if options[:goal].present?
+    activity = convert_url(options[:transaction], activity) if options[:transaction].present?
 
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
@@ -116,13 +116,13 @@ class Services::ActivityService
   end
 
   private
-  def convert_message(goal, defined_activity)
-    defined_activity[:message] = sprintf(defined_activity[:message], goal.name)
-    defined_activity
+  def self.convert_message(goal, activity)
+    activity[:message] = sprintf(activity[:message], goal.name)
+    activity
   end
 
-  def convert_url(transaction, defined_activity)
-    defined_activity[:url] = sprintf(defined_activity[:url], transaction.id)
-    defined_activity
+  def self.convert_url(transaction, activity)
+    activity[:url] = sprintf(activity[:url], transaction.id)
+    activity
   end
 end
