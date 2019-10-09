@@ -110,7 +110,8 @@ class Services::ActivityService
       )
     rescue => exception
       Rails.logger.info("failed to create activity ===============")
-      raise exception
+      p exception
+      p exception.backtrace
     end
   end
 
