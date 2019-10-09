@@ -17,10 +17,10 @@ class Services::ActivityService
   def self.create_activity(user_id, group_id = nil, used_date, activity_type, options)
 
     defiend_activity = fetch_activity(activity_type)
-    defiend_activity = activity_message_replace_with_suitable_goal_message(options[:goal], activity_word) if options[:goal].present?
-    defiend_activity = activity_url_replace_with_suitable_transactioi_url(options[:transaction], activity_word) if options[:transaction].present?
+    defiend_activity = activity_message_replace_with_suitable_goal_message(options[:goal], defiend_activity) if options[:goal].present?
+    defiend_activity = activity_url_replace_with_suitable_transactioi_url(options[:transaction], defiend_activity) if options[:transaction].present?
 
-    create_activity_data(user_id, group_id, used_date, activity_type, activity_suitable_words)
+    create_activity_data(user_id, group_id, used_date, activity_type, defiend_activity)
   end
 
   def self.set_activity_list(financier_account_type_key, tran, account, user)
@@ -97,15 +97,15 @@ class Services::ActivityService
     }
   end
 
-  def self.create_activity_data(user_id, group_id, used_date, activity_type, activity_suitable_word)
+  def self.create_activity_data(user_id, group_id, used_date, activity_type, defiend_activity)
     begin
       Entities::Activity.create!(
           user_id: user_id,
           group_id: group_id,
-          url: activity_suitable_word[:url],
+          url: defiend_activity[:url],
           count:  0,
           activity_type:  activity_type,
-          message: activity_suitable_word[:message],
+          message: defiend_activity[:message],
           date: used_date
       )
     rescue => exception
@@ -119,13 +119,13 @@ class Services::ActivityService
     ACTIVITY_TYPE::NAME[activity_type]
   end
 
-  def self.activity_message_replace_with_suitable_goal_message(goal, message_and_url)
-    message_and_url[:message] = sprintf(message_and_url[:message], goal.name)
-    message_and_url
+  def self.activity_message_replace_with_suitable_goal_message(goal, defined_activity)
+    defiend_activity[:message] = sprintf(defined_activity[:message], goal.name)
+    defiend_activity
   end
 
-  def self.activity_url_replace_with_suitable_transactioi_url(transaction, message_and_url)
-    message_and_url[:url] = sprintf(message_and_url[:url], transaction.id)
-    message_and_url
+  def self.activity_url_replace_with_suitable_transactioi_url(transaction, defined_activity)
+    defiend_activity[:url] = sprintf(defined_activity[:url], transaction.id)
+    defiend_activity
   end
 end
