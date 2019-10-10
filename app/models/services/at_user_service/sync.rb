@@ -109,7 +109,6 @@ class Services::AtUserService::Sync
       end
 
       src_trans = []
-      activities = []
       monthly_trans = []
       last_at_sync_tran_monthly_date = Services::AtSyncTransactionMonthlyDateLogService.fetch_last_one(financier_account_type_key, a)
       if res.key?(rec_key) && !res[rec_key].blank?
@@ -142,7 +141,6 @@ class Services::AtUserService::Sync
           src_trans << tran
 
           monthly_trans << fetch_monthly_tran(financier_account_type_key, tran, last_at_sync_tran_monthly_date)
-          activities << activity if activity.present?
         end
       end
 

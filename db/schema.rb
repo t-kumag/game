@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_03_174339) do
+ActiveRecord::Schema.define(version: 2019_10_10_152003) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -66,6 +66,7 @@ ActiveRecord::Schema.define(version: 2019_10_03_174339) do
     t.integer "at_user_bank_account_id"
     t.integer "at_user_card_account_id"
     t.integer "at_user_emoney_service_account_id"
+    t.integer "user_id"
     t.datetime "latest_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
