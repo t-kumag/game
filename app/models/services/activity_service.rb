@@ -19,7 +19,7 @@ class Services::ActivityService
     activity = ACTIVITY_TYPE::NAME[activity_type]
     activity = convert_goal_message(options[:goal], activity) if options[:goal].present?
     activity = convert_tran_url(options[:transaction], activity) if options[:transaction].present?
-    activity = convert_trans_message(options[:transactions], activity) if options[:transactions].present?
+    activity = convert_trans_message(options[:transactions], options[:at_sync_tansaction_latest_date], activity) if options[:transactions].present?
 
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
@@ -111,7 +111,8 @@ class Services::ActivityService
           count:  0,
           activity_type:  activity_type,
           message: activity[:message],
-          date: used_date
+          date: used_date,
+          at_sync_transaction_latest_date: activity[:at_sync_tansaction_latest_date]
       )
     rescue => exception
       Rails.logger.info("failed to create activity ===============")
@@ -131,8 +132,9 @@ class Services::ActivityService
     activity
   end
 
-  def self.convert_trans_message(transactions, activity)
+  def self.convert_trans_message(transactions, at_sync_tansaction_latest_date, activity)
     activity[:message] = sprintf(activity[:message], transactions.count)
+    activity[:at_sync_tansaction_latest_date] = at_sync_tansaction_latest_date
     activity
   end
 end
