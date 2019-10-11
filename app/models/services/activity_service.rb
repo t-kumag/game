@@ -16,13 +16,10 @@ class Services::ActivityService
 
   def self.create_activity(user_id, group_id, used_date, activity_type, options={})
 
-    hoge= ACTIVITY_TYPE::NAME[activity_type]
-    Rails.logger.info("before activity ===============")
-    p hoge
-    p ACTIVITY_TYPE::NAME
-    activity = convert_goal_message(options[:goal], hoge) if options[:goal].present?
-    activity = convert_tran_url(options[:transaction], hoge) if options[:transaction].present?
-    activity = convert_trans_message(options[:transactions], options[:at_sync_tansaction_latest_date], hoge) if options[:transactions].present?
+    defined_activity = ACTIVITY_TYPE::NAME[activity_type]
+    activity = convert_goal_message(options[:goal], defined_activity) if options[:goal].present?
+    activity = convert_tran_url(options[:transaction], defined_activity) if options[:transaction].present?
+    activity = convert_trans_message(options[:transactions], options[:at_sync_tansaction_latest_date], defined_activity) if options[:transactions].present?
     Rails.logger.info("activity ===============")
     p hoge
 
