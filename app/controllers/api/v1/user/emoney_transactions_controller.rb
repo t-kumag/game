@@ -45,7 +45,13 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
         emoney_account_transaction_param[:group_id],
     )
 
-    render json: {}, status: 200 and return if @response.blank?
+    if @response[:user_distributed_transaction].share
+      Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
+                                                DateTime.now, :person_tran_to_familly)
+      Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
+                                                DateTime.now, :person_tran_to_familly_partner)
+    end
+    render json: {}, status: 200 and return if @response[:user_distributed_transaction].blank?
     render 'update', formats: 'json', handlers: 'jbuilder'
   end
 
