@@ -53,7 +53,6 @@ class Services::AtUserService::Sync
         # error_count が 1以上の場合はスクレイピングしないが、バッファされたRESULT_CODEでEが返るため
         # error_count が 1未満の場合のみエラーとして扱う
         if account['last_rslt_cd'] === 'E' || account['last_rslt_cd'] === 'A'
-          # アクティビティログに記録
           Services::ActivityService.create_activity(account.at_user.user_id, nil, Time.zone.now, :financial_account_faild)
           # 初回エラー発生時もエラーとしてカウントする
           if lastAccount.nil? || lastAccount['error_count'] < 1
