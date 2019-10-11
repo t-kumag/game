@@ -4,7 +4,7 @@ class Api::V1::ActivitiesController < ApplicationController
   def index
 
     last_sync_date = Services::AtSyncTransactionLatestDateLogService.fetch_latest_sync_log_date(@current_user)
-    last_activity_sync_date = fetech_last_activity_sync_exist?(last_sync_date)
+    last_activity_sync_date = last_activity_sync_exist?(last_sync_date)
     transaction = fetch_transaction(last_sync_date, Time.now)
     create_activity(transaction,last_activity_sync_date, last_sync_date)
 
@@ -23,7 +23,7 @@ class Api::V1::ActivitiesController < ApplicationController
     options
   end
 
-  def fetech_last_activity_sync_exist?(last_sync_date)
+  def last_activity_sync_exist?(last_sync_date)
 
     last_activity_sync_date = {}
     last_activity_sync_date[:person_outcome_income]  = true

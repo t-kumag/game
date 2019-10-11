@@ -16,10 +16,15 @@ class Services::ActivityService
 
   def self.create_activity(user_id, group_id, used_date, activity_type, options={})
 
-    activity = ACTIVITY_TYPE::NAME[activity_type]
-    activity = convert_goal_message(options[:goal], activity) if options[:goal].present?
-    activity = convert_tran_url(options[:transaction], activity) if options[:transaction].present?
-    activity = convert_trans_message(options[:transactions], options[:at_sync_tansaction_latest_date], activity) if options[:transactions].present?
+    hoge= ACTIVITY_TYPE::NAME[activity_type]
+    Rails.logger.info("before activity ===============")
+    p hoge
+    p ACTIVITY_TYPE::NAME
+    activity = convert_goal_message(options[:goal], hoge) if options[:goal].present?
+    activity = convert_tran_url(options[:transaction], hoge) if options[:transaction].present?
+    activity = convert_trans_message(options[:transactions], options[:at_sync_tansaction_latest_date], hoge) if options[:transactions].present?
+    Rails.logger.info("activity ===============")
+    p hoge
 
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
@@ -122,19 +127,25 @@ class Services::ActivityService
   end
 
   private
-  def self.convert_goal_message(goal, activity)
+  def self.convert_goal_message(goal, defined_activity)
+    activity = {}
     activity[:message] = sprintf(activity[:message], goal.name)
+    activity[:url] = defined_activity[:url]
     activity
   end
 
-  def self.convert_tran_url(transaction, activity)
-    activity[:url] = sprintf(activity[:url], transaction.id)
+  def self.convert_tran_url(transaction, defined_activity)
+    activity = {}
+    activity[:message] = defined_activity[:message]
+    activity[:url]     = sprintf(defined_activity[:url], transaction.id)
     activity
   end
 
-  def self.convert_trans_message(transactions, at_sync_tansaction_latest_date, activity)
+  def self.convert_trans_message(transactions, at_sync_tansaction_latest_date, defined_activity)
+    activity = {}
     activity[:message] = sprintf(activity[:message], transactions.count)
     activity[:at_sync_tansaction_latest_date] = at_sync_tansaction_latest_date
+    activity[:url] = defined_activity[:url]
     activity
   end
 end
