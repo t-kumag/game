@@ -20,8 +20,6 @@ class Services::ActivityService
     activity = convert_goal_message(options[:goal], defined_activity) if options[:goal].present?
     activity = convert_tran_url(options[:transaction], defined_activity) if options[:transaction].present?
     activity = convert_trans_message(options[:transactions], options[:at_sync_tansaction_latest_date], defined_activity) if options[:transactions].present?
-    Rails.logger.info("activity ===============")
-    p hoge
 
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
@@ -126,7 +124,7 @@ class Services::ActivityService
   private
   def self.convert_goal_message(goal, defined_activity)
     activity = {}
-    activity[:message] = sprintf(activity[:message], goal.name)
+    activity[:message] = sprintf(defined_activity[:message], goal.name)
     activity[:url] = defined_activity[:url]
     activity
   end
@@ -140,7 +138,7 @@ class Services::ActivityService
 
   def self.convert_trans_message(transactions, at_sync_tansaction_latest_date, defined_activity)
     activity = {}
-    activity[:message] = sprintf(activity[:message], transactions.count)
+    activity[:message] = sprintf(defined_activity[:message], transactions.count)
     activity[:at_sync_tansaction_latest_date] = at_sync_tansaction_latest_date
     activity[:url] = defined_activity[:url]
     activity
