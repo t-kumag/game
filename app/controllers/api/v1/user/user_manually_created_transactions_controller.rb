@@ -4,7 +4,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   @error = {}
 
   def index
-    @transaction = Entities::UserManuallyCreatedTransaction.where(user_id: @current_user.id)
+    @transactions = Entities::UserManuallyCreatedTransaction.where(user_id: @current_user.id)
     render :index, formats: :json, handlers: :jbuilder
   end
 
