@@ -26,7 +26,7 @@ class Api::V1::ActivitiesController < ApplicationController
   def last_activity_sync_exist?(last_sync_date)
 
     last_activity_sync_date = {}
-    last_activity_sync_date[:person_outcome_income]  = true
+    last_activity_sync_date[:person_outcome_income] = true
     last_activity_sync_date[:familly_outcome_income] = true
     return last_activity_sync_date unless last_sync_date
 
@@ -41,11 +41,11 @@ class Api::V1::ActivitiesController < ApplicationController
   def fetch_transaction(last_sync_date, now)
     transaction = {}
     transaction[:no_shared] = nil
-    transaction[:shared]    = nil
+    transaction[:shared] = nil
 
     return transaction unless last_sync_date.present?
     transaction[:no_shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, created_at: last_sync_date..now, share: false)
-    transaction[:shared]    = Entities::UserDistributedTransaction.where(user_id: @current_user.id, created_at: last_sync_date..now, share: true)
+    transaction[:shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, created_at: last_sync_date..now, share: true)
     transaction
   end
 
