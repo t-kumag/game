@@ -31,7 +31,7 @@ class Api::V1::ActivitiesController < ApplicationController
     return last_activity_sync_date unless last_sync_date
 
     person_outcome_income = Services::ActivityService.fetch_activity_type(@current_user, :person_outcome_income)
-    familly_outcome_income = Services::ActivityService.fetch_activity_type(@current_user, :family_outcome_income)
+    familly_outcome_income = Services::ActivityService.fetch_activity_type(@current_user, :familly_outcome_income)
 
     last_activity_sync_date[:person_outcome_income] = check_latest_day?(person_outcome_income, last_sync_date) if person_outcome_income.present?
     last_activity_sync_date[:familly_outcome_income] = check_latest_day?(familly_outcome_income, last_sync_date) if familly_outcome_income.present?
@@ -57,7 +57,7 @@ class Api::V1::ActivitiesController < ApplicationController
 
     if transaction[:shared].present? && last_activity_sync_date[:familly_outcome_income]
       options = create_activity_options(transaction[:shared], latest_sync_date)
-      Services::ActivityService.create_activity(@current_user.to_user_id, @current_user.group_id, Time.zone.now, :familly_outcome_income, options)
+      Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :familly_outcome_income, options)
     end
   end
 
