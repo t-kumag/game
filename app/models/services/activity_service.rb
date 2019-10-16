@@ -137,7 +137,7 @@ class Services::ActivityService
   end
 
   def self.convert_tran_url(transaction, defined_activity, activity)
-    activity[:url]     = sprintf(defined_activity[:url], transaction.id)
+    activity[:url] = sprintf(defined_activity[:url], transaction.id)
     activity
   end
 
