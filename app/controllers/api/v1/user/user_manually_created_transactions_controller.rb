@@ -82,7 +82,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def create_user_manually_created
-    convert_amount params
     save_params = params.permit(
       :at_transaction_category_id,
       :payment_method_id,
@@ -102,7 +101,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def update_user_manually_created(transaction)
-    convert_amount params
     save_params = params.permit(
       :at_transaction_category_id,
       :payment_method_id,
@@ -137,27 +135,4 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         used_location: used_location
     }
   end
-
-  # params[:type]の指定でamountの符号を変換する
-  def convert_amount(params)
-    params[:amount] ||= 0
-    params[:amount] = payment_amount unless params.has_key?(:type)
-    params[:amount] = payment_amount if params[:type] == 'payment'
-    params[:amount] = receipt_amount if params[:type] == 'receipt'
-  end
-
-  # 支出金額 マイナス変換する
-  def payment_amount
-    return  params[:amount] if params[:amount] < 0
-    return -params[:amount] if params[:amount] > 0
-    0
-  end
-
-  # 入金金額 プラス変換する
-  def receipt_amount
-    return  params[:amount] if params[:amount] > 0
-    return -params[:amount] if params[:amount] < 0
-    0
-  end
-
 end
