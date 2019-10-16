@@ -95,8 +95,16 @@ class Api::V1::UsersController < ApplicationController
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
     at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
+    account_limit = check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
 
-    return render json: { errors: { code: '', message: "five account limit of free users" } }, status: 422  unless check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
+    finance = Services::FinanceService.new(@current_user).find_finance(:fnc_id, params[:fnc_id]) if params.has_key?(:fnc_id)
+    skip_account_limit = check_finance_error(finance)
+
+    # 無料ユーザーの口座数が上限に達していた場合はエラーを返し口座数を制限する
+    # AT口座のエラー解消の場合は口座数の制限はスキップする
+    if account_limit == false && skip_account_limit == false
+        return render json: { errors: { code: '', message: "five account limit of free users" } }, status: 422
+    end
 
     @response = Services::AtUserService.new(@current_user).at_url
     render 'at_url', formats: 'json', handlers: 'jbuilder'
@@ -242,6 +250,15 @@ class Api::V1::UsersController < ApplicationController
     # 将来はチェックボックスになる予定のため処理は残す
     # Services::UserCancelAnswerService.new(@current_user).register_cancel_checklist(cancel_checklists)
     Services::UserCancelReasonService.new(@current_user).register_cancel_reason(cancel_reason)
+  end
+
+  # AT口座エラーの有無を確認する
+  def check_finance_error(finance)
+    return false unless finance.present?
+    if finance.last_rslt_cd === 'E' || finance.last_rslt_cd === 'A'
+      return true
+    end
+    false
   end
 
 end
