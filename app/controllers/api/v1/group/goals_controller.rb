@@ -22,7 +22,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def create
     if get_goal_setting_params[:at_user_bank_account_id].present? &&
-        disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]])
+        disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id]], true)
       return render_disallowed_financier_ids
     end
 
@@ -135,6 +135,13 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     current_user_banks = @current_user.at_user.at_user_bank_accounts.pluck(:id)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+
+    if partner_at_user_id.present?
+      current_user_banks << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+      current_user_banks.flatten!
+    end
+
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     goal_setting = goal.goal_settings.find_by(at_user_bank_account_id: current_user_banks)
 
