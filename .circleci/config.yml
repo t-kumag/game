@@ -27,7 +27,7 @@ jobs:
           MYSQL_PASSWORD: pass
           MYSQL_DATABASE: dev_osdr_db
           MYSQL_TEST_DATABASE: test_osdr_db
-    working_directory: ~/repo
+    working_directory: ~/app
     steps:
       - checkout
       - restore_cache:
@@ -68,7 +68,7 @@ jobs:
           MYSQL_PASSWORD: pass
           MYSQL_DATABASE: dev_osdr_db
           MYSQL_TEST_DATABASE: test_osdr_db
-    working_directory: ~/repo
+    working_directory: ~/app
     steps:
       - checkout
       - restore_cache:
