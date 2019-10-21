@@ -4,53 +4,53 @@
 #
 version: 2
 jobs:
-  rubocop:
+  # rubocop:
+  #   docker:
+  #     - image: circleci/ruby:2.5.1-node-browsers-legacy
+  #       environment:
+  #         RAILS_ENV: test
+  #         DB_HOST: 127.0.0.1
+  #         DB_PORT: 3306
+  #         DB_NAME: dev_osdr_db
+  #         DB_TEST_NAME: test_osdr_db
+  #         DB_USER: devusr
+  #         DB_TEST_USER: testusr
+  #         DB_PWD: pass
+  #         TZ: Asia/Tokyo
+  #         REDIS_HOST: redis
+  #         REDIS_PORT: 6379
+  #     - image: circleci/mysql:5.7
+  #       environment:
+  #         MYSQL_ROOT_PASSWORD: pwd
+  #         MYSQL_USER: devusr
+  #         MYSQL_TEST_USER: testusr
+  #         MYSQL_PASSWORD: pass
+  #         MYSQL_DATABASE: dev_osdr_db
+  #         MYSQL_TEST_DATABASE: test_osdr_db
+  #   working_directory: ~/app
+  #   steps:
+  #     - checkout
+  #     - restore_cache:
+  #         keys:
+  #           - v1-dependencies-{{ checksum "Gemfile.lock" }}
+  #           # fallback to using the latest cache if no exact match is found
+  #           - v1-dependencies-
+  #     - run: bundle install --jobs=4 --retry=3 --path vendor/bundle
+  #     - run: yarn install
+  #     - save_cache:
+  #         paths:
+  #           - ./vendor/bundle
+  #         key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+  #     # Rubocop
+  #     - run:
+  #         name: Rubocop
+  #         command: bundle exec rubocop
+  rspec:
     docker:
       - image: circleci/ruby:2.5.1-node-browsers-legacy
         environment:
           RAILS_ENV: test
           DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_NAME: dev_osdr_db
-          DB_TEST_NAME: test_osdr_db
-          DB_USER: devusr
-          DB_TEST_USER: testusr
-          DB_PWD: pass
-          TZ: Asia/Tokyo
-          REDIS_HOST: redis
-          REDIS_PORT: 6379
-      - image: circleci/mysql:5.7
-        environment:
-          MYSQL_ROOT_PASSWORD: pwd
-          MYSQL_USER: devusr
-          MYSQL_TEST_USER: testusr
-          MYSQL_PASSWORD: pass
-          MYSQL_DATABASE: dev_osdr_db
-          MYSQL_TEST_DATABASE: test_osdr_db
-    working_directory: ~/app
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "Gemfile.lock" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-      - run: bundle install --jobs=4 --retry=3 --path vendor/bundle
-      - run: yarn install
-      - save_cache:
-          paths:
-            - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
-      # Rubocop
-      - run:
-          name: Rubocop
-          command: bundle exec rubocop
-  rspec:
-    docker:
-      - image: circleci/ruby:2.5.1-node-browsers-legacy
-        environment:
-          # RAILS_ENV: test
-          # DB_HOST: 127.0.0.1
           # DB_PORT: 3306
           # DB_TEST_NAME: test_osdr_db
           # DB_TEST_USER: testusr
@@ -63,8 +63,8 @@ jobs:
           MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_DATABASE: circle_test
           MYSQL_HOST: 127.0.0.1
-          # MYSQL_ROOT_HOST: %
           MYSQL_USER: root
+          # MYSQL_ROOT_HOST: %
           # MYSQL_ROOT_PASSWORD: pwd
           # MYSQL_USER: testusr
           # MYSQL_PASSWORD: pass
