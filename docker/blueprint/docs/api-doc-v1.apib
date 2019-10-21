@@ -1,5 +1,5 @@
-# Group ユーザー系
-/api/v1/user/xxx系
+# Group 個人機能
+/api/v1/user/*
 
 ## Profiles [/api/v1/user/profiles]
 Resource of Profiles
@@ -76,8 +76,41 @@ Resource of Profiles
 
             {}
         
-# Group グループ系
-/api/v1/group/xxx系
+# Group 家族機能
+/api/v1/group/*
+
+## 家族口座登録 [/api/v1/group/at-account]
+
+### 家族口座登録 [POST]
+
+#### Description
+
+* 家族口座の登録を行う。
+
+#### Parameters
+* fnc_id (string)
+* fnc_type (string) [bank|card|etc]
+
++ Request Example (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "fnc_id": "b123",
+                "fnc_type": "bank"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
+
 
 # Group その他
 /api/v1/xxx系
