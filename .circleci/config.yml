@@ -10,6 +10,15 @@ jobs:
         environment:
           RAILS_ENV: test
           DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: dev_osdr_db
+          DB_TEST_NAME: test_osdr_db
+          DB_USER: devusr
+          DB_TEST_USER: testusr
+          DB_PWD: pass
+          TZ: Asia/Tokyo
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
       - image: circleci/mysql:5.7
         environment:
           MYSQL_ROOT_PASSWORD: pwd
@@ -42,6 +51,15 @@ jobs:
         environment:
           RAILS_ENV: test
           DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: dev_osdr_db
+          DB_TEST_NAME: test_osdr_db
+          DB_USER: devusr
+          DB_TEST_USER: testusr
+          DB_PWD: pass
+          TZ: Asia/Tokyo
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
       - image: circleci/mysql:5.7
         environment:
           MYSQL_ROOT_PASSWORD: pwd
