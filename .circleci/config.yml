@@ -49,21 +49,26 @@ jobs:
     docker:
       - image: circleci/ruby:2.5.1-node-browsers-legacy
         environment:
-          RAILS_ENV: test
-          DB_HOST: 127.0.0.1
+          # RAILS_ENV: test
+          # DB_HOST: 127.0.0.1
           # DB_PORT: 3306
           # DB_TEST_NAME: test_osdr_db
           # DB_TEST_USER: testusr
-          DB_PWD: pass
+          # DB_PWD: pass
           # TZ: Asia/Tokyo
           # REDIS_HOST: redis
           # REDIS_PORT: 6379
       - image: circleci/mysql:5.7
         environment:
-          MYSQL_ROOT_PASSWORD: pwd
-          MYSQL_USER: testusr
-          MYSQL_PASSWORD: pass
-          MYSQL_DATABASE: test_osdr_db
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_DATABASE: circle_test
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_ROOT_HOST: %
+          MYSQL_USER: root
+          # MYSQL_ROOT_PASSWORD: pwd
+          # MYSQL_USER: testusr
+          # MYSQL_PASSWORD: pass
+          # MYSQL_DATABASE: test_osdr_db
     working_directory: ~/app
     steps:
       - checkout
