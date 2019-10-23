@@ -81,7 +81,7 @@ class Api::V1::User::BankTransactionsController < ApplicationController
     options[:goal] = nil
     options[:transaction] = transaction
     options[:transactions] = nil
-    options[:at_sync_tansaction_latest_date] = nil
+    options[:at_sync_transaction_latest_date] = nil
     options
   end
 end

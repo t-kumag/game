@@ -19,7 +19,7 @@ class Api::V1::ActivitiesController < ApplicationController
     options[:goal] = nil
     options[:transaction] = nil
     options[:transactions] = transactions
-    options[:at_sync_tansaction_latest_date] = last_sync_date
+    options[:at_sync_transaction_latest_date] = last_sync_date
     options
   end
 

@@ -20,7 +20,7 @@ class Services::ActivityService
     activity = set_activity(defined_activity)
     activity = convert_goal_message(options[:goal], defined_activity, activity) if options[:goal].present?
     activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
-    activity = convert_trans_message(options[:transactions], options[:at_sync_tansaction_latest_date], defined_activity, activity) if options[:transactions].present?
+    activity = convert_trans_message(options[:transactions], options[:at_sync_transaction_latest_date], defined_activity, activity) if options[:transactions].present?
 
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
@@ -113,8 +113,9 @@ class Services::ActivityService
           activity_type:  activity_type,
           message: activity[:message],
           date: used_date,
-          at_sync_transaction_latest_date: activity[:at_sync_tansaction_latest_date]
+          at_sync_transaction_latest_date: activity[:at_sync_transaction_latest_date]
       )
+
     rescue => exception
       Rails.logger.info("failed to create activity ===============")
       p exception
@@ -127,7 +128,7 @@ class Services::ActivityService
     activity = {}
     activity[:message] = defined_activity[:message]
     activity[:url] = defined_activity[:url]
-    activity[:at_sync_tansaction_latest_date] = nil
+    activity[:at_sync_transaction_latest_date] = nil
     activity
   end
 
@@ -141,9 +142,9 @@ class Services::ActivityService
     activity
   end
 
-  def self.convert_trans_message(transactions, at_sync_tansaction_latest_date, defined_activity, activity)
+  def self.convert_trans_message(transactions, at_sync_transaction_latest_date, defined_activity, activity)
     activity[:message] = sprintf(defined_activity[:message], transactions.count)
-    activity[:at_sync_tansaction_latest_date] = at_sync_tansaction_latest_date
+    activity[:at_sync_transaction_latest_date] = at_sync_transaction_latest_date
     activity
   end
 end
