@@ -10,7 +10,6 @@ RSpec.describe 'bs_controller' do
       it 'response 200' do
         get "/api/v1/user/bs-summary", headers: headers
         expect(response.status).to eq 200
-        p response.body
       end
 
       it 'response json' do

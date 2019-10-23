@@ -39,7 +39,6 @@ RSpec.describe 'card_accounts_controller' do
 
         get "/api/v1/user/card-accounts-summary", headers: headers
         response_json = JSON.parse(response.body)
-        p response.body
         expect(response_json['app']['current_month_payment']).to eq 0
       end
     end
