@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'pl_controller' do
-  let(:user) { create(:user, :with_at_user_bank_transactions) }
+  let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
   let(:find_params) { {
     from: '2019-12-29',
@@ -16,7 +16,6 @@ RSpec.describe 'pl_controller' do
     context 'success' do
       it 'response 200' do
         get "/api/v1/user/pl-summary", params: find_params, headers: headers
-        p response.body
         expect(response.status).to eq 200
       end
 
@@ -34,7 +33,6 @@ RSpec.describe 'pl_controller' do
     context 'success' do
       it 'response 200' do
         get "/api/v1/user/pl-categories", params: find_params, headers: headers
-        p response.body
         expect(response.status).to eq 200
       end
 
@@ -52,7 +50,6 @@ RSpec.describe 'pl_controller' do
     context 'success' do
       it 'response 200' do
         get "/api/v1/user/pl-grouped-categories", params: find_params, headers: headers
-        p response.body
         expect(response.status).to eq 200
       end
 
