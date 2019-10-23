@@ -38,6 +38,7 @@ RSpec.describe Api::V1::PairingRequestsController do
   end
 
   describe '#receive_pairing_request' do
+    let(:headers) { { Authorization: 'Bearer ' + partner_user.token } }
     let(:params) { { 
       pairing_token: pairing_request.token
     } } 
@@ -83,6 +84,17 @@ RSpec.describe Api::V1::PairingRequestsController do
         post '/api/v1/pairing-requests/receive_pairing_request', params: params, headers: headers
         expect(Entities::Activity.where(user_id: user.id)).to exist
         expect(Entities::Activity.where(user_id: partner_user.id)).to exist
+      end
+    end
+  end
+
+  describe '#destroy' do
+    let(:user) { create(:user, :with_partner_user) }
+
+    context 'success' do
+      it 'response 200' do
+        delete '/api/v1/pairing-requests', headers: headers 
+        expect(response.status).to eq 200
       end
     end
   end
