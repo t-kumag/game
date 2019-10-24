@@ -132,6 +132,8 @@ class Services::GoalService
     user_ids = [@user.id]
     user_ids.push(@user.partner_user.id) if with_group
     goals = Entities::GoalSetting.where(at_user_bank_account_id: bank_id, user_id: user_ids).map do |gs|
+      # 現状は goal 削除時に goal_settings はそのままのため、ここで除外する
+      next if gs.goal.nil?
       user = Entities::User.find(gs.user_id)
       current_amount = get_user_current_amount(user, gs.goal.id)[:current_amount]
       {
@@ -139,7 +141,7 @@ class Services::GoalService
         current_amount: current_amount,
         name: gs.goal.name
       }
-    end
+    end.compact
 
     if with_group
       after_merge_goals = []
