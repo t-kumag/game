@@ -87,7 +87,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal_setting.update!(get_goal_setting_params)
         partner_goal_setting.update!(get_partner_goal_setting_params)
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
-          goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
+          goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount) if goal_setting.at_user_bank_account_id.present?
         end
       end
     rescue ActiveRecord::RecordInvalid => db_err
