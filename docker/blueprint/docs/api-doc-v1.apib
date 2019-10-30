@@ -128,7 +128,7 @@ Resource of Transactions
                 ]
             }
 
-### ユーザ明細取得 [GET]
+### ユーザグループ明細取得 [GET]
 
 #### Path
 /user/grouped-transactions
@@ -1235,7 +1235,7 @@ Resource of Icon
 # Group その他
 /api/v1/xxx系
 
-## Auth [/api/v1/auth/login]
+## 認証 [/api/v1/auth/login]
 
 ### ログイン [POST]
 
@@ -1263,8 +1263,6 @@ Resource of Icon
                 }
             }
 
-
-## Auth [/api/v1/auth/logout]
 
 ### ログアウト [DELETE]
 
@@ -1619,4 +1617,19 @@ Resource of Pairing
               }
             }
 
+
+## ペアリング削除 [DELETE]
+
+
++ Request ユーザプロフィール更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
 
