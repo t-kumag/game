@@ -128,6 +128,68 @@ Resource of Transactions
                 ]
             }
 
+### ユーザ明細取得 [GET]
+
+#### Path
+/user/grouped-transactions
+
+#### Parameters
+
+* category_id (int)
+* share (boolean)
+* scope (string) [income|outcome]
+* from (date)
+* to (date)
+
+
++ Request ユーザプロフィール取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "category_id": "1",
+                "share": "false",
+                "scope": "income",
+                "from": "2019-08-01",
+                "to": "2019-08-31"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": [
+                   {
+                     "at_user_card_account_id": 13,
+                     "user_id": 20,
+                     "amount": -4900,
+                     "used_date": "2019-08-27 00:00:00",
+                     "used_location": "JOJO TOWN",
+                     "type": "card",
+                     "is_shared": false,
+                     "is_account_shared": false,
+                     "transaction_id": 195,
+                     "at_transaction_category_id": 1
+                   },
+                   {
+                     "at_user_emoney_service_account_id": 13,
+                     "user_id": 20,
+                     "amount": -195,
+                     "used_date": "2019-08-15 00:00:00",
+                     "used_location": "入 東銀座出新宿区",
+                     "type": "emoney",
+                     "is_shared": false,
+                     "is_account_shared": false,
+                     "transaction_id": 221,
+                     "at_transaction_category_id": 1
+                   }
+                ]
+            }
 
 ## 銀行口座 [/api/v1/user/bank-account]
 Resource of Bank Account
@@ -264,6 +326,12 @@ Resource of Bank Account Transactions
 
             }
 
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
 ### 明細詳細取得 [GET]
 
 #### Parameters
@@ -294,6 +362,12 @@ Resource of Bank Account Transactions
                   "transaction_id": 184
                 }
             }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
 
 ### 明細詳細更新 [PUT]
 
@@ -463,6 +537,12 @@ Resource of Card Account Transactions
                 ]
 
             }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
 
 ### 明細詳細取得 [GET]
 
@@ -664,6 +744,12 @@ Resource of Emoney Account Transactions
                 ]
 
             }
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
 
 ### 明細詳細取得 [GET]
 
@@ -695,6 +781,13 @@ Resource of Emoney Account Transactions
                   "transaction_id": 192
                 }
             }
+
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
 
 ### 明細詳細更新 [PUT]
 
@@ -936,7 +1029,7 @@ Resource of BS
 
 
 ## アイコン [/api/v1/user/icon]
-Resource of Icoon
+Resource of Icon
 
 ### アイコン取得 [GET]
 
@@ -951,9 +1044,19 @@ Resource of Icoon
     + Body
 
             {
-                "img_url": "https://osdr-img-test.s3-ap-northeast-1.amazonaws.comaaa"
+                "img_url": "https://osdr-img-test.s3-ap-northeast-1.amazonaws.com"
             }
 
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "icon not found."
+                }
+            }
 
 ### アイコン登録 [POST]
 
@@ -1009,6 +1112,16 @@ Resource of Icoon
             {}
 
 
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "icon not found"
+                }
+            }
 
 
 
