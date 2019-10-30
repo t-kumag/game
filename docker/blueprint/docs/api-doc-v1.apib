@@ -1166,3 +1166,344 @@ Resource of Icoon
     + Body
 
             {}
+
+## アクティビティ [/api/v1/user/activities]
+Resource of Activity
+
+### アクティビティ取得 [GET]
+
++ Request ユーザプロフィール取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "activities": [
+                  {
+                    "day": "2019-10-30",
+                    "type": "goal_add_money",
+                    "message": "目標に入金がありました。"
+                  },
+                  {
+                    "day": "2019-10-30",
+                    "type": "goal_add_money",
+                    "message": "目標に入金がありました。"
+                  }
+            }
+
+
+
+## budget question [/api/v1/user/budget-questions]
+Resource of Budget Questions
+
+### budget questions 登録 [POST]
+
++ Request ユーザプロフィール登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "budget_questions":[
+                   {
+                      "budget_question_id":1,
+                      "step":1
+                   },
+                   {
+                      "budget_question_id":2,
+                      "step":2
+                   }
+                ]
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 400 (application/json)
+
+    + Body
+
+            {}
+
+
+## カテゴリ [/api/v1/user/budget-questions]
+Resource of Category
+
+### カテゴリ取得 [GET]
+
++ Request ユーザプロフィール登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "app": {
+                    "at_grouped_categories": [
+                          {
+                             "at_grouped_category_id": 17,
+                             "at_grouped_category_name": "入金",
+                             "at_transaction_categories": [
+                                {
+                                    "at_transaction_category_id": 123,
+                                    "at_transaction_category_category_name1": "ATM入金"
+                                },
+                                {
+                                    "at_transaction_category_id": 124,
+                                    "at_transaction_category_category_name1": "振込入金"
+                                },
+                                {
+                                    "at_transaction_category_id": 125,
+                                    "at_transaction_category_category_name1": "清算入金"
+                                },
+                                {
+                                    "at_transaction_category_id": 126,
+                                    "at_transaction_category_category_name1": "給与入金"
+                                },
+                                {
+                                    "at_transaction_category_id": 127,
+                                    "at_transaction_category_category_name1": "賞与入金"
+                                },
+                                {
+                                    "at_transaction_category_id": 128,
+                                    "at_transaction_category_category_name1": "貯金入金"
+                                },
+                                {
+                                    "at_transaction_category_id": 129,
+                                    "at_transaction_category_category_name1": "配当等収入"
+                                },
+                                {
+                                    "at_transaction_category_id": 130,
+                                    "at_transaction_category_category_name1": "雑収入"
+                                },
+                                {
+                                    "at_transaction_category_id": 131,
+                                    "at_transaction_category_category_name1": "融資入金"
+                                },
+                                {
+                                    "at_transaction_category_id": 132,
+                                    "at_transaction_category_category_name1": "家賃所得"
+                                },
+                                {
+                                    "at_transaction_category_id": 133,
+                                    "at_transaction_category_category_name1": "利子所得"
+                                },
+                                {
+                                    "at_transaction_category_id": 134,
+                                    "at_transaction_category_category_name1": "振込手数料入金"
+                                },
+                                {
+                                    "at_transaction_category_id": 135,
+                                    "at_transaction_category_category_name1": "その他入金"
+                                }
+                             ]
+                          }
+                        ]
+                }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 400 (application/json)
+
+    + Body
+
+            {}
+
+
+## 通知 [/api/v1/user/notices]
+Resource of Notice
+
+## 通知取得 [GET]
+
++ Request ユーザプロフィール登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "notices": [
+                  {
+                    "id": 1,
+                    "title": "金融機関の連携方法】はこちら",
+                    "url": "https://osidori.co/news/2019/08/19/152/"
+                  }
+                ]
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 400 (application/json)
+
+    + Body
+
+            {}
+
+
+## 通知登録 [POST]
+
++ Request ユーザプロフィール登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "title": "【金融機関の連携方法】はこちら",
+                "date": "2019-08-22",
+                "url": "https://osidori.co/news/2019/08/19/152/"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 400 (application/json)
+
+    + Body
+
+            {}
+
+
+## ペアリング [/api/v1/user/pairing-requests]
+Resource of Pairing
+
+
+## ペアリング取得 [GET]
+
++ Request ユーザプロフィール登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": {
+                  "token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                  "token_expires_at": "2019-11-07T01:44:45.000+09:00"
+                }
+            }
+
+## ペアリング登録 [POST]
+
+#### Path
+/user/pairing-request/receive_pairing_request
+
+
++ Request ユーザプロフィール登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "pairing_token": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "pairing token not found"
+              }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "paring user not found or invalid token."
+              }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "same user"
+              }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "paring user already exist."
+              }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "from user group taken"
+              }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "to user group taken"
+              }
+            }
+
+
