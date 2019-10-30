@@ -1507,7 +1507,7 @@ Resource of Notice
 Resource of Pairing
 
 
-## ペアリング取得 [GET]
+### ペアリング取得 [GET]
 
 + Request ユーザプロフィール登録 (application/json)
 
@@ -1527,7 +1527,7 @@ Resource of Pairing
                 }
             }
 
-## ペアリング登録 [POST]
+### ペアリング登録 [POST]
 
 #### Path
 /user/pairing-request/receive_pairing_request
@@ -1618,7 +1618,7 @@ Resource of Pairing
             }
 
 
-## ペアリング削除 [DELETE]
+### ペアリング削除 [DELETE]
 
 
 + Request ユーザプロフィール更新 (application/json)
@@ -1641,10 +1641,10 @@ Resource of Users
 
 ### アクティベート [GET]
 
-## Path
+#### Path
 /user/activate
 
-## Param
+#### Param
 * token (string)
 
 
@@ -1675,10 +1675,94 @@ Resource of Users
 
             { }
 
+### at_user取得 [GET]
+
+#### Path
+/user/at-url
+
+#### Param
+* token (string)
+
+
++ Request at-url取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": {
+                    "url": "https://atdev.369webcash.com/openadd001.act",
+                    "chnl_id": "CHNL_OSIDORI",
+                    "token_key": "lG41z5gjYPe8s8WcIOBRRglhUkui7pV6AiXvZabVOFk="
+                }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "user not found or invalid token."
+                }
+            }
+
+### at_sync取得 [GET]
+
+#### Path
+/user/at-sync
+
+#### Param
+* token (string)
+
+
++ Request at-sync取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
+### at_token取得 [GET]
+
+#### Path
+/user/at-token
+
+#### Param
+* token (string)
+
+
++ Request at-sync取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": {
+                    "token": "euFznKzVG2v9txVidLCCegM7FQJJ2yhJnAh3SPaVLfQ=",
+                    "expires_at": "20191130035239"
+                }
+            }
 
 ### 会員登録 [POST]
 
-## Path
+#### Path
 /users
 
 
@@ -1708,7 +1792,7 @@ Resource of Users
 
 ### メール再送信 [POST]
 
-## Path
+#### Path
 /user/resend
 
 
@@ -1736,9 +1820,9 @@ Resource of Users
 
             {}
 
-### パスワード変更要求 [POST]
+### パスワード変更要求登録 [POST]
 
-## Path
+#### Path
 /users/change_password_request
 
 
@@ -1772,9 +1856,9 @@ Resource of Users
             }
 
 
-### パスワード変更要求 [POST]
+### パスワード変更登録 [POST]
 
-## Path
+#### Path
 /users/change_password
 
 
@@ -1849,9 +1933,13 @@ Resource of Users
               }
             }
 
-### ユーザプロフィール更新 [PUT]
 
-+ Request ユーザプロフィール更新 (application/json)
+### ユーザー削除 [DELETE]
+
+#### Path
+/users
+
++ Request ユーザー削除 (application/json)
 
     + Headers
 
@@ -1859,14 +1947,10 @@ Resource of Users
 
     + Body
 
-
             {
-                "gender": 0,
-                "birthday": "2019-01-01",
-                "has_child": 0,
-                "push": false
+                "user_cancel_reason":"hogehoge",
+                "user_cancel_checklists":[1,2]
             }
-
 
 + Response 200 (application/json)
 
@@ -1874,118 +1958,16 @@ Resource of Users
 
             {}
 
-## ユーザ明細取得 [/api/v1/user/transactions]
-Resource of Transactions
-
-
-### ユーザ明細取得 [GET]
-
-#### Parameters
-
-* category_id (int)
-* share (boolean)
-* scope (string) [income|outcome]
-* from (date)
-* to (date)
-
-
-+ Request ユーザプロフィール取得 (application/json)
-
-    + Headers
-
-            Authorization: Bearer [access_token]
++ Response 400 (application/json)
 
     + Body
 
             {
-                "category_id": "1",
-                "share": "false",
-                "scope": "income",
-                "from": "2019-08-01",
-                "to": "2019-08-31"
-            }
-
-+ Response 200 (application/json)
-
-    + Body
-
-            {
-                "app": [
-                   {
-                       "at_user_bank_account_id": 11,
-                       "user_id": 19,
-                       "amount": -461000,
-                       "used_date": "2019-09-30 00:00:00",
-                       "used_location": "カフェベートーベンbank",
-                       "type": "bank",
-                       "is_shared": false,
-                       "is_account_shared": false,
-                       "transaction_id": 261,
-                       "at_transaction_category_id": 30
-                   }
+                "errors": [
+                  {
+                    "resource": null,
+                    "field": "user_cancel_reason",
+                    "code": "blank"
+                  }
                 ]
             }
-
-### ユーザグループ明細取得 [GET]
-
-#### Path
-/user/grouped-transactions
-
-#### Parameters
-
-* category_id (int)
-* share (boolean)
-* scope (string) [income|outcome]
-* from (date)
-* to (date)
-
-
-+ Request ユーザプロフィール取得 (application/json)
-
-    + Headers
-
-            Authorization: Bearer [access_token]
-
-    + Body
-
-            {
-                "category_id": "1",
-                "share": "false",
-                "scope": "income",
-                "from": "2019-08-01",
-                "to": "2019-08-31"
-            }
-
-+ Response 200 (application/json)
-
-    + Body
-
-            {
-                "app": [
-                   {
-                     "at_user_card_account_id": 13,
-                     "user_id": 20,
-                     "amount": -4900,
-                     "used_date": "2019-08-27 00:00:00",
-                     "used_location": "JOJO TOWN",
-                     "type": "card",
-                     "is_shared": false,
-                     "is_account_shared": false,
-                     "transaction_id": 195,
-                     "at_transaction_category_id": 1
-                   },
-                   {
-                     "at_user_emoney_service_account_id": 13,
-                     "user_id": 20,
-                     "amount": -195,
-                     "used_date": "2019-08-15 00:00:00",
-                     "used_location": "入 東銀座出新宿区",
-                     "type": "emoney",
-                     "is_shared": false,
-                     "is_account_shared": false,
-                     "transaction_id": 221,
-                     "at_transaction_category_id": 1
-                   }
-                ]
-            }
-
