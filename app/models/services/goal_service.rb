@@ -128,6 +128,36 @@ class Services::GoalService
     user.free? && Entities::Goal.where(user_id: user.id).count < Settings.at_user_limit_free_goal
   end
 
+  def goals(bank_id, with_group=false)
+    user_ids = [@user.id]
+    user_ids.push(@user.partner_user.id) if with_group
+    goals = Entities::GoalSetting.where(at_user_bank_account_id: bank_id, user_id: user_ids).map do |gs|
+      # 現状は goal 削除時に goal_settings はそのままのため、ここで除外する
+      next if gs.goal.nil?
+      user = Entities::User.find(gs.user_id)
+      current_amount = get_user_current_amount(user, gs.goal.id)[:current_amount]
+      {
+        goal_id: gs.goal_id,
+        current_amount: current_amount,
+        name: gs.goal.name
+      }
+    end.compact
+
+    if with_group
+      after_merge_goals = []
+      goals.each do |v|
+        g = after_merge_goals.select {|i| i[:goal_id] === v[:goal_id] }.first
+        if g.blank?
+          after_merge_goals << v
+        else
+          g[:current_amount] += v[:current_amount]
+        end
+      end 
+    end
+
+    with_group ? after_merge_goals : goals
+  end
+
   def get_user_current_amount(user, goal_id)
     goal_logs = Entities::GoalLog.where(user_id: user.id, goal_id: goal_id)
     monthly_amount = get_monthly_amount_sum(goal_logs)
