@@ -1560,6 +1560,119 @@ Resource of Goal
               }
             }
 
+
+## 目標設定 [/api/v1/group/goals]
+Resource of Goal
+
+###  目標設定詳細取得 [GET]
+
+#### path
+/group/goals/:goal_id/goal-settings/:id
+
+#### Parameters
+
+* goal_id (int)
+* id (int)
+
++ Request 目標一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": {
+                  "goal_setting_id": 143,
+                  "goal_id": 85,
+                  "user_id": 20,
+                  "at_user_bank_account_id": 13,
+                  "monthly_amount": 250,
+                  "first_amount": 500
+                }
+            }
+
+
+###  目標設定登録 [POST]
+
++ Request 目標詳細取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+    + Body
+
+            {
+                "at_user_bank_account_id": 1,
+                "monthly_amount": 100000,
+                "first_amount": 50000
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "goal not found.s"
+              }
+            }
+
+###  目標設定更新 [PUT]
+
++ Request 目標設定更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+    + Body
+
+            {
+                "at_user_bank_account_id": 1,
+                "monthly_amount": 100000,
+                "first_amount": 50000
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "goal not found.s"
+              }
+            }
+
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "goal_setting not found"
+              }
+            }
+
+
 # Group その他
 /api/v1/xxx系
 
