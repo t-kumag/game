@@ -1887,6 +1887,18 @@ Resource of Users
     + Body
 
             {
+              "errors": {
+                "code": "",
+                "mesasge": "user not found or invalid token."
+              }
+            }
+
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
                 "errors": [
                   {
                     "resource": "User",
@@ -1895,7 +1907,7 @@ Resource of Users
                   }
                 ]
             }
-+ Response 422 (application/json)
++ Response 400 (application/json)
 
     + Body
 
@@ -1908,7 +1920,7 @@ Resource of Users
                   }
                 ]
             }
-+ Response 422 (application/json)
++ Response 400 (application/json)
 
     + Body
 
@@ -1921,18 +1933,6 @@ Resource of Users
                   }
                 ]
             }
-
-+ Response 422 (application/json)
-
-    + Body
-
-            {
-              "errors": {
-                "code": "",
-                "mesasge": "user not found or invalid token."
-              }
-            }
-
 
 ### ユーザー削除 [DELETE]
 

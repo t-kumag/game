@@ -854,7 +854,12 @@
   "<span class="hljs-attribute">token</span>": <span class="hljs-value"><span class="hljs-string">"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</span></span>,
   "<span class="hljs-attribute">password</span>": <span class="hljs-value"><span class="hljs-string">"hogehoge"</span></span>,
   "<span class="hljs-attribute">password_confirm</span>": <span class="hljs-value"><span class="hljs-string">"hogehog"</span>
-</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span><span class="tab-button">422</span><span class="tab-button">422</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+</span>}</code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span><span class="tab-button">400</span><span class="tab-button">400</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
+    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"user not found or invalid token."</span>
+  </span>}
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
     {
       "<span class="hljs-attribute">resource</span>": <span class="hljs-value"><span class="hljs-string">"User"</span></span>,
@@ -878,11 +883,6 @@
       "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"confirmation"</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"user not found or invalid token."</span>
-  </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="その他-ユーザー-post-3" class="action post"><h4 class="action-heading"><div class="name">パスワード変更登録</div><a href="#その他-ユーザー-post-3" class="method post">POST</a><code class="uri">/api/v1/user</code></h4><h4 id="header-path-9">Path <a class="permalink" href="#header-path-9" aria-hidden="true">¶</a></h4>
 <p>/users/change_password</p>
 </div></div><hr class="split"><div class="right"><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">ユーザー削除</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
@@ -901,7 +901,7 @@
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="その他-ユーザー-delete" class="action delete"><h4 class="action-heading"><div class="name">ユーザー削除</div><a href="#その他-ユーザー-delete" class="method delete">DELETE</a><code class="uri">/api/v1/user</code></h4><h4 id="header-path-10">Path <a class="permalink" href="#header-path-10" aria-hidden="true">¶</a></h4>
 <p>/users</p>
-</div></div><hr class="split"><div class="middle"><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 30 Oct 2019</p></div></div></div></div><script>/* eslint-env browser */
+</div></div><hr class="split"><div class="middle"><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 31 Oct 2019</p></div></div></div></div><script>/* eslint-env browser */
 /* eslint quotes: [2, "single"] */
 'use strict';
 
