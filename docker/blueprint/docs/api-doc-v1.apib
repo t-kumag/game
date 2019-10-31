@@ -1232,6 +1232,334 @@ Resource of Icon
                 ]
             }
 
+## 目標 [/api/v1/group/goals]
+Resource of Goal
+
+###  目標一覧取得 [GET]
+
+#### Parameters
+
+* id (int)
+
++ Request 目標一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": [
+                    {
+                        "goals": {
+                            "goal_id": 71,
+                            "goal_type_id": 2,
+                            "name": "仮目標 雨宮",
+                            "img_url": "https://osdr-img-test.s3-ap-northeast-1.amazonaws.com/goal_types/2/bg-card-goal-education.png",
+                            "goal_amount": 10000,
+                            "current_amount": 0,
+                            "start_date": "2019-09-24",
+                            "end_date": "2020-07-24",
+                            "progress_all": {
+                                "progress": 0.0
+                        },
+                        "progress_monthly": {
+                            "progress": 0.0,
+                            "icon": "bad"
+                            }
+                        },
+                        "goals_settings": [
+                            {
+                                "goal_setting_id": 117,
+                                "user_id": 20,
+                                "at_user_bank_account_id": null,
+                                "monthly_amount": 600,
+                                "first_amount": 50
+                            },
+                            {
+                                "goal_setting_id": 118,
+                                "user_id": 19,
+                                "at_user_bank_account_id": null,
+                                "monthly_amount": 400,
+                                "first_amount": 50
+                            }
+                        ]
+                    },
+                    {
+                        "goals": {
+                            "goal_id": 71,
+                            "goal_type_id": 2,
+                            "name": "仮目標 雨宮",
+                            "img_url": "https://osdr-img-test.s3-ap-northeast-1.amazonaws.com/goal_types/2/bg-card-goal-education.png",
+                            "goal_amount": 10000,
+                            "current_amount": 0,
+                            "start_date": "2019-09-24",
+                            "end_date": "2020-07-24",
+                            "progress_all": {
+                                "progress": 0.0
+                            },
+                            "progress_monthly": {
+                                "progress": 0.0,
+                                "icon": "bad"
+                                }
+                            },
+                            "goals_settings": [
+                                {
+                                    "goal_setting_id": 121,
+                                    "user_id": 19,
+                                    "at_user_bank_account_id": null,
+                                    "monthly_amount": 400,
+                                    "first_amount": 0
+                                },
+                                {
+                                    "goal_setting_id": 122,
+                                    "user_id": 20,
+                                    "at_user_bank_account_id": 13,
+                                    "monthly_amount": 600,
+                                    "first_amount": 0
+                                }
+                            ]
+                        }
+                    },
+                ]
+            }
+
+
+###  目標詳細取得 [GET]
+
++ Request 目標詳細取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "goals": {
+                    "goal_id": null,
+                    "goal_type_id": 4,
+                    "name": "とりあえず貯金",
+                    "img_url": "https://osdr-img-test.s3-ap-northeast-1.amazonaws.com/goal_types/4/bg-card-goal-savings.png",
+                    "goal_amount": 5000,
+                    "current_amount": 600,
+                    "goal_difference_amount": null,
+                    "start_date": "2019-10-18",
+                    "end_date": "2020-08-18"
+                },
+                "owner_current_amount": {
+                    "monthly_amount": 0,
+                    "first_amount": 0,
+                    "add_amount": 0,
+                    "current_amount": 0
+                },
+                "partner_current_amount": {
+                    "monthly_amount": 0,
+                    "first_amount": 500,
+                    "add_amount": 100,
+                    "current_amount": 600
+                }
+                "goals_settings": [
+                    {
+                        "goal_setting_id": 135,
+                        "user_id": 19,
+                        "at_user_bank_account_id": 13,
+                        "monthly_amount": 250,
+                        "first_amount": 500
+                    },
+                    {
+                        "goal_setting_id": 136,
+                        "user_id": 20,
+                        "at_user_bank_account_id": null,
+                        "monthly_amount": 250,
+                        "first_amount": 0
+                    }
+                ]
+            }
+
+
+### 目標登録 [POST]
+
++ Request 目標登録登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "goals": {
+                    "goal_amount" : 5000,
+                    "end_date" : "2020-08-18",
+                    "name" : "",
+                    "start_date" : "2019-10-18",
+                    "goal_type_id" : 4
+                },
+                "partner_goal_settings": {
+                    "monthly_amount" : 5000,
+                    "first_amount" : 0"
+                },
+                "goal_settings": {
+                    "monthly_amount" : 5000,
+                    "first_amount" : "0",
+                    "at_user_bank_account_id" : ""
+                }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "five goal limit of free users"
+              }
+            }
+
+### 目標追加入金登録 [POST]
+
+#### Path
+* /api/v1/group/goals/:goal_id/add_money
+
++ Request 目標登録登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "add_amount": 0,
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "user not found or goal not found."
+              }
+            }
+            o
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "minus balance"
+              }
+            }
+
+### 目標更新 [PUT]
+
++ Request ユーザプロフィール更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "goals": {
+                    "goal_amount" : 10000,
+                    "start_date" : "2019-09-24",
+                    "end_date" : "2020-07-24",
+                    "name" : "仮目標 雨宮",
+                    "goal_type_id" : 2,
+                    "img_url" : "\/goal_types\/2\/bg-card-goal-education.png"
+                },
+                "partner_goal_settings": {
+                    "monthly_amount" : 400,
+                    "first_amount" : 0,
+                    "goal_setting_id" : 121
+                    "at_user_bank_account_id": 13
+                },
+                "goal_settings": {
+                    "goal_setting_id" : 122,
+                    "monthly_amount" : 600,
+                    "first_amount" : 500,
+                    "at_user_bank_account_id": 13
+                }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "Goal not found."
+              }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "Goal settings not found."
+              }
+            }
+
+### 目標削除 [DELETE]
+
++ Request ログアウト (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "Goal not found."
+              }
+            }
+
 # Group その他
 /api/v1/xxx系
 
