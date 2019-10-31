@@ -92,7 +92,7 @@ Resource of Profiles
 Resource of Transactions
 
 
-### ユーザ明細取得 [GET]
+### ユーザ明細一覧取得 [GET]
 
 #### Parameters
 
@@ -103,7 +103,7 @@ Resource of Transactions
 * to (date)
 
 
-+ Request ユーザ明細取得 (application/json)
++ Request ユーザ明細一覧取得 (application/json)
 
     + Headers
 
@@ -140,7 +140,7 @@ Resource of Transactions
                 ]
             }
 
-### ユーザグループ明細取得 [GET]
+### ユーザグループ明細一覧取得 [GET]
 
 #### Path
 /user/grouped-transactions
@@ -154,7 +154,7 @@ Resource of Transactions
 * to (date)
 
 
-+ Request ユーザグループ取得 (application/json)
++ Request ユーザグループ明細一覧取得 (application/json)
 
     + Headers
 
@@ -372,7 +372,7 @@ Resource of Bank Account Transactions
             {
                 "errors": {
                   "code": "",
-                  "mesasge": "Disallowed transaction id.."
+                  "mesasge": "Disallowed financier id."
                 }
             }
 
@@ -812,7 +812,7 @@ Resource of Card Account
             {
                 "errors": {
                   "code": "",
-                  "mesasge": "Disallowed transaction id."
+                  "mesasge": "Disallowed financier id."
                 }
             }
 
@@ -842,7 +842,7 @@ Resource of Card Account
             {
                 "errors": {
                   "code": "",
-                  "mesasge": "Disallowed transaction id."
+                  "mesasge": "Disallowed financier id."
                 }
             }
 
