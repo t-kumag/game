@@ -103,7 +103,7 @@ Resource of Transactions
 * to (date)
 
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request ユーザ明細取得 (application/json)
 
     + Headers
 
@@ -154,7 +154,7 @@ Resource of Transactions
 * to (date)
 
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request ユーザグループ取得 (application/json)
 
     + Headers
 
@@ -208,7 +208,7 @@ Resource of Bank Account
 
 ### 銀行口座取得 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 銀行口座取得 (application/json)
 
     + Headers
 
@@ -238,7 +238,7 @@ Resource of Bank Account
 * id (int)
 * share (boolean)
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request 銀行口座登録 (application/json)
 
     + Headers
 
@@ -255,13 +255,23 @@ Resource of Bank Account
     + Body
             {}
 
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
 
 ### 銀行口座削除 [DELETE]
 
 #### Parameters
 * id (int)
 
-+ Request ユーザプロフィール更新 (application/json)
++ Request 銀行口座更新 (application/json)
 
     + Headers
 
@@ -272,6 +282,17 @@ Resource of Bank Account
     + Body
 
             {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
 
 
 ## 銀行取引明細 [/api/v1/user/bank-account/:bank_account_id/transactions]
@@ -284,7 +305,7 @@ Resource of Bank Account Transactions
 * from (date)
 * to (date)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 明細一覧取得 (application/json)
 
     + Headers
 
@@ -361,7 +382,7 @@ Resource of Bank Account Transactions
 
 * id (int)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 明細詳細取得 (application/json)
 
     + Headers
 
@@ -413,7 +434,7 @@ Resource of Bank Account Transactions
 * at_transaction_category_id (int)
 * used_location (string
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request 明細詳細更新 (application/json)
 
     + Headers
 
@@ -449,7 +470,7 @@ Resource of Bank Account Summary
 
 ### 銀行口座合計 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 銀行口座合計 (application/json)
 
     + Headers
 
@@ -470,7 +491,7 @@ Resource of Card Account
 
 ### カード口座取得 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request カード口座取得 (application/json)
 
     + Headers
 
@@ -498,7 +519,7 @@ Resource of Card Account
 #### Parameters
 * card_account_id (int)
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request カード口座更新 (application/json)
 
     + Headers
 
@@ -531,7 +552,7 @@ Resource of Card Account
 #### Parameters
 * id (int)
 
-+ Request ユーザプロフィール更新 (application/json)
++ Request カード削除 (application/json)
 
     + Headers
 
@@ -563,7 +584,7 @@ Resource of Card Account Transactions
 * from (date)
 * to (date)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 明細一覧取得 (application/json)
 
     + Headers
 
@@ -629,7 +650,7 @@ Resource of Card Account Transactions
 
 * id (int)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 明細取得取得 (application/json)
 
     + Headers
 
@@ -678,7 +699,7 @@ Resource of Card Account Transactions
 * card_account_id (int)
 * transaction_id (int)
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request 明細詳細更新 (application/json)
 
     + Headers
 
@@ -718,7 +739,7 @@ Resource of Card Account Summary
 
 ### カード口座合計 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request カード口座合計 (application/json)
 
     + Headers
 
@@ -767,7 +788,7 @@ Resource of Card Account
 #### Parameters
 * emoney_account_id (int)
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request 電子マネー口座更新 (application/json)
 
     + Headers
 
@@ -802,7 +823,7 @@ Resource of Card Account
 #### Parameters
 * id (int)
 
-+ Request ユーザプロフィール更新 (application/json)
++ Request 電子マネー削除 (application/json)
 
     + Headers
 
@@ -838,7 +859,7 @@ Resource of Emoney Account Transactions
 * from (date)
 * to (date)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 明細一覧取得 (application/json)
 
     + Headers
 
@@ -904,7 +925,7 @@ Resource of Emoney Account Transactions
 
 * id (int)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 明細詳細取得 (application/json)
 
     + Headers
 
@@ -958,7 +979,7 @@ Resource of Emoney Account Transactions
 * used_location (string)
 * share (boolean)
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request 明細詳細更新 (application/json)
 
     + Headers
 
@@ -998,7 +1019,7 @@ Resource of Emoney Account Summary
 
 ### 電子マネー口座合計 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 電子マネー口座合計 (application/json)
 
     + Headers
 
@@ -1018,7 +1039,7 @@ Resource of User Manually Transactions
 
 ### 明細数取得 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 明細数取得 (application/json)
 
     + Headers
 
@@ -1039,7 +1060,7 @@ Resource of User Manually Transactions
 
 * id (int)
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request 明細詳細更新 (application/json)
 
     + Headers
 
@@ -1075,7 +1096,7 @@ Resource of Pl Account Transactions
 * from (date)
 * to (date)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 取引明細合計 (application/json)
 
     + Headers
 
@@ -1103,7 +1124,7 @@ Resource of Pl Account Transactions
 * from (date)
 * to (date)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 取引明細カテゴリ一覧 (application/json)
 
     + Headers
 
@@ -1151,7 +1172,7 @@ Resource of Pl Grouped Account Transactions
 * from (date)
 * to (date)
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 取引明細グループカテゴリ一覧 (application/json)
 
     + Headers
 
@@ -1184,7 +1205,7 @@ Resource of BS
 
 ### 資産合計取得 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request 資産合計取得 (application/json)
 
     + Headers
 
@@ -1206,7 +1227,7 @@ Resource of Icon
 
 ### アイコン取得 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request アイコン取得 (application/json)
 
     + Headers
 
@@ -1233,7 +1254,7 @@ Resource of Icon
 
 ### アイコン登録 [POST]
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request アイコン登録 (application/json)
 
     + Headers
 
@@ -1264,7 +1285,7 @@ Resource of Icon
             }
 ### アイコン更新 [PUT]
 
-+ Request ユーザプロフィール更新 (application/json)
++ Request アイコン更新 (application/json)
 
     + Headers
 
@@ -1649,7 +1670,7 @@ Resource of Goal
 
 ### 目標更新 [PUT]
 
-+ Request ユーザプロフィール更新 (application/json)
++ Request 目標更新 (application/json)
 
     + Headers
 
@@ -1897,7 +1918,7 @@ Resource of Activity
 
 ### アクティビティ取得 [GET]
 
-+ Request ユーザプロフィール取得 (application/json)
++ Request アクティビティ取得 (application/json)
 
     + Headers
 
@@ -1928,7 +1949,7 @@ Resource of Budget Questions
 
 ### budget questions 登録 [POST]
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request budget questions登録 (application/json)
 
     + Headers
 
@@ -1967,7 +1988,7 @@ Resource of Category
 
 ### カテゴリ取得 [GET]
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request カテゴリ取得 (application/json)
 
     + Headers
 
@@ -2057,7 +2078,7 @@ Resource of Notice
 
 ## 通知取得 [GET]
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request 通知取得 (application/json)
 
     + Headers
 
@@ -2090,7 +2111,7 @@ Resource of Notice
 
 ## 通知登録 [POST]
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request 通知登録 (application/json)
 
     + Headers
 
@@ -2123,7 +2144,7 @@ Resource of Pairing
 
 ### ペアリング取得 [GET]
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request ペアリング取得 (application/json)
 
     + Headers
 
@@ -2147,7 +2168,7 @@ Resource of Pairing
 /user/pairing-request/receive_pairing_request
 
 
-+ Request ユーザプロフィール登録 (application/json)
++ Request ペアリング登録 (application/json)
 
     + Headers
 
@@ -2235,7 +2256,7 @@ Resource of Pairing
 ### ペアリング削除 [DELETE]
 
 
-+ Request ユーザプロフィール更新 (application/json)
++ Request ペアリング削除 (application/json)
 
     + Headers
 
