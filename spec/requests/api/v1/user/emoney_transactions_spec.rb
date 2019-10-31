@@ -32,7 +32,7 @@ RSpec.describe 'emoney_transactions_controller' do
 
         get "/api/v1/user/emoney-accounts/#{at_user_emoney_service_account.id}/transactions/#{at_user_emoney_transaction.id}", headers: headers
         response_json = JSON.parse(response.body)
-        actual_app = response_json['app'];
+        actual_app = response_json['app']
 
         expect(actual_app).not_to eq nil
       end

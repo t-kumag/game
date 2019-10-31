@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'pl_controller' do
+RSpec.describe Api::V1::Group::PlController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
   let(:find_params) { {
@@ -15,12 +15,12 @@ RSpec.describe 'pl_controller' do
   describe '#summary' do
     context 'success' do
       it 'response 200' do
-        get "/api/v1/user/pl-summary", params: find_params, headers: headers
+        get "/api/v1/group/pl-summary", params: find_params, headers: headers
         expect(response.status).to eq 200
       end
 
       it 'response json' do
-        get "/api/v1/user/pl-summary", params: find_params, headers: headers
+        get "/api/v1/group/pl-summary", params: find_params, headers: headers
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
 
@@ -32,12 +32,12 @@ RSpec.describe 'pl_controller' do
   describe '#categories' do
     context 'success' do
       it 'response 200' do
-        get "/api/v1/user/pl-categories", params: find_params, headers: headers
+        get "/api/v1/group/pl-categories", params: find_params, headers: headers
         expect(response.status).to eq 200
       end
 
       it 'response json' do
-        get "/api/v1/user/pl-categories", params: find_params, headers: headers
+        get "/api/v1/group/pl-categories", params: find_params, headers: headers
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
 
@@ -49,12 +49,12 @@ RSpec.describe 'pl_controller' do
   describe '#grouped_categories' do
     context 'success' do
       it 'response 200' do
-        get "/api/v1/user/pl-grouped-categories", params: find_params, headers: headers
+        get "/api/v1/group/pl-grouped-categories", params: find_params, headers: headers
         expect(response.status).to eq 200
       end
 
       it 'response json' do
-        get "/api/v1/user/pl-grouped-categories", params: find_params, headers: headers
+        get "/api/v1/group/pl-grouped-categories", params: find_params, headers: headers
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
 

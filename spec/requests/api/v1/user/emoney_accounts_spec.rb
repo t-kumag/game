@@ -35,11 +35,9 @@ RSpec.describe 'emoney_accounts_controller' do
       end
 
       it 'response json' do
-        at_user_emoney_service_account_share_false
-
         get "/api/v1/user/emoney-accounts-summary", headers: headers
-        response_json = JSON.parse(response.body)
 
+        response_json = JSON.parse(response.body)
         expect(response_json['app']['amount']).to eq 0
       end
     end

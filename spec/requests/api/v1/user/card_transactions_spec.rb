@@ -29,10 +29,9 @@ RSpec.describe 'card_transactions_controller' do
 
       it 'response json' do
         at_user_card_transaction
-
         get "/api/v1/user/card-accounts/#{at_user_card_account.id}/transactions/#{at_user_card_transaction.id}", headers: headers
         response_json = JSON.parse(response.body)
-        actual_app = response_json['app'];
+        actual_app = response_json['app']
 
         expect(actual_app).not_to eq nil
       end
