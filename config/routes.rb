@@ -95,6 +95,7 @@ Rails.application.routes.draw do
         get 'goal-graph/:id', :to => 'goals#graph'
 
         get 'profiles', :to => 'profiles#show'
+        resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index]
       end
 
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
