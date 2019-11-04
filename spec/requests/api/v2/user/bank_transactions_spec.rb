@@ -21,24 +21,24 @@ RSpec.describe 'bank_transactions_controller' do
 
       it 'response json' do
         expect_bank_transaction = at_user_bank_transaction
-        expeted_distributed_transaction = expect_bank_transaction.user_distributed_transaction
+        expect_distributed_transaction = expect_bank_transaction.user_distributed_transaction
 
         get "/api/v2/user/bank-accounts/#{at_user_bank_account.id}/transactions/", params: find_params, headers: headers
         response_json = JSON.parse(response.body)
         actual_transactions = response_json['transactions']
 
         expect(actual_transactions.length).to eq 1
-        expect(actual_transactions[0]['at_user_bank_transaction_id']).to eq expeted_distributed_transaction.at_user_bank_transaction_id
-        expect(actual_transactions[0]['amount']).to eq expeted_distributed_transaction.amount
-        expect(actual_transactions[0]['used_date']).to eq expeted_distributed_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S')
-        expect(actual_transactions[0]['used_location']).to eq expeted_distributed_transaction.used_location
-        expect(actual_transactions[0]['user_id']).to eq expeted_distributed_transaction.user_id
+        expect(actual_transactions[0]['at_user_bank_transaction_id']).to eq expect_distributed_transaction.at_user_bank_transaction_id
+        expect(actual_transactions[0]['amount']).to eq expect_distributed_transaction.amount
+        expect(actual_transactions[0]['used_date']).to eq expect_distributed_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S')
+        expect(actual_transactions[0]['used_location']).to eq expect_distributed_transaction.used_location
+        expect(actual_transactions[0]['user_id']).to eq expect_distributed_transaction.user_id
         expect(actual_transactions[0]['is_account_shared']).to eq at_user_bank_account.share
-        expect(actual_transactions[0]['is_shared']).to eq expeted_distributed_transaction.share
-        expect(actual_transactions[0]['at_transaction_category_id']).to eq expeted_distributed_transaction.at_transaction_category_id
-        expect(actual_transactions[0]['category_name1']).to eq expeted_distributed_transaction.at_transaction_category.category_name1
-        expect(actual_transactions[0]['category_name2']).to eq expeted_distributed_transaction.at_transaction_category.category_name2
-        expect(actual_transactions[0]['transaction_id']).to eq expeted_distributed_transaction.at_user_bank_transaction_id
+        expect(actual_transactions[0]['is_shared']).to eq expect_distributed_transaction.share
+        expect(actual_transactions[0]['at_transaction_category_id']).to eq expect_distributed_transaction.at_transaction_category_id
+        expect(actual_transactions[0]['category_name1']).to eq expect_distributed_transaction.at_transaction_category.category_name1
+        expect(actual_transactions[0]['category_name2']).to eq expect_distributed_transaction.at_transaction_category.category_name2
+        expect(actual_transactions[0]['transaction_id']).to eq expect_distributed_transaction.at_user_bank_transaction_id
         expect(response_json['next_transaction_used_date']).to eq nil
       end
     end

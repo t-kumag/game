@@ -19,11 +19,11 @@ RSpec.describe Api::V1::Group::PlController do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/group/pl-summary", params: find_params, headers: headers
+
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
-
         expect(actual_app).not_to eq nil
       end
     end
@@ -36,11 +36,11 @@ RSpec.describe Api::V1::Group::PlController do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/group/pl-categories", params: find_params, headers: headers
+
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
-
         expect(actual_app).not_to eq nil
       end
     end
@@ -53,11 +53,11 @@ RSpec.describe Api::V1::Group::PlController do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/group/pl-grouped-categories", params: find_params, headers: headers
+
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
-
         expect(actual_app).not_to eq nil
       end
     end

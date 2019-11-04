@@ -16,7 +16,6 @@ RSpec.describe Api::V1::Group::BankAccountsController do
       it 'response share is true only' do
         expect_bank_account = at_user_bank_account
         at_user_bank_account_share_false
-
         get "/api/v1/group/bank-accounts", headers: headers
 
         response_json = JSON.parse(response.body)
@@ -49,7 +48,6 @@ RSpec.describe Api::V1::Group::BankAccountsController do
       it 'response share is true only' do
         expect_amount = at_user_bank_account.balance
         at_user_bank_account_share_false
-
         get "/api/v1/group/bank-accounts-summary", headers: headers
 
         response_json = JSON.parse(response.body)

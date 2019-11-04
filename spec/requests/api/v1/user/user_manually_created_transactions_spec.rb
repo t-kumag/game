@@ -28,6 +28,23 @@ RSpec.describe 'user_manually_created_transactions_controller' do
     Entities::UserDistributedTransaction.find_by(user_id: user.id)
   }
 
+  describe '#index' do
+    context 'success' do
+      it 'response 200' do
+        get "/api/v1/user/user-manually-created-transactions/", headers: headers
+        expect(response.status).to eq 200
+      end
+
+      it 'body is not nil' do
+        get "/api/v1/user/user-manually-created-transactions/", headers: headers
+
+        response_json = JSON.parse(response.body)
+        actual_app = response_json['app'];
+        expect(actual_app).not_to eq nil
+      end
+    end
+  end
+
   describe '#show' do
     context 'success' do
       it 'response 200' do
@@ -35,11 +52,11 @@ RSpec.describe 'user_manually_created_transactions_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}", headers: headers
+
         response_json = JSON.parse(response.body)
         actual_app = response_json['app'];
-
         expect(actual_app).not_to eq nil
       end
     end

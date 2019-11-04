@@ -14,15 +14,13 @@ RSpec.describe 'emoney_accounts_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         at_user_emoney_service_account_share_false
-
         get "/api/v1/user/emoney-accounts", headers: headers
+
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
-
-        expect(actual_app.class).to eq Array
-        expect(actual_app.length).to eq 1
+        expect(actual_app).not_to eq nil
       end
     end
   end
@@ -34,11 +32,12 @@ RSpec.describe 'emoney_accounts_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/user/emoney-accounts-summary", headers: headers
 
         response_json = JSON.parse(response.body)
-        expect(response_json['app']['amount']).to eq 0
+        actual_app = response_json['app']
+        expect(actual_app).not_to eq nil
       end
     end
   end

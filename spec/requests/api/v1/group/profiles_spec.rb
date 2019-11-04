@@ -13,7 +13,7 @@ RSpec.describe Api::V1::Group::ProfilesController do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         user_profile
         get "/api/v1/group/profiles", headers: headers
 

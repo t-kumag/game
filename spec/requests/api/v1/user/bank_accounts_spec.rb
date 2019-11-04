@@ -18,8 +18,8 @@ RSpec.describe 'bank_accounts_controller' do
         at_user_bank_account
         expect_bank_account = at_user_bank_account_share_false
         get "/api/v1/user/bank-accounts", headers: headers
-        response_json = JSON.parse(response.body)
 
+        response_json = JSON.parse(response.body)
         expect(response_json['app'].length).to eq 1
         expect(response_json['app'][0]['account_id']).to eq expect_bank_account.id
         expect(response_json['app'][0]['name']).to eq expect_bank_account.fnc_nm
@@ -49,8 +49,8 @@ RSpec.describe 'bank_accounts_controller' do
         at_user_bank_account
         expect_amount = at_user_bank_account_share_false.balance
         get "/api/v1/user/bank-accounts-summary", headers: headers
-        response_json = JSON.parse(response.body)
 
+        response_json = JSON.parse(response.body)
         expect(response_json['app']['amount']).to eq expect_amount
       end
     end

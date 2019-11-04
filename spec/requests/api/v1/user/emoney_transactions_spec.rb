@@ -8,10 +8,6 @@ RSpec.describe 'emoney_transactions_controller' do
     used_location: 'ミロク居酒屋 支払',
     share: false
   } }
-  let(:find_params) { {
-    from: '2018-12-31',
-    to: '2019-01-01'
-  } }
   let(:at_user_emoney_service_account) { user.at_user.at_user_emoney_service_accounts.first }
   let(:at_user_emoney_transaction) { at_user_emoney_service_account.at_user_emoney_transactions.first }
   let(:user_distributed_transaction_after_update) {
@@ -27,13 +23,12 @@ RSpec.describe 'emoney_transactions_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         at_user_emoney_transaction
-
         get "/api/v1/user/emoney-accounts/#{at_user_emoney_service_account.id}/transactions/#{at_user_emoney_transaction.id}", headers: headers
+
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
-
         expect(actual_app).not_to eq nil
       end
     end

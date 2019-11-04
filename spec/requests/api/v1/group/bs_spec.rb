@@ -12,8 +12,9 @@ RSpec.describe Api::V1::Group::BsController do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/group/bs-summary", headers: headers
+
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
         expect(actual_app).not_to eq nil

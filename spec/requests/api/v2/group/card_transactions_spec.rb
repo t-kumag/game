@@ -19,7 +19,7 @@ RSpec.describe 'card_transactions_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v2/group/card-accounts/#{at_user_card_account.id}/transactions/", params: find_params, headers: headers
 
         response_json = JSON.parse(response.body)

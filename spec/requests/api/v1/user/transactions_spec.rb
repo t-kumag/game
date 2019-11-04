@@ -20,7 +20,7 @@ RSpec.describe 'transactions_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/user/transactions", params: find_params, headers: headers
 
         response_json = JSON.parse(response.body)
@@ -37,7 +37,7 @@ RSpec.describe 'transactions_controller' do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/user/grouped-transactions", params: find_params, headers: headers
 
         response_json = JSON.parse(response.body)

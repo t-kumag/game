@@ -33,7 +33,7 @@ RSpec.describe Api::V1::Group::GoalsController do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         goal
         get "/api/v1/group/goals", headers: headers
 
@@ -51,7 +51,7 @@ RSpec.describe Api::V1::Group::GoalsController do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         get "/api/v1/group/goals/#{goal.id}", headers: headers
 
         response_json = JSON.parse(response.body)

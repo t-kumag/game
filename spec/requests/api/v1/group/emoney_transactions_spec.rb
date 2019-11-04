@@ -26,7 +26,7 @@ RSpec.describe Api::V1::Group::EmoneyTransactionsController do
         expect(response.status).to eq 200
       end
 
-      it 'response json' do
+      it 'body is not nil' do
         id = user.at_user.at_user_emoney_service_accounts.first.at_user_emoney_transactions.first.id
         get "/api/v1/group/emoney-accounts/#{at_user_emoney_account.id}/transactions/#{id}", headers: headers
 
