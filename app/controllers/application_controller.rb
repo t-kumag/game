@@ -331,18 +331,18 @@ class ApplicationController < ActionController::Base
   end
 
   def render_disallowed_financier_ids
-    render json: { errors: { code: '', message: "Disallowed financier id." } }, status: 403
+    render json: { errors: { code: '003001', message: "Disallowed financier id." } }, status: 422
   end
 
   def render_disallowed_transaction_ids
-r   render json: { errors: { code: '', message: "Disallowed transaction id." } }, status: 403
+    render json: { errors: { code: '', message: "Disallowed transaction id." } }, status: 422
   end
 
   def render_disallowed_goal_ids
-    render json: { errors: { code: '', message: "Disallowed goal id." } }, status: 403
+    render json: { errors: { code: '', message: "Disallowed goal id." } }, status: 422
   end
 
   def render_disallowed_goal_setting_ids
-    render json: { errors: { code: '', message: "Disallowed goal setting id." } }, status: 403
+    render json: { errors: { code: '', message: "Disallowed goal setting id." } }, status: 422
   end
 end
