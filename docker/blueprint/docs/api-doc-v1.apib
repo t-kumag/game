@@ -255,6 +255,16 @@ Resource of Bank Account
     + Body
             {}
 
++ Response 200 (application/json)
+
+    + Body
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "account not found."
+                }
+            }
+
 + Response 422 (application/json)
 
     + Body
@@ -536,6 +546,16 @@ Resource of Card Account
     + Body
             {}
 
++ Response 200 (application/json)
+
+    + Body
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "account not found."
+                }
+            }
+
 + Response 422 (application/json)
 
     + Body
@@ -805,6 +825,16 @@ Resource of Card Account
     + Body
             {}
 
++ Response 200 (application/json)
+
+    + Body
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "account not found."
+                }
+            }
+
 + Response 422 (application/json)
 
     + Body
@@ -1037,7 +1067,7 @@ Resource of Emoney Account Summary
 ## 手動明細 [/api/v1/user/user-manually-created-transactions]
 Resource of User Manually Transactions
 
-### 明細数取得 [GET]
+### 手動明細取得 [GET]
 
 + Request 明細数取得 (application/json)
 
@@ -1054,7 +1084,32 @@ Resource of User Manually Transactions
                 }
             }
 
-### 明細詳細更新 [PUT]
+### 手動明細登録 [POST]
+
++ Request アイコン登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "payment_method_id": 1,
+                "at_transaction_category_id": 1,
+                "used_date":"2019-09-11",
+                "title":1,
+                "amount":-1211,
+                "used_location":1,
+                "share": true
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+### 手動明細詳細更新 [PUT]
 
 #### Parameters
 
@@ -1084,6 +1139,23 @@ Resource of User Manually Transactions
     + Body
             {}
 
+### 手動明細詳細削除 [DELETE]
+
+#### Parameters
+
+* id (int)
+
++ Request 手動明細詳細削除 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
 
 ## 取引明細合計 [/api/v1/user/pl-summary]
 Resource of Pl Account Transactions
@@ -1577,6 +1649,18 @@ Resource of Goal
             }
 
 
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "errors": {
+                "code": "",
+                "mesasge": "Record not found."
+              }
+            }
+
+
 ### 目標登録 [POST]
 
 + Request 目標登録登録 (application/json)
@@ -1850,7 +1934,7 @@ Resource of Goal
             {
               "errors": {
                 "code": "",
-                "mesasge": "goal not found.s"
+                "mesasge": "goal not found."
               }
             }
 
@@ -1862,7 +1946,7 @@ Resource of Goal
             {
               "errors": {
                 "code": "",
-                "mesasge": "goal_setting not found"
+                "mesasge": "goal_setting not found."
               }
             }
 
@@ -2304,11 +2388,6 @@ Resource of Users
                 }
             }
 
-+ Response 403 (application/json)
-
-    + Body
-
-            { }
 
 ### at_user取得 [GET]
 
