@@ -55,7 +55,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def change_password_request
-    return render json: { errors: { code: '', message: "email not found." } }, status: 422
     user = Entities::User.where(email: params[:email]).first
 
     if user.present?
@@ -63,8 +62,9 @@ class Api::V1::UsersController < ApplicationController
       user.save!
       MailDelivery.user_change_password_request(user).deliver
 
-    else
       render json: {}, status: 200
+    else
+      render json: { errors: { code: '', message: "email not found." } }, status: 422
     end
   end
 
