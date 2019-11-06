@@ -201,6 +201,16 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  def disallowed_at_emoney_account_ids?(emoney_ids)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    at_user_emoney_ids =  Entities::AtUserEmoneyServiceAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+
+    emoney_ids.each do |id|
+      return true if at_user_emoney_ids.include?(id)
+    end
+    false
+  end
+
   def disallowed_at_bank_transaction_ids?(bank_id, bank_transaction_ids, with_group=false)
     user_bank = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:find_by, id: bank_id)
     at_user_bank_transaction_ids = []
