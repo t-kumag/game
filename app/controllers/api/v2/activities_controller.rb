@@ -1,4 +1,4 @@
-class Api::V1::ActivitiesController < ApplicationController
+class Api::V2::ActivitiesController < ApplicationController
   before_action :authenticate, except: :login
 
   def index
