@@ -14,14 +14,15 @@ class Services::ActivityService
     Entities::Activity.import activities, :on_duplicate_key_update => [:user_id, :date, :activity_type], :validate => false
   end
 
-  def self.create_user_activity(user_id, group_id, used_date, activity_type)
-    Entities::Activity.find_or_create_by(user_id: user_id, date: used_date, activity_type: activity_type) do |activity|
-      activity.user_id = user_id
-      activity.group_id = group_id
-      activity.count = 0
-      activity.activity_type = activity_type
-      activity.date = used_date
-    end
+  def self.create_activity(user_id, group_id, used_date, activity_type, options={})
+
+    defined_activity = ACTIVITY_TYPE::NAME[activity_type]
+    activity = set_activity(defined_activity)
+    activity = convert_goal_message(options[:goal], defined_activity, activity) if options[:goal].present?
+    activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
+    activity = convert_trans_message(options[:transactions], options[:at_sync_transaction_latest_date], defined_activity, activity) if options[:transactions].present?
+
+    create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
 
   def self.set_activity_list(financier_account_type_key, tran, account, user)
@@ -46,6 +47,14 @@ class Services::ActivityService
     return true if latest_one.nil? ? true : false
     activity_data_column = get_activity_data_column(financier_account_type_key)
     check_duplication_old_act(latest_one, activity, activity_data_column)
+  end
+
+  def self.fetch_activities(current_user, page)
+    Entities::Activity.where(user_id: current_user.id).order(created_at: "DESC").page(page)
+  end
+
+  def self.fetch_activity_type(current_user, type)
+    Entities::Activity.where(user_id: current_user.id).where(activity_type: type).order(created_at: "DESC").first()
   end
 
   private
@@ -92,5 +101,50 @@ class Services::ActivityService
         used_date: { col: "USED_DATE" },
         amount_receipt: { col: "AMOUNT_RECEIPT", income: 'individual_emoney_income', outcome: 'individual_emoney_outcome' },
     }
+  end
+
+  def self.create_activity_data(user_id, group_id, used_date, activity_type, activity)
+    begin
+      Entities::Activity.create!(
+          user_id: user_id,
+          group_id: group_id,
+          url: activity[:url],
+          count:  0,
+          activity_type:  activity_type,
+          message: activity[:message],
+          date: used_date,
+          at_sync_transaction_latest_date: activity[:at_sync_transaction_latest_date]
+      )
+
+    rescue => exception
+      Rails.logger.info("failed to create activity ===============")
+      p exception
+      p exception.backtrace
+    end
+  end
+
+  private
+  def self.set_activity(defined_activity)
+    activity = {}
+    activity[:message] = defined_activity[:message]
+    activity[:url] = defined_activity[:url]
+    activity[:at_sync_transaction_latest_date] = nil
+    activity
+  end
+
+  def self.convert_goal_message(goal, defined_activity, activity)
+    activity[:message] = sprintf(defined_activity[:message], goal.name)
+    activity
+  end
+
+  def self.convert_tran_url(transaction, defined_activity, activity)
+    activity[:url] = sprintf(defined_activity[:url], transaction.id)
+    activity
+  end
+
+  def self.convert_trans_message(transactions, at_sync_transaction_latest_date, defined_activity, activity)
+    activity[:message] = sprintf(defined_activity[:message], transactions.count)
+    activity[:at_sync_transaction_latest_date] = at_sync_transaction_latest_date
+    activity
   end
 end

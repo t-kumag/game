@@ -121,7 +121,6 @@ class Services::AtUserService::Sync
       end
 
       src_trans = []
-      activities = []
       monthly_trans = []
       last_at_sync_tran_monthly_date = Services::AtSyncTransactionMonthlyDateLogService.fetch_last_one(financier_account_type_key, a)
       if res.key?(rec_key) && !res[rec_key].blank?
@@ -153,16 +152,14 @@ class Services::AtUserService::Sync
           end
           src_trans << tran
 
-          activity = get_activity(financier_account_type_key, tran, a, activities)
           monthly_trans << fetch_monthly_tran(financier_account_type_key, tran, last_at_sync_tran_monthly_date)
-          activities << activity if activity.present?
         end
       end
 
       monthly_trans.compact!
       Services::AtSyncTransactionMonthlyDateLogService.save_at_sync_tran_monthly_date_log(monthly_trans)
       transaction_entity.import src_trans, on_duplicate_key_update: data_column.map { |k, _v| k }, validate: false
-      Services::ActivityService.save_activities(activities)
+      # 最後の同期時間を記録
       Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
 
       # ATの同期log
@@ -342,15 +339,6 @@ class Services::AtUserService::Sync
   end
 
   private
-
-  def get_activity(financier_account_type_key, tran, account, activities)
-    activity = Services::ActivityService.set_activity_list(financier_account_type_key, tran, account, @user)
-    check_duplicate_activity = Services::ActivityService.check_activity_duplication(financier_account_type_key, activities, activity)
-    latest_sync_date = Services::AtSyncTransactionLatestDateLogService.get_latest_one(financier_account_type_key, account)
-    check_difference_date = latest_sync_date.present? && latest_sync_date < activity[:date] ? true : false
-
-    return activity if check_duplicate_activity && check_difference_date
-  end
 
   def fetch_monthly_tran(financier_account_type_key, tran, last_at_sync_tran_monthly_date)
     at_sync_tran_monthly_date_log = Services::AtSyncTransactionMonthlyDateLogService.set_at_sync_tran_monthly_date_log(financier_account_type_key, tran)
