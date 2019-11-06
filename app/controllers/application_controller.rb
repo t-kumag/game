@@ -169,6 +169,16 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  def disallowed_at_bank_account_ids?(bank_ids)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    at_user_bank_ids = Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+
+    bank_ids.each do |id|
+      return true if at_user_bank_ids.include?(id)
+    end
+    false
+  end
+
   def disallowed_at_card_ids?(card_ids, with_group=false)
     at_user_id         =  @current_user.try(:at_user).try(:id)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
@@ -185,7 +195,7 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  def disallowed_at_card_account_ids?(card_ids, with_group=false)
+  def disallowed_at_card_account_ids?(card_ids)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
     at_user_card_ids = Entities::AtUserCardAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
 
