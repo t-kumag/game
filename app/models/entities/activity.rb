@@ -140,6 +140,8 @@ class Entities::Activity < ApplicationRecord
         message = "目標に入金がありました。"
       end
 
+      next unless message.present?
+
       @result.push({
         "day": dayStr,
         "type": a.activity_type,
