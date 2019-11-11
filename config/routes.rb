@@ -126,6 +126,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
+      get 'user/at-sync', :to => 'users#at_sync'
       resources :activities, :path => '/activities', :only => [:index] do
       end
       # 個人用
