@@ -35,7 +35,9 @@ class Services::ActivityService
         activity[:date] = tran[k]
       elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
         activity[:activity_type] = (tran[k].to_i == 0) ? v[:income] : v[:outcome]
+        activity[:activity_type] = "individual_card_outcome" if k == :payment_amount
         activity[:message] = (tran[k].to_i == 0) ? v[:income_message] : v[:outcome_message]
+        activity[:message] = "クレジットカードの支出があります。" if k == :payment_amount
       end
     end
     activity
@@ -85,6 +87,8 @@ class Services::ActivityService
         used_date: { col: "USED_DATE" },
         # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
         payment_amount: { col: "PAYMENT_AMOUNT",
+                          income: nil,
+                          income_message: nil,
                           outcome: 'individual_card_outcome',
                           outcome_message: 'クレジットカードの支出があります'
         },
@@ -170,4 +174,5 @@ class Services::ActivityService
 
     activity
   end
+
 end
