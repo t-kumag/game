@@ -15,8 +15,8 @@ module ACTIVITY_TYPE
       person_tran_to_familly_partner:    { message: 'パートナーが取引明細を家族画面に振り分けました', url: 'osidori://transactions/%d'},
       person_account_to_familly:         { message: 'あなたが登録金融機関を家族画面に移動しました', url: 'osidori://financial-accounts'},
       person_account_to_familly_partner: { message: 'パートナーが登録金融機関を家族画面に移動しました', url: 'osidori://financial-accounts'},
-      individual_manual_outcome:         { message: 'あなたが取引明細を手動で作成しました', url: 'osidori://transactions/%d'},
       familly_expense_income:            { message: '家族の取引が%d件ありました', url: 'osidori://transactions'},
+      individual_manual_outcome:         { message: 'あなたが取引明細を手動で作成しました', url: 'osidori://transactions/%d'},
       individual_manual_outcome_fam:     { message: '夫婦の明細が手動で作成されました。', url: 'osidori://transactions/%d'}
   }.freeze
 end
