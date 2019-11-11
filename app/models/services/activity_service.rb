@@ -37,6 +37,7 @@ class Services::ActivityService
         activity[:date] = tran[k]
       elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
         activity[:activity_type] = (tran[k].to_i == 0) ? v[:income] : v[:outcome]
+        activity[:message] = (tran[k].to_i == 0) ? v[:income_message] : v[:outcome_message]
       end
     end
     activity
@@ -85,21 +86,34 @@ class Services::ActivityService
     {
         used_date: { col: "USED_DATE" },
         # カードはどちらも支出しかないのでどちらも同じ値(individual_card_outcome)で実装
-        payment_amount: { col: "PAYMENT_AMOUNT", income: 'individual_card_outcome', outcome: 'individual_card_outcome' },
+        payment_amount: { col: "PAYMENT_AMOUNT",
+                          outcome: 'individual_card_outcome',
+                          outcome_message: 'クレジットカードの支出があります'
+        },
     }
   end
 
   def self.get_bank_activity_data_column
     {
         trade_date: { col: "TRADE_DTM" },
-        amount_receipt: { col: "AMOUNT_RECEIPT", income: 'individual_bank_income', outcome: 'individual_bank_outcome' },
+        amount_receipt: { col: "AMOUNT_RECEIPT",
+                          income: 'individual_bank_income',
+                          income_message: '銀行口座に収入があります',
+                          outcome: 'individual_bank_outcome',
+                          outcome_message: '銀行口座の支出があります'
+        },
     }
   end
 
   def self.get_emoney_activity_data_column
     {
         used_date: { col: "USED_DATE" },
-        amount_receipt: { col: "AMOUNT_RECEIPT", income: 'individual_emoney_income', outcome: 'individual_emoney_outcome' },
+        amount_receipt: { col: "AMOUNT_RECEIPT",
+                          income: 'individual_emoney_income',
+                          income_message: '電子マネーに収入があります。',
+                          outcome: 'individual_emoney_outcome',
+                          outcome_message: '電子マネーの支出があります。'
+        },
     }
   end
 
