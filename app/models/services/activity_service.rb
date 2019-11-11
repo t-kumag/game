@@ -25,11 +25,9 @@ class Services::ActivityService
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
 
-  def self.set_activity_list(financier_account_type_key, tran, account, user)
-    activity = Entities::Activity.new
-    activity[:count] = 0
-    activity[:user_id] = user.id
-    activity[:group_id] = account[:group_id]
+  def self.set_activity_list(financier_account_type_key, tran, account, user, request)
+    activity = create_base_activity(user, account)
+    return  activity unless request.path.include?("v1")
     activity_data_column = get_activity_data_column(financier_account_type_key)
 
     activity_data_column.each do |k, v|
@@ -159,6 +157,17 @@ class Services::ActivityService
   def self.convert_trans_message(transactions, at_sync_transaction_latest_date, defined_activity, activity)
     activity[:message] = sprintf(defined_activity[:message], transactions.count)
     activity[:at_sync_transaction_latest_date] = at_sync_transaction_latest_date
+    activity
+  end
+  def self.create_base_activity(user, account)
+    activity = Entities::Activity.new
+    activity[:count] = 0
+    activity[:user_id] = user.id
+    activity[:group_id] = account[:group_id]
+    activity[:date] = DateTime.new(0)
+    activity[:activity_type] =nil
+    activity[:message] = nil
+
     activity
   end
 end

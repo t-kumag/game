@@ -79,9 +79,11 @@ class Services::AtUserService
 
   end
 
-  def sync_at_user_finance
+  def sync_at_user_finance(request)
     puts 'sync_at_user_finance=========='
-    Services::AtUserService::Sync.new(@user).sync
+    at_user_service = Services::AtUserService::Sync.new(@user, nil)
+    at_user_service.request = request
+    at_user_service.sync
   end
 
   def sync_user_distributed_transaction

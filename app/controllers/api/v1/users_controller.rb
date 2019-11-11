@@ -127,7 +127,7 @@ class Api::V1::UsersController < ApplicationController
       # http://redmine.369webcash.com/issues/2916
       # at_user_service.exec_scraping
 
-      at_user_service.sync_at_user_finance
+      at_user_service.sync_at_user_finance(request)
       at_user_service.sync_user_distributed_transaction
     rescue => e
       SlackNotifier.ping("ERROR Api::V1::UsersController#at_sync")

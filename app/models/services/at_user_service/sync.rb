@@ -3,10 +3,12 @@ require 'nkf'
 
 
 class Services::AtUserService::Sync
+  attr_writer :request
 
   def initialize(user, fnc_type = 'all')
     @user = user
     @fnc_type = fnc_type.blank? ? 'all' : fnc_type
+    @request
   end
 
   def get_accounts_from_at
@@ -345,7 +347,7 @@ class Services::AtUserService::Sync
   private
 
   def get_activity(financier_account_type_key, tran, account, activities)
-    activity = Services::ActivityService.set_activity_list(financier_account_type_key, tran, account, @user)
+    activity = Services::ActivityService.set_activity_list(financier_account_type_key, tran, account, @user, @request)
     check_duplicate_activity = Services::ActivityService.check_activity_duplication(financier_account_type_key, activities, activity)
     latest_sync_date = Services::AtSyncTransactionLatestDateLogService.get_latest_one(financier_account_type_key, account)
     check_difference_date = latest_sync_date.present? && latest_sync_date < activity[:date] ? true : false
