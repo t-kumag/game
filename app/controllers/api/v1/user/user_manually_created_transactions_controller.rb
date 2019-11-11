@@ -25,7 +25,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
           options = {transaction: nil}
         end
         options[:transaction] = Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
-
         create_user_manually_activity(@current_user, transaction[:used_date], options)
       end
 
