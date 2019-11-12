@@ -50,7 +50,7 @@ class Services::ActivityService
   end
 
   def self.fetch_activities(current_user, page)
-    Entities::Activity.where(user_id: current_user.id).order(created_at: "DESC").page(page)
+    Entities::Activity.where(user_id: current_user.id).where.not(message: nil).order(created_at: "DESC").page(page)
   end
 
   def self.fetch_activity_type(current_user, type)
@@ -82,7 +82,7 @@ class Services::ActivityService
   end
 
   def self.fetch_latest_sync_log_date(current_user)
-    Entities::Activity.order(id: :desc).where(user_id: current_user.id).pluck("sync_criteria_date").first
+    Entities::Activity.order(id: :desc).where(user_id: current_user.id).pluck("at_sync_transaction_latest_date").first
   end
 
   def self.get_card_activity_data_column
@@ -166,6 +166,7 @@ class Services::ActivityService
     activity[:at_sync_transaction_latest_date] = at_sync_transaction_latest_date
     activity
   end
+
   def self.create_base_activity(user, account, latest_sync_date)
     activity = Entities::Activity.new
     activity[:count] = 0
@@ -174,7 +175,7 @@ class Services::ActivityService
     activity[:date] = DateTime.new(0)
     activity[:activity_type] =nil
     activity[:message] = nil
-    activity[:sync_criteria_date] = latest_sync_date
+    activity[:at_sync_transaction_latest_date] = latest_sync_date
 
 
     activity

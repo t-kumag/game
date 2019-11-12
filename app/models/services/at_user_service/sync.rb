@@ -348,10 +348,11 @@ class Services::AtUserService::Sync
   def get_activity(financier_account_type_key, tran, account, activities)
     latest_sync_date = Services::AtSyncTransactionLatestDateLogService.get_latest_one(financier_account_type_key, account)
     activity = Services::ActivityService.set_activity_list(financier_account_type_key, tran, account, @user, latest_sync_date)
-    check_duplicate_activity = Services::ActivityService.check_activity_duplication(financier_account_type_key, activities, activity)
+    #check_duplicate_activity = Services::ActivityService.check_activity_duplication(financier_account_type_key, activities, activity)
     check_difference_date = latest_sync_date.present? && latest_sync_date < activity[:date] ? true : false
 
-    return activity if check_duplicate_activity && check_difference_date
+    #return activity if check_duplicate_activity && check_difference_date
+    return activity if check_difference_date
   end
 
   def fetch_monthly_tran(financier_account_type_key, tran, last_at_sync_tran_monthly_date)

@@ -21,7 +21,6 @@ ActiveRecord::Schema.define(version: 2019_11_12_181848) do
     t.string "message"
     t.datetime "date", null: false
     t.datetime "at_sync_transaction_latest_date"
-    t.datetime "sync_criteria_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

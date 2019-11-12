@@ -33,6 +33,13 @@ class Api::V2::ActivitiesController < ApplicationController
     person_expense_income = Services::ActivityService.fetch_activity_type(@current_user, :person_expense_income)
     familly_expense_income = Services::ActivityService.fetch_activity_type(@current_user, :familly_expense_income)
 
+    if person_expense_income.nil? && familly_expense_income.nil?
+      person = create_activity_empty_options(sync_criteria_date)
+      familly = create_activity_empty_options(sync_criteria_date)
+      person_expense_income = Services::ActivityService.create_activity_data(@current_user.id, @current_user.group_id, Time.now, :person_expense_income, person)
+      familly_expense_income = Services::ActivityService.create_activity_data(@current_user.id, @current_user.group_id, Time.now, :familly_expense_income, familly)
+    end
+
     last_activity_sync_date[:person_expense_income] = check_latest_day?(person_expense_income, sync_criteria_date) if person_expense_income.present?
     last_activity_sync_date[:familly_expense_income] = check_latest_day?(familly_expense_income, sync_criteria_date) if familly_expense_income.present?
     last_activity_sync_date
@@ -44,11 +51,11 @@ class Api::V2::ActivitiesController < ApplicationController
     transaction[:shared] = nil
 
     return transaction unless sync_criteria_date.present?
-    transaction[:no_shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, created_at: sync_criteria_date..now, share: false)
-    transaction[:shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, created_at: sync_criteria_date..now, share: true)
+    transaction[:no_shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: sync_criteria_date..now, share: false)
+    transaction[:shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: sync_criteria_date..now, share: true)
 
-    transaction[:no_shared] = remove_user_manually_created_transaction(transaction[:no_shared])
-    transaction[:shared] = remove_user_manually_created_transaction(transaction[:shared])
+    #transaction[:no_shared] = remove_user_manually_created_transaction(transaction[:no_shared])
+    #transaction[:shared] = remove_user_manually_created_transaction(transaction[:shared])
     transaction
   end
 
@@ -65,19 +72,24 @@ class Api::V2::ActivitiesController < ApplicationController
   end
 
   def check_latest_day?(last_tran_date, sync_criteria_date)
-    last_tran_date.at_sync_transaction_latest_date != sync_criteria_date
+    last_tran_date.at_sync_transaction_latest_date < sync_criteria_date
   end
 
-  def remove_user_manually_created_transaction(transactions)
-    transactions.reject do |t|
-      if t.user_manually_created_transaction_id.present?
-        # 手動明細は削除する
-        true
-      else
-        # 手動明細以外は削除しない
-        false
-      end
-    end
+  private
+  def create_activity_empty_options(at_sync_transaction_latest_date)
+    {message: nil, url: nil, at_sync_transaction_latest_date: at_sync_transaction_latest_date}
   end
+
+  #def remove_user_manually_created_transaction(transactions)
+  #  transactions.reject do |t|
+  #    if t.user_manually_created_transaction_id.present?
+  #      # 手動明細は削除する
+  #      true
+  #    else
+  #      # 手動明細以外は削除しない
+  #      false
+  #    end
+  #  end
+  #end
 
 end
