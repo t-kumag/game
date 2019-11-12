@@ -25,12 +25,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
           options = {}
         end
         Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
-        # TODO: 夫婦と個人を判断するメソッドがないので、現時点で保留とする
-        #user_manually_create = Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
-        #Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
-        #                                               transaction[:used_date], 'individual_manual_outcome', nil, user_manually_create)
       end
-
     rescue => exception
       raise exception
     end
@@ -92,6 +87,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def create_user_manually_created
+    convert_amount params
     save_params = params.permit(
       :at_transaction_category_id,
       :payment_method_id,
@@ -103,11 +99,15 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
 
+    Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
+                                                   save_params[:used_date], 'individual_manual_outcome')
+
     Entities::UserManuallyCreatedTransaction.create!(save_params)
 
   end
 
   def update_user_manually_created(transaction)
+    convert_amount params
     save_params = params.permit(
       :at_transaction_category_id,
       :payment_method_id,
@@ -118,6 +118,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     )
 
     transaction.update!(update_param(save_params, transaction))
+    Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
+                                                   transaction[:used_date], 'individual_manual_outcome')
     transaction
   end
 
@@ -140,4 +142,27 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         used_location: used_location
     }
   end
+
+  # params[:type]の指定でamountの符号を変換する
+  def convert_amount(params)
+    params[:amount] ||= 0
+    params[:amount] = payment_amount unless params.has_key?(:type)
+    params[:amount] = payment_amount if params[:type] == 'payment'
+    params[:amount] = receipt_amount if params[:type] == 'receipt'
+  end
+
+  # 支出金額 マイナス変換する
+  def payment_amount
+    return  params[:amount] if params[:amount] < 0
+    return -params[:amount] if params[:amount] > 0
+    0
+  end
+
+  # 入金金額 プラス変換する
+  def receipt_amount
+    return  params[:amount] if params[:amount] > 0
+    return -params[:amount] if params[:amount] < 0
+    0
+  end
+
 end

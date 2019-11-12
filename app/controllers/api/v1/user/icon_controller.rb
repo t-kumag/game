@@ -35,7 +35,7 @@ class Api::V1::User::IconController < ApplicationController
 
   def index
     @icon = Entities::UserIcon.find_by(user_id: @current_user.id)
-    render json: { errors: { code: '', mesasge: "icon not found." } }, status: 422 unless @icon.present?
+    return render json: { errors: { code: '', mesasge: "icon not found." } }, status: 422 unless @icon.present?
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
 end

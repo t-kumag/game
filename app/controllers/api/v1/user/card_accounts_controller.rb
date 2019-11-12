@@ -53,10 +53,6 @@ class Api::V1::User::CardAccountsController < ApplicationController
         require_group && return if params[:share] == true
         account = Entities::AtUserCardAccount.find account_id
         account.update!(get_account_params)
-        if account.share
-          Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
-          Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner)
-        end
         render json: {}, status: 200
       else
         # TODO(fujiura): code の検討と、エラー処理共通化
@@ -73,9 +69,9 @@ class Api::V1::User::CardAccountsController < ApplicationController
 
     def destroy
       account_id = params[:id].to_i
-      if disallowed_at_card_ids?([account_id])
-        render_disallowed_financier_ids && return
-      end
+
+      render_disallowed_account_ids && return if disallowed_at_card_account_ids?([account_id])
+      render_disallowed_financier_ids && return if disallowed_at_card_ids?([account_id])
 
       if @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id).include?(account_id)
         Services::AtUserService.new(@current_user).delete_account(Entities::AtUserCardAccount, [account_id])
