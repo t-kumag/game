@@ -25,9 +25,8 @@ class Services::ActivityService
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
 
-  def self.set_activity_list(financier_account_type_key, tran, account, user, request)
+  def self.set_activity_list(financier_account_type_key, tran, account, user)
     activity = create_base_activity(user, account)
-    return  activity unless request.path.include?("v1")
     activity_data_column = get_activity_data_column(financier_account_type_key)
 
     activity_data_column.each do |k, v|
