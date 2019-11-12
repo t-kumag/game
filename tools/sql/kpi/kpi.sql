@@ -8,7 +8,14 @@ SELECT
 
   u.created_at AS メール登録完了日時,
   
+  email_authenticated AS メアド認証,
+  
   u.email AS メールアドレス,
+  
+  CASE
+    WHEN u.deleted_at IS NULL THEN 0
+    ELSE 1
+  END AS 退会の有無,
 
   CASE
     WHEN gender = 0 THEN "女" 
