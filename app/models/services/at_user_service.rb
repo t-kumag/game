@@ -81,7 +81,7 @@ class Services::AtUserService
 
   def sync_at_user_finance
     puts 'sync_at_user_finance=========='
-    Services::AtUserService::Sync.new(@user, nil)
+    Services::AtUserService::Sync.new(@user).sync
   end
 
   def sync_user_distributed_transaction
