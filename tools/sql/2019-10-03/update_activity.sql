@@ -10,6 +10,6 @@ UPDATE  activities SET message = "手動で明細が作成されました。" wh
 UPDATE  activities SET message = "夫婦のクレジットカードの支出があります。" where activity_type = "partner_card_outcome";
 UPDATE  activities SET message = "夫婦の電子マネーの支出があります。" where activity_type = "partner_emoney_outcome";
 UPDATE  activities SET message = "夫婦の電子マネーに収入があります。" where activity_type = "partner_emoney_income";
-UPDATE  activities SET message = "ペアリングが完了しました。" where activity_type = "pairing_created";
+UPDATE  activities SET message = "ペアリングが完了しました!" where activity_type = "pairing_created";
 UPDATE  activities SET message = "目標が作成されました。" where activity_type = "goal_created";
 UPDATE  activities SET message = "目標に入金がありました。" where activity_type = "goal_add_money";
