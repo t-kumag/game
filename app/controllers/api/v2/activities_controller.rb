@@ -54,8 +54,6 @@ class Api::V2::ActivitiesController < ApplicationController
     transaction[:no_shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: sync_criteria_date..now, share: false)
     transaction[:shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: sync_criteria_date..now, share: true)
 
-    #transaction[:no_shared] = remove_user_manually_created_transaction(transaction[:no_shared])
-    #transaction[:shared] = remove_user_manually_created_transaction(transaction[:shared])
     transaction
   end
 
@@ -79,17 +77,5 @@ class Api::V2::ActivitiesController < ApplicationController
   def create_activity_empty_options(at_sync_transaction_latest_date)
     {message: nil, url: nil, at_sync_transaction_latest_date: at_sync_transaction_latest_date}
   end
-
-  #def remove_user_manually_created_transaction(transactions)
-  #  transactions.reject do |t|
-  #    if t.user_manually_created_transaction_id.present?
-  #      # 手動明細は削除する
-  #      true
-  #    else
-  #      # 手動明細以外は削除しない
-  #      false
-  #    end
-  #  end
-  #end
 
 end
