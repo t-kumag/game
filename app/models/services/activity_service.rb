@@ -82,11 +82,11 @@ class Services::ActivityService
   end
 
   def self.fetch_at_sync_transaction_latest_date(current_user)
-    Entities::Activity.order(id: :desc).where(user_id: current_user.id).where.not(at_sync_transaction_latest_date: nil).pluck("at_sync_transaction_latest_date").first
+    Entities::Activity.order(id: :desc).where(user_id: current_user.id).pluck("at_sync_transaction_latest_date").first
   end
 
   def self.fetch_sync_criteria_date(current_user)
-    Entities::Activity.order(id: :desc).where(user_id: current_user.id).where.not(sync_criteria_date: nil).pluck("sync_criteria_date").first
+    Entities::Activity.order(id: :desc).where(user_id: current_user.id).pluck("sync_criteria_date").first
   end
 
   def self.get_card_activity_data_column

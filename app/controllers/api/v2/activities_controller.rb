@@ -3,19 +3,14 @@ class Api::V2::ActivitiesController < ApplicationController
 
   def index
 
-    # アクティビティのトータル件数を表示した時間
-    # 件数を表示をした際に書き込まれる時間
+    ## アクティティの件数を出す際にメモする時間
     at_sync_transaction_latest_date = Services::ActivityService.fetch_at_sync_transaction_latest_date(@current_user)
 
     # at-sync時にアクティビティが追加される際に記載する時間
     sync_criteria_date = Services::ActivityService.fetch_sync_criteria_date(@current_user)
 
-    # アクティビティのトータル件数を表示時間とアクティビティが追加された時間を比べる。
     last_activity_sync_date = last_activity_sync_exist?(sync_criteria_date)
-    # アクティビティのトータル件数を表示した時間 と　更新した時間に差分があればデータを取得
-    transaction = fetch_transaction(at_sync_transaction_latest_date, sync_criteria_date)
-
-    # その差分を登録する
+    transaction = fetch_transaction(at_sync_transaction_latest_date, sync_criteria_datew)
     create_activity(transaction,last_activity_sync_date, sync_criteria_date)
 
     @activities = Services::ActivityService.fetch_activities(@current_user, params[:page])
