@@ -25,8 +25,8 @@ class Services::ActivityService
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
 
-  def self.set_activity_list(financier_account_type_key, tran, account, user, latest_sync_date)
-    activity = create_base_activity(user, account, latest_sync_date)
+  def self.set_activity_list(financier_account_type_key, tran, account, user)
+    activity = create_base_activity(user, account)
     activity_data_column = get_activity_data_column(financier_account_type_key)
 
     activity_data_column.each do |k, v|
@@ -79,10 +79,6 @@ class Services::ActivityService
       end
     end
     ((src_insert[:date] == true) && (src_insert[:activity] == true)) ? false : true
-  end
-
-  def self.fetch_latest_sync_log_date(current_user)
-    Entities::Activity.order(id: :desc).where(user_id: current_user.id).pluck("sync_criteria_date").first
   end
 
   def self.get_card_activity_data_column
@@ -166,7 +162,7 @@ class Services::ActivityService
     activity[:at_sync_transaction_latest_date] = at_sync_transaction_latest_date
     activity
   end
-  def self.create_base_activity(user, account, latest_sync_date)
+  def self.create_base_activity(user, account)
     activity = Entities::Activity.new
     activity[:count] = 0
     activity[:user_id] = user.id
@@ -174,8 +170,6 @@ class Services::ActivityService
     activity[:date] = DateTime.new(0)
     activity[:activity_type] =nil
     activity[:message] = nil
-    activity[:sync_criteria_date] = latest_sync_date
-
 
     activity
   end

@@ -3,7 +3,7 @@ class Api::V2::ActivitiesController < ApplicationController
 
   def index
 
-    last_sync_date = Services::ActivityService.fetch_latest_sync_log_date(@current_user)
+    last_sync_date = Services::AtSyncTransactionLatestDateLogService.fetch_latest_sync_log_date(@current_user)
     last_activity_sync_date = last_activity_sync_exist?(last_sync_date)
     transaction = fetch_transaction(last_sync_date, Time.now)
     create_activity(transaction,last_activity_sync_date, last_sync_date)

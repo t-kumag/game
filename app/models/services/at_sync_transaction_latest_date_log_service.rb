@@ -11,6 +11,9 @@ class Services::AtSyncTransactionLatestDateLogService
     end
   end
 
+  def self.fetch_latest_sync_log_date(current_user)
+    Entities::AtSyncTransactionLatestDateLog.order(id: :desc).where(user_id: current_user.id).pluck("latest_date").first
+  end
 
   def self.activity_sync_log(financier_account_type_key, account)
     activity_sync_log = []
