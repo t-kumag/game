@@ -81,12 +81,8 @@ class Services::ActivityService
     ((src_insert[:date] == true) && (src_insert[:activity] == true)) ? false : true
   end
 
-  def self.fetch_at_sync_transaction_latest_date(current_user)
+  def self.fetch_latest_sync_log_date(current_user)
     Entities::Activity.order(id: :desc).where(user_id: current_user.id).pluck("at_sync_transaction_latest_date").first
-  end
-
-  def self.fetch_sync_criteria_date(current_user)
-    Entities::Activity.order(id: :desc).where(user_id: current_user.id).pluck("sync_criteria_date").first
   end
 
   def self.get_card_activity_data_column
@@ -179,7 +175,7 @@ class Services::ActivityService
     activity[:date] = DateTime.new(0)
     activity[:activity_type] =nil
     activity[:message] = nil
-    activity[:sync_criteria_date] = latest_sync_date
+    activity[:at_sync_transaction_latest_date] = latest_sync_date
 
 
     activity

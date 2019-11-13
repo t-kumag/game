@@ -10,7 +10,7 @@ class Api::V2::ActivitiesController < ApplicationController
     sync_criteria_date = Services::ActivityService.fetch_sync_criteria_date(@current_user)
 
     last_activity_sync_date = last_activity_sync_exist?(sync_criteria_date)
-    transaction = fetch_transaction(at_sync_transaction_latest_date, sync_criteria_datew)
+    transaction = fetch_transaction(sync_criteria_date, Time.now)
     create_activity(transaction,last_activity_sync_date, sync_criteria_date)
 
     @activities = Services::ActivityService.fetch_activities(@current_user, params[:page])
@@ -50,14 +50,14 @@ class Api::V2::ActivitiesController < ApplicationController
     last_activity_sync_date
   end
 
-  def fetch_transaction(at_sync_transaction_latest_date, sync_criteria_date)
+  def fetch_transaction(sync_criteria_date, now)
     transaction = {}
     transaction[:no_shared] = nil
     transaction[:shared] = nil
 
-    return transaction unless at_sync_transaction_latest_date.present?
-    transaction[:no_shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: at_sync_transaction_latest_date..sync_criteria_date, share: false)
-    transaction[:shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: at_sync_transaction_latest_date..sync_criteria_date, share: true)
+    return transaction unless sync_criteria_date.present?
+    transaction[:no_shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: sync_criteria_date..now, share: false)
+    transaction[:shared] = Entities::UserDistributedTransaction.where(user_id: @current_user.id, used_date: sync_criteria_date..now, share: true)
 
     transaction
   end
