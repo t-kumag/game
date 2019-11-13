@@ -20,6 +20,7 @@ ActiveRecord::Schema.define(version: 2019_11_13_081503) do
     t.string "url"
     t.string "message"
     t.datetime "date", null: false
+    t.datetime "at_sync_transaction_latest_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

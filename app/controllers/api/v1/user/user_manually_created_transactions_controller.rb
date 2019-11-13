@@ -164,7 +164,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
 
   def create_user_manually_activity(current_user, used_date, options)
-    if options[:share].present?
+    if options[:transaction][:share]
       # 無駄なキーを渡すと誤作動を起こす可能性があるので削除します。
       options.delete(:group_id)
       options.delete(:share)
