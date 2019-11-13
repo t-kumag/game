@@ -3,10 +3,11 @@ class Api::V2::ActivitiesController < ApplicationController
 
   def index
 
+    # TO DO: 一旦ここは仕様を含め考え直し。
     #last_sync_date = Services::AtSyncTransactionLatestDateLogService.fetch_latest_sync_log_date(@current_user)
-    last_activity_sync_date = last_activity_sync_exist?(last_sync_date)
-    transaction = fetch_transaction(last_sync_date, Time.now)
-    create_activity(transaction,last_activity_sync_date, last_sync_date)
+    #last_activity_sync_date = last_activity_sync_exist?(last_sync_date)
+    #transaction = fetch_transaction(last_sync_date, Time.now)
+    #create_activity(transaction,last_activity_sync_date, last_sync_date)
 
     @activities = Services::ActivityService.fetch_activities(@current_user, params[:page])
     render 'index', formats: 'json', handlers: 'jbuilder'
