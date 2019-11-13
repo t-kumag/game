@@ -11,9 +11,9 @@ class Services::AtSyncTransactionLatestDateLogService
     end
   end
 
-  def self.fetch_latest_sync_log_date(current_user)
-    Entities::AtSyncTransactionLatestDateLog.order(id: :desc).where(user_id: current_user.id).pluck("latest_date").first
-  end
+  #def self.fetch_latest_sync_log_date(current_user)
+  #  Entities::AtSyncTransactionLatestDateLog.order(id: :desc).where(user_id: current_user.id).pluck("latest_date").first
+  #end
 
   def self.activity_sync_log(financier_account_type_key, account)
     activity_sync_log = []
@@ -31,7 +31,6 @@ class Services::AtSyncTransactionLatestDateLogService
   def self.set_at_user_card_account_id(account)
     Entities::AtSyncTransactionLatestDateLog.new(
         at_user_card_account_id: account.id,
-        user_id: account.at_user.user_id,
         latest_date: DateTime.now
     )
   end
@@ -39,7 +38,6 @@ class Services::AtSyncTransactionLatestDateLogService
   def self.set_at_user_bank_account_id(account)
     Entities::AtSyncTransactionLatestDateLog.new(
         at_user_bank_account_id: account.id,
-        user_id: account.at_user.user_id,
         latest_date: DateTime.now
     )
   end
@@ -47,7 +45,6 @@ class Services::AtSyncTransactionLatestDateLogService
   def self.set_at_user_emoney_service_account_id(account)
     Entities::AtSyncTransactionLatestDateLog.new(
         at_user_emoney_service_account_id: account.id,
-        user_id: account.at_user.user_id,
         latest_date: DateTime.now
     )
   end
