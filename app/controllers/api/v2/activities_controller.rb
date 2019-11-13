@@ -45,8 +45,8 @@ class Api::V2::ActivitiesController < ApplicationController
       familly_expense_income = Services::ActivityService.create_activity_data(@current_user.id, @current_user.group_id, Time.now, :familly_expense_income, familly)
     end
 
-    last_activity_sync_date[:person_expense_income] = check_latest_day?(person_expense_income, sync_criteria_date)
-    last_activity_sync_date[:familly_expense_income] = check_latest_day?(familly_expense_income, sync_criteria_date)
+    last_activity_sync_date[:person_expense_income] = check_latest_day?(person_expense_income, sync_criteria_date) if person_expense_income.present?
+    last_activity_sync_date[:familly_expense_income] = check_latest_day?(familly_expense_income, sync_criteria_date) if familly_expense_income.present?
     last_activity_sync_date
   end
 
