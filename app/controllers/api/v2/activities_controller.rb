@@ -69,8 +69,8 @@ class Api::V2::ActivitiesController < ApplicationController
     end
   end
 
-  def check_latest_day?(last_tran_date, sync_criteria_date)
-    last_tran_date.at_sync_transaction_latest_date != sync_criteria_date
+  def check_latest_day?(last_tran_date, last_sync_date)
+    last_tran_date.at_sync_transaction_latest_date != last_sync_date
   end
 
   def remove_user_manually_created_transaction(transactions)
