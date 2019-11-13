@@ -156,6 +156,10 @@ class Services::PlService
         WHEN udt.amount < 0 THEN udt.amount
         ELSE 0
       END AS amount_payment,
+      CASE
+        WHEN udt.amount > 0 THEN udt.amount
+        ELSE 0
+      END AS amount_receipt,
         atc.category_name1,
         atc.category_name2
       FROM
