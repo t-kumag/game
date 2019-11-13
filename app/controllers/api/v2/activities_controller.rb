@@ -7,7 +7,7 @@ class Api::V2::ActivitiesController < ApplicationController
     # 件数を表示をした際に書き込まれる時間
     at_sync_transaction_latest_date = Services::ActivityService.fetch_at_sync_transaction_latest_date(@current_user)
 
-    # アクティビティが追加される際に記載する時間(at-sync時のみ)
+    # at-sync時にアクティビティが追加される際に記載する時間
     sync_criteria_date = Services::ActivityService.fetch_sync_criteria_date(@current_user)
 
     # アクティビティのトータル件数を表示時間とアクティビティが追加された時間を比べる。

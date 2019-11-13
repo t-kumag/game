@@ -3,7 +3,6 @@ require 'nkf'
 
 
 class Services::AtUserService::Sync
-  attr_writer :request
 
   def initialize(user, fnc_type = 'all')
     @user = user
