@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_12_225018) do
+ActiveRecord::Schema.define(version: 2019_10_16_075910) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -20,7 +20,6 @@ ActiveRecord::Schema.define(version: 2019_11_12_225018) do
     t.string "url"
     t.string "message"
     t.datetime "date", null: false
-    t.datetime "at_sync_transaction_latest_date"
     t.datetime "sync_criteria_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
