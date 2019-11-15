@@ -54,6 +54,7 @@ class Services::GoalService
         current_amount: goal.current_amount,
         start_date: goal.start_date,
         end_date: goal.end_date,
+        progress_all: progress_all(goal.current_amount,  goal.goal_amount),
         progress_monthly: progress_monthly(goal),
         owner_current_amount: owner_current_amount,
         partner_current_amount: partner_current_amount,
