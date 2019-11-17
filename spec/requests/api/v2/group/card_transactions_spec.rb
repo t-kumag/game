@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'card_transactions_controller' do
+RSpec.describe Api::V2::Group::CardTransactionsController do
   let(:user) { create(:user, :with_at_user_card_transactions) }
   let(:headers) { { 'Authorization': 'Bearer ' + user.token} }
   let(:params) { {

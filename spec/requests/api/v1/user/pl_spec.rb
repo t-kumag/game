@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'pl_controller' do
+RSpec.describe Api::V1::User::PlController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
   let(:params) { {

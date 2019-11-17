@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'bank_accounts_controller' do
+RSpec.describe Api::V1::User::BankAccountsController do
   let(:user) { create(:user, :with_at_user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
   let(:params) { { share: false} }

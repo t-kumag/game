@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'transactions_controller' do
+RSpec.describe Api::V1::User::TransactionsController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
   let(:find_params) { {

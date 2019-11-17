@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'bs_controller' do
+RSpec.describe Api::V1::User::BsController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
   # TODO 実際にレスポンスに値を入れる場合はtransaction系のデータ追加が必要

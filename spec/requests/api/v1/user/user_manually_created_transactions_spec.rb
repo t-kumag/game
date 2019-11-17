@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'user_manually_created_transactions_controller' do
+RSpec.describe Api::V1::User::UserManuallyCreatedTransactionsController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token } }
   let(:params) { {

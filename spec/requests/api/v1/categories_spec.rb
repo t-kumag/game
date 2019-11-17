@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'categories_controller' do
+RSpec.describe Api::V1::CategoriesController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
 
