@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'bank_transactions_controller' do
   let(:user) { create(:user, :with_at_user_bank_transactions) }
   let(:headers) { { 'Authorization': 'Bearer ' + user.token} }
-  let(:find_params) { {
+  let(:params) { {
     from: '2018-12-31',
     to: '2019-01-01'
   } }
@@ -15,7 +15,7 @@ RSpec.describe 'bank_transactions_controller' do
   describe '#index' do
     context 'success' do
       it 'response 200' do
-        get "/api/v2/user/bank-accounts/#{at_user_bank_account.id}/transactions/", params: find_params, headers: headers
+        get "/api/v2/user/bank-accounts/#{at_user_bank_account.id}/transactions/", params: params, headers: headers
         expect(response.status).to eq 200
       end
 
@@ -23,7 +23,7 @@ RSpec.describe 'bank_transactions_controller' do
         expect_bank_transaction = at_user_bank_transaction
         expect_distributed_transaction = expect_bank_transaction.user_distributed_transaction
 
-        get "/api/v2/user/bank-accounts/#{at_user_bank_account.id}/transactions/", params: find_params, headers: headers
+        get "/api/v2/user/bank-accounts/#{at_user_bank_account.id}/transactions/", params: params, headers: headers
         response_json = JSON.parse(response.body)
         actual_transactions = response_json['transactions']
 

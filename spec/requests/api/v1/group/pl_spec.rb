@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Api::V1::Group::PlController do
   let(:user) { create(:user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
-  let(:find_params) { {
+  let(:params) { {
     from: '2019-12-29',
     to: '2019-12-31',
     share: false
@@ -15,12 +15,12 @@ RSpec.describe Api::V1::Group::PlController do
   describe '#summary' do
     context 'success' do
       it 'response 200' do
-        get "/api/v1/group/pl-summary", params: find_params, headers: headers
+        get "/api/v1/group/pl-summary", params: params, headers: headers
         expect(response.status).to eq 200
       end
 
       it 'body is not nil' do
-        get "/api/v1/group/pl-summary", params: find_params, headers: headers
+        get "/api/v1/group/pl-summary", params: params, headers: headers
 
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
@@ -32,12 +32,12 @@ RSpec.describe Api::V1::Group::PlController do
   describe '#categories' do
     context 'success' do
       it 'response 200' do
-        get "/api/v1/group/pl-categories", params: find_params, headers: headers
+        get "/api/v1/group/pl-categories", params: params, headers: headers
         expect(response.status).to eq 200
       end
 
       it 'body is not nil' do
-        get "/api/v1/group/pl-categories", params: find_params, headers: headers
+        get "/api/v1/group/pl-categories", params: params, headers: headers
 
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
@@ -49,12 +49,12 @@ RSpec.describe Api::V1::Group::PlController do
   describe '#grouped_categories' do
     context 'success' do
       it 'response 200' do
-        get "/api/v1/group/pl-grouped-categories", params: find_params, headers: headers
+        get "/api/v1/group/pl-grouped-categories", params: params, headers: headers
         expect(response.status).to eq 200
       end
 
       it 'body is not nil' do
-        get "/api/v1/group/pl-grouped-categories", params: find_params, headers: headers
+        get "/api/v1/group/pl-grouped-categories", params: params, headers: headers
 
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']

@@ -22,13 +22,13 @@ RSpec.describe Api::V1::Group::EmoneyTransactionsController do
     context 'success' do
       it 'response 200' do
         id = user.at_user.at_user_emoney_service_accounts.first.at_user_emoney_transactions.first.id
-        get "/api/v1/group/emoney-accounts/#{at_user_emoney_account.id}/transactions/#{id}", headers: headers
+        get "/api/v1/group/emoney-accounts/#{at_user_emoney_account.id}/transactions/#{at_user_emoney_transaction.id}", headers: headers
         expect(response.status).to eq 200
       end
 
       it 'body is not nil' do
         id = user.at_user.at_user_emoney_service_accounts.first.at_user_emoney_transactions.first.id
-        get "/api/v1/group/emoney-accounts/#{at_user_emoney_account.id}/transactions/#{id}", headers: headers
+        get "/api/v1/group/emoney-accounts/#{at_user_emoney_account.id}/transactions/#{at_user_emoney_transaction.id}", headers: headers
 
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']

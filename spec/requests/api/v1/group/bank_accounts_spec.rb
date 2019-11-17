@@ -20,13 +20,13 @@ RSpec.describe Api::V1::Group::BankAccountsController do
 
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
-        expect(response_json['app'].length).to eq 1
-        expect(response_json['app'][0]['account_id']).to eq expect_bank_account.id
-        expect(response_json['app'][0]['name']).to eq expect_bank_account.fnc_nm
-        expect(response_json['app'][0]['amount']).to eq expect_bank_account.balance
-        expect(response_json['app'][0]['fnc_id']).to eq expect_bank_account.fnc_id
-        expect(response_json['app'][0]['last_rslt_cd']).to eq expect_bank_account.last_rslt_cd
-        expect(response_json['app'][0]['last_rslt_msg']).to eq expect_bank_account.last_rslt_msg
+        expect(actual_app.length).to eq 1
+        expect(actual_app[0]['account_id']).to eq expect_bank_account.id
+        expect(actual_app[0]['name']).to eq expect_bank_account.fnc_nm
+        expect(actual_app[0]['amount']).to eq expect_bank_account.balance
+        expect(actual_app[0]['fnc_id']).to eq expect_bank_account.fnc_id
+        expect(actual_app[0]['last_rslt_cd']).to eq expect_bank_account.last_rslt_cd
+        expect(actual_app[0]['last_rslt_msg']).to eq expect_bank_account.last_rslt_msg
       end
     end
 
