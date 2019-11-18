@@ -49,12 +49,89 @@ class Services::ActivityService
     check_duplication_old_act(latest_one, activity, activity_data_column)
   end
 
-  def self.fetch_activities(current_user, page)
-    Entities::Activity.where(user_id: current_user.id).order(created_at: "DESC").page(page)
+  def self.fetch_activities(user, page)
+    Entities::Activity.where(user_id: user.id).order(created_at: "DESC").page(page)
   end
 
-  def self.fetch_activity_type(current_user, type)
-    Entities::Activity.where(user_id: current_user.id).where(activity_type: type).order(created_at: "DESC").first()
+  def self.fetch_activity_type(user, type)
+    Entities::Activity.where(user_id: user.id).where(activity_type: type).order(created_at: "DESC").first()
+  end
+
+  # TODO v2移行時に削除
+  # のちに削除される一時的な処理
+  def self.trade_list(user, date=Time.now.strftime("%Y-%m-%d").to_s)
+    p_count = Entities::Activity
+      .where(user_id: user.id)
+      .where("activity_type LIKE ?", 'individual%')
+      .where("created_at >= ?", date)
+      .count
+
+    f_count = Entities::Activity
+      .where(user_id: user.id)
+      .where("activity_type LIKE ?", 'partner%')
+      .where("created_at >= ?", date)
+      .count
+
+    [p_count, f_count]
+  end
+
+  # TODO v2移行時に削除
+  # のちに削除される一時的な処理
+  # アクティビティから個人と家族の取引をカウントする
+  def self.save_trade_count(user, date=Time.now.strftime("%Y-%m-%d").to_s)
+    nums =trade_list(user)
+
+    # message生成 個人の取引がn件ありました。 person_expense_income
+    # ここから
+    p_activity = Entities::Activity
+      .where(user_id: user.id)
+      .where("activity_type LIKE ?", 'person_expense_income')
+      .where("created_at >= ?", date)
+      .first
+
+    if p_activity.present? && nums[0] > 0
+      begin
+        p_activity.update_attributes(
+            count: nums[0],
+            message: sprintf(ACTIVITY_TYPE::NAME[:person_expense_income][:message], nums[0])
+        )
+      rescue => e
+        # 処理を中断させない。
+      end
+    end
+
+    if p_activity.blank?
+      set_activity = set_activity(ACTIVITY_TYPE::NAME[:person_expense_income])
+      set_activity[:message] = sprintf(ACTIVITY_TYPE::NAME[:person_expense_income][:message], nums[0])
+      set_activity[:count] = nums[0]
+      create_activity_data(user.id, nil, date, 'person_expense_income', set_activity)
+    end
+
+    # message生成 家族の取引がn件ありました。familly_expense_income
+    # ここから
+    f_activity = Entities::Activity
+                     .where(user_id: user.id)
+                     .where("activity_type LIKE ?", 'familly_expense_income')
+                     .where("created_at >= ?", date)
+                     .first
+
+    if f_activity.present? && nums[1] > 0
+      begin
+        f_activity.update_attributes(
+            count: nums[1],
+            message: sprintf(ACTIVITY_TYPE::NAME[:familly_expense_income][:message], nums[1])
+        )
+      rescue => e
+        # 処理を中断させない。
+      end
+    end
+
+    if f_activity.blank?
+      set_activity = set_activity(ACTIVITY_TYPE::NAME[:familly_expense_income])
+      set_activity[:message] = sprintf(ACTIVITY_TYPE::NAME[:familly_expense_income][:message], nums[1])
+      set_activity[:count] = nums[1]
+      create_activity_data(user.id, user.group_id, date, 'familly_expense_income', set_activity)
+    end
   end
 
   private
@@ -124,7 +201,7 @@ class Services::ActivityService
           user_id: user_id,
           group_id: group_id,
           url: activity[:url],
-          count:  0,
+          count:  activity[:count],
           activity_type:  activity_type,
           message: activity[:message],
           date: used_date,
@@ -144,6 +221,7 @@ class Services::ActivityService
     activity[:message] = defined_activity[:message]
     activity[:url] = defined_activity[:url]
     activity[:at_sync_transaction_latest_date] = nil
+    activity[:count] = 0
     activity
   end
 
