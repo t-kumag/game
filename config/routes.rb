@@ -130,6 +130,8 @@ Rails.application.routes.draw do
     end
 
     namespace :v2 do
+      resources :activities, :path => '/activities', :only => [:index] do
+      end
       # 個人用
       namespace :user do
         resources :bank_accounts, path: '/bank-accounts' do

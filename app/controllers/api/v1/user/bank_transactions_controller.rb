@@ -47,7 +47,15 @@ class Api::V1::User::BankTransactionsController < ApplicationController
         bank_account_transaction_param[:group_id],
     )
 
-    render json: {}, status: 200 and return if @response.blank?
+    if @response[:user_distributed_transaction].share
+      options = create_activity_options(@response[:user_distributed_transaction])
+      Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
+                                                DateTime.now, :person_tran_to_familly, options)
+      Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
+                                                DateTime.now, :person_tran_to_familly_partner, options)
+    end
+
+    render json: {}, status: 200 and return if @response[:user_distributed_transaction].blank?
     render 'update', formats: 'json', handlers: 'jbuilder'
   end
 
@@ -67,4 +75,13 @@ class Api::V1::User::BankTransactionsController < ApplicationController
     }
   end
 
+  private
+  def create_activity_options(transaction)
+    options = {}
+    options[:goal] = nil
+    options[:transaction] = transaction
+    options[:transactions] = nil
+    options[:at_sync_transaction_latest_date] = nil
+    options
+  end
 end

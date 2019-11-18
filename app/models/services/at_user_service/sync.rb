@@ -163,6 +163,7 @@ class Services::AtUserService::Sync
       Services::AtSyncTransactionMonthlyDateLogService.save_at_sync_tran_monthly_date_log(monthly_trans)
       transaction_entity.import src_trans, on_duplicate_key_update: data_column.map { |k, _v| k }, validate: false
       Services::ActivityService.save_activities(activities)
+      # 最後の同期時間を記録
       Services::AtSyncTransactionLatestDateLogService.activity_sync_log(financier_account_type_key, a)
 
       # ATの同期log

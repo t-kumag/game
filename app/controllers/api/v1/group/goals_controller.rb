@@ -43,13 +43,14 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal.goal_settings.create!(get_partner_goal_setting_params)
         # 頭金を入金する際に必要
         goal_service = Services::GoalService.new(@current_user)
+        options = create_activity_options(goal)
+        create_goal_activity_log(options)
 
         # 目標ログの登録
         goal.goal_settings.each do |gs|
           goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
         end
       end
-      create_goal_activity_log
 
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
@@ -86,6 +87,8 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
         partner_goal_setting.update!(get_partner_goal_setting_params)
+        options = create_activity_options(goal)
+        update_goal_activity_log(options)
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount) if goal_setting.at_user_bank_account_id.present?
         end
@@ -152,7 +155,8 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal_service = Services::GoalService.new(@current_user)
     if goal_service.check_bank_balance(params[:add_amount], goal_setting)
       goal_service.add_money(goal, goal_setting, params[:add_amount])
-      Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money)
+      options = create_activity_options(goal)
+      Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
       render(json: {}, status: 200)
     else
       render(json: {errors: [{code:"", message:"minus balance"}]}, status: 422)
@@ -269,8 +273,21 @@ class Api::V1::Group::GoalsController < ApplicationController
     (amount1.to_f / amount2.to_f).to_s
   end
 
-  def create_goal_activity_log
-    Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created)
-    Services::ActivityService.create_user_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created)
+  def create_goal_activity_log(options)
+    Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created, options)
+    Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created_partner, options)
+  end
+
+  def update_goal_activity_log(options)
+    Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
+    Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
+  end
+
+  def create_activity_options(goal)
+    options = {}
+    options[:goal] = goal
+    options[:transaction] = nil
+    options[:at_sync_transaction_latest_date] = nil
+    options
   end
 end
