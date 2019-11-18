@@ -1,6 +1,6 @@
 json.app do
   json.goals do
-    json.goal_id @response[:id]
+    json.goal_id @response[:goal_id]
     json.goal_type_id @response[:goal_type_id]
     json.name @response[:name]
     json.img_url "#{Settings.s3_img_url}#{@response[:img_url]}" if @response[:img_url].present?
