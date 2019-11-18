@@ -214,9 +214,6 @@ class Services::GoalService
     monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
   end
 
-
-
-
   private
 
   def get_monthly_amount_sum(goal_logs)
