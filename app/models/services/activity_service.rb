@@ -100,7 +100,7 @@ class Services::ActivityService
       end
     end
 
-    if p_activity.blank?
+    if p_activity.blank? && nums[1] > 0
       set_activity = set_activity(ACTIVITY_TYPE::NAME[:person_expense_income])
       set_activity[:message] = sprintf(ACTIVITY_TYPE::NAME[:person_expense_income][:message], nums[0])
       set_activity[:count] = nums[0]
@@ -126,7 +126,7 @@ class Services::ActivityService
       end
     end
 
-    if f_activity.blank?
+    if f_activity.blank? && nums[1] > 0
       set_activity = set_activity(ACTIVITY_TYPE::NAME[:familly_expense_income])
       set_activity[:message] = sprintf(ACTIVITY_TYPE::NAME[:familly_expense_income][:message], nums[1])
       set_activity[:count] = nums[1]
