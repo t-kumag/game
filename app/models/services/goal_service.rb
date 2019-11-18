@@ -12,7 +12,7 @@ class Services::GoalService
     amount
   end
 
-  def get_goal_lists(goals)
+  def goal_list(goals)
     goals = goals.map do |g|
       {
           id: g.id,

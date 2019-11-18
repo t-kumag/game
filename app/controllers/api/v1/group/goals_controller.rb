@@ -4,7 +4,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def index
     goals = Entities::Goal.where(group_id: @current_user.group_id)
-    @responses = Services::GoalService.new(@current_user).get_goal_lists(goals) if goals.present?
+    @responses = Services::GoalService.new(@current_user).goal_list(goals) if goals.present?
     render(json: {}, status: 200) and return if @responses.blank?
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
