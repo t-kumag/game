@@ -123,6 +123,10 @@ Rails.application.routes.draw do
       post 'user/resend', to: 'users#resend'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
+
+      if Rails.env.development?
+        get 'sample1/report', to: 'sample1#report'
+      end
     end
 
     namespace :v2 do
