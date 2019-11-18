@@ -64,6 +64,14 @@ class Services::AtUserService::Sync
           if account['last_rslt_cd'] === 'E' || account['last_rslt_cd'] === 'A'
             # 初回エラー発生時もエラーとしてカウントする
             if lastAccount.nil? || lastAccount['error_count'] < 1
+
+              # タスク No.150
+              if Rails.env.development?
+                SlackNotifier.ping("INFO 金融エラー通知テスト")
+                SlackNotifier.ping(account)
+              end
+              # タスク No.150
+              
               account['error_date'] = DateTime.now
               account['error_count'] = 1
             end
