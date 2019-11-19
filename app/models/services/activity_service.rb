@@ -237,6 +237,7 @@ class Services::ActivityService
     activity[:message] = sprintf(defined_activity[:message], transactions.count)
     activity
   end
+
   def self.create_base_activity(user, account)
     activity = Entities::Activity.new
     activity[:count] = 0
@@ -245,7 +246,6 @@ class Services::ActivityService
     activity[:date] = DateTime.new(0)
     activity[:activity_type] =nil
     activity[:message] = nil
-
     activity
   end
 
