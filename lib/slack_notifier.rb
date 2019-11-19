@@ -6,7 +6,7 @@ module SlackNotifier
       return sn.ping("nil")  if message.nil?
       sn.ping(message)
     rescue => e
-      logger.error(e)
+      Rails.logger.error(e)
     end
   end
 end
