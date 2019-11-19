@@ -214,7 +214,6 @@ class Api::V1::Group::GoalsController < ApplicationController
     options = {}
     options[:goal] = goal
     options[:transaction] = nil
-    options[:at_sync_transaction_latest_date] = nil
     options
   end
 end
