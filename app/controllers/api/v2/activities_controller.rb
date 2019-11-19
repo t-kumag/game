@@ -2,13 +2,10 @@ class Api::V2::ActivitiesController < ApplicationController
   before_action :authenticate, except: :login
 
   def index
-
-    # TO DO: 一旦ここは仕様を含め考え直し。
-    #last_sync_date = Services::AtSyncTransactionLatestDateLogService.fetch_latest_sync_log_date(@current_user)
-    #last_activity_sync_date = last_activity_sync_exist?(last_sync_date)
-    #transaction = fetch_transaction(last_sync_date, Time.now)
-    #create_activity(transaction,last_activity_sync_date, last_sync_date)
-
+    # TODO v1の件数カウント使用でv2の件数messageを表示する
+    # TODO v1のカウント処理を削除後はuser_distributed_transactionsの明細をカウントするようにする。
+    # 当日差分のみをカウントすればクエリは重たくならない
+    Services::ActivityService.save_trade_count(@current_user)
     @activities = Services::ActivityService.fetch_activities(@current_user, params[:page])
     render 'index', formats: 'json', handlers: 'jbuilder'
   end
