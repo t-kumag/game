@@ -20,7 +20,7 @@ class Services::ActivityService
     activity = set_activity(defined_activity)
     activity = convert_goal_message(options[:goal], defined_activity, activity) if options[:goal].present?
     activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
-    activity = convert_trans_message(options[:transactions], options[:at_sync_transaction_latest_date], defined_activity, activity) if options[:transactions].present?
+    activity = convert_trans_message(options[:transactions], defined_activity, activity) if options[:transactions].present?
 
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
@@ -79,7 +79,7 @@ class Services::ActivityService
   # のちに削除される一時的な処理
   # アクティビティから個人と家族の取引をカウントする
   def self.save_trade_count(user, date=Time.now.strftime("%Y-%m-%d").to_s)
-    nums =trade_list(user)
+    nums = trade_list(user)
 
     # message生成 個人の取引がn件ありました。 person_expense_income
     # ここから
@@ -100,7 +100,7 @@ class Services::ActivityService
       end
     end
 
-    if p_activity.blank? && nums[1] > 0
+    if p_activity.blank? && nums[0] > 0
       set_activity = set_activity(ACTIVITY_TYPE::NAME[:person_expense_income])
       set_activity[:message] = sprintf(ACTIVITY_TYPE::NAME[:person_expense_income][:message], nums[0])
       set_activity[:count] = nums[0]
@@ -205,7 +205,6 @@ class Services::ActivityService
           activity_type:  activity_type,
           message: activity[:message],
           date: used_date,
-          at_sync_transaction_latest_date: activity[:at_sync_transaction_latest_date]
       )
 
     rescue => exception
@@ -220,7 +219,6 @@ class Services::ActivityService
     activity = {}
     activity[:message] = defined_activity[:message]
     activity[:url] = defined_activity[:url]
-    activity[:at_sync_transaction_latest_date] = nil
     activity[:count] = 0
     activity
   end
@@ -235,11 +233,11 @@ class Services::ActivityService
     activity
   end
 
-  def self.convert_trans_message(transactions, at_sync_transaction_latest_date, defined_activity, activity)
+  def self.convert_trans_message(transactions, defined_activity, activity)
     activity[:message] = sprintf(defined_activity[:message], transactions.count)
-    activity[:at_sync_transaction_latest_date] = at_sync_transaction_latest_date
     activity
   end
+
   def self.create_base_activity(user, account)
     activity = Entities::Activity.new
     activity[:count] = 0
@@ -248,7 +246,6 @@ class Services::ActivityService
     activity[:date] = DateTime.new(0)
     activity[:activity_type] =nil
     activity[:message] = nil
-
     activity
   end
 
