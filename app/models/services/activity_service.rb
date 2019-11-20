@@ -1,11 +1,17 @@
 class Services::ActivityService
 
-  def self.get_activity_data(user_id, group_id, activity_type)
+  def self.get_activity_data(user_id, group_id, activity_type, goal)
+    defined_activity = ACTIVITY_TYPE::NAME[activity_type]
+    activity = set_activity(defined_activity)
+    activity = convert_goal_message(goal, defined_activity, activity) if goal.present?
+
     {
         user_id: user_id,
         group_id: group_id,
-        count: 0,
+        url: activity[:url],
+        count:  activity[:count],
         activity_type: activity_type,
+        message: activity[:message],
         date: Time.zone.now
     }
   end
