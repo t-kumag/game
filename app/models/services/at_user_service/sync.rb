@@ -221,7 +221,9 @@ class Services::AtUserService::Sync
         cert_type: { col: 'CERT_TYPE' },
         scrap_dtm: { col: 'SCRAP_DTM', opt: 'time_parse' },
         last_rslt_cd: { col: 'LAST_RSLT_CD' },
-        last_rslt_msg: { col: 'LAST_RSLT_MSG' }
+        last_rslt_msg: { col: 'LAST_RSLT_MSG' },
+        error_date: { col: 'CUSTOM_COLUMN' },
+        error_count: { col: 'CUSTOM_COLUMN' }
       )
     end
 
@@ -265,7 +267,9 @@ class Services::AtUserService::Sync
         cert_type: { col: 'CERT_TYPE' },
         scrap_dtm: { col: 'SCRAP_DTM', opt: 'time_parse' },
         last_rslt_cd: { col: 'LAST_RSLT_CD' },
-        last_rslt_msg: { col: 'LAST_RSLT_MSG' }
+        last_rslt_msg: { col: 'LAST_RSLT_MSG' },
+        error_date: { col: 'CUSTOM_COLUMN' },
+        error_count: { col: 'CUSTOM_COLUMN' }
       )
     end
   end
