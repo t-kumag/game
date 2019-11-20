@@ -1,0 +1,45 @@
+# Group 個人機能
+/api/v2/user/*
+
+
+# Group 家族機能
+/api/v2/group/*
+
+# Group その他
+/api/v2/xxx系
+
+## アクティビティ [/api/v2/user/activities]
+Resource of Activity
+
+### アクティビティ取得 [GET]
+
++ Request アクティビティ取得 (application/json)
+
+    + Headers
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "activities": [
+                  {
+                    "day": "2019-11-18",
+                    "url": "osidori://transactions",
+                    "message": "個人の取引が3件ありました"
+                  },
+                  {
+                    "day": "2019-11-18",
+                    "url": "osidori://transactions",
+                    "message": "家族の取引が1件ありました"
+                  },
+                  {
+                    "day": "2019-11-18",
+                    "url": null,
+                    "message": "銀行口座の支出があります。"
+
+                  }
+            }
+
+

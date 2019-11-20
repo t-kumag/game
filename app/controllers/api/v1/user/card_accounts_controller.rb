@@ -53,6 +53,10 @@ class Api::V1::User::CardAccountsController < ApplicationController
         require_group && return if params[:share] == true
         account = Entities::AtUserCardAccount.find account_id
         account.update!(get_account_params)
+        if account.share
+          Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
+          Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner)
+        end
         render json: {}, status: 200
       else
         # TODO(fujiura): code の検討と、エラー処理共通化

@@ -1,35 +1,17 @@
-# == Schema Information
-#
-# Table name: at_user_card_accounts
-#
-#  id            :bigint(8)        not null, primary key
-#  at_user_id    :bigint(8)
-#  at_card_id    :bigint(8)
-#  share         :boolean
-#  fnc_id        :string(255)      not null
-#  fnc_cd        :string(255)      not null
-#  fnc_nm        :string(255)      not null
-#  corp_yn       :string(255)      not null
-#  brn_cd        :string(255)
-#  brn_nm        :string(255)
-#  acct_no       :string(255)
-#  memo          :string(255)
-#  use_yn        :string(255)      not null
-#  cert_type     :string(255)      not null
-#  scrap_dtm     :datetime         not null
-#  last_rslt_cd  :string(255)
-#  last_rslt_msg :string(255)
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
-#
-
 class Entities::AtUserCardAccount < ApplicationRecord
+  RELATION_KEY = 'at_user_card_id'.freeze
+
   acts_as_paranoid # 論理削除
   belongs_to :at_user
   belongs_to :at_card
   has_many :at_user_card_transactions
   has_many :at_scraping_logs
   has_many :at_sync_transaction_logs
+
+  # TODO ReportServiceと合わせて実装する
+  def ids
+    [1]
+  end
 
   # 今月の引落し額
   def current_month_payment_amount

@@ -103,7 +103,7 @@ class Api::V1::UsersController < ApplicationController
     # 無料ユーザーの口座数が上限に達していた場合はエラーを返し口座数を制限する
     # AT口座のエラー解消の場合は口座数の制限はスキップする
     if account_limit == false && skip_account_limit == false
-        return render json: { errors: { code: '', message: "five account limit of free users" } }, status: 422
+        return render json: { errors: { code: '007002', message: "five account limit of free users" } }, status: 422
     end
 
     @response = Services::AtUserService.new(@current_user).at_url
