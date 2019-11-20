@@ -135,10 +135,15 @@ class Entities::Activity < ApplicationRecord
       when "goal_created"
         #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
         message = "目標が作成されました。"
+      when "goal_created_partner"
+        #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
+        message = "目標が作成されました。"
       when "goal_add_money"
         #message = "夫婦の電子マネーに収入が" + a.count.to_s + "件あります。"
         message = "目標に入金がありました。"
       end
+
+      next unless message.present?
 
       @result.push({
         "day": dayStr,

@@ -1,4 +1,5 @@
 class Services::GoalGraphService
+  # TODO: spanで取得したい月数を指定しているがfrom..toの取得したい範囲指定に変更する。
   def initialize(user, goal, span)
     @user = user
     @goal = goal

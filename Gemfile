@@ -113,3 +113,6 @@ gem 'redis-namespace'
 
 # mail iso-2022-jp
 gem 'mail-iso-2022-jp'
+
+# slack-notifier'
+gem 'slack-notifier'

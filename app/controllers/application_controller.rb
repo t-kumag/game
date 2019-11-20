@@ -169,6 +169,16 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  def disallowed_at_bank_account_ids?(bank_ids)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    at_user_bank_ids = Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+
+    bank_ids.each do |id|
+      return true if at_user_bank_ids.include?(id)
+    end
+    false
+  end
+
   def disallowed_at_card_ids?(card_ids, with_group=false)
     at_user_id         =  @current_user.try(:at_user).try(:id)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
@@ -185,6 +195,16 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  def disallowed_at_card_account_ids?(card_ids)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    at_user_card_ids = Entities::AtUserCardAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+
+    card_ids.each do |id|
+      return true if at_user_card_ids.include?(id)
+    end
+    false
+  end
+
   def disallowed_at_emoney_ids?(emoney_ids, with_group=false)
     at_user_id         =  @current_user.try(:at_user).try(:id)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
@@ -197,6 +217,16 @@ class ApplicationController < ActionController::Base
 
     emoney_ids.each do |id|
       return true unless at_user_emoney_ids.include?(id)
+    end
+    false
+  end
+
+  def disallowed_at_emoney_account_ids?(emoney_ids)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    at_user_emoney_ids =  Entities::AtUserEmoneyServiceAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+
+    emoney_ids.each do |id|
+      return true if at_user_emoney_ids.include?(id)
     end
     false
   end
@@ -328,6 +358,10 @@ class ApplicationController < ActionController::Base
 
   def require_group
     render json: { errors: { code: '', message: "Require group." } }, status: 422 unless @current_user.group_id.present?
+  end
+
+  def render_disallowed_account_ids
+    render json: { errors: { code: '003002', message: "Disallowed account id." } }, status: 422
   end
 
   def render_disallowed_financier_ids

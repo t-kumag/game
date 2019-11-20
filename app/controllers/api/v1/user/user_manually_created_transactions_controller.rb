@@ -20,12 +20,14 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         transaction = create_user_manually_created
         if params[:share] === true
           require_group && return
-          options = {group_id: @current_user.group_id, share: params[:share]}
+          options = {group_id: @current_user.group_id, share: params[:share], transaction: nil}
         else
-          options = {}
+          options = {transaction: nil}
         end
-        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
+        options[:transaction] = Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
+        create_user_manually_activity(@current_user, transaction[:used_date], options)
       end
+
     rescue => exception
       raise exception
     end
@@ -99,9 +101,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
 
-    Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
-                                                   save_params[:used_date], 'individual_manual_outcome')
-
     Entities::UserManuallyCreatedTransaction.create!(save_params)
 
   end
@@ -118,8 +117,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     )
 
     transaction.update!(update_param(save_params, transaction))
-    Services::ActivityService.create_user_activity(@current_user.id, @current_user.group_id,
-                                                   transaction[:used_date], 'individual_manual_outcome')
     transaction
   end
 
@@ -163,6 +160,19 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     return  params[:amount] if params[:amount] > 0
     return -params[:amount] if params[:amount] < 0
     0
+  end
+
+
+  def create_user_manually_activity(current_user, used_date, options)
+    if options[:transaction][:share]
+      # 無駄なキーを渡すと誤作動を起こす可能性があるので削除します。
+      options.delete(:group_id)
+      options.delete(:share)
+      Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
+      Services::ActivityService.create_activity(current_user.partner_user.id, current_user.group_id, used_date, :individual_manual_outcome_fam, options)
+    else
+      Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
+    end
   end
 
 end

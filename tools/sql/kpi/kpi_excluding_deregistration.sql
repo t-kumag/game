@@ -917,4 +917,7 @@ LEFT JOIN
 ON
   q3.user_id = u.id
 
+WHERE
+  u.deleted_at is null
+
 ORDER BY u.id

@@ -1,8 +1,8 @@
 #TODO 1日1回のバッチ処理かsidekiqなどの並列処理で使用する
 class Services::UserDistributedTransactionService
-  def initialize(user, target = 'all')
+  def initialize(user, fnc_type = 'all')
     @user = user
-    @target = target.blank? ? 'all' : target
+    @fnc_type = fnc_type.blank? ? 'all' : fnc_type
   end
 
   # TODO 同じような処理を切り出すか、後の仕様で分けておいたほうが複雑にならないか検討してリファクタする
@@ -12,14 +12,14 @@ class Services::UserDistributedTransactionService
   def sync
 
     begin
-      case @target
+      case @fnc_type
       when 'bank'
         puts "sync to user_distributed_transactions bank========== "
         sync_at_user_bank_transactions
       when 'card'
         puts "sync to user_distributed_transactions card========== "
         sync_at_user_card_transactions
-      when 'emoney'
+      when 'etc'
         puts "sync to user_distributed_transactions emoney========== "
         sync_at_user_emoney_transactions
       else

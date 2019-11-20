@@ -65,22 +65,22 @@ RSpec.describe Api::V1::User::UserManuallyCreatedTransactionsController do
   describe '#create' do
     context 'success' do
       it 'response 200' do
-        post '/api/v1/user/user-manually-created-transactions', params: params, headers: headers
+        post '/api/v1/user/user-manually-created-transactions', params: params, as: :json, headers: headers
         expect(response.status).to eq 200
       end
 
       it 'increase one record of user_manually_created_transactions' do
-        post '/api/v1/user/user-manually-created-transactions', params: params, headers: headers
+        post '/api/v1/user/user-manually-created-transactions', params: params, as: :json, headers: headers
         expect(Entities::UserManuallyCreatedTransaction.where(user_id: user.id)).to exist
       end
 
       it 'increase one record of user_distributed_transactions' do
-        post '/api/v1/user/user-manually-created-transactions', params: params, headers: headers
+        post '/api/v1/user/user-manually-created-transactions', params: params, as: :json, headers: headers
         expect(Entities::UserDistributedTransaction.where(user_id: user.id)).to exist
       end
 
       it 'increase one record of activities' do
-        post '/api/v1/user/user-manually-created-transactions', params: params, headers: headers
+        post '/api/v1/user/user-manually-created-transactions', params: params, as: :json, headers: headers
         expect(Entities::Activity.where(user_id: user.id)).to exist
       end
     end
@@ -99,28 +99,32 @@ RSpec.describe Api::V1::User::UserManuallyCreatedTransactionsController do
 
     it 'response 200' do
       put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
-        params: params,
+        params: params, 
+        as: :json, 
         headers: headers
       expect(response.status).to eq 200
     end
 
     it 'used_location is updated' do
       put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
-        params: params,
+        params: params, 
+        as: :json, 
         headers: headers
       expect(user_manually_created_transaction_after_update.used_location).to eq params[:used_location]
     end
 
     it 'used_location is updated' do
       put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
-        params: params,
+        params: params, 
+        as: :json, 
         headers: headers
       expect(user_distributed_transaction_after_update.used_location).to eq params[:used_location]
     end
 
     it 'increase one record of activities' do
       put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
-        params: params,
+        params: params, 
+        as: :json, 
         headers: headers
       expect(Entities::Activity.where(user_id: user.id)).to exist
     end

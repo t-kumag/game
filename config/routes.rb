@@ -123,9 +123,15 @@ Rails.application.routes.draw do
       post 'user/resend', to: 'users#resend'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
+
+      if Rails.env.development?
+        get 'sample1/report', to: 'sample1#report'
+      end
     end
 
     namespace :v2 do
+      resources :activities, :path => '/activities', :only => [:index] do
+      end
       # 個人用
       namespace :user do
         resources :bank_accounts, path: '/bank-accounts' do
