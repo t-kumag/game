@@ -62,13 +62,8 @@ class Services::AtUserService::Sync
             end
           end
 
-          # osidoriのデータを引き継ぐ
-          last_account = account_entity.find_by(fnc_id: account['fnc_id'])
-          account.error_date = last_account.error_date
-          account.error_count = last_account.error_count
-
-          # ATエラーのメール、アクティビティ通知
-          send_error_mail_activity(account, last_account)
+          # AT口座エラー処理 メール通知・アクティビティ通知
+          at_finance_error(account_entity, account)
 
           accounts << account
         end
@@ -374,17 +369,22 @@ class Services::AtUserService::Sync
   end
 
   # AT口座エラーの通知
-  def send_error_mail_activity(account, last_account)
+  def at_finance_error(account_entity, account)
+    last_account = account_entity.find_by(fnc_id: account['fnc_id'])
+    if last_account.present?
+      # エラー情報を引き継ぐ
+      account.error_date = last_account.error_date
+      account.error_count = last_account.error_count
+    end
+
     # ATのエラーレスポンスがEとAの場合にエラー通知
     if account['last_rslt_cd'] === 'E' || account['last_rslt_cd'] === 'A'
       # 初回エラー発生時もエラーとしてカウントする
       if last_account.blank? || last_account.error_date.blank?
         account[:error_date] = DateTime.now
         account[:error_count] = 1
-        if Rails.env.development?
-          # SlackNotifier.ping("INFO 金融エラー通知テスト") # debug
-          MailDelivery.account_linkage_error(@user, account).deliver
-        end
+        # AT口座エラーの通知
+        send_error_notice(account)
       else
         # エラー解消されていなければカウントを続ける
         # 日付はエラー発生日のまま
@@ -396,5 +396,14 @@ class Services::AtUserService::Sync
       account.error_count = 0
     end
     account
+  end
+
+  # AT口座エラーの通知
+  def send_error_notice(account)
+    MailDelivery.account_linkage_error(@user, account).deliver
+    Services::ActivityService.create_activity(@user.id, nil, Time.now, :financial_account_faild)
+    if Rails.env.development?
+      #SlackNotifier.ping("INFO 金融エラー通知テスト") # debug
+    end
   end
 end
