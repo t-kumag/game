@@ -86,14 +86,6 @@ RSpec.describe 'user_manually_created_transactions_controller' do
         headers: headers
       expect(user_distributed_transaction_after_update.used_location).to eq params[:used_location]
     end
-
-    it 'increase one record of activities' do
-      put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
-        params: params, 
-        as: :json, 
-        headers: headers
-      expect(Entities::Activity.where(user_id: user.id)).to exist
-    end
   end
 
   describe '#destroy' do
