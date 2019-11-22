@@ -157,6 +157,7 @@ class Api::V1::Group::GoalsController < ApplicationController
       goal_service.add_money(goal, goal_setting, params[:add_amount])
       options = create_activity_options(goal)
       Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
+      Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
       render(json: {}, status: 200)
     else
       render(json: {errors: [{code:"", message:"minus balance"}]}, status: 422)
