@@ -53,6 +53,10 @@ class Services::ActivityService
     Entities::Activity.where(user_id: user.id).order(created_at: "DESC").page(page)
   end
 
+  def self.fetch_activities_goal_finished
+    Entities::Activity.where(activity_type: :goal_finished).pluck(:user_id)
+  end
+
   def self.fetch_activity_type(user, type)
     Entities::Activity.where(user_id: user.id).where(activity_type: type).order(created_at: "DESC").first()
   end

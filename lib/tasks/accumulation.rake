@@ -7,14 +7,15 @@ namespace :accumulation do
     goals = []
     activities = []
 
+    activities_goal_finished = Services::ActivityService.fetch_activities_goal_finished
     Entities::Goal.find_each do |g|
       Rails.logger.info("start accumulation ===============")
       begin
         old_goal_and_goal_logs = {}
         g.goal_settings.each do |gs|
-          next unless gs.at_user_bank_account.present?
-          next unless check_balance?(g, gs, gs.at_user_bank_account)
-          next unless check_goal_amount?(g)
+          next unless has_bank_account?(g, gs)
+          next unless check_goal_amount?(g, gs, activities_goal_finished)
+          next unless check_balance?(g, gs)
 
           goal = Services::GoalService.get_goal(g, gs)
           goal_log =  Services::GoalLogService.get_goal_log(g, gs)
@@ -42,21 +43,47 @@ namespace :accumulation do
   end
 
   private
-  def check_balance?(goal, goal_setting, at_user_bank_account)
 
-    balance_minus_goal = at_user_bank_account.balance - goal.current_amount
+  def check_balance?(goal, goal_setting)
 
-    # (銀行口座の残高 - 積み立て済み金額 ) > 月額貯金額
+    # 残高 = (銀行口座の残高 - 現在の積み立て済み金額 )
+    balance_minus_goal = goal_setting.at_user_bank_account.balance - goal.current_amount
+
+    # (残高) > 月額貯金額
     return true if balance_minus_goal > goal_setting.monthly_amount
+    options = create_activity_options(goal)
+    Services::ActivityService.create_activity(goal.id, goal.group_id, Time.zone.now, :goal_fail_no_account, options)
     # ここはAPIエラーを投げる?
     false
   end
 
-  def check_goal_amount?(goal)
+  def check_goal_amount?(goal, goal_setting, activities_goal_finished)
 
+    return false if activities_goal_finished.include?(goal_setting.user_id)
     # 目標金額 > 現在の貯金額
     return true if goal.goal_amount > goal.current_amount
-    # ここはAPIエラーを投げる?
+
+
+    # 目標達成メッセージの記入
+    options = create_activity_options(goal)
+    Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_finished, options)
     false
+  end
+
+  def has_bank_account?(goal, goal_setting)
+
+    return true if goal_setting.at_user_bank_account.present?
+
+    options = create_activity_options(goal)
+    Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_fail_short_of_money, options)
+    false
+  end
+
+
+  def create_activity_options(goal)
+    options = {}
+    options[:goal] = goal
+    options[:transaction] = nil
+    options
   end
 end
