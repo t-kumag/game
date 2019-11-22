@@ -52,7 +52,7 @@ namespace :accumulation do
     # (残高) > 月額貯金額
     return true if balance_minus_goal > goal_setting.monthly_amount
     options = create_activity_options(goal)
-    Services::ActivityService.create_activity(goal.id, goal.group_id, Time.zone.now, :goal_fail_no_account, options)
+    Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_fail_short_of_money, options)
     # ここはAPIエラーを投げる?
     false
   end
@@ -75,7 +75,7 @@ namespace :accumulation do
     return true if goal_setting.at_user_bank_account.present?
 
     options = create_activity_options(goal)
-    Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_fail_short_of_money, options)
+    Services::ActivityService.create_activity(goal.id, goal.group_id, Time.zone.now, :goal_fail_no_account, options)
     false
   end
 
