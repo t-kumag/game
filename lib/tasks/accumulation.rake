@@ -75,7 +75,7 @@ namespace :accumulation do
     return true if goal_setting.at_user_bank_account.present?
 
     options = create_activity_options(goal)
-    Services::ActivityService.create_activity(goal.id, goal.group_id, Time.zone.now, :goal_fail_no_account, options)
+    Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_fail_no_account, options)
     false
   end
 
