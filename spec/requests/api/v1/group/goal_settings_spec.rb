@@ -10,16 +10,17 @@ RSpec.describe Api::V1::Group::GoalSettingsController do
   } }
   let!(:goal_type) { create(:goal_type, :all_goal_type) }
   let(:goal) { create(:goal, :with_goal_settings, user_id: user.id, group_id: user.group_id) }
+  let(:goal_setting) { Entities::GoalSetting.find_by(user_id: user.id) }
 
   describe '#show' do
     context 'success' do
       it 'response 200' do
-        get "/api/v1/group/goals/#{goal.id}/goal-settings/#{goal.goal_settings[0].id}", headers: headers
+        get "/api/v1/group/goals/#{goal.id}/goal-settings/#{goal_setting.id}", headers: headers
         expect(response.status).to eq 200
       end
 
       it 'body is not nil' do
-        get "/api/v1/group/goals/#{goal.id}/goal-settings/#{goal.goal_settings[0].id}", headers: headers
+        get "/api/v1/group/goals/#{goal.id}/goal-settings/#{goal_setting.id}", headers: headers
 
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
@@ -44,7 +45,6 @@ RSpec.describe Api::V1::Group::GoalSettingsController do
       monthly_amount: 500000,
       first_amount: 0
     } }
-    let(:goal_setting) { Entities::GoalSetting.find_by(user_id: user.id) }
 
     context 'success' do
       it 'response 200' do

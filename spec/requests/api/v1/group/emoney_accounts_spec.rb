@@ -18,7 +18,7 @@ RSpec.describe Api::V1::Group::EmoneyAccountsController do
 
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
-        expect(actual_app.class).not_to eq nil
+        expect(actual_app).not_to eq nil
       end
     end
   end
@@ -35,7 +35,7 @@ RSpec.describe Api::V1::Group::EmoneyAccountsController do
 
         response_json = JSON.parse(response.body)
         actual_app = response_json['app']
-        expect(actual_app.class).not_to eq nil
+        expect(actual_app).not_to eq nil
       end
     end
   end

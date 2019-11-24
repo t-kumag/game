@@ -4,7 +4,6 @@ RSpec.describe Api::V1::Group::ProfilesController do
   let(:user) { create(:user, :with_partner_user) }
   let(:user_profile) { create(:user_profile, user_id: user.partner_user.id) }
   let(:headers) { { Authorization: 'Bearer ' + user.token} }
-  # TODO 実際にレスポンスに値を入れる場合はtransaction系のデータ追加が必要
 
   describe '#show' do
     context 'success' do

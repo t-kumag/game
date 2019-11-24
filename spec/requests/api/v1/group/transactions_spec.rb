@@ -11,7 +11,6 @@ RSpec.describe Api::V1::Group::TransactionsController do
   } }
   let!(:at_grouped_category) { create(:at_grouped_category) }
   let!(:at_transaction_category) { create(:at_transaction_category) }
-  # TODO 実際にレスポンスに値を入れる場合はdistribution系のデータ追加が必要
 
   describe '#index' do
     context 'success' do

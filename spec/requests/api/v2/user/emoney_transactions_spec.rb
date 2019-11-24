@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe 'emoney_transactions_controller' do
+RSpec.describe Api::V2::User::EmoneyTransactionsController do
   let(:user) { create(:user, :with_at_user_emoney_transactions) }
   let(:headers) { { 'Authorization': 'Bearer ' + user.token} }
   let(:params) { {
