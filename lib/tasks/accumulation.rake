@@ -49,8 +49,9 @@ namespace :accumulation do
     # 残高 = (銀行口座の残高 - 現在の積み立て済み金額 )
     balance_minus_goal = goal_setting.at_user_bank_account.balance - goal.current_amount
 
-    # (残高) > 月額貯金額
-    return true if balance_minus_goal > goal_setting.monthly_amount
+    # 残高 >= 月額貯金額
+    return true if balance_minus_goal >= goal_setting.monthly_amount
+
     options = create_activity_options(goal)
     Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_fail_short_of_money, options)
     # ここはAPIエラーを投げる?
@@ -59,10 +60,11 @@ namespace :accumulation do
 
   def check_goal_amount?(goal, goal_setting, activities_goal_finished)
 
-    return false if activities_goal_finished.include?(goal_setting.user_id)
-    # 目標金額 > 現在の貯金額
-    return true if goal.goal_amount > goal.current_amount
+    # 目標金額 >= 現在の貯金額
+    return true unless goal.current_amount >= goal.goal_amount
 
+    # 過去の達成ログが存在してたら再度書き込みはしない
+    return false if activities_goal_finished.include?(goal_setting.user_id)
 
     # 目標達成メッセージの記入
     options = create_activity_options(goal)
