@@ -1,13 +1,13 @@
 class Services::ActivityService
 
-  def self.get_activity_data(g, gs, activity_type)
+  def self.make_goal_activity(goal, goal_setting, activity_type)
     defined_activity = ACTIVITY_TYPE::NAME[activity_type]
     activity = set_activity(defined_activity)
-    activity = convert_goal_message(g, defined_activity, activity) if g.present?
-    fetch_activity(gs.user_id, g.group_id, activity_type, activity)
+    activity = convert_goal_message(goal, defined_activity, activity) if goal.present?
+    assign_parameter(goal_setting.user_id, goal.group_id, activity_type, activity)
   end
 
-  def self.fetch_activity(user_id, group_id, activity_type, activity)
+  def self.assign_parameter(user_id, group_id, activity_type, activity)
     {
         user_id: user_id,
         group_id: group_id,

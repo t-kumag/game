@@ -27,7 +27,7 @@ namespace :accumulation do
           end
           goal_logs << goal_log
           goals << goal
-          activities << Services::ActivityService.get_activity_data(g, gs, :goal_monthly_accumulation)
+          activities << Services::ActivityService.make_goal_activity(g, gs, :goal_monthly_accumulation)
         end
       rescue ActiveRecord::RecordInvalid => db_err
         raise db_err
