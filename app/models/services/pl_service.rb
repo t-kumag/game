@@ -6,9 +6,21 @@ class Services::PlService
   end
   
   def ignore_at_category_ids
-    [
-      '1581', # カード返済（クレジットカード引き落とし）
-    ]
+    if exclusion_pattern?
+      [
+        '1581' # カード返済（クレジットカード引き落とし）
+      ]
+    else
+      [
+        '00000' # 存在しないATカテゴリーID
+      ] 
+    end
+  end
+
+  def exclusion_pattern?
+    bank_accounts = Entities::AtUserBankAccount.where(at_user_id: at_user_ids, share: @with_group)
+    card_accounts = Entities::AtUserCardAccount.where(at_user_id: at_user_ids, share: @with_group)
+    bank_accounts.present? && card_accounts.present? ? true : false
   end
 
   def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)

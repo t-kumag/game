@@ -1,7 +1,6 @@
 require 'nkf'
 
 
-
 class Services::AtUserService::Sync
 
   def initialize(user, fnc_type = 'all')
@@ -42,11 +41,16 @@ class Services::AtUserService::Sync
             financier = src_financier
           end
 
+          # バルクインサートするための初期値を設定
           account = account_entity.new(
             at_user_id: @user.at_user.id,
             # at_card_id: card.id,
-            share: false
+            share: false,
+            error_date: '',
+            error_count: 0
           )
+
+          # ATのデータをセットする
           account[financier_type_key] = financier.id
           data_column.each do |k, v|
             # AT からのレスポンスに含まれないカラムはスキップする
@@ -58,21 +62,9 @@ class Services::AtUserService::Sync
             end
           end
 
-          lastAccount = account_entity.find_by(fnc_id: account['fnc_id'])
-          # error_count が 1以上の場合はスクレイピングしないが、バッファされたRESULT_CODEでEが返るため
-          # error_count が 1未満の場合のみエラーとして扱う
-          if account['last_rslt_cd'] === 'E' || account['last_rslt_cd'] === 'A'
-            # 初回エラー発生時もエラーとしてカウントする
-            if lastAccount.nil? || lastAccount['error_count'] < 1
-              account['error_date'] = DateTime.now
-              account['error_count'] = 1
-            end
-            # バルクインサート時にUPDATEされるようハッシュにキーを追加する
-            data_column.store('error_date', '')
-            data_column.store('error_count', '')
-            # TODO ミロクの仕様変更によりエラーが更新毎に送信される障害発生 処理を修正する
-            #MailDelivery.account_linkage_error(@user, account).deliver
-          end
+          # AT口座エラー処理 メール通知・アクティビティ通知
+          at_finance_error(account_entity, account)
+
           accounts << account
         end
       end
@@ -80,7 +72,7 @@ class Services::AtUserService::Sync
     rescue => e
       SlackNotifier.ping("ERROR Services::AtUserService::Sync#sync_account")
       SlackNotifier.ping(e)
-      logger.error(e.backtrace)
+      Rails.logger.error(e.backtrace)
     end
   end
 
@@ -224,7 +216,9 @@ class Services::AtUserService::Sync
         cert_type: { col: 'CERT_TYPE' },
         scrap_dtm: { col: 'SCRAP_DTM', opt: 'time_parse' },
         last_rslt_cd: { col: 'LAST_RSLT_CD' },
-        last_rslt_msg: { col: 'LAST_RSLT_MSG' }
+        last_rslt_msg: { col: 'LAST_RSLT_MSG' },
+        error_date: { col: 'CUSTOM_COLUMN' },
+        error_count: { col: 'CUSTOM_COLUMN' }
       )
     end
 
@@ -247,7 +241,9 @@ class Services::AtUserService::Sync
         cert_type: { col: 'CERT_TYPE' },
         scrap_dtm: { col: 'SCRAP_DTM', opt: 'time_parse' },
         last_rslt_cd: { col: 'LAST_RSLT_CD' },
-        last_rslt_msg: { col: 'LAST_RSLT_MSG' }
+        last_rslt_msg: { col: 'LAST_RSLT_MSG' },
+        error_date: { col: 'CUSTOM_COLUMN' },
+        error_count: { col: 'CUSTOM_COLUMN' }
       )
     end
 
@@ -266,7 +262,9 @@ class Services::AtUserService::Sync
         cert_type: { col: 'CERT_TYPE' },
         scrap_dtm: { col: 'SCRAP_DTM', opt: 'time_parse' },
         last_rslt_cd: { col: 'LAST_RSLT_CD' },
-        last_rslt_msg: { col: 'LAST_RSLT_MSG' }
+        last_rslt_msg: { col: 'LAST_RSLT_MSG' },
+        error_date: { col: 'CUSTOM_COLUMN' },
+        error_count: { col: 'CUSTOM_COLUMN' }
       )
     end
   end
@@ -368,5 +366,44 @@ class Services::AtUserService::Sync
     return 'JB' if @fnc_type == 'bank'
     return 'JC' if @fnc_type == 'card'
     return 'JD' if @fnc_type == 'etc'
+  end
+
+  # AT口座エラーの通知
+  def at_finance_error(account_entity, account)
+    last_account = account_entity.find_by(fnc_id: account['fnc_id'])
+    if last_account.present?
+      # エラー情報を引き継ぐ
+      account.error_date = last_account.error_date
+      account.error_count = last_account.error_count
+    end
+
+    # ATのエラーレスポンスがEとAの場合にエラー通知
+    if account['last_rslt_cd'] === 'E' || account['last_rslt_cd'] === 'A'
+      # 初回エラー発生時もエラーとしてカウントする
+      if last_account.blank? || last_account.error_date.blank?
+        account[:error_date] = DateTime.now
+        account[:error_count] = 1
+        # AT口座エラーの通知
+        send_error_notice(account)
+      else
+        # エラー解消されていなければカウントを続ける
+        # 日付はエラー発生日のまま
+        account[:error_count] += 1
+      end
+    elsif account['last_rslt_cd'] != 'E' && account['last_rslt_cd'] != 'A'
+      # 口座エラーが解消されていればエラーをリセットする
+      account.error_date = nil
+      account.error_count = 0
+    end
+    account
+  end
+
+  # AT口座エラーの通知
+  def send_error_notice(account)
+    MailDelivery.account_linkage_error(@user, account).deliver
+    Services::ActivityService.create_activity(@user.id, nil, Time.now, :financial_account_faild)
+    if Rails.env.development?
+      #SlackNotifier.ping("INFO 金融エラー通知テスト") # debug
+    end
   end
 end
