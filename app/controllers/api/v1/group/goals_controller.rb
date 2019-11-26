@@ -239,13 +239,13 @@ class Api::V1::Group::GoalsController < ApplicationController
   # 現在の目標貯金額が目標金額に到達していなければtrueを返す
   #   -> 既に全体目標金額に現在の目標が到達していたら、その地点でアクティビティログが出力されてるため
   def is_checked_exceed_goal_amount?(goal)
-    goal.current_amount >= goal.goal_amount == false
+    (goal.current_amount >= goal.goal_amount) == false
   end
 
   # goalの追加入金後の現在の貯金額と目標貯金額の状況をチェック
   # (目標の現在貯金更新額 >= 目標金額) == true
   # 目標貯金更新額が目標貯金に到達したらtrueを返す
   def is_checked_exceed_update_goal_amount?(goal)
-    goal.current_amount >= goal.goal_amount == true
+    (goal.current_amount >= goal.goal_amount) == true
   end
 end

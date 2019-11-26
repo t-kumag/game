@@ -57,7 +57,7 @@ class Services::ActivityService
   end
 
   def self.fetch_activities_goal_finished
-    Entities::Activity.where(activity_type: :goal_finished).pluck(:user_id)
+    Entities::Activity.where(activity_type: :goal_finished)
   end
 
   def self.fetch_activity_type(user, type)
