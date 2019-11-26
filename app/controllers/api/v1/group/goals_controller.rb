@@ -49,8 +49,8 @@ class Api::V1::Group::GoalsController < ApplicationController
         # 目標ログの登録
         goal.goal_settings.each do |gs|
           goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
-          create_goal_finished_activity_log(options) if is_checked_exceed_update_goal_amount?(goal)
         end
+        create_goal_finished_activity_log(options) if is_checked_exceed_update_goal_amount?(goal)
       end
 
     rescue ActiveRecord::RecordInvalid => db_err
@@ -85,6 +85,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     begin
       ActiveRecord::Base.transaction do
+        exceed_goal_amount = is_checked_exceed_goal_amount?(goal)
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
         partner_goal_setting.update!(get_partner_goal_setting_params)
@@ -93,6 +94,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount) if goal_setting.at_user_bank_account_id.present?
         end
+        create_goal_finished_activity_log(options) if exceed_goal_amount && is_checked_exceed_update_goal_amount?(goal)
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
