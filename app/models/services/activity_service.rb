@@ -24,13 +24,7 @@ class Services::ActivityService
   end
 
   def self.create_activity(user_id, group_id, used_date, activity_type, options={})
-
-    defined_activity = ACTIVITY_TYPE::NAME[activity_type]
-    activity = set_activity(defined_activity)
-    activity = convert_goal_message(options[:goal], defined_activity, activity) if options[:goal].present?
-    activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
-    activity = convert_trans_message(options[:transactions], defined_activity, activity) if options[:transactions].present?
-
+    activity = activity_assign_parameter(activity_type, options)
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
 
@@ -259,6 +253,15 @@ class Services::ActivityService
     activity[:date] = DateTime.new(0)
     activity[:activity_type] =nil
     activity[:message] = nil
+    activity
+  end
+
+  def self.activity_assign_parameter(activity_type, options)
+    defined_activity = ACTIVITY_TYPE::NAME[activity_type]
+    activity = set_activity(defined_activity)
+    activity = convert_goal_message(options[:goal], defined_activity, activity) if options[:goal].present?
+    activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
+    activity = convert_trans_message(options[:transactions], defined_activity, activity) if options[:transactions].present?
     activity
   end
 

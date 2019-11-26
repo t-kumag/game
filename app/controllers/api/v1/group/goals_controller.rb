@@ -154,8 +154,26 @@ class Api::V1::Group::GoalsController < ApplicationController
     
     goal_service = Services::GoalService.new(@current_user)
     if goal_service.check_bank_balance(params[:add_amount], goal_setting)
+
+      # (目標の現在貯金額 >= 目標貯金額金額) == false
+      # 現在の目標貯金額が目標金額に到達していなければtrueを返す
+      #   -> 既に全体目標金額に現在の目標が到達していたら、その地点でアクティビティログが出力されてるため
+      is_exceed_goal_amount = (goal.current_amount >= goal.goal_amount) == false
+
       goal_service.add_money(goal, goal_setting, params[:add_amount])
       options = create_activity_options(goal)
+
+      # (目標の現在貯金更新額 >= 目標金額) == true
+      # 目標貯金更新額が目標貯金に到達したらtrueを返す
+      is_exceed_update_goal_amount = (goal.current_amount >= goal.goal_amount) == true
+
+      # 更新前の目標貯金額が溜まっていた場合は、既にアクテビティログがあるのでログ出力は不要
+      # 更新前の目標貯金額が溜まっていない + 更新後に目標金額に到達した ->このケースのみログを書き込む
+      if is_exceed_goal_amount && is_exceed_update_goal_amount
+        Services::ActivityService.create_activity(@current_user.id, goal.group_id, Time.now, :goal_finished, options)
+        Services::ActivityService.create_activity(@current_user.id, goal.group_id, Time.now, :goal_finished, options)
+      end
+
       Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
       Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
       render(json: {}, status: 200)
