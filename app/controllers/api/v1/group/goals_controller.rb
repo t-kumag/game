@@ -226,7 +226,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   def create_goal_finished_activity_log(options)
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.now, :goal_finished, options)
-    Services::ActivityService.create_activity(@current_user.partner_user.i, @current_user.group_id, Time.now, :goal_finished, options)
+    Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.now, :goal_finished, options)
   end
 
   def create_activity_options(goal)
