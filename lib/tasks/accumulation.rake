@@ -26,7 +26,8 @@ namespace :accumulation do
             goal = Services::GoalService.update_goal_plus_current_amount(goal, gs, old_goal_and_goal_logs[:goal_logs])
             goal_log = Services::GoalLogService.update_goal_log(goal, gs, old_goal_and_goal_logs[:goal_logs])
           end
-          create_activity_finished_goal(g, gs, options)if is_checked_exceed_update_goal_amount?(goal)
+          # 「積立入金後の現在の貯金額」が「目標貯金総額」に到達したらtrueを返す
+          create_activity_finished_goal(g, gs, options) if goal[:current_amount] >= goal[:goal_amount]
           goal_logs << goal_log
           goals << goal
           activities << Services::ActivityService.make_goal_activity(g, gs, :goal_monthly_accumulation)
@@ -84,12 +85,5 @@ namespace :accumulation do
 
   def create_activity_finished_goal(goal, goal_setting, options)
     Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_finished, options)
-  end
-
-  # goalの積立入金後の現在の貯金額と目標貯金額の状況をチェック
-  # (目標の現在貯金更新額 >= 目標金額) == true
-  # 目標貯金更新額が目標貯金に到達したらtrueを返す
-  def is_checked_exceed_update_goal_amount?(goal)
-    (goal[:current_amount] >= goal[:goal_amount]) == true
   end
 end

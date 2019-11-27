@@ -44,13 +44,13 @@ class Api::V1::Group::GoalsController < ApplicationController
         # 頭金を入金する際に必要
         goal_service = Services::GoalService.new(@current_user)
         options = create_activity_options(goal)
-        create_goal_activity_log(options)
+        create_goal_activity(options)
 
         # 目標ログの登録
         goal.goal_settings.each do |gs|
           goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
         end
-        create_goal_finished_activity_log(options) if is_checked_exceed_update_goal_amount?(goal)
+        create_goal_finished_activity_log(options) if goal.current_amount >= goal.goal_amount
       end
 
     rescue ActiveRecord::RecordInvalid => db_err
@@ -85,16 +85,16 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     begin
       ActiveRecord::Base.transaction do
-        exceed_goal_amount = is_checked_exceed_goal_amount?(goal)
+        exceed_goal_amount = exceed_goal_amount?(goal)
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
         partner_goal_setting.update!(get_partner_goal_setting_params)
         options = create_activity_options(goal)
-        update_goal_activity_log(options)
+        update_goal_activity(options)
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount) if goal_setting.at_user_bank_account_id.present?
         end
-        create_goal_finished_activity_log(options) if exceed_goal_amount && is_checked_exceed_update_goal_amount?(goal)
+        create_goal_finished_activity_log(options) if exceed_goal_amount && goal.current_amount >= goal.goal_amount
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
@@ -157,17 +157,17 @@ class Api::V1::Group::GoalsController < ApplicationController
     
     goal_service = Services::GoalService.new(@current_user)
     if goal_service.check_bank_balance(params[:add_amount], goal_setting)
-      # goalの追加入金前の現在の貯金額と目標貯金額の状況をチェック
-      exceed_goal_amount = is_checked_exceed_goal_amount?(goal)
+      # 「追加入金前の現在の目標貯金額」と「目標貯金総額」の状況をチェック
+      exceed_goal_amount = exceed_goal_amount?(goal)
       goal_service.add_money(goal, goal_setting, params[:add_amount])
       options = create_activity_options(goal)
 
       Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
       Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
 
-      # 更新前の目標貯金額が溜まっていた場合は、既にアクテビティログがあるのでログ出力は不要
-      # 更新前の目標貯金額が溜まっていない + 更新後に目標金額に到達した ->このケースのみログを書き込む
-      if exceed_goal_amount && is_checked_exceed_update_goal_amount?(goal)
+      # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達していた場合は、既にアクテビティログがあるのでログ出力は不要
+      # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達してない + 「追加入金後の現在の目標貯金額」が「目標金額総額」に到達 ->このケースのみログを書き込む
+      if exceed_goal_amount && goal.current_amount >= goal.goal_amount
         create_goal_finished_activity_log(options)
       end
 
@@ -214,12 +214,12 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   private
 
-  def create_goal_activity_log(options)
+  def create_goal_activity(options)
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created, options)
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created_partner, options)
   end
 
-  def update_goal_activity_log(options)
+  def update_goal_activity(options)
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
   end
@@ -236,17 +236,11 @@ class Api::V1::Group::GoalsController < ApplicationController
     options
   end
 
-  # (目標の現在貯金額 >= 目標貯金額金額) == false
-  # 現在の目標貯金額が目標金額に到達していなければtrueを返す
-  #   -> 既に全体目標金額に現在の目標が到達していたら、その地点でアクティビティログが出力されてるため
-  def is_checked_exceed_goal_amount?(goal)
+  # 「現在の目標貯金額」が「目標金額総額 」に到達していなければtrueを返す
+  #   -> 既に「目標金額総額 」に「現在の目標貯金額」が到達していたら、その地点でアクティビティログが出力されてるため
+  def exceed_goal_amount?(goal)
+    # (現在の目標貯金額 >= 目標貯金総額) == false
     (goal.current_amount >= goal.goal_amount) == false
   end
 
-  # goalの追加入金後の現在の貯金額と目標貯金額の状況をチェック
-  # (目標の現在貯金更新額 >= 目標金額) == true
-  # 目標貯金更新額が目標貯金に到達したらtrueを返す
-  def is_checked_exceed_update_goal_amount?(goal)
-    (goal.current_amount >= goal.goal_amount) == true
-  end
 end
