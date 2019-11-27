@@ -2,6 +2,7 @@
 class MailDelivery < ApplicationMailer
   def user_registration(user)
     @token = user.token
+    @token_expires_at = Time.parse(user.token_expires_at.to_s).strftime("%Y-%m-%d %H:%M")
     mail( :to => user.email,
           :subject => '【OsidOri】登録を完了してはじめよう' )
   end

@@ -6,6 +6,8 @@ OsidOriへようこそ！
 ▼ご登録完了用のURL▼
 <%= Settings.api_url %>/activate.html?token=<%= @token %>
 
+※有効期限: <%= @token_expires_at %>
+
 ▼注：アプリが開かない場合▼
 Yahoo!メールアプリなどで、URLをタップしてもOsidOriアプリが開かない場合があります。その場合はURLをコピーしSafariやChromeなどのブラウザに貼り付け開いて下さい。
 
