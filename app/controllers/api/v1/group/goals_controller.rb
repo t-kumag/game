@@ -137,11 +137,11 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_ids && return
     end
 
-    user_banks = @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id)
+    user_banks = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck, :id)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     if partner_at_user_id.present?
-      user_banks << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+      user_banks << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).try(:pluck, :id)
       user_banks.flatten!
     end
 
