@@ -325,10 +325,7 @@ class Services::AtUserService
 
       # 口座が以上終了している場合にscrapingをskipする
       skip_ids = []
-      reset_all_account_error
       skip_ids = get_skip_fnc_ids
-
-
       fnc_ids.each do |fnc_id|
 
         if skip_ids.include?(fnc_id)

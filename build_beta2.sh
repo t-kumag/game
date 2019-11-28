@@ -1,35 +1,32 @@
 #!/bin/bash
 
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 [develop|staging|production] [rails|worker|batch]"
+  echo "Usage: $0 [beta2] [rails|worker|batch]"
   exit 1
 fi
 
 ENV=$1
 TARGET=$2
 
-if [ "${ENV}" = "develop" ]; then
+if [ "${ENV}" = "beta2" ]; then
   echo ENV: ${ENV}
-elif [ "${ENV}" = "staging" ]; then
-  echo ENV: ${ENV}
-elif [ "${ENV}" = "production" ]; then
-  echo ENV: ${ENV}
+  ENV=latest
 else
-  echo "Usage: $0 [develop|staging|production] [rails|worker|batch]"
+  echo "Usage: $0 [beta2] [rails|worker|batch]"
   exit 1
 fi
 
 if [ "${TARGET}" = "rails" ]; then
-  REPOSITORY=osidori/osidori-api
+  REPOSITORY=osidori-api/dev-beta2
   DOCKER_FILE=rails.Dockerfile 
 elif [ "${TARGET}" = "worker" ]; then
-  REPOSITORY=osidori/osidori-sidekiq
+  REPOSITORY=osidori-api/dev-beta2-worker
   DOCKER_FILE=worker.Dockerfile 
 elif [ "${TARGET}" = "batch" ]; then
-  REPOSITORY=osidori/batch-acmm
+  REPOSITORY=osidori/batch-acmm-beta2
   DOCKER_FILE=batch.Dockerfile 
 else
-  echo "Usage: $0 [develop|staging|production] [rails|worker|batch]"
+  echo "Usage: $0 [beta2] [rails|worker|batch]"
   exit 1
 fi
 echo Target: ${TARGET} / ${REPOSITORY}
