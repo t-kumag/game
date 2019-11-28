@@ -50,7 +50,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         goal.goal_settings.each do |gs|
           goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
         end
-        create_goal_finished_activity_log(options) if goal.current_amount >= goal.goal_amount
+        create_goal_finished_activity(options) if goal.current_amount >= goal.goal_amount
       end
 
     rescue ActiveRecord::RecordInvalid => db_err
@@ -94,7 +94,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount) if goal_setting.at_user_bank_account_id.present?
         end
-        create_goal_finished_activity_log(options) if exceed_goal_amount && goal.current_amount >= goal.goal_amount
+        create_goal_finished_activity(options) if exceed_goal_amount && goal.current_amount >= goal.goal_amount
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
@@ -168,7 +168,7 @@ class Api::V1::Group::GoalsController < ApplicationController
       # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達していた場合は、既にアクテビティログがあるのでログ出力は不要
       # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達してない + 「追加入金後の現在の目標貯金額」が「目標金額総額」に到達 ->このケースのみログを書き込む
       if exceed_goal_amount && goal.current_amount >= goal.goal_amount
-        create_goal_finished_activity_log(options)
+        create_goal_finished_activity(options)
       end
 
       render(json: {}, status: 200)
@@ -224,7 +224,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
   end
 
-  def create_goal_finished_activity_log(options)
+  def create_goal_finished_activity(options)
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.now, :goal_finished, options)
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.now, :goal_finished, options)
   end
@@ -239,8 +239,8 @@ class Api::V1::Group::GoalsController < ApplicationController
   # 「現在の目標貯金額」が「目標金額総額 」に到達していなければtrueを返す
   #   -> 既に「目標金額総額 」に「現在の目標貯金額」が到達していたら、その地点でアクティビティログが出力されてるため
   def exceed_goal_amount?(goal)
-    # (現在の目標貯金額 >= 目標貯金総額) == false
-    (goal.current_amount >= goal.goal_amount) == false
+    # 目標貯金総額 <= 現在の目標貯金額
+    goal.goal_amount <= goal.current_amount
   end
 
 end
