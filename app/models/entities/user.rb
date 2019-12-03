@@ -71,8 +71,7 @@ class Entities::User < ApplicationRecord
 
   def generate_token
       salt = SecureRandom.hex(16)
-      time = DateTime.now
-      token = Digest::SHA256.hexdigest(id.to_s + time.to_s + salt)
+      token = Digest::SHA256.hexdigest(id.to_s + email + salt)
       if Entities::User.find_by(token: token).present?
         raise StandardError, 'Duplicate token.'
       end
