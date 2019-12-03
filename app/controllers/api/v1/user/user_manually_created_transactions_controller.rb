@@ -180,7 +180,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     tran = {}
     tran[:id] = transaction.user_manually_created_transaction_id
     tran[:share] = transaction.share
-    tran[:type] = "user_manually_created_transaction"
+    tran[:type] = "manually_created"
     tran
   end
 
