@@ -235,6 +235,7 @@ class Services::ActivityService
 
   def self.convert_goal_message(goal, defined_activity, activity)
     activity[:message] = sprintf(defined_activity[:message], goal.name)
+    activity[:url] = sprintf(defined_activity[:url], goal.id)
     activity
   end
 
