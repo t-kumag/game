@@ -43,7 +43,11 @@ class Entities::User < ApplicationRecord
   enum rank: { free: 0, premium: 1 }
 
   def reset_token
-    self.token = generate_token
+    token = generate_token
+    if token.blank?
+      raise StandardError, 'Empty token.'
+    end
+    self.token = token
     self.token_expires_at = DateTime.now + 30
   end
 
@@ -66,10 +70,13 @@ class Entities::User < ApplicationRecord
   end
 
   def generate_token
-    # TODO　envなどから参照する
-    salt = 'sjdhp2wys5ga4a2ks'
-    time = DateTime.now
-    Digest::SHA256.hexdigest(id.to_s + time.to_s + salt)
+      salt = SecureRandom.hex(16)
+      time = DateTime.now
+      token = Digest::SHA256.hexdigest(id.to_s + time.to_s + salt)
+      if Entities::User.find_by(token: token).present?
+        raise StandardError, 'Duplicate token.'
+      end
+      token
   end
 
   delegate :group_id, to: :participate_group, allow_nil: true
