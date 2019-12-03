@@ -41,7 +41,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         user_manually_created_transaction = find_transaction
-        render_disallowed_transaction_ids && return if transaction.blank?
+        render_disallowed_transaction_ids && return if user_manually_created_transaction.blank?
         update_user_manually_created(user_manually_created_transaction)
 
         if params[:share] === true
