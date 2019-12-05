@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Api::V1::Group::GoalsController do
   let(:user) { create(:pairing_user_at_user_bank_accounts) }
-  let(:headers) { { Authorization: 'Bearer ' + user.token } } 
-  let(:params) { { 
+  let(:headers) { { Authorization: 'Bearer ' + user.token } }
+  let(:params) { {
     goals: {
       goal_type_id: 1,
       name: 'ラスベガス旅行資金',
@@ -22,7 +22,44 @@ RSpec.describe Api::V1::Group::GoalsController do
       first_amount: 150000
     }
   } }
-  let!(:goal_type) { create(:goal_type, :all_goal_type) } 
+  let(:goal) { create(:goal, :with_goal_settings, user_id: user.id, group_id: user.group_id) }
+  let!(:goal_type) { create(:goal_type, :all_goal_type) }
+
+  describe '#index' do
+    context 'success' do
+      it 'response 200' do
+        goal
+        get '/api/v1/group/goals', headers: headers
+        expect(response.status).to eq 200
+      end
+
+      it 'body is not nil' do
+        goal
+        get "/api/v1/group/goals", headers: headers
+
+        response_json = JSON.parse(response.body)
+        actual_app = response_json['app']
+        expect(actual_app).not_to eq nil
+      end
+    end
+  end
+
+  describe '#show' do
+    context 'success' do
+      it 'response 200' do
+        get "/api/v1/group/goals/#{goal.id}", headers: headers
+        expect(response.status).to eq 200
+      end
+
+      it 'body is not nil' do
+        get "/api/v1/group/goals/#{goal.id}", headers: headers
+
+        response_json = JSON.parse(response.body)
+        actual_app = response_json['app']
+        expect(actual_app).not_to eq nil
+      end
+    end
+  end
 
   describe '#create' do
     context 'success' do
@@ -49,7 +86,7 @@ RSpec.describe Api::V1::Group::GoalsController do
   end
 
   describe '#update' do
-    let(:params) { { 
+    let(:params) { {
       goals: {
         goal_type_id: 1,
         name: 'ハワイ旅行資金',

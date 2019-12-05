@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe 'user_manually_created_transactions_controller' do
-  let(:user) { create(:user) } 
-  let(:headers) { { Authorization: 'Bearer ' + user.token } } 
-  let(:params) { { 
+RSpec.describe Api::V1::User::UserManuallyCreatedTransactionsController do
+  let(:user) { create(:user) }
+  let(:headers) { { Authorization: 'Bearer ' + user.token } }
+  let(:params) { {
     at_transaction_category_id: 1,
     payment_method_id: nil,
     used_date: '2019/12/31',
@@ -12,21 +12,55 @@ RSpec.describe 'user_manually_created_transactions_controller' do
     used_location: 'test',
     share: false
   } }
-  let!(:at_grouped_category) { create(:at_grouped_category) } 
+  let!(:at_grouped_category) { create(:at_grouped_category) }
   let!(:at_transaction_category) { create(:at_transaction_category) }
-  let(:user_manually_created_transaction) { 
+  let(:user_manually_created_transaction) {
     create(
-      :user_manually_created_transaction, 
+      :user_manually_created_transaction,
       :with_user_distributed_transaction,
-      user_id: user.id 
+      user_id: user.id
     )
   }
-  let(:user_manually_created_transaction_after_update) { 
-    Entities::UserManuallyCreatedTransaction.find_by(user_id: user.id) 
-  } 
-  let(:user_distributed_transaction_after_update) { 
-    Entities::UserDistributedTransaction.find_by(user_id: user.id) 
+  let(:user_manually_created_transaction_after_update) {
+    Entities::UserManuallyCreatedTransaction.find_by(user_id: user.id)
   }
+  let(:user_distributed_transaction_after_update) {
+    Entities::UserDistributedTransaction.find_by(user_id: user.id)
+  }
+
+  describe '#index' do
+    context 'success' do
+      it 'response 200' do
+        get "/api/v1/user/user-manually-created-transactions/", headers: headers
+        expect(response.status).to eq 200
+      end
+
+      it 'body is not nil' do
+        get "/api/v1/user/user-manually-created-transactions/", headers: headers
+
+        response_json = JSON.parse(response.body)
+        actual_app = response_json['app'];
+        expect(actual_app).not_to eq nil
+      end
+    end
+  end
+
+  describe '#show' do
+    context 'success' do
+      it 'response 200' do
+        get "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}", headers: headers
+        expect(response.status).to eq 200
+      end
+
+      it 'body is not nil' do
+        get "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}", headers: headers
+
+        response_json = JSON.parse(response.body)
+        actual_app = response_json['app'];
+        expect(actual_app).not_to eq nil
+      end
+    end
+  end
 
   describe '#create' do
     context 'success' do
@@ -51,9 +85,9 @@ RSpec.describe 'user_manually_created_transactions_controller' do
       end
     end
   end
-  
+
   describe '#update' do
-    let(:params) { { 
+    let(:params) { {
       at_transaction_category_id: 1,
       payment_method_id: nil,
       used_date: '2019/12/31',
@@ -65,24 +99,24 @@ RSpec.describe 'user_manually_created_transactions_controller' do
 
     it 'response 200' do
       put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
-        params: params, 
-        as: :json, 
+        params: params,
+        as: :json,
         headers: headers
       expect(response.status).to eq 200
     end
 
     it 'used_location is updated' do
       put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
-        params: params, 
-        as: :json, 
+        params: params,
+        as: :json,
         headers: headers
       expect(user_manually_created_transaction_after_update.used_location).to eq params[:used_location]
     end
 
     it 'used_location is updated' do
       put "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
-        params: params, 
-        as: :json, 
+        params: params,
+        as: :json,
         headers: headers
       expect(user_distributed_transaction_after_update.used_location).to eq params[:used_location]
     end
@@ -91,23 +125,23 @@ RSpec.describe 'user_manually_created_transactions_controller' do
   describe '#destroy' do
     context 'success' do
       it 'respose 200' do
-        delete "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}", 
+        delete "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
           headers: headers
         expect(response.status).to eq 200
       end
-      
+
       it 'user_manually_created_transaction is nil' do
         delete "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
           headers: headers
         expect(Entities::UserManuallyCreatedTransaction.find_by(user_id: user.id)).to eq nil
       end
-      
+
       it 'user_distributed_transaction is nil' do
         delete "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
           headers: headers
         expect(Entities::UserDistributedTransaction.find_by(user_id: user.id)).to eq nil
         end
-        
+
       it 'activity is nil' do
         delete "/api/v1/user/user-manually-created-transactions/#{user_manually_created_transaction.id}",
           headers: headers
