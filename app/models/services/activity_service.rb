@@ -45,8 +45,6 @@ class Services::ActivityService
       elsif v[:col] == "PAYMENT_AMOUNT" ||  v[:col] == "AMOUNT_RECEIPT"
         activity[:activity_type] = (tran[k].to_i == 0) ? v[:income] : v[:outcome]
         activity[:activity_type] = "individual_card_outcome" if k == :payment_amount
-        #activity[:message] = (tran[k].to_i == 0) ? v[:income_message] : v[:outcome_message]
-        #activity[:message] = "クレジットカードの支出があります。" if k == :payment_amount
       end
     end
     activity
