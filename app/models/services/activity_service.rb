@@ -232,11 +232,17 @@ class Services::ActivityService
 
   def self.convert_goal_message(goal, defined_activity, activity)
     activity[:message] = sprintf(defined_activity[:message], goal.name)
+    activity[:url] = sprintf(defined_activity[:url], goal.id)
     activity
   end
 
   def self.convert_tran_url(transaction, defined_activity, activity)
-    activity[:url] = sprintf(defined_activity[:url], transaction.id)
+    activity[:url] = sprintf(defined_activity[:url], transaction[:id], transaction[:type], transaction[:account_id])
+    activity
+  end
+
+  def self.convert_user_manually_tran_url(transaction, defined_activity, activity)
+    activity[:url] = sprintf(defined_activity[:url], transaction[:id], transaction[:type])
     activity
   end
 
@@ -261,6 +267,7 @@ class Services::ActivityService
     activity = set_activity(defined_activity)
     activity = convert_goal_message(options[:goal], defined_activity, activity) if options[:goal].present?
     activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
+    activity = convert_user_manually_tran_url(options[:user_manually_created_transaction], defined_activity, activity) if options[:user_manually_created_transaction].present?
     activity = convert_trans_message(options[:transactions], defined_activity, activity) if options[:transactions].present?
     activity
   end

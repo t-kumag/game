@@ -17,14 +17,15 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   def create
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
-        transaction = create_user_manually_created
+        user_manually_created_transaction = create_user_manually_created
         if params[:share] === true
           require_group && return
           options = {group_id: @current_user.group_id, share: params[:share], transaction: nil}
         else
           options = {transaction: nil}
         end
-        options[:transaction] = Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).create_user_manually_created(options)
+        transaction = Services::UserManuallyCreatedTransactionService.new(@current_user, user_manually_created_transaction).create_user_manually_created(options)
+        options[:user_manually_created_transaction] = create_transaction(transaction)
         create_user_manually_activity(@current_user, transaction[:used_date], options)
       end
 
@@ -39,9 +40,9 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
-        transaction = find_transaction
-        render_disallowed_transaction_ids && return if transaction.blank?
-        update_user_manually_created(transaction)
+        user_manually_created_transaction = find_transaction
+        render_disallowed_transaction_ids && return if user_manually_created_transaction.blank?
+        update_user_manually_created(user_manually_created_transaction)
 
         if params[:share] === true
           require_group && return
@@ -49,7 +50,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         else
           options = {}
         end
-        Services::UserManuallyCreatedTransactionService.new(@current_user, transaction).update_user_manually_created(options)
+        Services::UserManuallyCreatedTransactionService.new(@current_user, user_manually_created_transaction).update_user_manually_created(options)
       end
     rescue => exception
       raise exception
@@ -164,7 +165,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
 
   def create_user_manually_activity(current_user, used_date, options)
-    if options[:transaction][:share]
+    if options[:user_manually_created_transaction][:share]
       # 無駄なキーを渡すと誤作動を起こす可能性があるので削除します。
       options.delete(:group_id)
       options.delete(:share)
@@ -173,6 +174,14 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     else
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
     end
+  end
+
+  def create_transaction(transaction)
+    tran = {}
+    tran[:id] = transaction.user_manually_created_transaction_id
+    tran[:share] = transaction.share
+    tran[:type] = "manually_created"
+    tran
   end
 
 end

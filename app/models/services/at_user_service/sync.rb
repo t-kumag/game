@@ -400,7 +400,8 @@ class Services::AtUserService::Sync
 
   # AT口座エラーの通知
   def send_error_notice(account)
-    MailDelivery.account_linkage_error(@user, account).deliver
+    # biz要件でメール通知は一旦様子見
+    # MailDelivery.account_linkage_error(@user, account).deliver
     Services::ActivityService.create_activity(@user.id, nil, Time.now, :financial_account_faild)
     if Rails.env.development?
       #SlackNotifier.ping("INFO 金融エラー通知テスト") # debug
