@@ -272,4 +272,27 @@ class Services::ActivityService
     activity
   end
 
+  def self.get_goal_finished(goal, options={})
+    activity = activity_assign_parameter(:goal_finished, options)
+    [
+        {
+            user_id:  options[:goal].user.id,
+            group_id: goal[:group_id],
+            url: activity[:url],
+            count:  activity[:count],
+            activity_type:  :goal_finished,
+            message: activity[:message],
+            date: Time.zone.now,
+        },
+        {
+            user_id:  options[:goal].user.partner_user.id,
+            group_id:  goal[:group_id],
+            url: activity[:url],
+            count:  activity[:count],
+            activity_type:  :goal_finished,
+            message: activity[:message],
+            date: Time.zone.now
+        }
+    ]
+  end
 end

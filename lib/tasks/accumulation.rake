@@ -6,6 +6,7 @@ namespace :accumulation do
     goal_logs = []
     goals = []
     activities = []
+    goal_finishes = []
 
     Entities::Goal.find_each do |g|
       Rails.logger.info("start accumulation ===============")
@@ -27,10 +28,10 @@ namespace :accumulation do
             goal_log = Services::GoalLogService.update_goal_log(goal, gs, old_goal_and_goal_logs[:goal_logs])
           end
           # 「積立入金後の現在の貯金額」が「目標貯金総額」に到達したらtrueを返す
-          create_activity_finished_goal(g, gs, options) if goal[:current_amount] >= goal[:goal_amount]
           goal_logs << goal_log
           goals << goal
           activities << Services::ActivityService.make_goal_activity(g, gs, :goal_monthly_accumulation)
+          activities << Services::ActivityService.get_goal_finished(goal, options) if goal[:current_amount] >= goal[:goal_amount]
         end
       rescue ActiveRecord::RecordInvalid => db_err
         raise db_err
@@ -38,6 +39,7 @@ namespace :accumulation do
         #TODO: エラー処理については固定したフォーマットを考える
       end
     end
+    activities.flatten!
     Entities::Activity.import activities
     Entities::GoalLog.import goal_logs
     Entities::Goal.import goals, on_duplicate_key_update: [:current_amount]
@@ -83,7 +85,8 @@ namespace :accumulation do
     options
   end
 
-  def create_activity_finished_goal(goal, goal_setting, options)
-    Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_finished, options)
+  def create_activity_finished_goal(goal, options)
+    Services::ActivityService.create_activity(goal.user_id, goal.group_id, Time.zone.now, :goal_finished, options)
+    Services::ActivityService.create_activity( goal.user.partner_user.id, goal.group_id, Time.zone.now, :goal_finished, options)
   end
 end
