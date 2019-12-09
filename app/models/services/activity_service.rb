@@ -272,7 +272,7 @@ class Services::ActivityService
     activity
   end
 
-  def self.get_goal_finished(goal, options={})
+  def self.fetch_goal_finished(goal, options={})
     activity = activity_assign_parameter(:goal_finished, options)
     [
         {

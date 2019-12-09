@@ -31,7 +31,7 @@ namespace :accumulation do
           goal_logs << goal_log
           goals << goal
           activities << Services::ActivityService.make_goal_activity(g, gs, :goal_monthly_accumulation)
-          activities << Services::ActivityService.get_goal_finished(goal, options) if goal[:current_amount] >= goal[:goal_amount]
+          activities << Services::ActivityService.fetch_goal_finished(goal, options) if goal[:current_amount] >= goal[:goal_amount]
         end
       rescue ActiveRecord::RecordInvalid => db_err
         raise db_err
@@ -83,10 +83,5 @@ namespace :accumulation do
     options[:goal] = goal
     options[:transaction] = nil
     options
-  end
-
-  def create_activity_finished_goal(goal, options)
-    Services::ActivityService.create_activity(goal.user_id, goal.group_id, Time.zone.now, :goal_finished, options)
-    Services::ActivityService.create_activity( goal.user.partner_user.id, goal.group_id, Time.zone.now, :goal_finished, options)
   end
 end
