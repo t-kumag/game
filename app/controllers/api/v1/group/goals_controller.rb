@@ -239,8 +239,8 @@ class Api::V1::Group::GoalsController < ApplicationController
   # 「現在の目標貯金額」が「目標金額総額 」に到達していなければtrueを返す
   #   -> 既に「目標金額総額 」に「現在の目標貯金額」が到達していたらfalseを返す、その地点でアクティビティログが出力されてるため
   def exceed_goal_amount?(goal)
-    # 目標貯金総額 <= 現在の目標貯金額
-    goal.goal_amount >= goal.current_amount
+    # 目標貯金総額 >= 現在の目標貯金額
+    goal.goal_amount > goal.current_amount
   end
 
 end
