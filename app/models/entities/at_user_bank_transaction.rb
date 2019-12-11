@@ -22,6 +22,8 @@
 #
 
 class Entities::AtUserBankTransaction < ApplicationRecord
+  RELATION_KEY = :at_user_bank_transaction_id.freeze
+  DATE_COLUMN = :trade_date.freeze
   belongs_to :at_user_bank_account
   has_one :user_distributed_transaction
 

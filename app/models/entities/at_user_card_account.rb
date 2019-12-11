@@ -1,5 +1,5 @@
 class Entities::AtUserCardAccount < ApplicationRecord
-  RELATION_KEY = 'at_user_card_id'.freeze
+  RELATION_KEY = :at_user_card_account_id.freeze
 
   acts_as_paranoid # 論理削除
   belongs_to :at_user
