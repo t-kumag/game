@@ -46,7 +46,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
     )
 
     if @response[:user_distributed_transaction].share
-      options = create_activity_options(@response[:user_distributed_transaction])
+      options = create_activity_options(@response[:user_distributed_transaction], emoney_account_transaction_param)
       Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
                                                 DateTime.now, :person_tran_to_familly, options)
       Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
@@ -72,11 +72,19 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
   end
 
   private
-  def create_activity_options(transaction)
+  def create_activity_options(transaction, emoney_account_transaction_param)
     options = {}
     options[:goal] = nil
-    options[:transaction] = transaction
+    options[:transaction] = create_transaction(transaction, emoney_account_transaction_param)
     options[:transactions] = nil
     options
+  end
+
+  def create_transaction(transaction, card_account_transaction_param)
+    tran  = {}
+    tran[:id] = transaction.at_user_emoney_transaction_id
+    tran[:account_id] = card_account_transaction_param[:emoney_account_id]
+    tran[:type] = "emoney"
+    tran
   end
 end
