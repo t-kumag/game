@@ -148,6 +148,10 @@ Rails.application.routes.draw do
           resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
+
+        put 'pl-settings', :to => 'pl_settings#update'
+        get 'pl-settings', :to => 'pl_settings#show'
+
       end
 
       # 共有用
