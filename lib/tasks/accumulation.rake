@@ -6,7 +6,6 @@ namespace :accumulation do
     goal_logs = []
     goals = []
     activities = []
-    goal_finishes = []
 
     Entities::Goal.find_each do |g|
       Rails.logger.info("start accumulation ===============")
@@ -63,9 +62,8 @@ namespace :accumulation do
   end
 
   def check_goal_amount?(goal)
-    # 現在の貯金額 >= 目標金額
-    return true unless goal.current_amount >= goal.goal_amount
-    false
+    # 現在の貯金額 <= 目標金額
+    goal.current_amount <= goal.goal_amount
   end
 
   def has_bank_account?(goal, goal_setting)
