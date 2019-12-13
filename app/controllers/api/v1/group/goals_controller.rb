@@ -48,7 +48,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
         # 目標ログの登録
         goal.goal_settings.each do |gs|
-          goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
+          goal_service.add_first_amount(goal, gs, gs.first_amount)
         end
       end
 
@@ -90,7 +90,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         options = create_activity_options(goal)
         update_goal_activity_log(options)
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
-          goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount) if goal_setting.at_user_bank_account_id.present?
+          goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
         end
       end
     rescue ActiveRecord::RecordInvalid => db_err
