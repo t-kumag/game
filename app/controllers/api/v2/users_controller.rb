@@ -1,23 +1,21 @@
 class Api::V2::UsersController < ApplicationController
-  before_action :authenticate, only: [:status]
+  before_action :authenticate_token, only: [:status]
 
   def status
-    response = {
-      user_status: {
-        user_id: @current_user.id,
-        mail_registered: @current_user.email.present?,
-        mail_authenticated: @current_user.email_authenticated,
+    if @current_user.email_authenticated
+      @response = {
         finance_registered: finance_registered?,
         goal_created: goal_created?,
         transaction_shared: transaction_shared?,
         finance_shared: finance_shared?,
-        paired: @current_user.partner_user.present?,
         group_goal_created: goal_created?(true),
         group_transaction_shared: transaction_shared?(true),
         group_finance_shared: finance_shared?(true)
       }
-    }
-    render json: response, status: 200
+      render 'status', formats: 'json', handlers: 'jbuilder'
+    else
+      render 'not_email_authenticated', formats: 'json', handlers: 'jbuilder'
+    end
   end
 
   
