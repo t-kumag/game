@@ -148,19 +148,17 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     goal_setting = goal.goal_settings.find_by(at_user_bank_account_id: user_banks, user_id: @current_user.id)
 
+    goal_setting = goal.goal_settings.find_by(user_id: @current_user.id) unless goal_setting.present?
+
     if user_banks.blank? || goal.blank? || goal_setting.blank?
       render(json: {errors: [{code:"", message:"user not found or goal not found"}]}, status: 422) && return
     end
     
     goal_service = Services::GoalService.new(@current_user)
-    if goal_service.check_bank_balance(params[:add_amount], goal_setting)
-      goal_service.add_money(goal, goal_setting, params[:add_amount])
-      options = create_activity_options(goal)
-      Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
-      render(json: {}, status: 200)
-    else
-      render(json: {errors: [{code:"", message:"minus balance"}]}, status: 422)
-    end
+    goal_service.add_money(goal, goal_setting, params[:add_amount])
+    options = create_activity_options(goal)
+    Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
+    render(json: {}, status: 200)
   end
 
   private
