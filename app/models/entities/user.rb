@@ -15,8 +15,8 @@
 class Entities::User < ApplicationRecord
   acts_as_paranoid
   has_one :at_user, dependent: :destroy
-
   has_one :user_icon
+  has_one :user_pl_setting
   has_many :access_grants, class_name: 'Doorkeeper::AccessGrant',
                            foreign_key: :resource_owner_id,
                            dependent: :delete_all # or :destroy if you need callbacks
