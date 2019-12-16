@@ -132,6 +132,9 @@ Rails.application.routes.draw do
     namespace :v2 do
       resources :activities, :path => '/activities', :only => [:index] do
       end
+
+      get 'user/status', :to => 'users#status'
+
       # 個人用
       namespace :user do
         resources :bank_accounts, path: '/bank-accounts' do
