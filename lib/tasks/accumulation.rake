@@ -13,7 +13,7 @@ namespace :accumulation do
       begin
         old_goal_and_goal_logs = {}
         g.goal_settings.each do |gs|
-          next unless has_bank_account?(g, gs)
+          next unless has_bank_account?(gs)
           next unless check_goal_amount?(g)
           next unless check_balance?(g, gs)
 
@@ -55,8 +55,6 @@ namespace :accumulation do
     # 残高 >= 月額貯金額
     return true if balance_minus_goal >= goal_setting.monthly_amount
 
-    options = create_activity_options(goal)
-    Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_fail_short_of_money, options)
     # ここはAPIエラーを投げる?
     false
   end
@@ -66,12 +64,8 @@ namespace :accumulation do
     goal.current_amount <= goal.goal_amount
   end
 
-  def has_bank_account?(goal, goal_setting)
-
+  def has_bank_account?(goal_setting)
     return true if goal_setting.at_user_bank_account.present?
-
-    options = create_activity_options(goal)
-    Services::ActivityService.create_activity(goal_setting.user_id, goal.group_id, Time.zone.now, :goal_fail_no_account, options)
     false
   end
 
