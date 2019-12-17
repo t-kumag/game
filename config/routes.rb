@@ -132,6 +132,9 @@ Rails.application.routes.draw do
     namespace :v2 do
       resources :activities, :path => '/activities', :only => [:index] do
       end
+
+      get 'user/status', :to => 'users#status'
+
       # 個人用
       namespace :user do
         resources :bank_accounts, path: '/bank-accounts' do
@@ -148,6 +151,10 @@ Rails.application.routes.draw do
           resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
+
+        put 'pl-settings', :to => 'pl_settings#update'
+        get 'pl-settings', :to => 'pl_settings#show'
+
       end
 
       # 共有用
