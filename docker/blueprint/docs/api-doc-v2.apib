@@ -1,6 +1,95 @@
 # Group 個人機能
 /api/v2/user/*
 
+## PL期間設定 [/api/v2/user/pl-settings]
+Resource of PlSetting
+
+### PL期間設定更新 [PUT]
+
+#### Description
+
+* PL期間設定の更新を行う
+
+
+#### Parameters
+
+* pl_period_date (int)
+* pl_type (string) [ago|since|""]
+* group_pl_period_date (int)
+* group_pl_type (string) [ago|since|""]
+
++ Request PL期間設定更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+{
+  "pl_settings": {
+    "pl_period_date": 25,
+    "pl_type": "ago",
+    "group_pl_period_date": 25,
+    "group_pl_type": "ago"
+  }
+}
+
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
+### PL期間設定取得 [GET]
+
+#### Description
+
+* PL期間設定を取得する
+
+
+#### Parameters
+
+* pl_period_date (int)
+* pl_type (string) [ago|since|""]
+* group_pl_period_date (int)
+* group_pl_type (string) [ago|since|""]
+
++ Request Example (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+             "pl_settings": {
+              "pl_period_date": 25,
+              "pl_type": "ago",
+              "group_pl_period_date": 25,
+              "group_pl_type": "ago"
+             }
+            }
+
++ Request Example　no record (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+             "pl_settings": {
+              "pl_period_date": null,
+              "pl_type": null,
+              "group_pl_period_date": null,
+              "group_pl_type": null
+             }
+            }
 
 # Group 家族機能
 /api/v2/group/*

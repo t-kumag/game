@@ -18,7 +18,7 @@ class Api::V2::User::PlSettingsController < ApplicationController
       @response = Entities::UserPlSetting.create!(user_id: @current_user.id)
     end
     @response.update!(update_params)
-    render 'show', formats: 'json', handlers: 'jbuilder'
+    render json: {}, status: :no_content
   end
 
   def update_params
