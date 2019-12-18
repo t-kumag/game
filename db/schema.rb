@@ -10,19 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_11_091908) do
+ActiveRecord::Schema.define(version: 2019_12_18_130408) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "group_id"
     t.integer "count", default: 0, null: false
     t.string "activity_type", null: false
+    t.string "url"
     t.string "message"
     t.datetime "date", null: false
-    t.datetime "at_sync_transaction_latest_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "url"
   end
 
   create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -68,7 +67,6 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
     t.integer "at_user_bank_account_id"
     t.integer "at_user_card_account_id"
     t.integer "at_user_emoney_service_account_id"
-    t.integer "user_id"
     t.datetime "latest_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -289,7 +287,6 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
     t.datetime "updated_at", null: false
     t.index ["at_user_bank_account_id"], name: "index_b_l_on_at_user_bank_account_id"
     t.index ["at_user_emoney_service_account_id"], name: "index_b_l_on_at_user_emoney_service_account_id"
-    t.index ["date", "at_user_bank_account_id"], name: "aaaa", unique: true
   end
 
   create_table "budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -488,14 +485,6 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
     t.index ["user_id"], name: "index_user_icons_on_user_id"
   end
 
-  create_table "user_mail_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.bigint "user_id"
-    t.string "mail_name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_user_mail_logs_on_user_id"
-  end
-
   create_table "user_manually_created_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "at_transaction_category_id"
@@ -504,6 +493,7 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
     t.string "title"
     t.bigint "amount", default: 0, null: false
     t.string "used_location"
+    t.text "memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["at_transaction_category_id"], name: "index_u_m_c_t_on_at_transaction_category_id"
@@ -581,6 +571,7 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
   add_foreign_key "at_user_emoney_transactions", "at_user_emoney_service_accounts"
   add_foreign_key "at_user_tokens", "at_users"
   add_foreign_key "at_users", "users"
+  add_foreign_key "balance_logs", "at_user_bank_accounts"
   add_foreign_key "balance_logs", "at_user_emoney_service_accounts"
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
   add_foreign_key "goal_logs", "at_user_bank_accounts"
@@ -608,7 +599,6 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
   add_foreign_key "user_distributed_transactions", "user_manually_created_transactions"
   add_foreign_key "user_distributed_transactions", "users"
   add_foreign_key "user_icons", "users"
-  add_foreign_key "user_mail_logs", "users"
   add_foreign_key "user_manually_created_transactions", "at_transaction_categories"
   add_foreign_key "user_manually_created_transactions", "payment_methods"
   add_foreign_key "user_manually_created_transactions", "users"
