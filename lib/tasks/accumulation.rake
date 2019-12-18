@@ -37,6 +37,7 @@ namespace :accumulation do
       end
     end
     activities.flatten!
+    Entities::Activity.import activities
     Entities::GoalLog.import goal_logs, on_duplicate_key_update: [:user_id, :goal_id], validate: false
     Entities::Goal.import goals, on_duplicate_key_update: [:current_amount]
     Rails.logger.info("end accumulation ===============")
