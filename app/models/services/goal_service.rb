@@ -137,16 +137,6 @@ class Services::GoalService
     end
   end
 
-  def check_bank_balance(add_amount, goal_setting)
-    if add_amount.blank? || goal_setting.try(:at_user_bank_account).blank?
-      false
-    elsif add_amount < goal_setting.try(:at_user_bank_account).try(:balance)
-      true
-    else
-      false
-    end
-  end
-
   def self.check_goal_limit_of_free_user(user)
     user.free? && Entities::Goal.where(user_id: user.id).count < Settings.at_user_limit_free_goal
   end
