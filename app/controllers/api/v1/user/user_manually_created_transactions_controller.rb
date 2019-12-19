@@ -115,7 +115,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :used_date,
       :title,
       :amount,
-      :used_location
+      :used_location,
+      :memo
     )
 
     transaction.update!(update_param(save_params, transaction))
@@ -131,6 +132,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     title = save_param[:title].present? ? save_param[:title] : transaction[:title]
     amount = save_param[:amount].present? ? save_param[:amount] : transaction[:amount]
     used_location = save_param[:used_location].present? ? save_param[:used_location] : transaction[:used_location]
+    memo = save_param[:memo].present? ? save_param[:memo] : transaction[:memo]
 
     {
         at_transaction_category_id: at_transaction_category_id,
@@ -138,7 +140,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         used_date: used_date,
         title: title,
         amount: amount,
-        used_location: used_location
+        used_location: used_location,
+        memo: memo
     }
   end
 
