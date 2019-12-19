@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_11_091908) do
+ActiveRecord::Schema.define(version: 2019_12_19_054453) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -506,6 +506,7 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
     t.string "used_location"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "payment_method_type"
     t.index ["at_transaction_category_id"], name: "index_u_m_c_t_on_at_transaction_category_id"
     t.index ["payment_method_id"], name: "index_u_m_c_t_on_payment_method_id"
     t.index ["user_id"], name: "index_user_manually_created_transactions_on_user_id"
@@ -556,6 +557,19 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
     t.integer "rank", default: 0
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
+  end
+
+  create_table "wallets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "name"
+    t.integer "balance", default: 0, null: false
+    t.integer "group_id"
+    t.boolean "share", default: false, null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "initial_balance"
+    t.index ["user_id"], name: "index_wallets_on_user_id"
   end
 
   add_foreign_key "at_scraping_logs", "at_user_bank_accounts"
@@ -614,4 +628,5 @@ ActiveRecord::Schema.define(version: 2019_12_11_091908) do
   add_foreign_key "user_manually_created_transactions", "users"
   add_foreign_key "user_pl_settings", "users"
   add_foreign_key "user_profiles", "users"
+  add_foreign_key "wallets", "users"
 end

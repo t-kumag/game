@@ -24,6 +24,12 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         else
           options = {transaction: nil}
         end
+
+        # 口座が財布の場合は残高を計算する
+        if params[:payment_method_type] == "wallet"
+          Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+        end
+
         transaction = Services::UserManuallyCreatedTransactionService.new(@current_user, user_manually_created_transaction).create_user_manually_created(options)
         options[:user_manually_created_transaction] = create_transaction(transaction)
         create_user_manually_activity(@current_user, transaction[:used_date], options)
@@ -41,6 +47,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         user_manually_created_transaction = find_transaction
+        old_transaction = user_manually_created_transaction.dup
         render_disallowed_transaction_ids && return if user_manually_created_transaction.blank?
         update_user_manually_created(user_manually_created_transaction)
 
@@ -50,6 +57,20 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         else
           options = {}
         end
+
+        # 口座が財布の場合は残高を計算する
+        if params[:payment_method_type] == "wallet"
+          if old_transaction[:payment_method_id].present?
+            # 口座が変わった場合、金額が変更された場合は財布残高の明細金額分を元に戻し再計算する。
+            if old_transaction[:payment_method_id] != params[:payment_method_id] || old_transaction[:amount] != params[:amount]
+              Services::WalletTransactionService::save_minus_balance(old_transaction[:payment_method_id], old_transaction[:amount])
+              Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+            end
+          else
+            Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+          end
+        end
+
         Services::UserManuallyCreatedTransactionService.new(@current_user, user_manually_created_transaction).update_user_manually_created(options)
       end
     rescue => exception
@@ -66,6 +87,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
+        Services::WalletTransactionService::save_minus_balance(transaction[:payment_method_id], transaction[:amount])
         transaction.destroy!
       end
     rescue => exception
@@ -94,6 +116,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     save_params = params.permit(
       :at_transaction_category_id,
       :payment_method_id,
+      :payment_method_type,
       :used_date,
       :title,
       :amount,
@@ -111,6 +134,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     save_params = params.permit(
       :at_transaction_category_id,
       :payment_method_id,
+      :payment_method_type,
       :used_date,
       :title,
       :amount,
@@ -126,6 +150,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     at_transaction_category_id = save_param[:at_transaction_category_id].present? ?
                                      save_param[:at_transaction_category_id] : transaction[:at_transaction_category_id]
     payment_method_id = save_param[:payment_method_id].present? ? save_param[:payment_method_id] : transaction[:payment_method_id]
+    payment_method_type = save_param[:payment_method_type].present? ? save_param[:payment_method_type] : transaction[:payment_method_type]
     used_date = save_param[:used_date].present? ? save_param[:used_date] : transaction[:used_date]
     title = save_param[:title].present? ? save_param[:title] : transaction[:title]
     amount = save_param[:amount].present? ? save_param[:amount] : transaction[:amount]
@@ -134,6 +159,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     {
         at_transaction_category_id: at_transaction_category_id,
         payment_method_id: payment_method_id,
+        payment_method_type: payment_method_type,
         used_date: used_date,
         title: title,
         amount: amount,

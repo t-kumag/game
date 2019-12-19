@@ -379,4 +379,29 @@ class ApplicationController < ActionController::Base
   def render_disallowed_goal_setting_ids
     render json: { errors: { code: '', message: "Disallowed goal setting id." } }, status: 422
   end
+
+  def limit_of_registered_finance?
+    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
+    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
+    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
+    wallet_ids = @current_user.try(:wallets).try(:pluck ,:id)
+
+    number_of_account =  0
+    if at_user_bank_account_ids.present?
+      number_of_account += at_user_bank_account_ids.count
+    end
+
+    if at_user_card_account_ids.present?
+      number_of_account += at_user_card_account_ids.count
+    end
+
+    if at_user_emoney_service_account_ids.present?
+      number_of_account += at_user_emoney_service_account_ids.count
+    end
+
+    if wallet_ids.present?
+      number_of_account += wallet_ids.count
+    end
+    @current_user.free? && number_of_account < Settings.at_user_limit_free_account
+  end
 end

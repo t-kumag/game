@@ -152,6 +152,10 @@ Rails.application.routes.draw do
           end
         end
 
+        resources :wallets, path: '/wallets' do
+          resources :wallet_transactions, path: '/transactions', on: :member, only: [:index, :show]
+        end
+
         put 'pl-settings', :to => 'pl_settings#update'
         get 'pl-settings', :to => 'pl_settings#show'
 
@@ -173,7 +177,13 @@ Rails.application.routes.draw do
           resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
+
+        resources :wallets, path: '/wallets' do
+          resources :wallet_transactions, path: '/transactions', on: :member, only: [:index, :show]
+        end
       end
+
+      resources :payment_methods, path: '/payment_methods', only: [:index]
     end
   end
 end
