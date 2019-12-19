@@ -97,7 +97,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :used_date,
       :title,
       :amount,
-      :used_location
+      :used_location,
+      :memo
     ).merge(
       user_id: @current_user.id
     )
