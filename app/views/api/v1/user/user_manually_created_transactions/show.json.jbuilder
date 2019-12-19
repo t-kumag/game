@@ -12,4 +12,5 @@ json.app do
   json.amount @response.amount
   json.is_shared @response.user_distributed_transaction.share
   json.used_location @response.used_location
+  json.memo @response.memo
 end
