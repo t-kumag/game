@@ -8,7 +8,7 @@ SELECT
 
   u.created_at AS メール登録完了日時, -- 仮登録日時
   
-  email_authenticated AS メアド認証,　-- 本登録の有無
+  email_authenticated AS メアド認証, -- 本登録の有無
   
   u.email AS メールアドレス,
   
