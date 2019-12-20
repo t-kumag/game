@@ -51,7 +51,7 @@ class Services::ActivityService
   end
 
   def self.fetch_activities(user, page)
-    Entities::Activity.where(user_id: user.id).where.not(message: nil).order(created_at: "DESC").page(page)
+    Entities::Activity.where(user_id: user.id).where.not(message: nil).order(id: "DESC").page(page)
   end
 
   def self.fetch_activities_goal_finished
