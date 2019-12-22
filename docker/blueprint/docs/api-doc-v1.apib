@@ -140,10 +140,7 @@ Resource of Transactions
                 ]
             }
 
-### ユーザグループ明細一覧取得 [GET]
-
-#### Path
-/user/grouped-transactions
+### ユーザグループ明細一覧取得 [GET /user/grouped-transactions]
 
 #### Parameters
 
@@ -231,7 +228,7 @@ Resource of Bank Account
             }
 
 
-### 銀行口座更新 [PUT]
+### 銀行口座更新 [PUT /api/v1/user/bank-accounts/:id]
 
 #### Parameters
 
@@ -276,7 +273,7 @@ Resource of Bank Account
                 }
             }
 
-### 銀行口座削除 [DELETE]
+### 銀行口座削除 [DELETE /api/v1/user/bank-accounts/:id]
 
 #### Parameters
 * id (int)
@@ -386,7 +383,7 @@ Resource of Bank Account Transactions
                 }
             }
 
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/user/bank-accounts/:bank_account_id/transactions/:id]
 
 #### Parameters
 
@@ -435,14 +432,14 @@ Resource of Bank Account Transactions
             }
 
 
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/user/bank-accounts/:bank_account_id/transactions/:id]
 
 #### Parameters
 
 * id (int)
 * share (boolean)
 * at_transaction_category_id (int)
-* used_location (string
+* used_location (string)
 
 + Request 明細詳細更新 (application/json)
 
@@ -524,10 +521,10 @@ Resource of Card Account
             }
 
 
-### カード口座更新 [PUT]
+### カード口座更新 [PUT /api/v1/user/card-accounts/:id]
 
 #### Parameters
-* card_account_id (int)
+* id (int)
 
 + Request カード口座更新 (application/json)
 
@@ -567,7 +564,7 @@ Resource of Card Account
                 }
             }
 
-### カード口座削除 [DELETE]
+### カード口座削除 [DELETE /api/v1/user/card-accounts/:id]
 
 #### Parameters
 * id (int)
@@ -665,7 +662,7 @@ Resource of Card Account Transactions
 
 
 
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/user/card-accounts/:card_account_id/transactions/:id]
 
 #### Parameters
 
@@ -713,12 +710,12 @@ Resource of Card Account Transactions
 
 
 
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/user/card-accounts/:card_account_id/transactions/:id]
 
 #### Parameters
 
 * card_account_id (int)
-* transaction_id (int)
+* id (int)
 
 + Request 明細詳細更新 (application/json)
 
@@ -804,10 +801,10 @@ Resource of Card Account
             }
 
 
-### 電子マネー口座更新 [PUT]
+### 電子マネー口座更新 [PUT /api/v1/user/emoney-accounts/:id]
 
 #### Parameters
-* emoney_account_id (int)
+* id (int)
 
 + Request 電子マネー口座更新 (application/json)
 
@@ -849,7 +846,7 @@ Resource of Card Account
 
 
 
-### 電子マネー口座削除 [DELETE]
+### 電子マネー口座削除 [DELETE /api/v1/user/emoney-accounts/:id]
 
 #### Parameters
 * id (int)
@@ -950,7 +947,7 @@ Resource of Emoney Account Transactions
 
 
 
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id]
 
 #### Parameters
 
@@ -999,9 +996,7 @@ Resource of Emoney Account Transactions
                 }
             }
 
-
-
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id]
 
 #### Parameters
 
@@ -1029,8 +1024,6 @@ Resource of Emoney Account Transactions
     + Body
             {}
 
-
-
 + Response 422 (application/json)
 
     + Body
@@ -1041,9 +1034,6 @@ Resource of Emoney Account Transactions
                   "mesasge": "Disallowed transaction id."
                 }
             }
-
-
-
 
 ## 電子マネー口座合計 [/api/v1/user/emoney-accounts-summary]
 Resource of Emoney Account Summary
@@ -1065,7 +1055,7 @@ Resource of Emoney Account Summary
                 }
             }
 
-## 手動明細 [/api/v1/user/user-manually-created-transactions]
+## 手動明細件数 [/api/v1/user/user-manually-created-transactions]
 Resource of User Manually Transactions
 
 ### 手動明細取得 [GET]
@@ -1110,7 +1100,39 @@ Resource of User Manually Transactions
     + Body
             {}
 
-### 手動明細詳細更新 [PUT]
+### 手動明細取得 [GET /api/v1/user/user-manually-created-transactions/:id]
+
+#### Parameters
+
+* id (int)
+
++ Request 明細取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                    "id": 1,
+                    "at_transaction_category": {
+                        "id": 1,
+                        "category_name1": "未分類",
+                        "category_name2": "未分類"
+                    },
+                    "used_date": "2019-10-01",
+                    "title": "test",
+                    "amount": 1000,
+                    "is_shared": false,
+                    "used_location": "公園"
+                }
+            }
+
+
+### 手動明細詳細更新 [PUT /api/v1/user/user-manually-created-transactions/:id]
 
 #### Parameters
 
@@ -1140,7 +1162,7 @@ Resource of User Manually Transactions
     + Body
             {}
 
-### 手動明細詳細削除 [DELETE]
+### 手動明細詳細削除 [DELETE /api/v1/user/user-manually-created-transactions/:id]
 
 #### Parameters
 
@@ -1527,10 +1549,7 @@ Resource of Profiles
             }
 
 
-### 家族グループ明細一覧取得 [GET]
-
-#### Path
-/user/grouped-transactions
+### 家族グループ明細一覧取得 [GET /group/grouped-transactions]
 
 #### Parameters
 
@@ -1596,10 +1615,6 @@ Resource of Profiles
 Resource of Goal
 
 ###  目標一覧取得 [GET]
-
-#### Parameters
-
-* id (int)
 
 + Request 目標一覧取得 (application/json)
 
@@ -1688,7 +1703,11 @@ Resource of Goal
             }
 
 
-###  目標詳細取得 [GET]
+###  目標詳細取得 [GET /api/v1/group/goals/:id]
+
+#### Parameters
+
+* id (int)
 
 + Request 目標詳細取得 (application/json)
 
@@ -1803,10 +1822,7 @@ Resource of Goal
               }
             }
 
-### 目標追加入金登録 [POST]
-
-#### Path
-* /api/v1/group/goals/:goal_id/add_money
+### 目標追加入金登録 [POST /api/v1/group/goals/:goal_id/add_money]
 
 + Request 目標登録登録 (application/json)
 
@@ -1935,13 +1951,10 @@ Resource of Goal
             }
 
 
-## 目標設定 [/api/v1/group/goals]
+## 目標設定 [/api/v1/group/goals/:goal_id/goal-settings]
 Resource of Goal
 
-###  目標設定詳細取得 [GET]
-
-#### path
-/group/goals/:goal_id/goal-settings/:id
+###  目標設定詳細取得 [GET /api/v1/group/goals/:goal_id/goal-settings/:id]
 
 #### Parameters
 
@@ -2002,7 +2015,7 @@ Resource of Goal
               }
             }
 
-###  目標設定更新 [PUT]
+###  目標設定更新 [PUT /api/v1/group/goals/:goal_id/goal-settings/:id]
 
 + Request 目標設定更新 (application/json)
 
@@ -2048,10 +2061,7 @@ Resource of Goal
 
 ## 目標グラフデータ取得 [/api/v1/group/goal-graph]
 
-### 目標グラフデータ取得 [GET]
-
-#### Path
-* /group/goal-graph/:id
+### 目標グラフデータ取得 [GET /api/v1/group/goal-graph/:id]
 
 #### Parameters
 
@@ -2191,7 +2201,7 @@ Resource of Bank Account Transactions
                 }
             }
 
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
 
 #### Parameters
 
@@ -2239,7 +2249,7 @@ Resource of Bank Account Transactions
                 }
             }
 
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
 
 #### Parameters
 
@@ -2397,7 +2407,7 @@ Resource of Card Account Transactions
 
 
 
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/group/card-accounts/:card_account_id/transactions/:id]
 
 #### Parameters
 
@@ -2444,7 +2454,7 @@ Resource of Card Account Transactions
             }
 
 
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/group/card-accounts/:card_account_id/transactions/:id]
 
 #### Parameters
 
@@ -2532,9 +2542,6 @@ Resource of Card Account
             }
 
 
-
-
-
 ## 電子マネー取引明細 [/api/v1/group/emoney-accounts/:emoney_account_id/transactions]
 Resource of Emoney Account Transactions
 
@@ -2602,10 +2609,7 @@ Resource of Emoney Account Transactions
                 }
             }
 
-
-
-
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
 
 #### Parameters
 
@@ -2654,8 +2658,7 @@ Resource of Emoney Account Transactions
                 }
             }
 
-
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
 
 #### Parameters
 
@@ -2695,9 +2698,6 @@ Resource of Emoney Account Transactions
                   "mesasge": "Disallowed transaction id."
                 }
             }
-
-
-
 
 ## 電子マネー口座合計 [/api/v1/group/emoney-accounts-summary]
 Resource of Emoney Account Summary
@@ -2880,12 +2880,6 @@ Resource of BS
 
 
 
-
-
-
-
-
-
 # Group その他
 /api/v1/xxx系
 
@@ -3001,8 +2995,7 @@ Resource of Budget Questions
 
             {}
 
-
-## カテゴリ [/api/v1/user/budget-questions]
+## カテゴリ [/api/v1/categories]
 Resource of Category
 
 ### カテゴリ取得 [GET]
@@ -3092,7 +3085,7 @@ Resource of Category
             {}
 
 
-## 通知 [/api/v1/user/notices]
+## 通知 [/api/v1/notices]
 Resource of Notice
 
 ## 通知取得 [GET]
@@ -3161,7 +3154,7 @@ Resource of Notice
 Resource of Pairing
 
 
-### ペアリング取得 [GET]
+### ペアリング取得 [GET /api/v1/pairing-requests/generate_pairing_token]
 
 + Request ペアリング取得 (application/json)
 
@@ -3181,11 +3174,7 @@ Resource of Pairing
                 }
             }
 
-### ペアリング登録 [POST]
-
-#### Path
-/user/pairing-request/receive_pairing_request
-
+### ペアリング登録 [POST /api/v1/user/pairing-request/receive_pairing_request]
 
 + Request ペアリング登録 (application/json)
 
@@ -3287,20 +3276,13 @@ Resource of Pairing
 
             {}
 
-
-
-
 ## ユーザー [/api/v1/user]
 Resource of Users
 
-### アクティベート [GET]
-
-#### Path
-/user/activate
+### アクティベート [GET /api/v1/user/activate]
 
 #### Param
 * token (string)
-
 
 + Request アクティベート取得 (application/json)
 
@@ -3324,10 +3306,7 @@ Resource of Users
             }
 
 
-### at_user取得 [GET]
-
-#### Path
-/user/at-url
+### at_user取得 [GET /api/v1/user/at-url]
 
 #### Param
 * token (string)
@@ -3362,10 +3341,7 @@ Resource of Users
                 }
             }
 
-### at_sync取得 [GET]
-
-#### Path
-/user/at-sync
+### at_sync取得 [GET /api/v1/user/at-sync]
 
 #### Param
 * token (string)
@@ -3383,10 +3359,7 @@ Resource of Users
 
             {}
 
-### at_token取得 [GET]
-
-#### Path
-/user/at-token
+### at_token取得 [GET /api/v1/user/at-token]
 
 #### Param
 * token (string)
@@ -3409,11 +3382,7 @@ Resource of Users
                 }
             }
 
-### 会員登録 [POST]
-
-#### Path
-/users
-
+### 会員登録 [POST /api/v1/users]
 
 + Request 会員登録 (application/json)
 
@@ -3439,11 +3408,7 @@ Resource of Users
                 }
             }
 
-### メール再送信 [POST]
-
-#### Path
-/user/resend
-
+### メール再送信 [POST /api/v1/user/resend]
 
 + Request メール再送信 (application/json)
 
@@ -3469,11 +3434,7 @@ Resource of Users
 
             {}
 
-### パスワード変更要求登録 [POST]
-
-#### Path
-/users/change_password_request
-
+### パスワード変更要求登録 [POST /api/v1/users/change_password_request]
 
 + Request メール再送信 (application/json)
 
@@ -3505,11 +3466,7 @@ Resource of Users
             }
 
 
-### パスワード変更登録 [POST]
-
-#### Path
-/users/change_password
-
+### パスワード変更登録 [POST /api/v1/users/change_password]
 
 + Request メール再送信 (application/json)
 
@@ -3583,10 +3540,7 @@ Resource of Users
                 ]
             }
 
-### ユーザー削除 [DELETE]
-
-#### Path
-/users
+### ユーザー削除 [DELETE /api/v1/users]
 
 + Request ユーザー削除 (application/json)
 
