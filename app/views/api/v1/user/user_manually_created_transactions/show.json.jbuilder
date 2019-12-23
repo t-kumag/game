@@ -14,4 +14,5 @@ json.app do
   json.used_location @response.used_location
   json.payment_method_id @response.payment_method_id
   json.payment_method_type @response.payment_method_type
+  json.memo @response.memo
 end
