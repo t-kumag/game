@@ -7,7 +7,6 @@ module ACTIVITY_TYPE
       goal_created_partner:              { message: 'パートナーが目標貯金「%s」を作成しました', url: 'osidori://goals/%d'},
       goal_updated:                      { message: '目標貯金「%s」が更新されました', url: 'osidori://goals/%d'},
       goal_monthly_accumulation:         { message: '目標貯金「%s」に月々の積立分が貯金されました', url: 'osidori://goals/%d'},
-      goal_loss:                         { message: '目標貯金「%s」への貯金ができませんでした（残高不足）', url: 'osidori://goals/%d'},
       goal_add_money:                    { message: '目標貯金「%s」に追加入金分が貯金されました', url: 'osidori://goals/%d'},
       goal_finished:                     { message: 'おめでとうございます！目標貯金「%s」が目標額を達成しました。', url: 'osidori://goals/%d'},
       person_expense_income:             { message: '個人の取引が%d件ありました', url: 'osidori://transactions'},
