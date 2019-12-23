@@ -158,20 +158,17 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
     
     goal_service = Services::GoalService.new(@current_user)
-
     # 「追加入金前の現在の目標貯金額」と「目標貯金総額」の状況をチェック
     over_current_amount = over_current_amount?(goal)
     goal_service.add_money(goal, goal_setting, params[:add_amount])
-
-    # アクテビィティ書き込み
     options = create_activity_options(goal)
+
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
 
     # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達していた場合は、既にアクテビティログがあるのでログ出力は不要
     # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達してない + 「追加入金後の現在の目標貯金額」が「目標金額総額」に到達 ->このケースのみログを書き込む
     create_goal_finished_activity(options) if over_current_amount && over_goal_amount?(goal)
-
     render(json: {}, status: 200)
   end
 
