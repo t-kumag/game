@@ -504,6 +504,7 @@ ActiveRecord::Schema.define(version: 2019_12_19_054453) do
     t.string "title"
     t.bigint "amount", default: 0, null: false
     t.string "used_location"
+    t.text "memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "payment_method_type"
