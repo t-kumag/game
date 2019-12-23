@@ -496,6 +496,7 @@ ActiveRecord::Schema.define(version: 2019_12_18_130408) do
     t.text "memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "payment_method_type"
     t.index ["at_transaction_category_id"], name: "index_u_m_c_t_on_at_transaction_category_id"
     t.index ["payment_method_id"], name: "index_u_m_c_t_on_payment_method_id"
     t.index ["user_id"], name: "index_user_manually_created_transactions_on_user_id"
