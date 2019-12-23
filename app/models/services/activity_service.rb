@@ -24,7 +24,14 @@ class Services::ActivityService
   end
 
   def self.create_activity(user_id, group_id, used_date, activity_type, options={})
-    activity = activity_assign_parameter(activity_type, options)
+
+    defined_activity = ACTIVITY_TYPE::NAME[activity_type]
+    activity = set_activity(defined_activity)
+    activity = convert_goal_message(options[:goal], defined_activity, activity) if options[:goal].present?
+    activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
+    activity = convert_user_manually_tran_url(options[:user_manually_created_transaction], defined_activity, activity) if options[:user_manually_created_transaction].present?
+    activity = convert_trans_message(options[:transactions], defined_activity, activity) if options[:transactions].present?
+
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end
 
@@ -52,10 +59,6 @@ class Services::ActivityService
 
   def self.fetch_activities(user, page)
     Entities::Activity.where(user_id: user.id).where.not(message: nil).order(created_at: "DESC").page(page)
-  end
-
-  def self.fetch_activities_goal_finished
-    Entities::Activity.where(activity_type: :goal_finished)
   end
 
   def self.fetch_activity_type(user, type)
@@ -260,37 +263,4 @@ class Services::ActivityService
     activity
   end
 
-  def self.activity_assign_parameter(activity_type, options)
-    defined_activity = ACTIVITY_TYPE::NAME[activity_type]
-    activity = set_activity(defined_activity)
-    activity = convert_goal_message(options[:goal], defined_activity, activity) if options[:goal].present?
-    activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
-    activity = convert_user_manually_tran_url(options[:user_manually_created_transaction], defined_activity, activity) if options[:user_manually_created_transaction].present?
-    activity = convert_trans_message(options[:transactions], defined_activity, activity) if options[:transactions].present?
-    activity
-  end
-
-  def self.fetch_goal_finished(goal, options={})
-    activity = activity_assign_parameter(:goal_finished, options)
-    [
-        {
-            user_id:  options[:goal].user.id,
-            group_id: goal[:group_id],
-            url: activity[:url],
-            count:  activity[:count],
-            activity_type:  :goal_finished,
-            message: activity[:message],
-            date: Time.zone.now,
-        },
-        {
-            user_id:  options[:goal].user.partner_user.id,
-            group_id:  goal[:group_id],
-            url: activity[:url],
-            count:  activity[:count],
-            activity_type:  :goal_finished,
-            message: activity[:message],
-            date: Time.zone.now
-        }
-    ]
-  end
 end
