@@ -231,6 +231,22 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  def disallowed_wallet_ids?(wallet_ids, with_group=false)
+    user_id         =  @current_user.id
+    partner_user_id =  @current_user.try(:partner_user).try(:id)
+
+    user_wallet_ids = Entities::Wallet.where(user_id: user_id).pluck(:id)
+    if partner_user_id && with_group
+      user_wallet_ids << Entities::Wallet.where(user_id: partner_user_id, share: true).pluck(:id)
+    end
+    user_wallet_ids.flatten!
+
+    wallet_ids.each do |id|
+      return true unless user_wallet_ids.include?(id)
+    end
+    false
+  end
+
   def disallowed_at_bank_transaction_ids?(bank_id, bank_transaction_ids, with_group=false)
     user_bank = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:find_by, id: bank_id)
     at_user_bank_transaction_ids = []

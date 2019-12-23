@@ -6,16 +6,16 @@ class Services::WalletTransactionService
     @to = to ? Time.zone.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
   end
 
-  def list(account_id)
-    get_distributed_transactions(account_id)
+  def list(wallet_id)
+    get_distributed_transactions(wallet_id)
   end
 
-  def detail(account_id, transaction_id)
-    get_distributed_transaction(account_id, transaction_id)
+  def detail(wallet_id, transaction_id)
+    get_distributed_transaction(wallet_id, transaction_id)
   end
 
-  def update(account_id, transaction_id, category_id, used_location, is_shared, group_id)
-    distributed = get_distributed_transaction(account_id, transaction_id)
+  def update(wallet_id, transaction_id, category_id, used_location, is_shared, group_id)
+    distributed = get_distributed_transaction(wallet_id, transaction_id)
     return {} if distributed[:user_distributed_transaction].blank?
 
     distributed[:user_distributed_transaction].at_transaction_category_id = category_id
@@ -26,12 +26,12 @@ class Services::WalletTransactionService
     distributed
   end
 
-  def get_distributed_transaction(account_id, transaction_id)
+  def get_distributed_transaction(wallet_id, transaction_id)
     transaction = {}
     wallet = if @is_group === true
-               Entities::Wallet.find_by(id: account_id, group_id: @user.group_id, share: true)
+               Entities::Wallet.find_by(id: wallet_id, group_id: @user.group_id, share: true)
              else
-               Entities::Wallet.find_by(id: account_id, user_id: @user.id, share: false)
+               Entities::Wallet.find_by(id: wallet_id, user_id: @user.id, share: false)
              end
     return {} if wallet.blank?
 
@@ -69,36 +69,33 @@ class Services::WalletTransactionService
     }
   end
 
-  def get_distributed_transactions(account_id)
+  def get_distributed_transactions(wallet_id)
     transactions = {}
     wallet = if @is_group === true
-               Entities::Wallet.find_by(id: account_id, group_id: @user.group_id, share: true)
+               Entities::Wallet.find_by(id: wallet_id, group_id: @user.group_id, share: true)
              else
-               Entities::Wallet.find_by(id: account_id, user_id: @user.id, share: false)
+               Entities::Wallet.find_by(id: wallet_id, user_id: @user.id, share: false)
              end
     return {} if wallet.blank?
-
     transactions[:is_account_shared] = wallet.share
+
+    # Pager
+    # 昨日から90日以内に明細があればその最新を返す。AT仕様に合わせて90日以上は考慮しない
+    next_transaction = Entities::UserManuallyCreatedTransaction.
+        where(payment_method_id: wallet.id, payment_method_type: 'wallet').
+        where(used_date: Time.zone.now.ago(90.days).strftime('%Y%m%d')..@from.yesterday).
+        order(used_date: 'DESC').
+        first
+    transactions[:next_transaction_used_date] = next_transaction.try(:used_date) ? next_transaction.used_date.strftime('%Y-%m-%d %H:%M:%S') : nil
+
+    # List
     transaction_ids = Entities::UserManuallyCreatedTransaction.
                       where(payment_method_id: wallet.id, payment_method_type: 'wallet').
                       where(used_date: @from..@to).
                       pluck(:id)
 
-    # at_sync_transaction_monthly_log = Services::AtSyncTransactionMonthlyDateLogService
-    #                                      .fetch_monthly_tran_date_from_spec_date(account_id, @from, "at_user_bank_account")
+    return transactions if transaction_ids.blank?
 
-    # 基本的に2019-08-21 00:00:00 のよう形でデータが取得できるため、23:59:59など細かい秒数は取得する必要がない。
-    # そのため、一日前の取得になっている。
-    # one_day_before_from = @from.yesterday
-    # next_transaction = nil
-    # if at_sync_transaction_monthly_log.present?
-    #   next_transaction = bank.at_user_bank_transactions.order(trade_date: :desc)
-    #                          .where(trade_date: at_sync_transaction_monthly_log.monthly_date..one_day_before_from).first
-    # end
-    #
-    # transactions[:next_transaction_used_date] = next_transaction.try(:trade_date) ? next_transaction.trade_date.strftime('%Y-%m-%d %H:%M:%S') : nil
-
-    return {} if transaction_ids.blank?
     transactions[:user_distributed_transaction] = Entities::UserDistributedTransaction.
                                                   joins(:at_transaction_category).
                                                   includes(:at_transaction_category).
@@ -106,7 +103,6 @@ class Services::WalletTransactionService
                                                   includes(:user_manually_created_transaction).
                                                   where(user_manually_created_transaction_id: transaction_ids).
                                                   order(used_date: 'DESC')
-    return {} if transactions[:user_distributed_transaction].blank?
     transactions
   end
 

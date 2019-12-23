@@ -25,10 +25,9 @@ class Api::V2::User::WalletsController < ApplicationController
 
   def update
     wallet_id = params[:id].to_i
-    # TODO: あとから対応
-    # if disallowed_at_bank_ids?([wallet_id])
-    #   render_disallowed_financier_ids && return
-    # end
+    if disallowed_wallet_ids?([wallet_id])
+      render_disallowed_financier_ids && return
+    end
 
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
       require_group && return if params[:wallets][:share] == true
@@ -47,11 +46,10 @@ class Api::V2::User::WalletsController < ApplicationController
 
   def destroy
     wallet_id = params[:id].to_i
-
-    # TODO: あとから対応
-    # render_disallowed_account_ids && return if disallowed_at_bank_account_ids?([account_id])
-    # render_disallowed_financier_ids && return if disallowed_at_bank_ids?([account_id])
-
+    if disallowed_wallet_ids?([wallet_id])
+      render_disallowed_financier_ids && return
+    end
+    
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
       Entities::Wallet.find(wallet_id).destroy
     end
