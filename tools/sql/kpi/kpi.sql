@@ -4,11 +4,11 @@ SELECT
   CASE
     WHEN pg.group_id IS NULL THEN 0
     ELSE pg.group_id
-  END AS ペアリングID,
+  END AS ペアリングID, -- 初回のペアリングID（ペアリング解除済みを考慮しない）
 
-  u.created_at AS メール登録完了日時,
+  u.created_at AS メール登録完了日時, -- 仮登録日時
   
-  email_authenticated AS メアド認証,
+  email_authenticated AS メアド認証, -- 本登録の有無
   
   u.email AS メールアドレス,
   
@@ -156,21 +156,21 @@ SELECT
       tmp.at_user_id
   ),0) AS 口座連携数_電子マネー,
 
-
+  -- ユーザーの連携銀行名、ない場合はnull
   at_user_numbered_bank.口座１,
   at_user_numbered_bank.口座２,
   at_user_numbered_bank.口座３,
   at_user_numbered_bank.口座４,
   at_user_numbered_bank.口座５,
 
-
+  -- ユーザーの連携カード名1～5、ない場合はnull
   at_user_numbered_card.クレカ１,
   at_user_numbered_card.クレカ２,
   at_user_numbered_card.クレカ３,
   at_user_numbered_card.クレカ４,
   at_user_numbered_card.クレカ５,
 
-
+  -- ユーザーの連携電子マネー名1～5、ない場合はnull
   at_user_numbered_emoney.IC１,
   at_user_numbered_emoney.IC２,
   at_user_numbered_emoney.IC３,
@@ -182,13 +182,13 @@ SELECT
   CASE 
     WHEN pg.group_id IS NULL THEN 0
     ELSE 1
-  END AS ペアリング有無,
+  END AS ペアリング有無, -- ペアリング解除済みの場合でもペアリング有（ペアリング解除済みを考慮しない）
 
 
   CASE 
     WHEN pg.user_id IS NULL THEN 0 
     ELSE pg.created_at 
-  END AS ペアリング完了日時,
+  END AS ペアリング完了日時, -- 初回のぺアリング完了日時（ペアリング解除済みを考慮しない）
 
 
   CASE 
@@ -596,20 +596,20 @@ SELECT
   END AS 不明が金融機関を目標貯金に連携した時刻３
 
 
-FROM
+FROM -- ユーザID,メール登録完了日時,メアド認証,メールアドレス,退会の有無
   users AS u
 
-INNER JOIN
+INNER JOIN -- 性別,生年月日,子どもの有無,push許諾
   user_profiles AS up
 ON 
   up.user_id = u.id 
 
-LEFT JOIN
+LEFT JOIN -- 後続処理用
   at_users AS au
 ON 
   u.id = au.user_id
 
-LEFT JOIN
+LEFT JOIN -- ペアリングID,ペアリング有無,初回ペアリング日時
   (
     SELECT
       user_id,
@@ -623,7 +623,7 @@ LEFT JOIN
 ON 
   pg.user_id = u.id
 
-LEFT JOIN 
+LEFT JOIN -- 目標貯金作成数,目標貯金作成日時,目標種類判断
   (
     SELECT
       user_id,
@@ -636,7 +636,8 @@ LEFT JOIN
   ) AS g
 ON g.user_id = u.id
 
-LEFT JOIN
+LEFT JOIN -- 口座連携の日時(初回連携分)
+ -- 各種連携機関（銀行,クレカ,電子マネー）のテーブルを結合（重複削除）しています。
   (
     SELECT
       union_table.at_user_id,
@@ -676,7 +677,7 @@ LEFT JOIN
 ON 
   first_created_accounts.at_user_id = au.id
 
-LEFT JOIN
+LEFT JOIN -- 連携銀行名
   (
     SELECT
       users.id as user_id,
@@ -719,7 +720,7 @@ LEFT JOIN
 ON
   at_user_numbered_bank.user_id = u.id
 
-LEFT JOIN
+LEFT JOIN -- 連携クレカ名
   (
     SELECT
       users.id as user_id,
@@ -762,7 +763,7 @@ LEFT JOIN
 ON
   at_user_numbered_card.user_id = u.id
 
-LEFT JOIN
+LEFT JOIN -- 連携電子マネー名
   (
     SELECT
       users.id as user_id,
@@ -805,7 +806,7 @@ LEFT JOIN
 ON
   at_user_numbered_emoney.user_id = u.id
 
-LEFT JOIN
+LEFT JOIN -- 診断タイプ(最大ステップ数の時のbudget_question_idで判別可能)
   (
     SELECT
       ubq.user_id, 
@@ -839,7 +840,7 @@ LEFT JOIN
 ON 
   max_step_teble.user_id = u.id
 
-LEFT JOIN
+LEFT JOIN -- 金融機関を目標貯金に連携した時刻
   (
     SELECT
       users.id,
@@ -883,7 +884,7 @@ LEFT JOIN
 ON 
   numbered_goal_settings_at_user_bank_account.id = u.id
 
-LEFT JOIN
+LEFT JOIN -- 診断のQ1,Q2,Q3の回答用
   (
     SELECT
       tmp.user_id,
@@ -896,12 +897,12 @@ LEFT JOIN
           user_budget_questions
         WHERE
           user_budget_questions.user_id = tmp.user_id
-          AND user_budget_questions.step = tmp.step - 1
+          AND user_budget_questions.step = tmp.step - 1 -- 1つ前のbudget_question_id
       ) AS prev_question_id
     FROM
       user_budget_questions AS tmp
     WHERE
-      budget_question_id IN (3,4)
+      budget_question_id IN (3,4) -- Q3に限定するため、budget_question_idの3,4とする
       AND NOT EXISTS 
       (
         SELECT
@@ -910,7 +911,7 @@ LEFT JOIN
           user_budget_questions AS tmp2
         WHERE
           tmp.user_id = tmp2.user_id
-          AND tmp.step < tmp2.step
+          AND tmp.step < tmp2.step -- 前の選択肢に戻れる仕様を考慮
           AND tmp2.budget_question_id IN (3,4)
       )
   ) AS q3
