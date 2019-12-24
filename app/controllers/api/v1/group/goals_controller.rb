@@ -44,13 +44,12 @@ class Api::V1::Group::GoalsController < ApplicationController
         # 頭金を入金する際に必要
         goal_service = Services::GoalService.new(@current_user)
         options = create_activity_options(goal)
-        create_goal_activity(options)
+        create_goal_activity_log(options)
 
         # 目標ログの登録
         goal.goal_settings.each do |gs|
           goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
         end
-        create_goal_finished_activity(options) if over_goal_amount?(goal)
       end
 
     rescue ActiveRecord::RecordInvalid => db_err
@@ -85,16 +84,14 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     begin
       ActiveRecord::Base.transaction do
-        over_current_amount = over_current_amount?(goal)
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
         partner_goal_setting.update!(get_partner_goal_setting_params)
         options = create_activity_options(goal)
-        update_goal_activity(options)
+        update_goal_activity_log(options)
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount) if goal_setting.at_user_bank_account_id.present?
         end
-        create_goal_finished_activity(options) if over_current_amount && over_goal_amount?(goal)
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
@@ -157,20 +154,9 @@ class Api::V1::Group::GoalsController < ApplicationController
     
     goal_service = Services::GoalService.new(@current_user)
     if goal_service.check_bank_balance(params[:add_amount], goal_setting)
-      # 「追加入金前の現在の目標貯金額」と「目標貯金総額」の状況をチェック
-      over_current_amount = over_current_amount?(goal)
       goal_service.add_money(goal, goal_setting, params[:add_amount])
       options = create_activity_options(goal)
-
       Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
-      Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
-
-      # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達していた場合は、既にアクテビティログがあるのでログ出力は不要
-      # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達してない + 「追加入金後の現在の目標貯金額」が「目標金額総額」に到達 ->このケースのみログを書き込む
-      if over_current_amount && over_goal_amount?(goal)
-        create_goal_finished_activity(options)
-      end
-
       render(json: {}, status: 200)
     else
       render(json: {errors: [{code:"", message:"minus balance"}]}, status: 422)
@@ -214,19 +200,14 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   private
 
-  def create_goal_activity(options)
+  def create_goal_activity_log(options)
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created, options)
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created_partner, options)
   end
 
-  def update_goal_activity(options)
+  def update_goal_activity_log(options)
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
-  end
-
-  def create_goal_finished_activity(options)
-    Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.now, :goal_finished, options)
-    Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.now, :goal_finished, options)
   end
 
   def create_activity_options(goal)
@@ -235,16 +216,4 @@ class Api::V1::Group::GoalsController < ApplicationController
     options[:transaction] = nil
     options
   end
-
-  # 「現在の目標貯金額」が「目標金額総額 」に到達していなければtrueを返す
-  #   -> 既に「目標金額総額 」に「現在の目標貯金額」が到達していたらfalseを返す、その地点でアクティビティログが出力されてるため
-  def over_current_amount?(goal)
-    # 目標貯金総額 > 現在の目標貯金額
-    goal.goal_amount >= goal.current_amount
-  end
-
-  def over_goal_amount?(goal)
-    goal.current_amount >= goal.goal_amount
-  end
-
 end
