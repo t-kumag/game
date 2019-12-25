@@ -49,9 +49,24 @@ class Api::V2::UsersController < ApplicationController
     return shared_bank_account_ids.present? || shared_card_account_ids.present? || shared_emoney_account_ids.present? unless with_group
 
     if @current_user.partner_user.present?
-      shared_bank_account_ids.try(:push, @current_user.partner_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:pluck ,:id))
-      shared_card_account_ids.try(:push, @current_user.partner_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:pluck ,:id))
-      shared_emoney_account_ids.try(:push, @current_user.partner_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:pluck ,:id)) 
+      if shared_bank_account_ids.present? 
+        shared_bank_account_ids << @current_user.partner_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:pluck ,:id)
+      else
+        shared_bank_account_ids = @current_user.partner_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:pluck ,:id)
+      end
+
+      if shared_card_account_ids.present? 
+        shared_card_account_ids << @current_user.partner_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:pluck ,:id)
+      else
+        shared_card_account_ids = @current_user.partner_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:pluck ,:id)
+      end
+
+      if shared_emoney_account_ids.present? 
+        shared_emoney_account_ids << @current_user.partner_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:pluck ,:id)
+      else
+        shared_emoney_account_ids = @current_user.partner_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:pluck ,:id)
+      end
+
       shared_bank_account_ids.try(:flatten!)
       shared_card_account_ids.try(:flatten!)
       shared_emoney_account_ids.try(:flatten!)
