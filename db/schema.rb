@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 2019_12_25_012345) do
   create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_bank_id"
-    t.bigint "balance", default: 0, null: false, unsigned: true
+    t.bigint "balance", default: 0, null: false
     t.boolean "share", default: false, null: false
     t.string "fnc_id", null: false
     t.string "fnc_cd", null: false

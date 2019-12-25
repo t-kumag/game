@@ -41,7 +41,7 @@ class Services::AtEmoneyTransactionService
 
     distributed[:user_distributed_transaction].at_transaction_category_id = category_id
     distributed[:user_distributed_transaction].used_location = used_location
-    distributed[:memo].memo = memo
+    distributed[:user_distributed_transaction].memo = memo
     distributed[:user_distributed_transaction].group_id = group_id
     distributed[:user_distributed_transaction].share = is_shared
     distributed[:user_distributed_transaction].save!
