@@ -240,7 +240,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   #   -> 既に「目標金額総額 」に「現在の目標貯金額」が到達していたらfalseを返す、その地点でアクティビティログが出力されてるため
   def over_current_amount?(goal)
     # 目標貯金総額 > 現在の目標貯金額
-    goal.goal_amount >= goal.current_amount
+    goal.goal_amount > goal.current_amount
   end
 
   def over_goal_amount?(goal)
