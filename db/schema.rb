@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_24_024315) do
+ActiveRecord::Schema.define(version: 2019_12_25_012345) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 2019_12_24_024315) do
   create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_bank_id"
-    t.bigint "balance", default: 0, null: false
+    t.bigint "balance", default: 0, null: false, unsigned: true
     t.boolean "share", default: false, null: false
     t.string "fnc_id", null: false
     t.string "fnc_cd", null: false
@@ -456,6 +456,7 @@ ActiveRecord::Schema.define(version: 2019_12_24_024315) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "used_location"
+    t.text "memo"
     t.bigint "amount", default: 0, null: false
     t.bigint "at_transaction_category_id"
     t.index ["at_transaction_category_id"], name: "index_u_d_t_on_at_transaction_category_id"
