@@ -140,6 +140,7 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_ids && return
     end
 
+    before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     user_banks = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck, :id)
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
@@ -148,18 +149,17 @@ class Api::V1::Group::GoalsController < ApplicationController
       user_banks.flatten!
     end
 
-    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
-    goal_setting = goal.goal_settings.find_by(at_user_bank_account_id: user_banks, user_id: @current_user.id)
+    goal_setting = before_goal.goal_settings.find_by(at_user_bank_account_id: user_banks, user_id: @current_user.id)
+    goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id) unless goal_setting.present?
 
-    goal_setting = goal.goal_settings.find_by(user_id: @current_user.id) unless goal_setting.present?
-
-    if user_banks.blank? || goal.blank? || goal_setting.blank?
+    if user_banks.blank? || before_goal.blank? || goal_setting.blank?
       render(json: {errors: [{code:"", message:"user not found or goal not found"}]}, status: 422) && return
     end
     
     goal_service = Services::GoalService.new(@current_user)
     # 「追加入金前の現在の目標貯金額」と「目標貯金総額」の状況をチェック
-    over_current_amount = over_current_amount?(goal)
+
+    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     goal_service.add_money(goal, goal_setting, params[:add_amount])
     options = create_activity_options(goal)
 
@@ -168,7 +168,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達していた場合は、既にアクテビティログがあるのでログ出力は不要
     # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達してない + 「追加入金後の現在の目標貯金額」が「目標金額総額」に到達 ->このケースのみログを書き込む
-    create_goal_finished_activity(options) if over_current_amount && over_goal_amount?(goal)
+    create_goal_finished_activity(options) if over_current_amount?(before_goal) && over_goal_amount?(goal)
     render(json: {}, status: 200)
   end
 
