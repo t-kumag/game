@@ -26,6 +26,7 @@ class Entities::User < ApplicationRecord
   has_one :participate_group
   has_one :group, through: :participate_group
   has_one :user_profile
+  has_many :wallets
   has_secure_password validations: true
 
   # email はメールアドレスとしての整合性と、仕様上の最大長をチェックする

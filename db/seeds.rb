@@ -6,10 +6,6 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-# payment_method
-Entities::PaymentMethod.create(name: '口座')
-Entities::PaymentMethod.create(name: 'クレジットカード')
-
 # BudgetQuestion
 10.times do
   Entities::BudgetQuestion.create

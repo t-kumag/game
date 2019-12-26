@@ -35,7 +35,7 @@ Resource of Profiles
     + Headers
 
             Authorization: Bearer [access_token]
-    
+
     + Body
 
             {
@@ -64,10 +64,10 @@ Resource of Profiles
     + Headers
 
             Authorization: Bearer [access_token]
-            
+
     + Body
 
-        
+
             {
                 "gender": 0,
                 "birthday": "2019-01-01",
@@ -75,7 +75,7 @@ Resource of Profiles
                 "push": false
             }
 
-        
+
 + Response 200 (application/json)
 
     + Body
@@ -140,10 +140,7 @@ Resource of Transactions
                 ]
             }
 
-### ユーザグループ明細一覧取得 [GET]
-
-#### Path
-/user/grouped-transactions
+### ユーザグループ明細一覧取得 [GET /user/grouped-transactions]
 
 #### Parameters
 
@@ -203,7 +200,7 @@ Resource of Transactions
                 ]
             }
 
-## 銀行口座 [/api/v1/user/bank-account]
+## 銀行口座 [/api/v1/user/bank-accounts]
 Resource of Bank Account
 
 ### 銀行口座取得 [GET]
@@ -231,7 +228,7 @@ Resource of Bank Account
             }
 
 
-### 銀行口座更新 [PUT]
+### 銀行口座更新 [PUT /api/v1/user/bank-accounts/:id]
 
 #### Parameters
 
@@ -276,7 +273,7 @@ Resource of Bank Account
                 }
             }
 
-### 銀行口座削除 [DELETE]
+### 銀行口座削除 [DELETE /api/v1/user/bank-accounts/:id]
 
 #### Parameters
 * id (int)
@@ -305,7 +302,7 @@ Resource of Bank Account
             }
 
 
-## 銀行取引明細 [/api/v1/user/bank-account/:bank_account_id/transactions]
+## 銀行取引明細 [/api/v1/user/bank-accounts/:bank_account_id/transactions]
 Resource of Bank Account Transactions
 
 ### 明細一覧取得 [GET]
@@ -386,7 +383,7 @@ Resource of Bank Account Transactions
                 }
             }
 
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/user/bank-accounts/:bank_account_id/transactions/:id]
 
 #### Parameters
 
@@ -435,14 +432,14 @@ Resource of Bank Account Transactions
             }
 
 
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/user/bank-accounts/:bank_account_id/transactions/:id]
 
 #### Parameters
 
 * id (int)
 * share (boolean)
 * at_transaction_category_id (int)
-* used_location (string
+* used_location (string)
 
 + Request 明細詳細更新 (application/json)
 
@@ -475,7 +472,7 @@ Resource of Bank Account Transactions
             }
 
 
-## 銀行口座合計 [/api/v1/user/bank-account-summary]
+## 銀行口座合計 [/api/v1/user/bank-accounts-summary]
 Resource of Bank Account Summary
 
 ### 銀行口座合計 [GET]
@@ -496,7 +493,7 @@ Resource of Bank Account Summary
             }
 
 
-## カード口座 [/api/v1/user/card-account]
+## カード口座 [/api/v1/user/card-accounts]
 Resource of Card Account
 
 ### カード口座取得 [GET]
@@ -524,10 +521,10 @@ Resource of Card Account
             }
 
 
-### カード口座更新 [PUT]
+### カード口座更新 [PUT /api/v1/user/card-accounts/:id]
 
 #### Parameters
-* card_account_id (int)
+* id (int)
 
 + Request カード口座更新 (application/json)
 
@@ -567,7 +564,7 @@ Resource of Card Account
                 }
             }
 
-### カード口座削除 [DELETE]
+### カード口座削除 [DELETE /api/v1/user/card-accounts/:id]
 
 #### Parameters
 * id (int)
@@ -594,7 +591,8 @@ Resource of Card Account
                   "mesasge": "Disallowed financier id."
                 }
             }
-## カード取引明細 [/api/v1/user/card-account/:card_account_id/transactions]
+
+## カード取引明細 [/api/v1/user/card-accounts/:card_account_id/transactions]
 Resource of Card Account Transactions
 
 ### 明細一覧取得 [GET]
@@ -664,7 +662,7 @@ Resource of Card Account Transactions
 
 
 
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/user/card-accounts/:card_account_id/transactions/:id]
 
 #### Parameters
 
@@ -712,12 +710,12 @@ Resource of Card Account Transactions
 
 
 
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/user/card-accounts/:card_account_id/transactions/:id]
 
 #### Parameters
 
 * card_account_id (int)
-* transaction_id (int)
+* id (int)
 
 + Request 明細詳細更新 (application/json)
 
@@ -754,7 +752,7 @@ Resource of Card Account Transactions
 
 
 
-## カード口座合計 [/api/v1/user/card-account-summary]
+## カード口座合計 [/api/v1/user/card-accounts-summary]
 Resource of Card Account Summary
 
 ### カード口座合計 [GET]
@@ -803,10 +801,10 @@ Resource of Card Account
             }
 
 
-### 電子マネー口座更新 [PUT]
+### 電子マネー口座更新 [PUT /api/v1/user/emoney-accounts/:id]
 
 #### Parameters
-* emoney_account_id (int)
+* id (int)
 
 + Request 電子マネー口座更新 (application/json)
 
@@ -848,7 +846,7 @@ Resource of Card Account
 
 
 
-### 電子マネー口座削除 [DELETE]
+### 電子マネー口座削除 [DELETE /api/v1/user/emoney-accounts/:id]
 
 #### Parameters
 * id (int)
@@ -879,7 +877,7 @@ Resource of Card Account
 
 
 
-## 電子マネー取引明細 [/api/v1/user/emoney-account/:emoney_account_id/transactions]
+## 電子マネー取引明細 [/api/v1/user/emoney-accounts/:emoney_account_id/transactions]
 Resource of Emoney Account Transactions
 
 ### 明細一覧取得 [GET]
@@ -949,7 +947,7 @@ Resource of Emoney Account Transactions
 
 
 
-### 明細詳細取得 [GET]
+### 明細詳細取得 [GET /api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id]
 
 #### Parameters
 
@@ -998,9 +996,7 @@ Resource of Emoney Account Transactions
                 }
             }
 
-
-
-### 明細詳細更新 [PUT]
+### 明細詳細更新 [PUT /api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id]
 
 #### Parameters
 
@@ -1028,8 +1024,6 @@ Resource of Emoney Account Transactions
     + Body
             {}
 
-
-
 + Response 422 (application/json)
 
     + Body
@@ -1041,10 +1035,7 @@ Resource of Emoney Account Transactions
                 }
             }
 
-
-
-
-## 電子マネー口座合計 [/api/v1/user/emoney-account-summary]
+## 電子マネー口座合計 [/api/v1/user/emoney-accounts-summary]
 Resource of Emoney Account Summary
 
 ### 電子マネー口座合計 [GET]
@@ -1064,7 +1055,7 @@ Resource of Emoney Account Summary
                 }
             }
 
-## 手動明細 [/api/v1/user/user-manually-created-transactions]
+## 手動明細件数 [/api/v1/user/user-manually-created-transactions]
 Resource of User Manually Transactions
 
 ### 手動明細取得 [GET]
@@ -1109,7 +1100,39 @@ Resource of User Manually Transactions
     + Body
             {}
 
-### 手動明細詳細更新 [PUT]
+### 手動明細取得 [GET /api/v1/user/user-manually-created-transactions/:id]
+
+#### Parameters
+
+* id (int)
+
++ Request 明細取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                    "id": 1,
+                    "at_transaction_category": {
+                        "id": 1,
+                        "category_name1": "未分類",
+                        "category_name2": "未分類"
+                    },
+                    "used_date": "2019-10-01",
+                    "title": "test",
+                    "amount": 1000,
+                    "is_shared": false,
+                    "used_location": "公園"
+                }
+            }
+
+
+### 手動明細詳細更新 [PUT /api/v1/user/user-manually-created-transactions/:id]
 
 #### Parameters
 
@@ -1139,7 +1162,7 @@ Resource of User Manually Transactions
     + Body
             {}
 
-### 手動明細詳細削除 [DELETE]
+### 手動明細詳細削除 [DELETE /api/v1/user/user-manually-created-transactions/:id]
 
 #### Parameters
 
@@ -1394,6 +1417,33 @@ Resource of Icon
 # Group 家族機能
 /api/v1/group/*
 
+
+# Profiles [/api/v1/group/profiles]
+Resource of Profiles
+
+### ユーザプロフィール取得 [GET]
+
++ Request ユーザプロフィール取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": {
+                    "user_id": 1,
+                    "partner_user_id": 2,
+                    "gender" : 0
+                    "birthday": "2019-01-01",
+                    "has_child": 0
+                }
+            }
+
+
 ## 家族口座登録 [/api/v1/group/at-account]
 
 ### 家族口座登録 [POST]
@@ -1498,14 +1548,73 @@ Resource of Icon
                 ]
             }
 
+
+### 家族グループ明細一覧取得 [GET /group/grouped-transactions]
+
+#### Parameters
+
+* category_id (int)
+* share (boolean)
+* scope (string) [income|outcome]
+* from (date)
+* to (date)
+
+
++ Request 家族グループ明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "category_id": "1",
+                "share": "false",
+                "scope": "income",
+                "from": "2019-08-01",
+                "to": "2019-08-31"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": [
+                   {
+                     "at_user_card_account_id": 13,
+                     "user_id": 20,
+                     "amount": -4900,
+                     "used_date": "2019-08-27 00:00:00",
+                     "used_location": "JOJO TOWN",
+                     "type": "card",
+                     "is_shared": false,
+                     "is_account_shared": false,
+                     "transaction_id": 195,
+                     "at_transaction_category_id": 1
+                   },
+                   {
+                     "at_user_emoney_service_account_id": 13,
+                     "user_id": 20,
+                     "amount": -195,
+                     "used_date": "2019-08-15 00:00:00",
+                     "used_location": "入 東銀座出新宿区",
+                     "type": "emoney",
+                     "is_shared": false,
+                     "is_account_shared": false,
+                     "transaction_id": 221,
+                     "at_transaction_category_id": 1
+                   }
+                ]
+            }
+
+
+
 ## 目標 [/api/v1/group/goals]
 Resource of Goal
 
 ###  目標一覧取得 [GET]
-
-#### Parameters
-
-* id (int)
 
 + Request 目標一覧取得 (application/json)
 
@@ -1594,7 +1703,11 @@ Resource of Goal
             }
 
 
-###  目標詳細取得 [GET]
+###  目標詳細取得 [GET /api/v1/group/goals/:id]
+
+#### Parameters
+
+* id (int)
 
 + Request 目標詳細取得 (application/json)
 
@@ -1683,7 +1796,7 @@ Resource of Goal
                 },
                 "partner_goal_settings": {
                     "monthly_amount" : 5000,
-                    "first_amount" : 0"
+                    "first_amount" : "0"
                 },
                 "goal_settings": {
                     "monthly_amount" : 5000,
@@ -1709,10 +1822,7 @@ Resource of Goal
               }
             }
 
-### 目標追加入金登録 [POST]
-
-#### Path
-* /api/v1/group/goals/:goal_id/add_money
+### 目標追加入金登録 [POST /api/v1/group/goals/:goal_id/add_money]
 
 + Request 目標登録登録 (application/json)
 
@@ -1841,13 +1951,10 @@ Resource of Goal
             }
 
 
-## 目標設定 [/api/v1/group/goals]
+## 目標設定 [/api/v1/group/goals/:goal_id/goal-settings]
 Resource of Goal
 
-###  目標設定詳細取得 [GET]
-
-#### path
-/group/goals/:goal_id/goal-settings/:id
+###  目標設定詳細取得 [GET /api/v1/group/goals/:goal_id/goal-settings/:id]
 
 #### Parameters
 
@@ -1908,7 +2015,7 @@ Resource of Goal
               }
             }
 
-###  目標設定更新 [PUT]
+###  目標設定更新 [PUT /api/v1/group/goals/:goal_id/goal-settings/:id]
 
 + Request 目標設定更新 (application/json)
 
@@ -1952,6 +2059,826 @@ Resource of Goal
               }
             }
 
+## 目標グラフデータ取得 [/api/v1/group/goal-graph]
+
+### 目標グラフデータ取得 [GET /api/v1/group/goal-graph/:id]
+
+#### Parameters
+
+* id (int)
+
++ Request 目標グラフデータ取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                    "2019-04-01": {
+                        "goal_amount": 500,
+                        "amount": 300,
+                        "progress": 0.6
+                    },
+                    "2019-06-01": {
+                        "goal_amount": 500,
+                        "amount": 500,
+                        "progress": 1.0
+                    }
+                }
+            }
+
+
+## 銀行口座 [/api/v1/group/bank-accounts]
+Resource of Bank Account
+
+### 銀行口座取得 [GET]
+
++ Request 銀行口座取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": [
+                   {
+                       "account_id": 11,
+                       "name": "XXXX情報銀行",
+                       "amount": 10000000,
+                       "fnc_id": "bhm6GicFMllKBnHVNPsNUi33IEsUAmu/+DgCuIjhnvrQb72pQUPLY14WNHjDNEhil7syMBBIPjej5cKSHNWTKHw==",
+                       "last_rslt_cd": "0",
+                       "last_rslt_msg": "正常"
+                   }
+                ]
+            }
+
+
+## 銀行取引明細 [/api/v1/group/bank-accounts/:bank_account_id/transactions]
+Resource of Bank Account Transactions
+
+### 明細一覧取得 [GET]
+
+#### Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": [
+                   {
+                     "at_user_bank_transaction_id": 189,
+                     "amount": -100000,
+                     "used_date": "2019-08-20 00:00:00",
+                     "used_location": "引出し",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 136,
+                     "category_name1": "出金",
+                     "category_name2": "ATM出金",
+                     "transaction_id": 189
+                   },
+                   {
+                     "at_user_bank_transaction_id": 191,
+                     "amount": -105,
+                     "used_date": "2019-08-15 00:00:00",
+                     "used_location": "テスウリヨウ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 149,
+                     "category_name1": "手数料",
+                     "category_name2": "その他手数料",
+                     "transaction_id": 191
+                   },
+                   {
+                     "at_user_bank_transaction_id": 190,
+                     "amount": 180000,
+                     "used_date": "2019-08-15 00:00:00",
+                     "used_location": "預入れ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 123,
+                     "category_name1": "入金",
+                     "category_name2": "ATM入金",
+                     "transaction_id": 190
+                   }
+                ]
+
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
+
+### 明細詳細取得 [GET /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
+
+#### Parameters
+
+* id (int)
+
++ Request 明細詳細取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                  "amount": -5342,
+                  "used_date": "2019-08-28 00:00:00",
+                  "used_location": "アサッテクル",
+                  "user_id": 19,
+                  "is_account_shared": false,
+                  "is_shared": false,
+                  "at_transaction_category_id": 1,
+                  "category_name1": "未分類",
+                  "category_name2": "未分類",
+                  "payment_name": "ミロク情報銀行",
+                  "transaction_id": 184
+                }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed transaction id.."
+                }
+            }
+
+### 明細詳細更新 [PUT /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
+
+#### Parameters
+
+* id (int)
+* share (boolean)
+* at_transaction_category_id (int)
+* used_location (string
+
++ Request 明細詳細更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+	            "at_transaction_category_id": 30,
+                "used_location": "カフェベートーベン",
+                "share": false
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed transaction id.."
+                }
+            }
+
+
+
+## 銀行口座合計 [/api/v1/group/bank-accounts-summary]
+Resource of Bank Account Summary
+
+### 銀行口座合計 [GET]
+
++ Request 銀行口座合計 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                    "amount": 100000,
+                }
+            }
+
+## カード口座 [/api/v1/group/card-accounts]
+Resource of Card Account
+
+### カード口座取得 [GET]
+
++ Request カード口座取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": [
+                   {
+                       "account_id": 11,
+                       "name": "XXXX情報銀行",
+                       "amount": 10000000,
+                       "fnc_id": "bhm6GicFMllKBnHVNPsNUi33IEsUAmu/+DgCuIjhnvrQb72pQUPLY14WNHjDNEhil7syMBBIPjej5cKSHNWTKHw==",
+                       "last_rslt_cd": "0",
+                       "last_rslt_msg": "正常"
+                   }
+                ]
+            }
+
+## カード取引明細 [/api/v1/group/card-accounts/:card_account_id/transactions]
+Resource of Card Account Transactions
+
+### 明細一覧取得 [GET]
+
+#### Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": [
+                   {
+                     "at_user_card_transaction_id": 251,
+                     "amount": -5400,
+                     "used_date": "2019-09-28 00:00:00",
+                     "used_location": "カフェベートーベンcard",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 30,
+                     "category_name1": "日用品",
+                     "category_name2": "ファッション、アクセサリー、時計",
+                     "transaction_id": 251
+                   },
+                   {
+                     "at_user_card_transaction_id": 252,
+                     "amount": -4900,
+                     "used_date": "2019-09-27 00:00:00",
+                     "used_location": "JOJO TOWN",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 1,
+                     "category_name1": "未分類",
+                     "category_name2": "未分類",
+                     "transaction_id": 252
+                   }
+                ]
+
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
+
+
+
+### 明細詳細取得 [GET /api/v1/group/card-accounts/:card_account_id/transactions/:id]
+
+#### Parameters
+
+* id (int)
+
++ Request 明細取得取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                  "amount": -4900,
+                  "used_date": "2019-09-03 00:00:00",
+                  "used_location": "JOJO TOWN",
+                  "user_id": 19,
+                  "is_account_shared": false,
+                  "is_shared": false,
+                  "at_transaction_category_id": 1,
+                  "category_name1": "未分類",
+                  "category_name2": "未分類",
+                  "payment_name": "ミロク情報カード",
+                  "transaction_id": 168
+                }
+            }
++ Response 200 (application/json)
+
+    + Body
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed transaction id."
+                }
+            }
+
+
+### 明細詳細更新 [PUT /api/v1/group/card-accounts/:card_account_id/transactions/:id]
+
+#### Parameters
+
+* card_account_id (int)
+* transaction_id (int)
+
++ Request 明細詳細更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+	            "at_transaction_category_id": 30,
+                "used_location": "カフェベートーベン",
+                "share": false
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed transaction id."
+                }
+            }
+
+
+## カード口座合計 [/api/v1/group/card-accounts-summary]
+Resource of Card Account Summary
+
+### カード口座合計 [GET]
+
++ Request カード口座合計 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                    "amount": 100000,
+                }
+            }
+
+
+## 電子マネー口座 [/api/v1/group/emoney-accounts]
+Resource of Card Account
+
+### 電子マネー口座取得 [GET]
+
++ Request 電子マネー情報取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": [
+                   {
+                       "account_id": 11,
+                       "name": "XXXX情報銀行",
+                       "amount": 10000000,
+                       "fnc_id": "bhm6GicFMllKBnHVNPsNUi33IEsUAmu/+DgCuIjhnvrQb72pQUPLY14WNHjDNEhil7syMBBIPjej5cKSHNWTKHw==",
+                       "last_rslt_cd": "0",
+                       "last_rslt_msg": "正常"
+                   }
+                ]
+            }
+
+
+## 電子マネー取引明細 [/api/v1/group/emoney-accounts/:emoney_account_id/transactions]
+Resource of Emoney Account Transactions
+
+### 明細一覧取得 [GET]
+
+#### Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": [
+                   {
+                     "at_user_emoney_transaction_id": 276,
+                     "amount": -150,
+                     "used_date": "2019-09-15 00:00:00",
+                     "used_location": "物販 ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 135,
+                     "category_name1": "入金",
+                     "category_name2": "その他入金",
+                     "transaction_id": 276
+                   },
+                   {
+                     "at_user_emoney_transaction_id": 275,
+                     "amount": -195,
+                     "used_date": "2019-09-15 00:00:00",
+                     "used_location": "入 東銀座出新宿区",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 1,
+                     "category_name1": "未分類",
+                     "category_name2": "未分類",
+                     "transaction_id": 275
+                   }
+                ]
+
+            }
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
+
+### 明細詳細取得 [GET /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
+
+#### Parameters
+
+* id (int)
+
++ Request 明細詳細取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                  "amount": -483,
+                  "used_date": "2019-09-03 00:00:00",
+                  "used_location": "カフェベートーベン",
+                  "user_id": 19,
+                  "is_account_shared": false,
+                  "is_shared": false,
+                  "at_transaction_category_id": 30,
+                  "category_name1": "日用品",
+                  "category_name2": "ファッション、アクセサリー、時計",
+                  "payment_name": "ミロクスイカ",
+                  "transaction_id": 192
+                }
+            }
+
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed transaction id."
+                }
+            }
+
+### 明細詳細更新 [PUT /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
+
+#### Parameters
+
+* id (int)
+* at_transaction_category_id (int)
+* used_location (string)
+* share (boolean)
+
++ Request 明細詳細更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+	            "at_transaction_category_id": 30,
+                "used_location": "カフェベートーベン",
+                "share": false
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed transaction id."
+                }
+            }
+
+## 電子マネー口座合計 [/api/v1/group/emoney-accounts-summary]
+Resource of Emoney Account Summary
+
+### 電子マネー口座合計 [GET]
+
++ Request 電子マネー口座合計 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                    "amount": 100000,
+                }
+            }
+
+
+## 手動明細 [/api/v1/group/user-manually-created-transactions]
+Resource of User Manually Transactions
+
+### 手動明細取得 [GET]
+
++ Request 明細数取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                    "count": 11
+                }
+            }
+
+
+## 取引明細合計 [/api/v1/group/pl-summary]
+Resource of Pl Account Transactions
+
+### 取引明細合計 [GET]
+
+#### Parameters
+
+* share (boolean)
+* from (date)
+* to (date)
+
++ Request 取引明細合計 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": {
+                  "income_amount": 55001,
+                  "expense_amount": -1403601
+                }
+
+            }
+
+## 取引明細カテゴリ [/api/v1/group/pl-categories]
+Resource of Pl Account Transactions
+
+### 取引明細カテゴリ一覧 [GET]
+
+#### Parameters
+
+* share (boolean)
+* from (date)
+* to (date)
+
++ Request 取引明細カテゴリ一覧 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": [
+                   {
+                     "category_id": 135,
+                     "category_name1": "入金",
+                     "category_name2": "その他入金",
+                     "income_amount": 5000,
+                     "expense_amount": 0
+                   },
+                   {
+                     "category_id": 7,
+                     "category_name1": "食費",
+                     "category_name2": "中華",
+                     "income_amount": 0,
+                     "expense_amount": -172
+                   },
+                   {
+                     "category_id": 1,
+                     "category_name1": "未分類",
+                     "category_name2": "未分類",
+                     "income_amount": 0,
+                     "expense_amount": -828
+                   }
+                ]
+
+            }
+
+
+## 取引明細グループカテゴリ [/api/v1/group/pl-grouped-categories]
+Resource of Pl Grouped Account Transactions
+
+### 取引明細グループカテゴリ一覧 [GET]
+
+#### Parameters
+
+* share (boolean)
+* from (date)
+* to (date)
+
++ Request 取引明細グループカテゴリ一覧 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "app": [
+                   {
+                     "category_id": 1,
+                     "category_name1": "未分類",
+                     "income_amount": 100002,
+                     "expense_amount": -3397370
+                   },
+                   {
+                     "category_id": 2,
+                     "category_name1": "食費",
+                     "income_amount": 0,
+                     "expense_amount": -43544
+                   }
+                ]
+
+            }
+
+## PL [/api/v1/group/bs-summary]
+
+Resource of BS
+
+### 資産合計取得 [GET]
+
++ Request 資産合計取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+                "app": {
+                    "amount": 20000000
+                }
+            }
+
+
+
 
 # Group その他
 /api/v1/xxx系
@@ -1965,7 +2892,7 @@ Resource of Goal
     + Headers
 
             Authorization: Bearer [access_token]
-    
+
     + Body
 
             {
@@ -1992,14 +2919,14 @@ Resource of Goal
     + Headers
 
             Authorization: Bearer [access_token]
-    
+
 + Response 200 (application/json)
 
     + Body
 
             {}
 
-## アクティビティ [/api/v1/user/activities]
+## アクティビティ [/api/v1/activities]
 Resource of Activity
 
 ### アクティビティ取得 [GET]
@@ -2030,7 +2957,7 @@ Resource of Activity
 
 
 
-## budget question [/api/v1/user/budget-questions]
+## budget question [/api/v1/budget-questions]
 Resource of Budget Questions
 
 ### budget questions 登録 [POST]
@@ -2068,8 +2995,7 @@ Resource of Budget Questions
 
             {}
 
-
-## カテゴリ [/api/v1/user/budget-questions]
+## カテゴリ [/api/v1/categories]
 Resource of Category
 
 ### カテゴリ取得 [GET]
@@ -2159,7 +3085,7 @@ Resource of Category
             {}
 
 
-## 通知 [/api/v1/user/notices]
+## 通知 [/api/v1/notices]
 Resource of Notice
 
 ## 通知取得 [GET]
@@ -2224,11 +3150,11 @@ Resource of Notice
             {}
 
 
-## ペアリング [/api/v1/user/pairing-requests]
+## ペアリング [/api/v1/pairing-requests]
 Resource of Pairing
 
 
-### ペアリング取得 [GET]
+### ペアリング取得 [GET /api/v1/pairing-requests/generate_pairing_token]
 
 + Request ペアリング取得 (application/json)
 
@@ -2248,11 +3174,7 @@ Resource of Pairing
                 }
             }
 
-### ペアリング登録 [POST]
-
-#### Path
-/user/pairing-request/receive_pairing_request
-
+### ペアリング登録 [POST /api/v1/pairing-request/receive_pairing_request]
 
 + Request ペアリング登録 (application/json)
 
@@ -2354,20 +3276,13 @@ Resource of Pairing
 
             {}
 
-
-
-
 ## ユーザー [/api/v1/user]
 Resource of Users
 
-### アクティベート [GET]
-
-#### Path
-/user/activate
+### アクティベート [GET /api/v1/user/activate]
 
 #### Param
 * token (string)
-
 
 + Request アクティベート取得 (application/json)
 
@@ -2391,10 +3306,7 @@ Resource of Users
             }
 
 
-### at_user取得 [GET]
-
-#### Path
-/user/at-url
+### at_user取得 [GET /api/v1/user/at-url]
 
 #### Param
 * token (string)
@@ -2429,10 +3341,7 @@ Resource of Users
                 }
             }
 
-### at_sync取得 [GET]
-
-#### Path
-/user/at-sync
+### at_sync取得 [GET /api/v1/user/at-sync]
 
 #### Param
 * token (string)
@@ -2450,10 +3359,7 @@ Resource of Users
 
             {}
 
-### at_token取得 [GET]
-
-#### Path
-/user/at-token
+### at_token取得 [GET /api/v1/user/at-token]
 
 #### Param
 * token (string)
@@ -2476,11 +3382,7 @@ Resource of Users
                 }
             }
 
-### 会員登録 [POST]
-
-#### Path
-/users
-
+### 会員登録 [POST /api/v1/users]
 
 + Request 会員登録 (application/json)
 
@@ -2506,11 +3408,7 @@ Resource of Users
                 }
             }
 
-### メール再送信 [POST]
-
-#### Path
-/user/resend
-
+### メール再送信 [POST /api/v1/user/resend]
 
 + Request メール再送信 (application/json)
 
@@ -2536,11 +3434,7 @@ Resource of Users
 
             {}
 
-### パスワード変更要求登録 [POST]
-
-#### Path
-/users/change_password_request
-
+### パスワード変更要求登録 [POST /api/v1/users/change_password_request]
 
 + Request メール再送信 (application/json)
 
@@ -2572,11 +3466,7 @@ Resource of Users
             }
 
 
-### パスワード変更登録 [POST]
-
-#### Path
-/users/change_password
-
+### パスワード変更登録 [POST /api/v1/users/change_password]
 
 + Request メール再送信 (application/json)
 
@@ -2650,10 +3540,7 @@ Resource of Users
                 ]
             }
 
-### ユーザー削除 [DELETE]
-
-#### Path
-/users
+### ユーザー削除 [DELETE /api/v1/users]
 
 + Request ユーザー削除 (application/json)
 
