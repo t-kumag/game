@@ -184,12 +184,75 @@ SELECT
     ELSE 1
   END AS ペアリング有無, -- ペアリング解除済みの場合でもペアリング有（ペアリング解除済みを考慮しない）
 
+  CASE 
+    WHEN pg.group_id IS NULL THEN 0
+    ELSE 1
+  END AS ペアリングの有無（夫婦）,
 
   CASE 
     WHEN pg.user_id IS NULL THEN 0 
     ELSE pg.created_at 
   END AS ペアリング完了日時, -- 初回のぺアリング完了日時（ペアリング解除済みを考慮しない）
 
+  CASE 
+    WHEN 
+    COALESCE((
+      SELECT
+        MIN(updated_at)
+      FROM
+        pairing_requests
+      WHERE
+        group_id IS NOT NULL
+      AND
+        from_user_id = u.id
+      GROUP BY
+        from_user_id
+    ), NOW()) 
+      <
+    COALESCE((
+      SELECT
+        MIN(updated_at)
+      FROM
+        pairing_requests
+      WHERE
+        group_id IS NOT NULL
+      AND
+        to_user_id = u.id
+      GROUP BY
+        to_user_id
+    ), NOW()) THEN 1 
+    ELSE 0
+  END AS ペアリング招待者,
+
+  CASE 
+    WHEN 
+    COALESCE((
+      SELECT
+        MIN(updated_at)
+      FROM
+        pairing_requests
+      WHERE
+        group_id IS NOT NULL
+      AND
+        from_user_id = u.id
+      GROUP BY
+        from_user_id
+    ), NOW())
+      >
+    COALESCE((
+      SELECT
+        MIN(updated_at)
+      FROM
+        pairing_requests
+      WHERE
+        group_id IS NOT NULL
+      AND
+        to_user_id = u.id
+      GROUP BY
+        to_user_id
+    ), NOW()) THEN 1 
+    ELSE 0
+  END AS ペアリング被招待者,
 
   CASE 
     WHEN gender = 1 THEN
