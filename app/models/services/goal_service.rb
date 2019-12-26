@@ -137,16 +137,6 @@ class Services::GoalService
     end
   end
 
-  def check_bank_balance(add_amount, goal_setting)
-    if add_amount.blank? || goal_setting.try(:at_user_bank_account).blank?
-      false
-    elsif add_amount < goal_setting.try(:at_user_bank_account).try(:balance)
-      true
-    else
-      false
-    end
-  end
-
   def self.check_goal_limit_of_free_user(user)
     user.free? && Entities::Goal.where(user_id: user.id).count < Settings.at_user_limit_free_goal
   end
@@ -244,21 +234,18 @@ class Services::GoalService
     (amount1.to_f / amount2.to_f).to_s
   end
 
-  def icon(monthly_achieving_rate)
-    return "best" if monthly_achieving_rate >= 0.7
-    return "normal" if monthly_achieving_rate >= 0.5
-    "bad"
-  end
-
   def monthly_achieving_rate_and_icon(monthly_amount, monthly_goal_amount)
+    icon = "normal"
     calculate_float_result = calculate_float_value_result(monthly_amount, monthly_goal_amount)
 
     # 1ヶ月の進捗状況 =  当月の貯金額 - 目標の貯金額
     # 切り捨てでの実装はBigDecimalを使用する必要があるために使用している
     monthly_achieving_rate = BigDecimal(calculate_float_result).floor(1).to_f
+    icon = "best" if BigDecimal(calculate_float_result) > 0
+
     {
         progress: monthly_achieving_rate,
-        icon: icon(monthly_achieving_rate)
+        icon: icon
     }
   end
 
