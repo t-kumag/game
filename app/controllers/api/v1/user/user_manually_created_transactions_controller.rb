@@ -87,7 +87,9 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
-        Services::WalletTransactionService::save_minus_balance(transaction[:payment_method_id], transaction[:amount])
+        if transaction[:payment_method_type] == "wallet"
+          Services::WalletTransactionService::save_minus_balance(transaction[:payment_method_id], transaction[:amount])
+        end
         transaction.destroy!
       end
     rescue => exception
