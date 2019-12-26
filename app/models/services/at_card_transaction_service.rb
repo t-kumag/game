@@ -24,6 +24,7 @@ class Services::AtCardTransactionService
       category_name2: distributed[:user_distributed_transaction].at_transaction_category.category_name2,
       used_date: distributed[:user_distributed_transaction].at_user_card_transaction.used_date,
       used_location: distributed[:user_distributed_transaction].used_location,
+      memo: distributed[:user_distributed_transaction].memo,
       user_id: distributed[:user_distributed_transaction].user_id,
       is_account_shared: distributed[:is_account_shared],
       is_shared: distributed[:user_distributed_transaction].at_user_card_transaction.at_user_card_account.share || distributed[:user_distributed_transaction].share,
@@ -32,12 +33,13 @@ class Services::AtCardTransactionService
     }
   end
 
-  def update(account_id, transaction_id, category_id, used_location, is_shared, group_id)
+  def update(account_id, transaction_id, category_id, used_location, memo, is_shared, group_id)
     distributed = get_distributed_transaction(account_id, transaction_id)
     return {} if distributed.blank?
 
     distributed[:user_distributed_transaction].at_transaction_category_id = category_id
     distributed[:user_distributed_transaction].used_location = used_location
+    distributed[:user_distributed_transaction].memo = memo
     distributed[:user_distributed_transaction].group_id = group_id
     distributed[:user_distributed_transaction].share = is_shared
     distributed[:user_distributed_transaction].save!

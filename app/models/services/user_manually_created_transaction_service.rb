@@ -15,6 +15,7 @@ class Services::UserManuallyCreatedTransactionService
         at_user_emoney_transaction_id: nil,
         user_manually_created_transaction_id: @transaction.id,
         used_location: @transaction.used_location,
+        memo: @transaction.memo,
         amount: @transaction.amount,
         at_transaction_category_id:  @transaction.at_transaction_category_id
     )
@@ -33,6 +34,7 @@ class Services::UserManuallyCreatedTransactionService
             at_user_emoney_transaction_id: nil,
             user_manually_created_transaction_id: @transaction.id,
             used_location: @transaction.used_location,
+            memo: @transaction.memo,
             amount: @transaction.amount,
             at_transaction_category_id:  @transaction.at_transaction_category_id
         }
