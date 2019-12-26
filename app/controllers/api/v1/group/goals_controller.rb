@@ -71,8 +71,8 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_setting_ids && return
     end
 
-    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
-    render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if goal.blank?
+    before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if before_goal.blank?
     goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
     partner_goal_setting = Entities::GoalSetting.find_by(id: params[:partner_goal_settings][:goal_setting_id])
 
@@ -85,7 +85,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     begin
       ActiveRecord::Base.transaction do
-        over_current_amount = over_current_amount?(goal)
+        goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
         partner_goal_setting.update!(get_partner_goal_setting_params)
@@ -94,7 +94,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
         end
-        create_goal_finished_activity(options) if over_current_amount && over_goal_amount?(goal)
+        create_goal_finished_activity(options) if over_current_amount?(before_goal) && over_goal_amount?(goal)
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
