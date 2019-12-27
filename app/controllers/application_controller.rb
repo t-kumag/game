@@ -376,12 +376,12 @@ class ApplicationController < ActionController::Base
     render json: { errors: { code: '', message: "Require group." } }, status: 422 unless @current_user.group_id.present?
   end
 
-  def render_disallowed_account_ids
-    render json: { errors: { code: '003002', message: "Disallowed account id." } }, status: 422
-  end
-
   def render_disallowed_financier_ids
     render json: { errors: { code: '003001', message: "Disallowed financier id." } }, status: 422
+  end
+
+  def render_disallowed_account_ids
+    render json: { errors: { code: '003002', message: "Disallowed account id." } }, status: 422
   end
 
   def render_disallowed_transaction_ids
