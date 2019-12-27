@@ -6,18 +6,6 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
-# TODO
-Entities::User.create(email: 'test01@example.com', password_digest: 'test01', token: 'xxxxxxxxxxx01', token_expires_at: '2019-06-01 12:00:00')
-Entities::User.create(email: 'test02@example.com', password_digest: 'test02', token: 'xxxxxxxxxxx02', token_expires_at: '2019-06-01 12:00:00')
-Entities::User.create(email: 'test03@example.com', password_digest: 'test03', token: 'xxxxxxxxxxx03', token_expires_at: '2019-06-01 12:00:00')
-Entities::User.create(email: 'test04@example.com', password_digest: 'test04', token: 'xxxxxxxxxxx04', token_expires_at: '2019-06-01 12:00:00')
-Entities::User.create(email: 'test88@example.com', password_digest: 'test88', token: 'qxxxxxxxxxx88', token_expires_at: '2019-06-01 12:00:00')
-
-
-# payment_method
-Entities::PaymentMethod.create(name: '口座')
-Entities::PaymentMethod.create(name: 'クレジットカード')
-
 # BudgetQuestion
 10.times do
   Entities::BudgetQuestion.create
@@ -34,25 +22,25 @@ Entities::GoalType.create(id:7, name: '車/バイク', img_url: "/goal_types/7/b
 Entities::GoalType.create(id:8, name: 'その他', img_url: "/goal_types/8/bg-card-goal-uncategory.png")
 
 # at_groupted_category
-Entities::AtGroupedCategory.create(id:1, category_name: '未分類')
-Entities::AtGroupedCategory.create(id:2, category_name: '食費')
-Entities::AtGroupedCategory.create(id:3, category_name: '交際')
-Entities::AtGroupedCategory.create(id:4, category_name: '日用品')
-Entities::AtGroupedCategory.create(id:5, category_name: '医療')
-Entities::AtGroupedCategory.create(id:6, category_name: '趣味・娯楽')
-Entities::AtGroupedCategory.create(id:7, category_name: '交通')
-Entities::AtGroupedCategory.create(id:8, category_name: '教育')
-Entities::AtGroupedCategory.create(id:9, category_name: '住宅・オフィス')
-Entities::AtGroupedCategory.create(id:10, category_name: '通信費・送料')
-Entities::AtGroupedCategory.create(id:11, category_name: '車')
-Entities::AtGroupedCategory.create(id:12, category_name: '年金・保険料')
-Entities::AtGroupedCategory.create(id:13, category_name: '水道光熱')
-Entities::AtGroupedCategory.create(id:14, category_name: '税金')
-Entities::AtGroupedCategory.create(id:15, category_name: '投資')
-Entities::AtGroupedCategory.create(id:16, category_name: '返済')
-Entities::AtGroupedCategory.create(id:17, category_name: '入金')
-Entities::AtGroupedCategory.create(id:18, category_name: '出金')
-Entities::AtGroupedCategory.create(id:19, category_name: '手数料')
+Entities::AtGroupedCategory.create(id:1, category_name: '未分類', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:2, category_name: '食費', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:3, category_name: '交際', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:4, category_name: '日用品', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:5, category_name: '医療', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:6, category_name: '趣味・娯楽', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:7, category_name: '交通', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:8, category_name: '教育', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:9, category_name: '住宅・オフィス', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:10, category_name: '通信費・送料', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:11, category_name: '車', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:12, category_name: '年金・保険料', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:13, category_name: '水道光熱', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:14, category_name: '税金', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:15, category_name: '投資', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:16, category_name: '返済', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:17, category_name: '入金', category_type: 'income')
+Entities::AtGroupedCategory.create(id:18, category_name: '出金', category_type: 'expence')
+Entities::AtGroupedCategory.create(id:19, category_name: '手数料', category_type: 'expence')
 
 
 # at_transaction_category

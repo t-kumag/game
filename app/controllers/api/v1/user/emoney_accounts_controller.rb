@@ -51,6 +51,10 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
         require_group && return if params[:share] == true
         account = Entities::AtUserEmoneyServiceAccount.find account_id
         account.update!(get_account_params)
+        if account.share
+          Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
+          Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner)
+        end
         render json: {}, status: 200
       else
         render json: { errors: { code: '', mesasge: "account not found." } }, status: 200
@@ -66,9 +70,9 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
 
     def destroy
       account_id = params[:id].to_i
-      if disallowed_at_emoney_ids?([account_id])
-        render_disallowed_financier_ids && return
-      end
+
+      render_disallowed_account_ids && return if disallowed_at_emoney_account_ids?([account_id])
+      render_disallowed_financier_ids && return if disallowed_at_emoney_ids?([account_id])
 
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)
         Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, [account_id])

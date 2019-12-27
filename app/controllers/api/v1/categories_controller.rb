@@ -2,10 +2,9 @@ class Api::V1::CategoriesController < ApplicationController
   before_action :authenticate
 
   def index
-    @categories_all = Entities::AtGroupedCategory.all
-    @responses = []
 
-    @categories_all.each do |ca|
+    @responses = []
+    grouped_categories.each do |ca|
 
       transaction_categories = []
       ca.at_transaction_categories.each do |atc|
@@ -25,4 +24,18 @@ class Api::V1::CategoriesController < ApplicationController
     render 'index', formats: 'json', handlers: 'jbuilder'
 
   end
+
+  private
+
+  def grouped_categories
+    if params[:type] === 'income'
+      c = Entities::AtGroupedCategory.where(category_type: 'income')
+    elsif params[:type] === 'expense'
+      c = Entities::AtGroupedCategory.where(category_type: 'expense')
+    else
+      c = Entities::AtGroupedCategory.all
+    end
+    c
+  end
+
 end

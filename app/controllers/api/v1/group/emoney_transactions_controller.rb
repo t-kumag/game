@@ -40,6 +40,7 @@ class Api::V1::Group::EmoneyTransactionsController < ApplicationController
         transaction_id,
         params[:at_transaction_category_id],
         params[:used_location],
+        params[:memo],
         params[:share],
         params[:share] ? @current_user.group_id : nil
     )

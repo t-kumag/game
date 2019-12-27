@@ -8,7 +8,7 @@ namespace :balance_log do
   task insert_monthly_amount: :environment do
     Rails.logger.info("start balance_log::insert_monthly_amount ===============")
 
-    last_date_of_current_month = Time.zone.today.end_of_month.end_of_month
+    last_date_of_current_month = Time.zone.today.end_of_month.end_of_day
 
     Entities::AtUser.find_each do |a|
       bank_amounts = a.try(:at_user_bank_accounts).map do |b|

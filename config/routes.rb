@@ -95,6 +95,7 @@ Rails.application.routes.draw do
         get 'goal-graph/:id', :to => 'goals#graph'
 
         get 'profiles', :to => 'profiles#show'
+        resources :user_manually_created_transactions, path: '/user-manually-created-transactions', only: [:index]
       end
 
       resources :pairing_requests, :path => '/pairing-requests', :only => [] do
@@ -122,9 +123,18 @@ Rails.application.routes.draw do
       post 'user/resend', to: 'users#resend'
 
       resources :budget_questions, path: '/budget-questions', only: [:create]
+
+      if Rails.env.development?
+        get 'sample1/report', to: 'sample1#report'
+      end
     end
 
     namespace :v2 do
+      resources :activities, :path => '/activities', :only => [:index] do
+      end
+
+      get 'user/status', :to => 'users#status'
+
       # 個人用
       namespace :user do
         resources :bank_accounts, path: '/bank-accounts' do
@@ -141,6 +151,14 @@ Rails.application.routes.draw do
           resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
+
+        resources :wallets, path: '/wallets' do
+          resources :wallet_transactions, path: '/transactions', on: :member, only: [:index, :show]
+        end
+
+        put 'pl-settings', :to => 'pl_settings#update'
+        get 'pl-settings', :to => 'pl_settings#show'
+
       end
 
       # 共有用
@@ -159,7 +177,13 @@ Rails.application.routes.draw do
           resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
+
+        resources :wallets, path: '/wallets' do
+          resources :wallet_transactions, path: '/transactions', on: :member, only: [:index, :show]
+        end
       end
+
+      resources :payment_methods, path: '/payment_methods', only: [:index]
     end
   end
 end

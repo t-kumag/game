@@ -11,6 +11,7 @@ json.app do
     json.amount r[:amount]
     json.used_date r[:used_date].strftime('%Y-%m-%d %H:%M:%S')
     json.used_location r[:used_location]
+    json.memo r[:memo]
     json.type r[:type]
     json.is_shared r[:is_shared]
     json.is_account_shared r[:is_account_shared]

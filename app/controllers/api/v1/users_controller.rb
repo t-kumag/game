@@ -92,18 +92,13 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_url
-    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
-    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
-    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
-    account_limit = check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
-
     finance = Services::FinanceService.new(@current_user).find_finance(:fnc_id, params[:fnc_id]) if params.has_key?(:fnc_id)
     skip_account_limit = check_finance_error(finance)
 
     # 無料ユーザーの口座数が上限に達していた場合はエラーを返し口座数を制限する
     # AT口座のエラー解消の場合は口座数の制限はスキップする
-    if account_limit == false && skip_account_limit == false
-        return render json: { errors: { code: '', message: "five account limit of free users" } }, status: 422
+    if limit_of_registered_finance? == false && skip_account_limit == false
+        return render json: { errors: { code: '007002', message: "five account limit of free users" } }, status: 422
     end
 
     @response = Services::AtUserService.new(@current_user).at_url
@@ -111,25 +106,29 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_sync
-    # ATユーザーが作成されていなければスキップする
-    return render json: {}, status: 200 unless @current_user.try(:at_user)
+    begin
+      # ATユーザーが作成されていなければスキップする
+      return render json: {}, status: 200 unless @current_user.try(:at_user)
 
-    if params[:only_accounts] == "true"
-      Services::AtUserService::Sync.new(@current_user).sync_accounts
-      return render json: {}, status: 200
+      if params[:only_accounts] == "true"
+        Services::AtUserService::Sync.new(@current_user, params[:fnc_type]).sync_accounts
+        return render json: {}, status: 200
+      end
+
+      at_user_service = Services::AtUserService.new(@current_user, params[:fnc_type])
+      # TODO ATのAPI一本化の対応
+      # 口座登録が正常に行われているものはスクレイピング必要ないためコメント
+      # リアルタイムで明細を取得したい場合に必要となるため、のちの課金対応で修正する
+      # http://redmine.369webcash.com/issues/2916
+      # at_user_service.exec_scraping
+
+      at_user_service.sync_at_user_finance
+      at_user_service.sync_user_distributed_transaction
+    rescue => e
+      SlackNotifier.ping("ERROR Api::V1::UsersController#at_sync")
+      SlackNotifier.ping(e)
+      logger.error(e.backtrace)
     end
-
-    at_user_service = Services::AtUserService.new(@current_user, params[:target])
-    # TODO ATのAPI一本化の対応
-    # 口座登録が正常に行われているものはスクレイピング必要ないためコメント
-    # リアルタイムで明細を取得したい場合に必要となるため、のちの課金対応で修正する
-    # http://redmine.369webcash.com/issues/2916
-    # at_user_service.exec_scraping
-
-    at_user_service.sync
-
-    puts 'user_distributed_transactions sync=========='
-    Services::UserDistributedTransactionService.new(@current_user, params[:target]).sync
 
     render json: {}, status: 200
   end
@@ -227,22 +226,6 @@ class Api::V1::UsersController < ApplicationController
       Services::AtUserService.new(@current_user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_ids)
     end
 
-  end
-
-  def check_at_user_limit_of_free_account(at_user_bank_account_ids, at_user_card_account_ids, at_user_emoney_service_account_ids)
-    number_of_account =  0
-    if at_user_bank_account_ids.present?
-      number_of_account += at_user_bank_account_ids.count
-    end
-
-    if at_user_card_account_ids.present?
-      number_of_account += at_user_card_account_ids.count
-    end
-
-    if at_user_emoney_service_account_ids.present?
-      number_of_account += at_user_emoney_service_account_ids.count
-    end
-    @current_user.free? && number_of_account < Settings.at_user_limit_free_account
   end
 
   def register_cancel_reasons(cancel_checklists, cancel_reason)

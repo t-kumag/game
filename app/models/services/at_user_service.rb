@@ -2,9 +2,9 @@ require 'nkf'
 
 class Services::AtUserService
 
-  def initialize(user, target = 'all')
+  def initialize(user, fnc_type = 'all')
     @user = user
-    @target = target.blank? ? 'all' : target
+    @fnc_type = fnc_type.blank? ? 'all' : fnc_type
     @today = Date.today
     # tokenは毎回更新する 有効期限は15分
     token
@@ -79,8 +79,14 @@ class Services::AtUserService
 
   end
 
-  def sync
+  def sync_at_user_finance
+    puts 'sync_at_user_finance=========='
     Services::AtUserService::Sync.new(@user).sync
+  end
+
+  def sync_user_distributed_transaction
+    puts 'sync_user_distributed_transaction=========='
+    Services::UserDistributedTransactionService.new(@user, @fnc_type).sync
   end
 
   # トークンを取得、叩くごとにtokenが更新される
@@ -286,7 +292,6 @@ class Services::AtUserService
     Services::AtUserService::Sync.new(@user).sync_accounts
 
     puts "scraping=========="
-    puts @target
 
     begin
       puts "scraping==========1"
@@ -320,10 +325,7 @@ class Services::AtUserService
 
       # 口座が以上終了している場合にscrapingをskipする
       skip_ids = []
-      reset_all_account_error
       skip_ids = get_skip_fnc_ids
-
-
       fnc_ids.each do |fnc_id|
 
         if skip_ids.include?(fnc_id)
@@ -350,19 +352,6 @@ class Services::AtUserService
       p "exception===================="
       p exception
     end
-
-
-
-    # api_name = "/openscher002.jct"
-    # params = {
-    #   "TOKEN_KEY" => token,
-    #   "FNC_ID" => fnc_id,
-    #   "START_DATE" => start_date,
-    #   "END_DATE" => end_date,
-    # }
-    # res = AtAPIClient.new(api_name, params).get
-
-    # return {token: res["TOKEN_KEY"], expire_date: res["EXPI_DT"]}
   end
 
   # at_scraping_logsを確認しscraping指示をskipする
@@ -370,14 +359,4 @@ class Services::AtUserService
   def skip_scraping(accounts)
     accounts.reject{ |account| account.at_scraping_logs.find_by("created_at > #{@today}").present? }
   end
-
-  # ## openuserr003
-  # ## トークン及びユーザーIDから、ユーザーの状態を照会します
-  # https://atdev.369webcash.com/openuserr003.jct?CHNL_ID=CHNL_OSIDORI&USER_ID=osdr_dev_0001
-  # {"RSLT_CD":"00000000","STATUS":"0","COMMON_HEAD":{"MESSAGE":"","CODE":"","ERROR":false},"RSLT_MSG":"","REGR_DTM":"20180822123504"}
-
-  # ## openlistr001
-  # ## トークンから口座管理及びスクレイピング実行画面を呼び出します
-  # https://atdev.369webcash.com/openlistr001.act?CHNL_ID=CHNL_OSIDORI&TOKEN_KEY=Y+3NCJ8PcCaRljYEi4EXMrlJLwei2JdTjgqyRt1JvFU=
-
 end

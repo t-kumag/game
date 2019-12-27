@@ -108,13 +108,9 @@ module AtAPIRequest
       def initialize(params)
         @path = "/openfincr003.jct"
         @method = HttpMethod::GET
-
-        # 金融機関区分	FNC_TYPE	半角英	2 			"未入力時 AL 処理
-        # AL : 全て, JD : 電子マネー"
-        # fnc_type = params[:fnc_type] if params.has_key?(:fnc_type) || !params[:fnc_type].blank?
         @params = {
-          "TOKEN_KEY" => params[:token], 
-          # "FNC_TYPE" => fnc_type,
+          "TOKEN_KEY" => params[:token],
+          "FNC_TYPE"  => params[:fnc_type]
         }
       end
     end

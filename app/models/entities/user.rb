@@ -15,8 +15,8 @@
 class Entities::User < ApplicationRecord
   acts_as_paranoid
   has_one :at_user, dependent: :destroy
-
   has_one :user_icon
+  has_one :user_pl_setting
   has_many :access_grants, class_name: 'Doorkeeper::AccessGrant',
                            foreign_key: :resource_owner_id,
                            dependent: :delete_all # or :destroy if you need callbacks
@@ -26,6 +26,7 @@ class Entities::User < ApplicationRecord
   has_one :participate_group
   has_one :group, through: :participate_group
   has_one :user_profile
+  has_many :wallets
   has_secure_password validations: true
 
   # email はメールアドレスとしての整合性と、仕様上の最大長をチェックする
@@ -43,7 +44,11 @@ class Entities::User < ApplicationRecord
   enum rank: { free: 0, premium: 1 }
 
   def reset_token
-    self.token = generate_token
+    token = generate_token
+    if token.blank?
+      raise StandardError, 'Empty token.'
+    end
+    self.token = token
     self.token_expires_at = DateTime.now + 30
   end
 
@@ -66,10 +71,12 @@ class Entities::User < ApplicationRecord
   end
 
   def generate_token
-    # TODO　envなどから参照する
-    salt = 'sjdhp2wys5ga4a2ks'
-    time = DateTime.now
-    Digest::SHA256.hexdigest(id.to_s + time.to_s + salt)
+      salt = SecureRandom.hex(16)
+      token = Digest::SHA256.hexdigest(id.to_s + email + salt)
+      if Entities::User.find_by(token: token).present?
+        raise StandardError, 'Duplicate token.'
+      end
+      token
   end
 
   delegate :group_id, to: :participate_group, allow_nil: true

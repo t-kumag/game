@@ -23,10 +23,10 @@ if [ "${TARGET}" = "rails" ]; then
   REPOSITORY=osidori/osidori-api
   DOCKER_FILE=rails.Dockerfile 
 elif [ "${TARGET}" = "worker" ]; then
-  REPOSITORY=osidori/batch-acmm
+  REPOSITORY=osidori/osidori-sidekiq
   DOCKER_FILE=worker.Dockerfile 
 elif [ "${TARGET}" = "batch" ]; then
-  REPOSITORY=osidori/osidori-sidekiq
+  REPOSITORY=osidori/batch-acmm
   DOCKER_FILE=batch.Dockerfile 
 else
   echo "Usage: $0 [develop|staging|production] [rails|worker|batch]"

@@ -50,6 +50,7 @@ class Services::TransactionService
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
+        memo: t.memo,
         transaction_id: t.at_user_bank_transaction_id || t.at_user_card_transaction_id || t.at_user_emoney_transaction_id || t.user_manually_created_transaction_id,
         type: type(t)
       }
