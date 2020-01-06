@@ -29,7 +29,7 @@ class Api::V1::Group::BsController < ApplicationController
       emoney_amount = share_on_emoney_accounts.sum{|i| i.balance}
     end
 
-    wallets =  Entities::Wallet.where(user_id: @current_user.group_id).where(share: true)
+    wallets =  Entities::Wallet.where(group_id: @current_user.group_id).where(share: true)
     if wallets.present?
       wallet_amount = wallets.sum{|i| i.balance}
     end
