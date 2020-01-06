@@ -4,7 +4,7 @@ FactoryBot.define do
     to_user_id       { nil }
     group_id         { nil }
     token            { "test" }
-    token_expires_at { "2019/12/31 23:59:59" }
+    token_expires_at { "2100/01/01 23:59:59" }
     status           { 0 }
   end
 end
