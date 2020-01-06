@@ -15,7 +15,7 @@ class Api::V1::Group::GoalSettingsController < ApplicationController
     end
 
     if Entities::Goal.find(params[:goal_id]).blank?
-      render json: { errors: { code: '', mesasge: "goal not found." } }, status: 422
+      render json: { errors: { code: '005004', mesasge: "Goal not found." } }, status: 422
     end
     if get_goal_setting_params[:at_user_bank_account_id].present? &&
         disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id].to_i], true)
@@ -38,7 +38,7 @@ class Api::V1::Group::GoalSettingsController < ApplicationController
     end
 
     if Entities::Goal.find(params[:goal_id]).blank?
-      render json: { errors: { code: '', mesasge: "goal not found." } }, status: 422
+      render json: { errors: { code: '005004', mesasge: "Goal not found." } }, status: 422
     end
     p get_goal_setting_params[:at_user_bank_account_id]
     if disallowed_at_bank_ids?([get_goal_setting_params[:at_user_bank_account_id].to_i], true)
@@ -47,7 +47,7 @@ class Api::V1::Group::GoalSettingsController < ApplicationController
 
     goal_setting = Entities::GoalSetting.find(params[:id])
     if goal_setting.blank?
-      render json: { errors: { code: '', mesasge: "goal_setting not found." } }, status: 422
+      render json: { errors: { code: '005005', mesasge: "goal_setting not found." } }, status: 422
     end
 
     begin
