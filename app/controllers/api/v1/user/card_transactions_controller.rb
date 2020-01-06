@@ -45,6 +45,7 @@ class Api::V1::User::CardTransactionsController < ApplicationController
         card_account_transaction_param[:used_location],
         card_account_transaction_param[:memo],
         card_account_transaction_param[:share],
+        card_account_transaction_param[:ignore],
         card_account_transaction_param[:group_id],
     )
 

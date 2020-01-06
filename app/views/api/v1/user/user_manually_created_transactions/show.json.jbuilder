@@ -15,4 +15,5 @@ json.app do
   json.payment_method_id @response.payment_method_id
   json.payment_method_type @response.payment_method_type
   json.memo @response.memo
+  json.is_ignored @response.ignore
 end

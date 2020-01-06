@@ -33,7 +33,7 @@ class Services::AtCardTransactionService
     }
   end
 
-  def update(account_id, transaction_id, category_id, used_location, memo, is_shared, group_id)
+  def update(account_id, transaction_id, category_id, used_location, memo, is_shared, is_ignored, group_id)
     distributed = get_distributed_transaction(account_id, transaction_id)
     return {} if distributed.blank?
 
@@ -42,6 +42,7 @@ class Services::AtCardTransactionService
     distributed[:user_distributed_transaction].memo = memo
     distributed[:user_distributed_transaction].group_id = group_id
     distributed[:user_distributed_transaction].share = is_shared
+    distributed[:user_distributed_transaction].ignore = is_ignored
     distributed[:user_distributed_transaction].save!
     distributed
   end

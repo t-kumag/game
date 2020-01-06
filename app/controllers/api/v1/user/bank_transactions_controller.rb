@@ -45,6 +45,7 @@ class Api::V1::User::BankTransactionsController < ApplicationController
         bank_account_transaction_param[:used_location],
         bank_account_transaction_param[:memo],
         bank_account_transaction_param[:share],
+        bank_account_transaction_param[:ignore],
         bank_account_transaction_param[:group_id],
     )
 

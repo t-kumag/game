@@ -101,6 +101,8 @@ class Services::PlService
       AND
         #{sql_shared("auca", share)}
       AND
+        udt.ignore = 1
+      AND
         atc.at_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
@@ -148,6 +150,8 @@ class Services::PlService
       AND
         #{sql_shared("auea", share)}
       AND
+        udt.ignore = 1
+      AND
         atc.at_category_id not in (#{ignore_at_category_ids.join(',')})
       AND
         udt.used_date >= "#{from}"
@@ -188,6 +192,8 @@ class Services::PlService
         udt.user_id in (#{user_ids.join(',')})
       AND
         udt.share in (#{share.join(',')})
+      AND
+        udt.ignore = 1
       AND
         udt.used_date >= "#{from}"
       AND

@@ -43,6 +43,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
         emoney_account_transaction_param[:used_location],
         emoney_account_transaction_param[:memo],
         emoney_account_transaction_param[:share],
+        emoney_account_transaction_param[:ignore],
         emoney_account_transaction_param[:group_id],
     )
 

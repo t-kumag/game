@@ -10,5 +10,6 @@ json.app do
   json.category_name2 @response[:category_name2]
   json.payment_name @response[:payment_name]
   json.transaction_id @response[:transaction_id]
+  json.is_ignored @response[:ignore]
 end
 
