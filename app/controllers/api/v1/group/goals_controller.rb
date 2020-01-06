@@ -15,7 +15,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
-    render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @response.blank?
+    render(json: { errors: { code: '005001', mesasge: "Record not found." } }, status: 422) and return if @response.blank?
 
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
@@ -153,7 +153,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id) unless goal_setting.present?
 
     if user_banks.blank? || before_goal.blank? || goal_setting.blank?
-      render json: {errors: {code:"005006", message:"user not found or goal not found" } }, status: 422 and return
+      render json: {errors: {code: '005006', message: "user not found or goal not found" } }, status: 422 and return
     end
     
     goal_service = Services::GoalService.new(@current_user)
