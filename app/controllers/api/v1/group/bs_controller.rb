@@ -4,6 +4,7 @@ class Api::V1::Group::BsController < ApplicationController
   def summary
     bank_amount = 0
     emoney_amount = 0
+    wallet_amount = 0
     share_off_goal_amount = 0
     share_on_goal_amount = 0
 
@@ -28,8 +29,13 @@ class Api::V1::Group::BsController < ApplicationController
       emoney_amount = share_on_emoney_accounts.sum{|i| i.balance}
     end
 
+    wallets =  Entities::Wallet.where(user_id: @current_user.group_id).where(share: true)
+    if wallets.present?
+      wallet_amount = wallets.sum{|i| i.balance}
+    end
+
     @response = {
-        amount: bank_amount + emoney_amount
+        amount: bank_amount + emoney_amount + wallet_amount
         # TODO: 目標一覧を口座取引に表示するまで目標金額はBSに含めない
         # amount: bank_amount + emoney_amount + share_off_goal_amount - share_on_goal_amount
     }
