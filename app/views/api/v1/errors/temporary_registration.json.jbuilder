@@ -1,5 +1,5 @@
 json.errors do
-  json.code ""
+  json.code "001001"
   json.message "account status is temporary registration."
 end
 

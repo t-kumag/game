@@ -64,7 +64,7 @@ class Api::V1::UsersController < ApplicationController
 
       render json: {}, status: 200
     else
-      render json: { errors: { code: '', message: "email not found." } }, status: 422
+      render json: { errors: { code: '001002', message: "email not found." } }, status: 422
     end
   end
 
@@ -87,7 +87,7 @@ class Api::V1::UsersController < ApplicationController
       current_user.save!
       render json: {}, status: 200
     else
-      render json: { errors: { code: '', message: "user not found or invalid token." } }, status: 422
+      render json: { errors: { code: '001003', message: "user not found or invalid token." } }, status: 422
     end
   end
 
