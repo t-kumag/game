@@ -18,7 +18,7 @@ FactoryBot.define do
     token               { |n| "test#{n}" } # ベアラートークン
     password_digest     { "testtest" }
     email_authenticated { 1 } # メール認証
-    token_expires_at    { "2020/01/01 00:00:00" }
+    token_expires_at    { "2100/01/01 00:00:00" }
     rank                { 0 } # 有料会員
     deleted_at          { nil }
 
