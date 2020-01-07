@@ -42,6 +42,7 @@ class Api::V1::Group::EmoneyTransactionsController < ApplicationController
         params[:used_location],
         params[:memo],
         params[:share],
+        params[:ignore],
         params[:share] ? @current_user.group_id : nil
     )
     render json: {}, status: 200 and return if @response.blank?
