@@ -54,8 +54,9 @@ class Api::V1::User::BankAccountsController < ApplicationController
       account = Entities::AtUserBankAccount.find account_id
       account.update!(get_account_params)
       if account.share
-        Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
-        Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner)
+        options = create_activity_options("familly")
+        Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly, options)
+        Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner, options)
       end
 
       render json: {}, status: 200
@@ -82,6 +83,16 @@ class Api::V1::User::BankAccountsController < ApplicationController
       Services::AtUserService.new(@current_user).delete_account(Entities::AtUserBankAccount, [account_id])
     end
     render json: {}, status: 200
+  end
+
+  private
+  def create_activity_options(account)
+    options = {}
+    options[:goal] = nil
+    options[:transaction] = nil
+    options[:transactions] = nil
+    options[:account] = account
+    options
   end
 end
 
