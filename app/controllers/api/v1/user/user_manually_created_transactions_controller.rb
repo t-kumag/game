@@ -24,6 +24,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         else
           options = {transaction: nil}
         end
+        options[:ignore] = params.has_key?(:ignore) ? params[:ignore] : false
 
         # 口座が財布の場合は残高を計算する
         if params[:payment_method_type] == "wallet"
@@ -57,6 +58,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         else
           options = {}
         end
+        options[:ignore] = params.has_key?(:ignore) ? params[:ignore] : false
 
         # 口座が財布の場合は残高を計算する
         if params[:payment_method_type] == "wallet"
@@ -123,8 +125,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :title,
       :amount,
       :used_location,
-      :memo,
-      :ignore
+      :memo
     ).merge(
       user_id: @current_user.id
     )
@@ -143,8 +144,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :title,
       :amount,
       :used_location,
-      :memo,
-      :ignore
+      :memo
     )
 
     transaction.update!(update_param(save_params, transaction))
@@ -162,7 +162,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     amount = save_param[:amount].present? ? save_param[:amount] : transaction[:amount]
     used_location = save_param[:used_location].present? ? save_param[:used_location] : transaction[:used_location]
     memo = save_param[:memo].present? ? save_param[:memo] : transaction[:memo]
-    ignore = save_param[:ignore].present? ? save_param[:ignore] : transaction[:ignore]
 
     {
         at_transaction_category_id: at_transaction_category_id,
@@ -172,8 +171,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         title: title,
         amount: amount,
         used_location: used_location,
-        memo: memo,
-        ignore: ignore,
+        memo: memo
     }
   end
 
