@@ -459,7 +459,7 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
     t.text "memo"
     t.bigint "amount", default: 0, null: false
     t.bigint "at_transaction_category_id"
-    t.boolean "ignore", default: false
+    t.boolean "ignore", default: false, null: false
     t.index ["at_transaction_category_id"], name: "index_u_d_t_on_at_transaction_category_id"
     t.index ["at_user_bank_transaction_id"], name: "index_u_d_t_on_at_user_bank_transaction_id"
     t.index ["at_user_card_transaction_id"], name: "index_u_d_t_on_at_user_card_transaction_id"

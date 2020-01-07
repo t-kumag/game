@@ -67,6 +67,7 @@ class Api::V1::User::BankTransactionsController < ApplicationController
     used_location = params[:used_location].present? ? params[:used_location] : exist_transaction[:used_location]
     memo = params[:memo].present? ? params[:memo] : exist_transaction[:memo]
     share = params[:share].present? ? params[:share] : false
+    ignore = params[:ignore].present? ? params[:ignore] : false
 
     {
         bank_account_id: params[:bank_account_id],
@@ -75,6 +76,7 @@ class Api::V1::User::BankTransactionsController < ApplicationController
         used_location: used_location,
         memo: memo,
         share: share,
+        ignore: ignore,
         group_id: share ? @current_user.group_id : nil
     }
   end
