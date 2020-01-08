@@ -133,6 +133,8 @@ Resource of Transactions
                        "used_location": "カフェベートーベンbank",
                        "type": "bank",
                        "is_shared": false,
+                       "is_ignored": false,
+                       "memo": "メモ",
                        "is_account_shared": false,
                        "transaction_id": 261,
                        "at_transaction_category_id": 30
@@ -394,6 +396,8 @@ Resource of Bank Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
+                  "memo": "メモ"",
                   "at_transaction_category_id": 1,
                   "category_name1": "未分類",
                   "category_name2": "未分類",
@@ -668,6 +672,8 @@ Resource of Card Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
+                  "memo": "メモ",
                   "at_transaction_category_id": 1,
                   "category_name1": "未分類",
                   "category_name2": "未分類",
@@ -948,6 +954,8 @@ Resource of Emoney Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
+                  "memo": "メモ",
                   "at_transaction_category_id": 30,
                   "category_name1": "日用品",
                   "category_name2": "ファッション、アクセサリー、時計",
@@ -1107,7 +1115,11 @@ Resource of User Manually Transactions
                     "title": "test",
                     "amount": 1000,
                     "is_shared": false,
+                    "is_ignored": false,
+                    "memo": "メモ",
                     "used_location": "公園"
+                    "payment_method_type": "wallet",
+                    "payment_method_id": 4
                 }
             }
 
@@ -1122,7 +1134,6 @@ Resource of User Manually Transactions
     + Body
 
             {
-                "payment_method_id": 1,
                 "at_transaction_category_id": 2,
                 "used_date":"2019-10-12",
                 "title":"コンビニ",
@@ -1131,7 +1142,9 @@ Resource of User Manually Transactions
                 "share": true,
                 "used_location":1,
                 "memo": "明細メモ",
-                "ignore": false
+                "ignore": false,
+                "payment_method_type": "wallet",
+                "payment_method_id": 4,
             }
 
 + Response 200 (application/json)
@@ -1158,7 +1171,6 @@ Resource of User Manually Transactions
     + Body
 
             {
-                "payment_method_id": 1,
                 "at_transaction_category_id": 2,
                 "used_date":"2019-10-12",
                 "title":"コンビニ",
@@ -1167,7 +1179,9 @@ Resource of User Manually Transactions
                 "share": true,
                 "used_location":1,
                 "memo": "明細メモ",
-                "ignore": false
+                "ignore": false,
+                "payment_method_type": "wallet",
+                "payment_method_id": 4
             }
 
 + Response 200 (application/json)
@@ -1551,6 +1565,8 @@ Resource of Profiles
                        "used_location": "ミロクゼイリシジムシヨ",
                        "type": "bank",
                        "is_shared": true,
+                       "is_ignored": false,
+                       "memo": "メモ",
                        "is_account_shared": true,
                        "transaction_id": 225,
                        "at_transaction_category_id": 1
@@ -2219,6 +2235,7 @@ Resource of Bank Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
                   "at_transaction_category_id": 1,
                   "category_name1": "未分類",
                   "category_name2": "未分類",
@@ -2427,6 +2444,7 @@ Resource of Card Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
                   "at_transaction_category_id": 1,
                   "category_name1": "未分類",
                   "category_name2": "未分類",
@@ -2625,6 +2643,7 @@ Resource of Emoney Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
                   "at_transaction_category_id": 30,
                   "category_name1": "日用品",
                   "category_name2": "ファッション、アクセサリー、時計",

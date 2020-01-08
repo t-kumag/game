@@ -1,6 +1,93 @@
 # Group 個人機能
 /api/v2/user/*
 
+
+## 財布 [/api/v2/user/wallets]
+Resource of Bank Account
+
+### 財布取得 [GET]
+
++ Request 財布取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "wallets": [
+                  {
+                    "id": 1,
+                    "name": "お財布A",
+                    "amount": 100,
+                    "goals": [
+                      {
+                        "current_amount": 0,
+                        "name": "結婚式"
+                      }
+                    ]
+                  }
+                ]
+            }
+
+### 財布登録 [POST /api/v2/user/wallets/:id]
+
++ Request 財布登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+            {
+             "wallets": {
+               "name": "お財布A",
+               "balance": 100
+             }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+### 財布更新 [PUT /api/v2/user/wallets/:id]
+
++ Request 財布更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+            {
+             "wallets": {
+              "name":"お財布A",
+              "share": true
+             }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+### 財布削除 [DELETE /api/v2/user/wqllets/:id]
+
++ Request 財布削除 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
 ## 銀行取引明細 [/api/v2/user/bank-accounts/:bank_account_id/transactions]
 Resource of Bank Account Transactions
 
@@ -311,6 +398,58 @@ Resource of PlSetting
 
 # Group 家族機能
 /api/v2/group/*
+
+
+## 財布 [/api/v2/group/wallets]
+Resource of Bank Account
+
+### 財布取得 [GET]
+
++ Request 財布取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "wallets": [
+                  {
+                    "id": 1,
+                    "name": "お財布A",
+                    "amount": 100,
+                    "goals": [
+                      {
+                        "current_amount": 0,
+                        "name": "結婚式"
+                      }
+                    ]
+                  }
+                ]
+            }
+
+### 財布登録 [POST /api/v2/group/wallets/:id]
+
++ Request 財布登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+            {
+             "wallets”: {
+               "name": "お財布A",
+               "balance": 100
+             }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
 
 ## 銀行取引明細 [/api/v2/group/bank-accounts/:bank_account_id/transactions]
 Resource of Bank Account Transactions
