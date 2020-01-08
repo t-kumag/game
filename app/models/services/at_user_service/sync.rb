@@ -71,7 +71,9 @@ class Services::AtUserService::Sync
       account_entity.import accounts, on_duplicate_key_update: data_column.map { |k, _v| k }, validate: false
     rescue => e
       SlackNotifier.ping("ERROR Services::AtUserService::Sync#sync_account")
+      Rails.logger.error("ERROR Services::AtUserService::Sync#sync_account")
       SlackNotifier.ping(e)
+      Rails.logger.error(e)
       Rails.logger.error(e.backtrace)
     end
   end
