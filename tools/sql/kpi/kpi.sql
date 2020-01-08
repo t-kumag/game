@@ -1,4 +1,4 @@
-SELECT 
+SELECT
   u.id AS ユーザID,
 
   CASE
@@ -7,25 +7,25 @@ SELECT
   END AS ペアリングID, -- 初回のペアリングID（ペアリング解除済みを考慮しない）
 
   u.created_at AS メール登録完了日時, -- 仮登録日時
-  
+
   email_authenticated AS メアド認証, -- 本登録の有無
-  
+
   u.email AS メールアドレス,
-  
+
   CASE
     WHEN u.deleted_at IS NULL THEN 0
     ELSE 1
   END AS 退会の有無,
 
   CASE
-    WHEN gender = 0 THEN "女" 
-    WHEN gender = 1 THEN "男" 
+    WHEN gender = 0 THEN "女"
+    WHEN gender = 1 THEN "男"
     ELSE 0
   END AS 性別,
 
   COALESCE(birthday, 0) AS 生年月日,
 
-  CASE 
+  CASE
     WHEN has_child > 0 THEN 1
     ELSE 0
   END AS 子どもの有無,
@@ -35,10 +35,10 @@ SELECT
 
 
   COALESCE(max_step_teble.budget_question_id, 0) AS 診断タイプ,
-  
+
     (
     SELECT
-      CASE 
+      CASE
         WHEN q3.budget_question_id = 3 THEN
           CASE
             WHEN prev_question_id = 2 THEN "2人が一定額を出しあい、そこから支出"
@@ -63,14 +63,14 @@ SELECT
           END
         WHEN q3.budget_question_id = 4 THEN
           CASE
-            WHEN prev_question_id = 2 THEN "共用口座が無い" 
-            ELSE "スキップ" 
+            WHEN prev_question_id = 2 THEN "共用口座が無い"
+            ELSE "スキップ"
           END
         ELSE 0
       END
   ) as Q2,
-  
-  CASE 
+
+  CASE
     WHEN COALESCE(max_step_teble.budget_question_id, 0) = 5 THEN "貯金用の口座で2人で貯金"
     WHEN COALESCE(max_step_teble.budget_question_id, 0) = 6 THEN "家計用と同じ口座で2人で貯金"
     WHEN COALESCE(max_step_teble.budget_question_id, 0) = 7 THEN "それぞれが個人口座で貯金"
@@ -179,173 +179,85 @@ SELECT
 
 
 
-  CASE 
+  CASE
     WHEN pg.group_id IS NULL THEN 0
     ELSE 1
   END AS ペアリング有無, -- ペアリング解除済みの場合でもペアリング有（ペアリング解除済みを考慮しない）
 
-  CASE 
+  CASE
     WHEN pg.group_id IS NULL THEN 0
     ELSE 1
   END AS ペアリングの有無（夫婦）,
 
-  CASE 
-    WHEN pg.user_id IS NULL THEN 0 
-    ELSE pg.created_at 
+  CASE
+    WHEN pg.user_id IS NULL THEN 0
+    ELSE pg.created_at
   END AS ペアリング完了日時, -- 初回のぺアリング完了日時（ペアリング解除済みを考慮しない）
 
-  CASE 
-    WHEN 
-    COALESCE((
-      SELECT
-        MIN(updated_at)
-      FROM
-        pairing_requests
-      WHERE
-        group_id IS NOT NULL
-      AND
-        from_user_id = u.id
-      GROUP BY
-        from_user_id
-    ), NOW()) 
-      <
-    COALESCE((
-      SELECT
-        MIN(updated_at)
-      FROM
-        pairing_requests
-      WHERE
-        group_id IS NOT NULL
-      AND
-        to_user_id = u.id
-      GROUP BY
-        to_user_id
-    ), NOW()) THEN 1 
-    ELSE 0
-  END AS ペアリング招待者,
-
-  CASE 
-    WHEN 
-    COALESCE((
-      SELECT
-        MIN(updated_at)
-      FROM
-        pairing_requests
-      WHERE
-        group_id IS NOT NULL
-      AND
-        from_user_id = u.id
-      GROUP BY
-        from_user_id
-    ), NOW())
-      >
-    COALESCE((
-      SELECT
-        MIN(updated_at)
-      FROM
-        pairing_requests
-      WHERE
-        group_id IS NOT NULL
-      AND
-        to_user_id = u.id
-      GROUP BY
-        to_user_id
-    ), NOW()) THEN 1 
-    ELSE 0
-  END AS ペアリング被招待者,
+  CASE
+  	WHEN EXISTS
+  	  (
+ 		SELECT
+			*
+  		FROM
+  			pairing_requests pr
+  		WHERE
+  			pr.group_id = pg.group_id
+  			AND pr.from_user_id = u.id
+  	  ) THEN 1
+  	  ELSE 0
+	END AS ペアリング招待者,
 
   CASE
-  WHEN EXISTS
-    (
-      SELECT
-        *
-      FROM
-        at_user_bank_accounts auba
-      WHERE
-        auba.at_user_id in (au.id, 
-          (
-            SELECT
-              tmp1.id
-            FROM
-              at_users tmp1
-            WHERE
-              tmp1.user_id = 
-              (
-                SELECT
-                  tmp2.user_id
-                FROM
-                  participate_groups tmp2
-                WHERE
-                  tmp2.group_id = pg.group_id
-                AND
-                  tmp2.user_id != u.id
-              )
-          )
-        )
-      AND
-        share = 1
-      UNION
-        SELECT
-          *
-        FROM
-          at_user_card_accounts auca
-        WHERE
-          auca.at_user_id in (au.id, 
-            (
-              SELECT
-                tmp1.id
-              FROM
-                at_users tmp1
-              WHERE
-                tmp1.user_id = 
-                (
-                  SELECT
-                    tmp2.user_id
-                  FROM
-                    participate_groups tmp2
-                  WHERE
-                    tmp2.group_id = pg.group_id
-                  AND
-                    tmp2.user_id != u.id
-                )
-            )
-          )
-        AND
-          share = 1
-        UNION
-          SELECT
-            *
-          FROM
-            at_user_emoney_service_accounts auea
-          WHERE
-            auea.at_user_id in (au.id, 
-              (
-                SELECT
-                  tmp1.id
-                FROM
-                  at_users tmp1
-                WHERE
-                  tmp1.user_id = 
-                  (
-                    SELECT
-                      tmp2.user_id
-                    FROM
-                      participate_groups tmp2
-                    WHERE
-                      tmp2.group_id = pg.group_id
-                    AND
-                      tmp2.user_id != u.id
-                  )
-              )
-            )
-          AND
-            share = 1
+  	WHEN EXISTS
+  	  (
+ 		SELECT
+			*
+  		FROM
+  			pairing_requests pr
+  		WHERE
+  			pr.group_id = pg.group_id
+  			AND pr.to_user_id = u.id
+  	  ) THEN 1
+  	  ELSE 0
+	END AS ペアリング被招待者,
+
+  CASE
+    WHEN EXISTS
+      (
+      	SELECT
+		  id
+		FROM
+	  	  at_user_bank_accounts tmp
+		WHERE
+	  	  tmp.group_id = pg.group_id
+	  	AND tmp.share = 1
+
+		UNION
+
+		SELECT
+		  id
+		FROM
+		  at_user_card_accounts tmp
+		WHERE
+	  	  tmp.group_id = pg.group_id
+	  	  AND tmp.share = 1
+
+		UNION
+
+		SELECT
+	  	  id
+		FROM
+	  	  at_user_bank_accounts tmp
+		WHERE
+	  	  tmp.group_id = pg.group_id
+	  	  AND tmp.share = 1
       ) THEN 1
-    ELSE 0
-  END AS 金融機関の共有の有無（夫婦）,
+      ELSE 0
+    END AS 金融機関の共有の有無（夫婦）,
 
 
-  CASE 
+  CASE
     WHEN gender = 1 THEN
       COALESCE((
         SELECT
@@ -386,7 +298,7 @@ SELECT
   END AS 金融機関の共有数＿夫が実施,
 
 
-  CASE 
+  CASE
     WHEN gender = 0 THEN
       COALESCE((
         SELECT
@@ -467,35 +379,20 @@ SELECT
     ELSE 0
   END AS 金融機関の共有数＿不明が実施,
 
+	CASE WHEN
+ 		(SELECT
+        	count(*)
+        FROM
+        	user_distributed_transactions udt
+        WHERE
+        	udt.group_id = pg.group_id
+			AND share = 1
+		) > 0 THEN 1
+		ELSE 0
+	END AS 明細の共有の有無（夫婦）,
+
 
   CASE
-    WHEN EXISTS
-      (
-        SELECT
-          *
-        FROM
-          user_distributed_transactions udt
-        WHERE
-          udt.user_id in (u.id, 
-            (
-              SELECT
-                tmp.user_id
-              FROM
-                participate_groups tmp
-              WHERE
-                tmp.group_id = pg.group_id
-              AND
-                tmp.user_id != u.id
-            )
-          )
-        AND
-          share = 1
-      ) THEN 1
-    ELSE 0
-  END AS 明細の共有の有無（夫婦）,
-
-
-  CASE 
     WHEN gender = 1 THEN
       COALESCE((
         SELECT
@@ -575,13 +472,13 @@ SELECT
           AND share = true
         GROUP BY
           u.id
-      ), 0) 
+      ), 0)
     ELSE 0
   END AS 明細の共有数＿妻が実施,
 
 
   CASE
-    WHEN gender IS NULL THEN 
+    WHEN gender IS NULL THEN
       COALESCE((
         SELECT
           COUNT(*)
@@ -601,7 +498,7 @@ SELECT
     WHEN g.u IS NULL THEN 0
     ELSE g.u
   END AS 目標貯金作成数,
-  
+
   CASE
     WHEN EXISTS
       (
@@ -611,7 +508,7 @@ SELECT
           goals g
         WHERE
           pg.group_id = g.group_id
-      ) 
+      )
       THEN 1
     ELSE 0
   END AS 目標貯金の有無（夫婦）,
@@ -623,7 +520,7 @@ SELECT
 
 
   CASE
-    WHEN exists 
+    WHEN exists
       (
         SELECT
           *
@@ -638,7 +535,7 @@ SELECT
 
 
   CASE
-    WHEN exists 
+    WHEN exists
       (
         SELECT
           *
@@ -746,7 +643,7 @@ SELECT
     WHEN gender = 1 THEN COALESCE(numbered_goal_settings_at_user_bank_account.金融機関を目標貯金に連携した時刻１, 0)
     ELSE 0
   END AS 夫が金融機関を目標貯金に連携した時刻１,
-  
+
   CASE
     WHEN gender = 1 THEN COALESCE(numbered_goal_settings_at_user_bank_account.金融機関を目標貯金に連携した時刻２, 0)
     ELSE 0
@@ -762,7 +659,7 @@ SELECT
     WHEN gender = 0 THEN COALESCE(numbered_goal_settings_at_user_bank_account.金融機関を目標貯金に連携した時刻１, 0)
     ELSE 0
   END AS 妻が金融機関を目標貯金に連携した時刻１,
-  
+
   CASE
     WHEN gender = 0 THEN COALESCE(numbered_goal_settings_at_user_bank_account.金融機関を目標貯金に連携した時刻２, 0)
     ELSE 0
@@ -778,7 +675,7 @@ SELECT
     WHEN gender IS NULL THEN COALESCE(numbered_goal_settings_at_user_bank_account.金融機関を目標貯金に連携した時刻１, 0)
     ELSE 0
   END AS 不明が金融機関を目標貯金に連携した時刻１,
-  
+
   CASE
     WHEN gender IS NULL THEN COALESCE(numbered_goal_settings_at_user_bank_account.金融機関を目標貯金に連携した時刻２, 0)
     ELSE 0
@@ -795,12 +692,12 @@ FROM -- ユーザID,メール登録完了日時,メアド認証,メールアド�
 
 INNER JOIN -- 性別,生年月日,子どもの有無,push許諾
   user_profiles AS up
-ON 
-  up.user_id = u.id 
+ON
+  up.user_id = u.id
 
 LEFT JOIN -- 後続処理用
   at_users AS au
-ON 
+ON
   u.id = au.user_id
 
 LEFT JOIN -- ペアリングID,ペアリング有無,初回ペアリング日時
@@ -810,11 +707,11 @@ LEFT JOIN -- ペアリングID,ペアリング有無,初回ペアリング日時
       created_at,
       group_id
     FROM
-      participate_groups 
+      participate_groups
     GROUP BY
       user_id
   ) AS pg
-ON 
+ON
   pg.user_id = u.id
 
 LEFT JOIN -- 目標貯金作成数,目標貯金作成日時,目標種類判断
@@ -824,7 +721,7 @@ LEFT JOIN -- 目標貯金作成数,目標貯金作成日時,目標種類判断
       created_at,
       count(user_id) AS u
     FROM
-      goals 
+      goals
     GROUP BY
       user_id
   ) AS g
@@ -868,7 +765,7 @@ LEFT JOIN -- 口座連携の日時(初回連携分)
   GROUP BY
     at_user_id
 ) AS first_created_accounts
-ON 
+ON
   first_created_accounts.at_user_id = au.id
 
 LEFT JOIN -- 連携銀行名
@@ -877,7 +774,7 @@ LEFT JOIN -- 連携銀行名
       users.id as user_id,
       -- at_users.id で GROUP BY し、集約関数で銀行名を連結する
       -- 集約値に、 bank_number ごとに変化する値を指定することで
-      -- 特定の bank_number のデータのみが残る 
+      -- 特定の bank_number のデータのみが残る
       GROUP_CONCAT(CASE WHEN at_user_numbered_bank.bank_number = 1 THEN at_user_numbered_bank.fnc_nm ELSE NULL END) AS 口座１,
       GROUP_CONCAT(CASE WHEN at_user_numbered_bank.bank_number = 2 THEN at_user_numbered_bank.fnc_nm ELSE NULL END) AS 口座２,
       GROUP_CONCAT(CASE WHEN at_user_numbered_bank.bank_number = 3 THEN at_user_numbered_bank.fnc_nm ELSE NULL END) AS 口座３,
@@ -899,7 +796,7 @@ LEFT JOIN -- 連携銀行名
               COUNT(*)+1
             FROM
               at_user_bank_accounts AS t
-            WHERE -- at_user_bank_accounts 内で at_user が同一で、id が違うものをカウント ＝ at_user ごとに連番が振られる 
+            WHERE -- at_user_bank_accounts 内で at_user が同一で、id が違うものをカウント ＝ at_user ごとに連番が振られる
               t.id < at_user_bank_accounts.id
               AND t.at_user_id = at_user_bank_accounts.at_user_id
           ) AS bank_number
@@ -920,7 +817,7 @@ LEFT JOIN -- 連携クレカ名
       users.id as user_id,
       -- at_users.id で GROUP BY し、集約関数で銀行名を連結する
       -- 集約値に、 card_number ごとに変化する値を指定することで
-      -- 特定の card_number のデータのみが残る 
+      -- 特定の card_number のデータのみが残る
       GROUP_CONCAT(CASE WHEN at_user_numbered_card.card_number = 1 THEN at_user_numbered_card.fnc_nm ELSE NULL END) AS クレカ１,
       GROUP_CONCAT(CASE WHEN at_user_numbered_card.card_number = 2 THEN at_user_numbered_card.fnc_nm ELSE NULL END) AS クレカ２,
       GROUP_CONCAT(CASE WHEN at_user_numbered_card.card_number = 3 THEN at_user_numbered_card.fnc_nm ELSE NULL END) AS クレカ３,
@@ -942,7 +839,7 @@ LEFT JOIN -- 連携クレカ名
               COUNT(*)+1
             FROM
               at_user_card_accounts AS t
-            WHERE -- at_user_card_accounts 内で at_user が同一で、id が違うものをカウント ＝ at_user ごとに連番が振られる 
+            WHERE -- at_user_card_accounts 内で at_user が同一で、id が違うものをカウント ＝ at_user ごとに連番が振られる
               t.id < at_user_card_accounts.id
               AND t.at_user_id = at_user_card_accounts.at_user_id
           ) AS card_number
@@ -963,7 +860,7 @@ LEFT JOIN -- 連携電子マネー名
       users.id as user_id,
       -- at_users.id で GROUP BY し、集約関数で銀行名を連結する
       -- 集約値に、 emoney_number ごとに変化する値を指定することで
-      -- 特定の emoney_number のデータのみが残る 
+      -- 特定の emoney_number のデータのみが残る
       GROUP_CONCAT(CASE WHEN at_user_numbered_emoney.emoney_number = 1 THEN at_user_numbered_emoney.fnc_nm ELSE NULL END) AS IC１,
       GROUP_CONCAT(CASE WHEN at_user_numbered_emoney.emoney_number = 2 THEN at_user_numbered_emoney.fnc_nm ELSE NULL END) AS IC２,
       GROUP_CONCAT(CASE WHEN at_user_numbered_emoney.emoney_number = 3 THEN at_user_numbered_emoney.fnc_nm ELSE NULL END) AS IC３,
@@ -985,7 +882,7 @@ LEFT JOIN -- 連携電子マネー名
               COUNT(*)+1
             FROM
               at_user_emoney_service_accounts AS t
-            WHERE -- at_user_emoney_service_accounts 内で at_user が同一で、id が違うものをカウント ＝ at_user ごとに連番が振られる 
+            WHERE -- at_user_emoney_service_accounts 内で at_user が同一で、id が違うものをカウント ＝ at_user ごとに連番が振られる
               t.id < at_user_emoney_service_accounts.id
               AND t.at_user_id = at_user_emoney_service_accounts.at_user_id
           ) AS emoney_number
@@ -1003,7 +900,7 @@ ON
 LEFT JOIN -- 診断タイプ(最大ステップ数の時のbudget_question_idで判別可能)
   (
     SELECT
-      ubq.user_id, 
+      ubq.user_id,
       ubq.budget_question_id,
       max_step_teble.max_step
     FROM
@@ -1031,7 +928,7 @@ LEFT JOIN -- 診断タイプ(最大ステップ数の時のbudget_question_idで
     WHERE
       max_step_teble.max_step = ubq.step
   ) AS max_step_teble
-ON 
+ON
   max_step_teble.user_id = u.id
 
 LEFT JOIN -- 金融機関を目標貯金に連携した時刻
@@ -1061,8 +958,8 @@ LEFT JOIN -- 金融機関を目標貯金に連携した時刻
              FROM
                goal_settings
              WHERE
-               at_user_bank_account_id IS NOT NULL -- at_user_bank_account_id が NULLを除いて連番を振る 
-          ) as t 
+               at_user_bank_account_id IS NOT NULL -- at_user_bank_account_id が NULLを除いて連番を振る
+          ) as t
         WHERE
           t.id < goal_settings.id -- 連番にするため、id同士で比較してカウントする
           AND t.user_id = goal_settings.user_id -- user_id でグルーピングされた連番とする
@@ -1075,7 +972,7 @@ LEFT JOIN -- 金融機関を目標貯金に連携した時刻
   GROUP BY
     users.id
   ) AS numbered_goal_settings_at_user_bank_account
-ON 
+ON
   numbered_goal_settings_at_user_bank_account.id = u.id
 
 LEFT JOIN -- 診断のQ1,Q2,Q3の回答用
@@ -1085,8 +982,8 @@ LEFT JOIN -- 診断のQ1,Q2,Q3の回答用
       step,
       budget_question_id,
       (
-        SELECT 
-          budget_question_id 
+        SELECT
+          budget_question_id
         FROM
           user_budget_questions
         WHERE
@@ -1097,7 +994,7 @@ LEFT JOIN -- 診断のQ1,Q2,Q3の回答用
       user_budget_questions AS tmp
     WHERE
       budget_question_id IN (3,4) -- Q3に限定するため、budget_question_idの3,4とする
-      AND NOT EXISTS 
+      AND NOT EXISTS
       (
         SELECT
           1
