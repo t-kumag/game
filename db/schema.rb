@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_06_093138) do
+ActiveRecord::Schema.define(version: 2020_01_08_145214) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
   create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_bank_id"
-    t.bigint "balance", default: 0, null: false, unsigned: true
+    t.bigint "balance", default: 0, null: false
     t.boolean "share", default: false, null: false
     t.string "fnc_id", null: false
     t.string "fnc_cd", null: false
@@ -304,7 +304,6 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
   end
 
   create_table "goal_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.integer "user_id"
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
     t.bigint "add_amount", default: 0, null: false
@@ -316,6 +315,7 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
     t.datetime "updated_at", null: false
     t.bigint "goal_amount", default: 0, null: false
     t.datetime "add_date"
+    t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_logs_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_logs_on_goal_id"
   end
@@ -367,6 +367,7 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
     t.string "title", null: false
     t.date "date", null: false
     t.string "url", null: false
+    t.boolean "marked", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
