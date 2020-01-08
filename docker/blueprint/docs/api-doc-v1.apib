@@ -94,7 +94,7 @@ Resource of Transactions
 
 ### ユーザ明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * category_id (int)
 * share (boolean)
@@ -142,7 +142,7 @@ Resource of Transactions
 
 ### ユーザグループ明細一覧取得 [GET /user/grouped-transactions]
 
-#### Parameters
+#### URL Parameters
 
 * category_id (int)
 * share (boolean)
@@ -307,7 +307,7 @@ Resource of Bank Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -384,10 +384,6 @@ Resource of Bank Account Transactions
             }
 
 ### 明細詳細取得 [GET /api/v1/user/bank-accounts/:bank_account_id/transactions/:id]
-
-#### Parameters
-
-* id (int)
 
 + Request 明細詳細取得 (application/json)
 
@@ -597,7 +593,7 @@ Resource of Card Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -665,8 +661,6 @@ Resource of Card Account Transactions
 ### 明細詳細取得 [GET /api/v1/user/card-accounts/:card_account_id/transactions/:id]
 
 #### Parameters
-
-* id (int)
 
 + Request 明細取得取得 (application/json)
 
@@ -882,7 +876,7 @@ Resource of Emoney Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -948,10 +942,6 @@ Resource of Emoney Account Transactions
 
 
 ### 明細詳細取得 [GET /api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id]
-
-#### Parameters
-
-* id (int)
 
 + Request 明細詳細取得 (application/json)
 
@@ -1102,10 +1092,6 @@ Resource of User Manually Transactions
 
 ### 手動明細取得 [GET /api/v1/user/user-manually-created-transactions/:id]
 
-#### Parameters
-
-* id (int)
-
 + Request 明細取得 (application/json)
 
     + Headers
@@ -1213,7 +1199,7 @@ Resource of Pl Account Transactions
 
 ### 取引明細カテゴリ一覧 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -1261,7 +1247,7 @@ Resource of Pl Grouped Account Transactions
 
 ### 取引明細グループカテゴリ一覧 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -1551,7 +1537,7 @@ Resource of Profiles
 
 ### 家族グループ明細一覧取得 [GET /group/grouped-transactions]
 
-#### Parameters
+#### URL Parameters
 
 * category_id (int)
 * share (boolean)
@@ -2125,7 +2111,7 @@ Resource of Bank Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -2204,8 +2190,6 @@ Resource of Bank Account Transactions
 ### 明細詳細取得 [GET /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
 
 #### Parameters
-
-* id (int)
 
 + Request 明細詳細取得 (application/json)
 
@@ -2342,7 +2326,7 @@ Resource of Card Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -2410,8 +2394,6 @@ Resource of Card Account Transactions
 ### 明細詳細取得 [GET /api/v1/group/card-accounts/:card_account_id/transactions/:id]
 
 #### Parameters
-
-* id (int)
 
 + Request 明細取得取得 (application/json)
 
@@ -2547,7 +2529,7 @@ Resource of Emoney Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -2612,8 +2594,6 @@ Resource of Emoney Account Transactions
 ### 明細詳細取得 [GET /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
 
 #### Parameters
-
-* id (int)
 
 + Request 明細詳細取得 (application/json)
 
@@ -2746,7 +2726,7 @@ Resource of Pl Account Transactions
 
 ### 取引明細合計 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -2774,7 +2754,7 @@ Resource of Pl Account Transactions
 
 ### 取引明細カテゴリ一覧 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -2822,7 +2802,7 @@ Resource of Pl Grouped Account Transactions
 
 ### 取引明細グループカテゴリ一覧 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -2887,6 +2867,11 @@ Resource of BS
 
 ### ログイン [POST]
 
+#### Parameters
+
+* email (string　required
+* password (string)　required
+
 + Request ログイン (application/json)
 
     + Headers
@@ -2896,7 +2881,7 @@ Resource of BS
     + Body
 
             {
-                "email": "osidori@email.com",
+                "email": "osidori@example.com",
                 "password": "password"
             }
 
@@ -2906,10 +2891,12 @@ Resource of BS
 
             {
                 "app": {
-                    "access_token": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+                    "access_token": "xxxxx",
                     "access_token_expires_at": "2019-01-01T01:00:00.000+09:00"
                 }
             }
+
++ Response 422 (application/json)
 
 
 ### ログアウト [DELETE]
@@ -3281,9 +3268,6 @@ Resource of Users
 
 ### アクティベート [GET /api/v1/user/activate]
 
-#### Param
-* token (string)
-
 + Request アクティベート取得 (application/json)
 
     + Headers
@@ -3306,13 +3290,13 @@ Resource of Users
             }
 
 
-### at_user取得 [GET /api/v1/user/at-url]
+### ATユーザー登録 [GET /api/v1/user/at-url]
 
-#### Param
-* token (string)
+#### Description
 
+* ATにユーザー登録を行い、AccountTrackerのwebページを開くurlを返却する。
 
-+ Request at-url取得 (application/json)
++ Request ATユーザー登録 (application/json)
 
     + Headers
 
@@ -3343,10 +3327,6 @@ Resource of Users
 
 ### at_sync取得 [GET /api/v1/user/at-sync]
 
-#### Param
-* token (string)
-
-
 + Request at-sync取得 (application/json)
 
     + Headers
@@ -3360,10 +3340,6 @@ Resource of Users
             {}
 
 ### at_token取得 [GET /api/v1/user/at-token]
-
-#### Param
-* token (string)
-
 
 + Request at-sync取得 (application/json)
 
