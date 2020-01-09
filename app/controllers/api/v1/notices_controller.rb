@@ -27,6 +27,27 @@ class Api::V1::NoticesController < ApplicationController
     render json: {}, status: 200
   end
 
+  def unread_total_count
+    @unread_total_count = Entities::Notice.where(marked:  false).count
+    render 'unread_total_count', formats: 'json', handlers: 'jbuilder'
+  end
+
+  def mark
+    unread_read_messaages = Entities::Notice.where(marked:  false)
+    save_list = unread_read_messaages.map do |urm|
+      Entities::Notice.new(
+          id: urm[:id],
+          title: urm[:title],
+          date: urm[:date],
+          url: urm[:url],
+          marked: true,
+          created_at: urm[:created_at]
+      )
+    end
+    Entities::Notice.import save_list, :on_duplicate_key_update => [:id, :marked]
+    render json: {}, status: 200
+  end
+
   def index
     @notices = Entities::Notice.order(created_at: "DESC").page(params[:page])
     render 'index', formats: 'json', handlers: 'jbuilder'
