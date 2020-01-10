@@ -64,11 +64,12 @@ class Api::V1::UsersController < ApplicationController
 
       render json: {}, status: 200
     else
-      render json: { errors: { code: '001002', message: "email not found." } }, status: 422
+      render json: { errors: ERROR_TYPE::NUMBER['001002'] }, status: 422
     end
   end
 
   def change_password
+    return render json: { errors: ERROR_TYPE::NUMBER['001003'] }, status: 422
     unless change_password_params[:password].present?
       render_400_invalid_validation([{resource: 'User', field: 'password', code: 'empty'}]) and return
     end
@@ -87,18 +88,19 @@ class Api::V1::UsersController < ApplicationController
       current_user.save!
       render json: {}, status: 200
     else
-      render json: { errors: { code: '001003', message: "user not found or invalid token." } }, status: 422
+      render json: { errors: ERROR_TYPE::NUMBER['001003'] }, status: 422
     end
   end
 
   def at_url
+    return render json: { errors: ERROR_TYPE::NUMBER['007002'] }, status: 422
     finance = Services::FinanceService.new(@current_user).find_finance(:fnc_id, params[:fnc_id]) if params.has_key?(:fnc_id)
     skip_account_limit = check_finance_error(finance)
 
     # 無料ユーザーの口座数が上限に達していた場合はエラーを返し口座数を制限する
     # AT口座のエラー解消の場合は口座数の制限はスキップする
     if limit_of_registered_finance? == false && skip_account_limit == false
-        return render json: { errors: { code: '007002', message: "five account limit of free users" } }, status: 422
+        return render json: { errors: ERROR_TYPE::NUMBER['007002'] }, status: 422
     end
 
     @response = Services::AtUserService.new(@current_user).at_url

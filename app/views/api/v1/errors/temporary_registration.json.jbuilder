@@ -1,7 +1,4 @@
-json.errors do
-  json.code "001001"
-  json.message "account status is temporary registration."
-end
+json.errors @error_response
 
 json.app do
   json.email @response[:email]
