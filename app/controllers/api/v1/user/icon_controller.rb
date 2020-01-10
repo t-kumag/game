@@ -2,7 +2,6 @@ class Api::V1::User::IconController < ApplicationController
   before_action :authenticate
 
   def create
-    return render(json: { errors: ERROR_TYPE::NUMBER['002001'] }, status: 422) && return
     if @current_user.user_icon.present?
       render(json: { errors: ERROR_TYPE::NUMBER['002001'] }, status: 422) && return
     end
