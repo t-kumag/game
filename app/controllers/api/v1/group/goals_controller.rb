@@ -136,7 +136,6 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def add_money
-    render json: {errors: [ERROR_TYPE::NUMBER['005006']] }, status: 422 and return
     if disallowed_goal_ids?([params[:id].to_i], true)
       render_disallowed_goal_ids && return
     end
