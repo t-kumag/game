@@ -1,9 +1,9 @@
 
 module ERROR_TYPE
   NUMBER = {
-      '001001' => { code: '001001', message: 'こちらのアドレスは本登録されておりません。再度認証URLを送付しますか？', info: 'Account status is temporary registration.'},
-      '001002' => { code: '001002', message: 'こちらのメールアドレはOsidOriに登録されていません。ご確認をお願いいたします。', info: 'Email not found.'},
-      '001003' => { code: '001003', message: 'こちらのメールアドレはOsidOriに登録されていません。ご確認をお願いいたします。', info: 'User not found or invalid token.'},
+      '001001' => { code: '001001', message: 'こちらのメールアドレスは本登録されておりません。再度認証URLを送付しますか？', info: 'Account status is temporary registration.'},
+      '001002' => { code: '001002', message: 'こちらのメールアドレスはOsidOriに登録されていません。ご確認をお願いいたします。', info: 'Email not found.'},
+      '001003' => { code: '001003', message: 'こちらのメールアドレスはOsidOriに登録されていません。ご確認をお願いいたします。', info: 'User not found or invalid token.'},
       '002001' => { code: '002001', message: '写真の登録に失敗しました。もう一度お試しください。', info: 'Icon is registered.'},
       '002002' => { code: '002002', message: '写真の登録に失敗しました。もう一度お試しください。', info: 'Icon not found.'},
       '003001' => { code: '003001', message: 'その金融機関にはアクセスできません。', info: 'Disallowed financier id.'},
