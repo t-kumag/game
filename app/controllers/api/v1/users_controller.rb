@@ -69,7 +69,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def change_password
-    return render json: { errors: [ERROR_TYPE::NUMBER['001003']] }, status: 422
     unless change_password_params[:password].present?
       render_400_invalid_validation([{resource: 'User', field: 'password', code: 'empty'}]) and return
     end
