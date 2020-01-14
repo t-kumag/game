@@ -15,7 +15,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
-    render(json: { errors: ERROR_TYPE::NUMBER['005001'] }, status: 422) and return if @response.blank?
+    render(json: { errors: [ERROR_TYPE::NUMBER['005001']] }, status: 422) and return if @response.blank?
 
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
@@ -72,12 +72,12 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
-    render json: { errors: ERROR_TYPE::NUMBER['005003'] }, status: 422 and return if before_goal.blank?
+    render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422 and return if before_goal.blank?
     goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
     partner_goal_setting = Entities::GoalSetting.find_by(id: params[:partner_goal_settings][:goal_setting_id])
 
     if goal_setting.blank? || partner_goal_setting.blank?
-      render json: { errors: ERROR_TYPE::NUMBER['005005'] }, status: 422 and return
+      render json: { errors: [ERROR_TYPE::NUMBER['005005']] }, status: 422 and return
     end
 
     # 頭金を入金する際に必要
@@ -112,7 +112,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     if goal.blank?
-      render json: { errors: ERROR_TYPE::NUMBER['005004'] }, status: 422 and return
+      render json: { errors: [ERROR_TYPE::NUMBER['005004']] }, status: 422 and return
     end
     begin
       goal.destroy
@@ -136,7 +136,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   end
 
   def add_money
-    render json: {errors: ERROR_TYPE::NUMBER['005006'] }, status: 422 and return
+    render json: {errors: [ERROR_TYPE::NUMBER['005006']] }, status: 422 and return
     if disallowed_goal_ids?([params[:id].to_i], true)
       render_disallowed_goal_ids && return
     end
@@ -154,7 +154,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id) unless goal_setting.present?
 
     if user_banks.blank? || before_goal.blank? || goal_setting.blank?
-      render json: {errors: ERROR_TYPE::NUMBER['005006'] }, status: 422 and return
+      render json: {errors: [ERROR_TYPE::NUMBER['005006']] }, status: 422 and return
     end
     
     goal_service = Services::GoalService.new(@current_user)
