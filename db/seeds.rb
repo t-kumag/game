@@ -71,7 +71,7 @@ Entities::AtTransactionCategory.create(id:24,at_category_id: '0125', category_na
 Entities::AtTransactionCategory.create(id:25,at_category_id: '0126', category_name1: '食費', category_name2: 'テーマパークレストラン', at_grouped_category_id: 2)
 Entities::AtTransactionCategory.create(id:26,at_category_id: '0127', category_name1: '食費', category_name2: 'オーベルジュ', at_grouped_category_id: 2)
 Entities::AtTransactionCategory.create(id:27,at_category_id: '0128', category_name1: '食費', category_name2: 'その他', at_grouped_category_id: 2)
-Entities::AtTransactionCategory.create(id:28,at_category_id: '0205', category_name1: '日用品', category_name2: 'コンビニ、スーパー', at_grouped_category_id: 4)
+Entities::AtTransactionCategory.create(id:28,at_category_id: '0205', category_name1: '日用品', category_name2: 'コンビニ、スーパー', at_grouped_category_id: 2)
 Entities::AtTransactionCategory.create(id:29,at_category_id: '0203', category_name1: '日用品', category_name2: '家電、携帯電話', at_grouped_category_id: 4)
 Entities::AtTransactionCategory.create(id:30,at_category_id: '0209', category_name1: '日用品', category_name2: 'ファッション、アクセサリー、時計', at_grouped_category_id: 4)
 Entities::AtTransactionCategory.create(id:31,at_category_id: '0208', category_name1: '日用品', category_name2: '趣味、スポーツ、工芸', at_grouped_category_id: 4)
