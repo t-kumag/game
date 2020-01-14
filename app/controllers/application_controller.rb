@@ -377,15 +377,15 @@ class ApplicationController < ActionController::Base
   end
 
   def render_disallowed_financier_ids
-    render json: { errors: ERROR_TYPE::NUMBER['003001'] }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['003001']] }, status: 422
   end
 
   def render_disallowed_account_ids
-    render json: { errors: ERROR_TYPE::NUMBER['003002'] }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['003002']] }, status: 422
   end
 
   def render_disallowed_transaction_ids
-    render json: { errors:  ERROR_TYPE::NUMBER['004001']  }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['004001']] }, status: 422
   end
 
   def render_disallowed_goal_ids
