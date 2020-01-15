@@ -6,6 +6,7 @@ module ERROR_TYPE
       '001003' => { code: '001003', message: 'こちらのメールアドレスはOsidOriに登録されていません。ご確認をお願いいたします。', info: 'User not found or invalid token.'},
       '002001' => { code: '002001', message: '写真の登録に失敗しました。もう一度お試しください。', info: 'Icon is registered.'},
       '002002' => { code: '002002', message: '写真の登録に失敗しました。もう一度お試しください。', info: 'Icon not found.'},
+      '002003' => { code: '002003', message: '写真の取得に失敗しました。もう一度お試しください。', info: 'Icon not get.'},
       '003001' => { code: '003001', message: 'その金融機関にはアクセスできません。', info: 'Disallowed financier id.'},
       '003002' => { code: '003002', message: '金融機関の削除は登録者のみ行えます。', info: 'Disallowed partner account id.'},
       '004001' => { code: '004001', message: 'その利用明細にはアクセスできません。', info: 'Disallowed transaction id.'},
