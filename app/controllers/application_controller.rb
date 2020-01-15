@@ -373,7 +373,7 @@ class ApplicationController < ActionController::Base
   end
 
   def require_group
-    render json: { errors: { code: '', message: "Require group." } }, status: 422 unless @current_user.group_id.present?
+    render json: { errors: [ERROR_TYPE::NUMBER['006001']] }, status: 422 unless @current_user.group_id.present?
   end
 
   def render_disallowed_financier_ids
@@ -389,11 +389,11 @@ class ApplicationController < ActionController::Base
   end
 
   def render_disallowed_goal_ids
-    render json: { errors: { code: '', message: "Disallowed goal id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['005002']] }, status: 422
   end
 
   def render_disallowed_goal_setting_ids
-    render json: { errors: { code: '', message: "Disallowed goal setting id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422
   end
 
   def limit_of_registered_finance?
