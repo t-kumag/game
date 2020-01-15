@@ -27,7 +27,7 @@ class Api::V1::User::IconController < ApplicationController
 
   def update
     @icon = @current_user.user_icon
-    render json: { errors: [ERROR_TYPE::NUMBER['002002']]  }, status: 422 unless @icon.present?
+    return render json: { errors: [ERROR_TYPE::NUMBER['002002']]  }, status: 422 unless @icon.present?
     @icon.img_url = params.permit(:img_url)[:img_url]
     @icon.save!
     render json: {}
