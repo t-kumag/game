@@ -4,7 +4,6 @@ class CreateNoticesMarks < ActiveRecord::Migration[5.2]
       t.references :notice, foreign_key: true
       t.references :user, null: false, foreign_key: true
       t.boolean :mark
-      t.timestamps
 
       t.timestamps
     end
