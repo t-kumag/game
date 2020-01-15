@@ -47,6 +47,7 @@ class Services::TransactionService
         at_transaction_category_id: t.at_transaction_category_id,
         is_shared: shared_account?(t, shared_accounts) || t.share,
         is_account_shared: shared_account?(t, shared_accounts),
+        is_ignored: t.ignore,
         user_id: t.user_id,
         amount: t.amount,
         used_date: t.used_date,
