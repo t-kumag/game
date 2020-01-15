@@ -146,6 +146,7 @@ class ApplicationController < ActionController::Base
 
   def check_temporary_user
     @response = Entities::User.temporary_user(params[:email])
+    @error_response = [ERROR_TYPE::NUMBER['001001']]
     if @response.present?
       render 'api/v1/errors/temporary_registration', formats: 'json', handlers: 'jbuilder', status: 422
     end
