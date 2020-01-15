@@ -92,7 +92,6 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_url
-    return render json: { errors: [ERROR_TYPE::NUMBER['007002']] }, status: 422
     finance = Services::FinanceService.new(@current_user).find_finance(:fnc_id, params[:fnc_id]) if params.has_key?(:fnc_id)
     skip_account_limit = check_finance_error(finance)
 
