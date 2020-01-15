@@ -27,7 +27,7 @@ class Api::V1::PairingRequestsController < ApplicationController
         end
 
         return render json: { errors: [ERROR_TYPE::NUMBER['006007']] }, status: 422 if DateTime.now > @pairing_request.token_expires_at
-        return render json: { errors: [ERROR_TYPE::NUMBER['006003']] }, status: 422  if @pairing_request.status.to_i == 2
+        return render json: { errors: [ERROR_TYPE::NUMBER['006003']] }, status: 422 if @pairing_request.status.to_i == 2
         return render json: { errors: [ERROR_TYPE::NUMBER['006002']] }, status: 422 if @pairing_request.from_user_id == @current_user.id
 
         from_user_group = Entities::ParticipateGroup.find_by(user_id: @pairing_request.from_user_id)
