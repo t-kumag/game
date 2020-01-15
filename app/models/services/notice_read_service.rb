@@ -8,7 +8,7 @@ class Services::NoticeReadService
     {
         notice_id: notice.id,
         user_id: current_user.id,
-        mark: false
+        read: false
     }
   end
 
