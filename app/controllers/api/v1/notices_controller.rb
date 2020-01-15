@@ -47,8 +47,8 @@ class Api::V1::NoticesController < ApplicationController
   end
 
   def all_read
-    unread_messaages = Entities::NoticesRead.where(user_id: @current_user.id, read:  false)
-    save_list = unread_messaages.map do |urm|
+    unread_messages = Entities::NoticesRead.where(user_id: @current_user.id, read:  false)
+    save_list = unread_messages.map do |urm|
       Entities::NoticesRead.new(
           id: urm[:id],
           notice_id: urm[:notice_id],
