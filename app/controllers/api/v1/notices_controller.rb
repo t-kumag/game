@@ -42,12 +42,12 @@ class Api::V1::NoticesController < ApplicationController
     end
 
     Entities::NoticesRead.import save_list, :on_duplicate_key_update => [:user_id, :read]
-    @unread_total_count = Entities::NoticesRead.where(user_id: @current_user.id, read:  false).count
+    @unread_total_count = Entities::NoticesRead.where(user_id: @current_user.id, read: false).count
     render 'unread_total_count', formats: 'json', handlers: 'jbuilder'
   end
 
   def all_read
-    unread_messages = Entities::NoticesRead.where(user_id: @current_user.id, read:  false)
+    unread_messages = Entities::NoticesRead.where(user_id: @current_user.id, read: false)
     save_list = unread_messages.map do |urm|
       Entities::NoticesRead.new(
           id: urm[:id],
