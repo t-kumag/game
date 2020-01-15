@@ -15,8 +15,8 @@ Rails.application.routes.draw do
 
       resources :notices, :path => '/notices', :only => [:index, :create] do
         collection do
-          get :unread_total_count
-          post :mark
+          get :unread-total-count
+          put :all_read
         end
       end
       resources :activities, :path => '/activities', :only => [:index] do
