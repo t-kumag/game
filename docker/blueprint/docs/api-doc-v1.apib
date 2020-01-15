@@ -94,7 +94,7 @@ Resource of Transactions
 
 ### ユーザ明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * category_id (int)
 * share (boolean)
@@ -133,6 +133,8 @@ Resource of Transactions
                        "used_location": "カフェベートーベンbank",
                        "type": "bank",
                        "is_shared": false,
+                       "is_ignored": false,
+                       "memo": "メモ",
                        "is_account_shared": false,
                        "transaction_id": 261,
                        "at_transaction_category_id": 30
@@ -142,7 +144,7 @@ Resource of Transactions
 
 ### ユーザグループ明細一覧取得 [GET /user/grouped-transactions]
 
-#### Parameters
+#### URL Parameters
 
 * category_id (int)
 * share (boolean)
@@ -230,11 +232,6 @@ Resource of Bank Account
 
 ### 銀行口座更新 [PUT /api/v1/user/bank-accounts/:id]
 
-#### Parameters
-
-* id (int)
-* share (boolean)
-
 + Request 銀行口座登録 (application/json)
 
     + Headers
@@ -275,9 +272,6 @@ Resource of Bank Account
 
 ### 銀行口座削除 [DELETE /api/v1/user/bank-accounts/:id]
 
-#### Parameters
-* id (int)
-
 + Request 銀行口座更新 (application/json)
 
     + Headers
@@ -307,7 +301,7 @@ Resource of Bank Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -385,10 +379,6 @@ Resource of Bank Account Transactions
 
 ### 明細詳細取得 [GET /api/v1/user/bank-accounts/:bank_account_id/transactions/:id]
 
-#### Parameters
-
-* id (int)
-
 + Request 明細詳細取得 (application/json)
 
     + Headers
@@ -406,6 +396,8 @@ Resource of Bank Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
+                  "memo": "メモ"",
                   "at_transaction_category_id": 1,
                   "category_name1": "未分類",
                   "category_name2": "未分類",
@@ -434,12 +426,13 @@ Resource of Bank Account Transactions
 
 ### 明細詳細更新 [PUT /api/v1/user/bank-accounts/:bank_account_id/transactions/:id]
 
-#### Parameters
+#### Body Parameters
 
-* id (int)
 * share (boolean)
 * at_transaction_category_id (int)
 * used_location (string)
+* memo (string)
+* ignore (boolean)
 
 + Request 明細詳細更新 (application/json)
 
@@ -452,7 +445,9 @@ Resource of Bank Account Transactions
             {
 	            "at_transaction_category_id": 30,
                 "used_location": "カフェベートーベン",
-                "share": false
+                "share": false,
+                "memo": "明細メモ",
+                "ignore": false
             }
 
 + Response 200 (application/json)
@@ -523,8 +518,7 @@ Resource of Card Account
 
 ### カード口座更新 [PUT /api/v1/user/card-accounts/:id]
 
-#### Parameters
-* id (int)
+#### Body Parameters
 
 + Request カード口座更新 (application/json)
 
@@ -566,9 +560,6 @@ Resource of Card Account
 
 ### カード口座削除 [DELETE /api/v1/user/card-accounts/:id]
 
-#### Parameters
-* id (int)
-
 + Request カード削除 (application/json)
 
     + Headers
@@ -597,7 +588,7 @@ Resource of Card Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -664,10 +655,6 @@ Resource of Card Account Transactions
 
 ### 明細詳細取得 [GET /api/v1/user/card-accounts/:card_account_id/transactions/:id]
 
-#### Parameters
-
-* id (int)
-
 + Request 明細取得取得 (application/json)
 
     + Headers
@@ -685,6 +672,8 @@ Resource of Card Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
+                  "memo": "メモ",
                   "at_transaction_category_id": 1,
                   "category_name1": "未分類",
                   "category_name2": "未分類",
@@ -712,10 +701,13 @@ Resource of Card Account Transactions
 
 ### 明細詳細更新 [PUT /api/v1/user/card-accounts/:card_account_id/transactions/:id]
 
-#### Parameters
+#### Body Parameters
 
-* card_account_id (int)
-* id (int)
+* share (boolean)
+* at_transaction_category_id (int)
+* used_location (string)
+* memo (string)
+* ignore (boolean)
 
 + Request 明細詳細更新 (application/json)
 
@@ -728,7 +720,9 @@ Resource of Card Account Transactions
             {
 	            "at_transaction_category_id": 30,
                 "used_location": "カフェベートーベン",
-                "share": false
+                "share": false,
+                "memo": "明細メモ",
+                "ignore": false
             }
 
 + Response 200 (application/json)
@@ -803,9 +797,6 @@ Resource of Card Account
 
 ### 電子マネー口座更新 [PUT /api/v1/user/emoney-accounts/:id]
 
-#### Parameters
-* id (int)
-
 + Request 電子マネー口座更新 (application/json)
 
     + Headers
@@ -848,9 +839,6 @@ Resource of Card Account
 
 ### 電子マネー口座削除 [DELETE /api/v1/user/emoney-accounts/:id]
 
-#### Parameters
-* id (int)
-
 + Request 電子マネー削除 (application/json)
 
     + Headers
@@ -882,7 +870,7 @@ Resource of Emoney Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -949,10 +937,6 @@ Resource of Emoney Account Transactions
 
 ### 明細詳細取得 [GET /api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id]
 
-#### Parameters
-
-* id (int)
-
 + Request 明細詳細取得 (application/json)
 
     + Headers
@@ -970,6 +954,8 @@ Resource of Emoney Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
+                  "memo": "メモ",
                   "at_transaction_category_id": 30,
                   "category_name1": "日用品",
                   "category_name2": "ファッション、アクセサリー、時計",
@@ -998,12 +984,14 @@ Resource of Emoney Account Transactions
 
 ### 明細詳細更新 [PUT /api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id]
 
-#### Parameters
+#### Body Parameters
 
 * id (int)
 * at_transaction_category_id (int)
 * used_location (string)
 * share (boolean)
+* memo (string)
+* ignore (boolean)
 
 + Request 明細詳細更新 (application/json)
 
@@ -1016,7 +1004,9 @@ Resource of Emoney Account Transactions
             {
 	            "at_transaction_category_id": 30,
                 "used_location": "カフェベートーベン",
-                "share": false
+                "share": false,
+                "memo": "明細メモ",
+                "ignore": false
             }
 
 + Response 200 (application/json)
@@ -1077,7 +1067,7 @@ Resource of User Manually Transactions
 
 ### 手動明細登録 [POST]
 
-+ Request アイコン登録 (application/json)
++ Request 明細登録 (application/json)
 
     + Headers
 
@@ -1092,7 +1082,9 @@ Resource of User Manually Transactions
                 "title":1,
                 "amount":-1211,
                 "used_location":1,
-                "share": true
+                "share": true,
+                "memo": "明細メモ",
+                "ignore": false
             }
 
 + Response 200 (application/json)
@@ -1101,10 +1093,6 @@ Resource of User Manually Transactions
             {}
 
 ### 手動明細取得 [GET /api/v1/user/user-manually-created-transactions/:id]
-
-#### Parameters
-
-* id (int)
 
 + Request 明細取得 (application/json)
 
@@ -1127,16 +1115,15 @@ Resource of User Manually Transactions
                     "title": "test",
                     "amount": 1000,
                     "is_shared": false,
+                    "is_ignored": false,
+                    "memo": "メモ",
                     "used_location": "公園"
+                    "payment_method_type": "wallet",
+                    "payment_method_id": 4
                 }
             }
 
-
-### 手動明細詳細更新 [PUT /api/v1/user/user-manually-created-transactions/:id]
-
-#### Parameters
-
-* id (int)
+### 手動明細詳細更新 [PUT /api/v1/user/user-manually-created-transactions]
 
 + Request 明細詳細更新 (application/json)
 
@@ -1147,14 +1134,54 @@ Resource of User Manually Transactions
     + Body
 
             {
-                "payment_method_id": 1,
                 "at_transaction_category_id": 2,
                 "used_date":"2019-10-12",
-                "title":1,
+                "title":"コンビニ",
                 "amount":111		,
                 "group_id": 1,
                 "share": true,
-                "used_location":1
+                "used_location":1,
+                "memo": "明細メモ",
+                "ignore": false,
+                "payment_method_type": "wallet",
+                "payment_method_id": 4,
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+### 手動明細詳細更新 [PUT /api/v1/user/user-manually-created-transactions/:id]
+
+#### Body Parameters
+
+* share (boolean)
+* at_transaction_category_id (int)
+* used_location (string)
+* memo (string)
+* ignore (boolean)
+
++ Request 明細詳細更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {
+                "at_transaction_category_id": 2,
+                "used_date":"2019-10-12",
+                "title":"コンビニ",
+                "amount":111		,
+                "group_id": 1,
+                "share": true,
+                "used_location":1,
+                "memo": "明細メモ",
+                "ignore": false,
+                "payment_method_type": "wallet",
+                "payment_method_id": 4
             }
 
 + Response 200 (application/json)
@@ -1163,10 +1190,6 @@ Resource of User Manually Transactions
             {}
 
 ### 手動明細詳細削除 [DELETE /api/v1/user/user-manually-created-transactions/:id]
-
-#### Parameters
-
-* id (int)
 
 + Request 手動明細詳細削除 (application/json)
 
@@ -1185,7 +1208,7 @@ Resource of Pl Account Transactions
 
 ### 取引明細合計 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -1213,7 +1236,7 @@ Resource of Pl Account Transactions
 
 ### 取引明細カテゴリ一覧 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -1261,7 +1284,7 @@ Resource of Pl Grouped Account Transactions
 
 ### 取引明細グループカテゴリ一覧 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -1452,7 +1475,8 @@ Resource of Profiles
 
 * 家族口座の登録を行う。
 
-#### Parameters
+#### Body Parameters
+
 * fnc_id (string)
 * fnc_type (string) [bank|card|etc]
 
@@ -1504,7 +1528,7 @@ Resource of Profiles
 * 家族の取引明細を取得する
 
 
-#### Parameters
+#### URL Parameters
 
 * category_id (int)
 * scope (string) [income|outcome]
@@ -1541,6 +1565,8 @@ Resource of Profiles
                        "used_location": "ミロクゼイリシジムシヨ",
                        "type": "bank",
                        "is_shared": true,
+                       "is_ignored": false,
+                       "memo": "メモ",
                        "is_account_shared": true,
                        "transaction_id": 225,
                        "at_transaction_category_id": 1
@@ -1551,7 +1577,7 @@ Resource of Profiles
 
 ### 家族グループ明細一覧取得 [GET /group/grouped-transactions]
 
-#### Parameters
+#### URL Parameters
 
 * category_id (int)
 * share (boolean)
@@ -1704,10 +1730,6 @@ Resource of Goal
 
 
 ###  目標詳細取得 [GET /api/v1/group/goals/:id]
-
-#### Parameters
-
-* id (int)
 
 + Request 目標詳細取得 (application/json)
 
@@ -1956,11 +1978,6 @@ Resource of Goal
 
 ###  目標設定詳細取得 [GET /api/v1/group/goals/:goal_id/goal-settings/:id]
 
-#### Parameters
-
-* goal_id (int)
-* id (int)
-
 + Request 目標一覧取得 (application/json)
 
     + Headers
@@ -2063,10 +2080,6 @@ Resource of Goal
 
 ### 目標グラフデータ取得 [GET /api/v1/group/goal-graph/:id]
 
-#### Parameters
-
-* id (int)
-
 + Request 目標グラフデータ取得 (application/json)
 
     + Headers
@@ -2125,7 +2138,7 @@ Resource of Bank Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -2203,9 +2216,7 @@ Resource of Bank Account Transactions
 
 ### 明細詳細取得 [GET /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
 
-#### Parameters
-
-* id (int)
+#### URL Parameters
 
 + Request 明細詳細取得 (application/json)
 
@@ -2224,6 +2235,7 @@ Resource of Bank Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
                   "at_transaction_category_id": 1,
                   "category_name1": "未分類",
                   "category_name2": "未分類",
@@ -2251,12 +2263,14 @@ Resource of Bank Account Transactions
 
 ### 明細詳細更新 [PUT /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
 
-#### Parameters
+#### Body Parameters
 
 * id (int)
 * share (boolean)
 * at_transaction_category_id (int)
-* used_location (string
+* used_location (string)
+* memo (string)
+* ignore (boolean)
 
 + Request 明細詳細更新 (application/json)
 
@@ -2269,7 +2283,9 @@ Resource of Bank Account Transactions
             {
 	            "at_transaction_category_id": 30,
                 "used_location": "カフェベートーベン",
-                "share": false
+                "share": false,
+                "memo": "明細メモ",
+                "ignore": false
             }
 
 + Response 200 (application/json)
@@ -2342,7 +2358,7 @@ Resource of Card Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -2409,9 +2425,7 @@ Resource of Card Account Transactions
 
 ### 明細詳細取得 [GET /api/v1/group/card-accounts/:card_account_id/transactions/:id]
 
-#### Parameters
-
-* id (int)
+#### URL Parameters
 
 + Request 明細取得取得 (application/json)
 
@@ -2430,6 +2444,7 @@ Resource of Card Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
                   "at_transaction_category_id": 1,
                   "category_name1": "未分類",
                   "category_name2": "未分類",
@@ -2456,10 +2471,8 @@ Resource of Card Account Transactions
 
 ### 明細詳細更新 [PUT /api/v1/group/card-accounts/:card_account_id/transactions/:id]
 
-#### Parameters
+#### Body Parameters
 
-* card_account_id (int)
-* transaction_id (int)
 
 + Request 明細詳細更新 (application/json)
 
@@ -2472,7 +2485,9 @@ Resource of Card Account Transactions
             {
 	            "at_transaction_category_id": 30,
                 "used_location": "カフェベートーベン",
-                "share": false
+                "share": false,
+                "memo": "明細メモ",
+                "ignore": false
             }
 
 + Response 200 (application/json)
@@ -2547,7 +2562,7 @@ Resource of Emoney Account Transactions
 
 ### 明細一覧取得 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * from (date)
 * to (date)
@@ -2611,10 +2626,6 @@ Resource of Emoney Account Transactions
 
 ### 明細詳細取得 [GET /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
 
-#### Parameters
-
-* id (int)
-
 + Request 明細詳細取得 (application/json)
 
     + Headers
@@ -2632,6 +2643,7 @@ Resource of Emoney Account Transactions
                   "user_id": 19,
                   "is_account_shared": false,
                   "is_shared": false,
+                  "is_ignored": false,
                   "at_transaction_category_id": 30,
                   "category_name1": "日用品",
                   "category_name2": "ファッション、アクセサリー、時計",
@@ -2660,12 +2672,13 @@ Resource of Emoney Account Transactions
 
 ### 明細詳細更新 [PUT /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
 
-#### Parameters
+#### Body Parameters
 
-* id (int)
+* share (boolean)
 * at_transaction_category_id (int)
 * used_location (string)
-* share (boolean)
+* memo (string)
+* ignore (boolean)
 
 + Request 明細詳細更新 (application/json)
 
@@ -2678,7 +2691,9 @@ Resource of Emoney Account Transactions
             {
 	            "at_transaction_category_id": 30,
                 "used_location": "カフェベートーベン",
-                "share": false
+                "share": false,
+                "memo": "明細メモ",
+                "ignore": false
             }
 
 + Response 200 (application/json)
@@ -2746,7 +2761,7 @@ Resource of Pl Account Transactions
 
 ### 取引明細合計 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -2774,7 +2789,7 @@ Resource of Pl Account Transactions
 
 ### 取引明細カテゴリ一覧 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -2822,7 +2837,7 @@ Resource of Pl Grouped Account Transactions
 
 ### 取引明細グループカテゴリ一覧 [GET]
 
-#### Parameters
+#### URL Parameters
 
 * share (boolean)
 * from (date)
@@ -2887,6 +2902,11 @@ Resource of BS
 
 ### ログイン [POST]
 
+#### Body Parameters
+
+* email (string　required
+* password (string)　required
+
 + Request ログイン (application/json)
 
     + Headers
@@ -2896,7 +2916,7 @@ Resource of BS
     + Body
 
             {
-                "email": "osidori@email.com",
+                "email": "osidori@example.com",
                 "password": "password"
             }
 
@@ -2906,10 +2926,12 @@ Resource of BS
 
             {
                 "app": {
-                    "access_token": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+                    "access_token": "xxxxx",
                     "access_token_expires_at": "2019-01-01T01:00:00.000+09:00"
                 }
             }
+
++ Response 422 (application/json)
 
 
 ### ログアウト [DELETE]
@@ -2960,9 +2982,9 @@ Resource of Activity
 ## budget question [/api/v1/budget-questions]
 Resource of Budget Questions
 
-### budget questions 登録 [POST]
+### 診断登録 [POST]
 
-+ Request budget questions登録 (application/json)
++ Request 診断登録 (application/json)
 
     + Headers
 
@@ -3026,46 +3048,6 @@ Resource of Category
                                 {
                                     "at_transaction_category_id": 125,
                                     "at_transaction_category_category_name1": "清算入金"
-                                },
-                                {
-                                    "at_transaction_category_id": 126,
-                                    "at_transaction_category_category_name1": "給与入金"
-                                },
-                                {
-                                    "at_transaction_category_id": 127,
-                                    "at_transaction_category_category_name1": "賞与入金"
-                                },
-                                {
-                                    "at_transaction_category_id": 128,
-                                    "at_transaction_category_category_name1": "貯金入金"
-                                },
-                                {
-                                    "at_transaction_category_id": 129,
-                                    "at_transaction_category_category_name1": "配当等収入"
-                                },
-                                {
-                                    "at_transaction_category_id": 130,
-                                    "at_transaction_category_category_name1": "雑収入"
-                                },
-                                {
-                                    "at_transaction_category_id": 131,
-                                    "at_transaction_category_category_name1": "融資入金"
-                                },
-                                {
-                                    "at_transaction_category_id": 132,
-                                    "at_transaction_category_category_name1": "家賃所得"
-                                },
-                                {
-                                    "at_transaction_category_id": 133,
-                                    "at_transaction_category_category_name1": "利子所得"
-                                },
-                                {
-                                    "at_transaction_category_id": 134,
-                                    "at_transaction_category_category_name1": "振込手数料入金"
-                                },
-                                {
-                                    "at_transaction_category_id": 135,
-                                    "at_transaction_category_category_name1": "その他入金"
                                 }
                              ]
                           }
@@ -3281,9 +3263,6 @@ Resource of Users
 
 ### アクティベート [GET /api/v1/user/activate]
 
-#### Param
-* token (string)
-
 + Request アクティベート取得 (application/json)
 
     + Headers
@@ -3306,13 +3285,13 @@ Resource of Users
             }
 
 
-### at_user取得 [GET /api/v1/user/at-url]
+### ATユーザー登録 [GET /api/v1/user/at-url]
 
-#### Param
-* token (string)
+#### Description
 
+* ATにユーザー登録を行い、AccountTrackerのwebページを開くurlを返却する。
 
-+ Request at-url取得 (application/json)
++ Request ATユーザー登録 (application/json)
 
     + Headers
 
@@ -3343,10 +3322,6 @@ Resource of Users
 
 ### at_sync取得 [GET /api/v1/user/at-sync]
 
-#### Param
-* token (string)
-
-
 + Request at-sync取得 (application/json)
 
     + Headers
@@ -3360,10 +3335,6 @@ Resource of Users
             {}
 
 ### at_token取得 [GET /api/v1/user/at-token]
-
-#### Param
-* token (string)
-
 
 + Request at-sync取得 (application/json)
 

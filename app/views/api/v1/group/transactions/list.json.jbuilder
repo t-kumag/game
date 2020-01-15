@@ -18,6 +18,6 @@ json.app do
     json.is_account_shared r[:is_account_shared]
     json.transaction_id r[:transaction_id]
     json.at_transaction_category_id r[:at_transaction_category_id]
-    json.is_ignored true # TODO 仮の固定値
+    json.is_ignored r[:is_ignored]
   end
 end

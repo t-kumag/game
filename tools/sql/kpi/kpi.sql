@@ -184,11 +184,165 @@ SELECT
     ELSE 1
   END AS ペアリング有無, -- ペアリング解除済みの場合でもペアリング有（ペアリング解除済みを考慮しない）
 
+  CASE 
+    WHEN pg.group_id IS NULL THEN 0
+    ELSE 1
+  END AS ペアリングの有無（夫婦）,
 
   CASE 
     WHEN pg.user_id IS NULL THEN 0 
     ELSE pg.created_at 
   END AS ペアリング完了日時, -- 初回のぺアリング完了日時（ペアリング解除済みを考慮しない）
+
+  CASE 
+    WHEN 
+    COALESCE((
+      SELECT
+        MIN(updated_at)
+      FROM
+        pairing_requests
+      WHERE
+        group_id IS NOT NULL
+      AND
+        from_user_id = u.id
+      GROUP BY
+        from_user_id
+    ), NOW()) 
+      <
+    COALESCE((
+      SELECT
+        MIN(updated_at)
+      FROM
+        pairing_requests
+      WHERE
+        group_id IS NOT NULL
+      AND
+        to_user_id = u.id
+      GROUP BY
+        to_user_id
+    ), NOW()) THEN 1 
+    ELSE 0
+  END AS ペアリング招待者,
+
+  CASE 
+    WHEN 
+    COALESCE((
+      SELECT
+        MIN(updated_at)
+      FROM
+        pairing_requests
+      WHERE
+        group_id IS NOT NULL
+      AND
+        from_user_id = u.id
+      GROUP BY
+        from_user_id
+    ), NOW())
+      >
+    COALESCE((
+      SELECT
+        MIN(updated_at)
+      FROM
+        pairing_requests
+      WHERE
+        group_id IS NOT NULL
+      AND
+        to_user_id = u.id
+      GROUP BY
+        to_user_id
+    ), NOW()) THEN 1 
+    ELSE 0
+  END AS ペアリング被招待者,
+
+  CASE
+  WHEN EXISTS
+    (
+      SELECT
+        *
+      FROM
+        at_user_bank_accounts auba
+      WHERE
+        auba.at_user_id in (au.id, 
+          (
+            SELECT
+              tmp1.id
+            FROM
+              at_users tmp1
+            WHERE
+              tmp1.user_id = 
+              (
+                SELECT
+                  tmp2.user_id
+                FROM
+                  participate_groups tmp2
+                WHERE
+                  tmp2.group_id = pg.group_id
+                AND
+                  tmp2.user_id != u.id
+              )
+          )
+        )
+      AND
+        share = 1
+      UNION
+        SELECT
+          *
+        FROM
+          at_user_card_accounts auca
+        WHERE
+          auca.at_user_id in (au.id, 
+            (
+              SELECT
+                tmp1.id
+              FROM
+                at_users tmp1
+              WHERE
+                tmp1.user_id = 
+                (
+                  SELECT
+                    tmp2.user_id
+                  FROM
+                    participate_groups tmp2
+                  WHERE
+                    tmp2.group_id = pg.group_id
+                  AND
+                    tmp2.user_id != u.id
+                )
+            )
+          )
+        AND
+          share = 1
+        UNION
+          SELECT
+            *
+          FROM
+            at_user_emoney_service_accounts auea
+          WHERE
+            auea.at_user_id in (au.id, 
+              (
+                SELECT
+                  tmp1.id
+                FROM
+                  at_users tmp1
+                WHERE
+                  tmp1.user_id = 
+                  (
+                    SELECT
+                      tmp2.user_id
+                    FROM
+                      participate_groups tmp2
+                    WHERE
+                      tmp2.group_id = pg.group_id
+                    AND
+                      tmp2.user_id != u.id
+                  )
+              )
+            )
+          AND
+            share = 1
+      ) THEN 1
+    ELSE 0
+  END AS 金融機関の共有の有無（夫婦）,
 
 
   CASE 
@@ -314,6 +468,33 @@ SELECT
   END AS 金融機関の共有数＿不明が実施,
 
 
+  CASE
+    WHEN EXISTS
+      (
+        SELECT
+          *
+        FROM
+          user_distributed_transactions udt
+        WHERE
+          udt.user_id in (u.id, 
+            (
+              SELECT
+                tmp.user_id
+              FROM
+                participate_groups tmp
+              WHERE
+                tmp.group_id = pg.group_id
+              AND
+                tmp.user_id != u.id
+            )
+          )
+        AND
+          share = 1
+      ) THEN 1
+    ELSE 0
+  END AS 明細の共有の有無（夫婦）,
+
+
   CASE 
     WHEN gender = 1 THEN
       COALESCE((
@@ -420,7 +601,20 @@ SELECT
     WHEN g.u IS NULL THEN 0
     ELSE g.u
   END AS 目標貯金作成数,
-
+  
+  CASE
+    WHEN EXISTS
+      (
+        SELECT
+          *
+        FROM
+          goals g
+        WHERE
+          pg.group_id = g.group_id
+      ) 
+      THEN 1
+    ELSE 0
+  END AS 目標貯金の有無（夫婦）,
 
   CASE
     WHEN g.created_at IS NULL THEN 0

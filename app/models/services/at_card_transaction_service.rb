@@ -28,12 +28,13 @@ class Services::AtCardTransactionService
       user_id: distributed[:user_distributed_transaction].user_id,
       is_account_shared: distributed[:is_account_shared],
       is_shared: distributed[:user_distributed_transaction].at_user_card_transaction.at_user_card_account.share || distributed[:user_distributed_transaction].share,
+      is_ignored: distributed[:user_distributed_transaction].ignore,
       payment_name: distributed[:user_distributed_transaction].at_user_card_transaction.at_user_card_account.fnc_nm + distributed[:user_distributed_transaction].at_user_card_transaction.at_user_card_account.brn_nm,
       transaction_id: distributed[:user_distributed_transaction].at_user_card_transaction_id,
     }
   end
 
-  def update(account_id, transaction_id, category_id, used_location, memo, is_shared, group_id)
+  def update(account_id, transaction_id, category_id, used_location, memo, is_shared, is_ignored, group_id)
     distributed = get_distributed_transaction(account_id, transaction_id)
     return {} if distributed.blank?
 
@@ -42,6 +43,7 @@ class Services::AtCardTransactionService
     distributed[:user_distributed_transaction].memo = memo
     distributed[:user_distributed_transaction].group_id = group_id
     distributed[:user_distributed_transaction].share = is_shared
+    distributed[:user_distributed_transaction].ignore = is_ignored
     distributed[:user_distributed_transaction].save!
     distributed
   end
