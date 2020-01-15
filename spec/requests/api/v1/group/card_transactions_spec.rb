@@ -6,7 +6,8 @@ RSpec.describe Api::V1::Group::CardTransactionsController do
   let(:params) { {
     at_transaction_category_id: 1,
     used_location: 'ミロク居酒屋 支払',
-    share: false
+    share: false,
+    ignore: false
   } }
   let(:at_user_card_account) { user.at_user.at_user_card_accounts.first }
   let(:at_user_card_transaction) { at_user_card_account.at_user_card_transactions.first }

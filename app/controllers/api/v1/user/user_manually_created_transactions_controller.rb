@@ -24,6 +24,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         else
           options = {transaction: nil}
         end
+        options[:ignore] = params.has_key?(:ignore) ? params[:ignore] : false
 
         # 口座が財布の場合は残高を計算する
         if params[:payment_method_type] == "wallet"
@@ -57,6 +58,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         else
           options = {}
         end
+        options[:ignore] = params.has_key?(:ignore) ? params[:ignore] : false
 
         # 口座が財布の場合は残高を計算する
         if params[:payment_method_type] == "wallet"
