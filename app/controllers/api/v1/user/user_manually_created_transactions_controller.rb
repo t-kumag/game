@@ -201,9 +201,11 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       # 無駄なキーを渡すと誤作動を起こす可能性があるので削除します。
       options.delete(:group_id)
       options.delete(:share)
+      options[:user_manually_created_transaction][:account] ||= "family"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
       Services::ActivityService.create_activity(current_user.partner_user.id, current_user.group_id, used_date, :individual_manual_outcome_fam, options)
     else
+      options[:user_manually_created_transaction][:account] ||= "personal"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
     end
   end
@@ -213,6 +215,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     tran[:id] = transaction.user_manually_created_transaction_id
     tran[:share] = transaction.share
     tran[:type] = "manually_created"
+    tran[:account] = nil
     tran
   end
 

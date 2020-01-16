@@ -245,7 +245,7 @@ class Services::ActivityService
   end
 
   def self.convert_user_manually_tran_url(transaction, defined_activity, activity)
-    activity[:url] = sprintf(defined_activity[:url], transaction[:id], transaction[:type])
+    activity[:url] = sprintf(defined_activity[:url], transaction[:id], transaction[:type], transaction[:account])
     activity
   end
 
