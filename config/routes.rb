@@ -14,6 +14,10 @@ Rails.application.routes.draw do
       delete 'auth/logout', to: 'auth#logout'
 
       resources :notices, :path => '/notices', :only => [:index, :create] do
+        collection do
+          get 'unread-total-count'
+          put 'all-read'
+        end
       end
       resources :activities, :path => '/activities', :only => [:index] do
       end
