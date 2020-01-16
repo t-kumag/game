@@ -52,7 +52,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
         account = Entities::AtUserEmoneyServiceAccount.find account_id
         account.update!(get_account_params)
         if account.share
-          options = create_activity_options("familly")
+          options = create_activity_options("family")
           Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly, options)
           Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner, options)
         end
