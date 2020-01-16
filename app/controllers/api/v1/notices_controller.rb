@@ -29,34 +29,34 @@ class Api::V1::NoticesController < ApplicationController
 
   def unread_total_count
     notices = Entities::Notice.all
-    notices_read = Entities::NoticesRead.where(user_id: @current_user.id)
+    notices_read = Entities::UserNotice.where(user_id: @current_user.id)
 
     save_list = []
     notices.each do |notice|
       if notices_read.present?
-        next if Services::NoticeReadService.already_exists?(notice, notices_read, @current_user)
-        save_list << Services::NoticeReadService.fetch_notice_read(notice, @current_user)
+        next if Services::UserNoticeService.already_exists?(notice, notices_read, @current_user)
+        save_list << Services::UserNoticeService.fetch_notice_read(notice, @current_user)
       else
-        save_list << Services::NoticeReadService.fetch_notice_read(notice, @current_user)
+        save_list << Services::UserNoticeService.fetch_notice_read(notice, @current_user)
       end
     end
 
-    Entities::NoticesRead.import save_list, :on_duplicate_key_update => [:user_id, :read]
-    @unread_total_count = Entities::NoticesRead.where(user_id: @current_user.id, read: false).count
+    Entities::UserNotice.import save_list, :on_duplicate_key_update => [:user_id, :read]
+    @unread_total_count = Entities::UserNotice.where(user_id: @current_user.id, read: false).count
     render 'unread_total_count', formats: 'json', handlers: 'jbuilder'
   end
 
   def all_read
-    unread_messages = Entities::NoticesRead.where(user_id: @current_user.id, read: false)
+    unread_messages = Entities::UserNotice.where(user_id: @current_user.id, read: false)
     save_list = unread_messages.map do |urm|
-      Entities::NoticesRead.new(
+      Entities::UserNotice.new(
           id: urm[:id],
           notice_id: urm[:notice_id],
           user_id: urm[:user_id],
           read: true
       )
     end
-    Entities::NoticesRead.import save_list, :on_duplicate_key_update => [:user_id, :read]
+    Entities::UserNotice.import save_list, :on_duplicate_key_update => [:user_id, :read]
     render json: {}, status: 200
   end
 

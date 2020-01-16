@@ -1,4 +1,4 @@
-class Services::NoticeReadService
+class Services::UserNoticeService
 
   def self.already_exists?(notice, notices_read, current_user)
     notices_read.find_by(notice_id: notice.id, user_id: current_user.id).present?

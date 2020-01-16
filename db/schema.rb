@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_06_093138) do
+ActiveRecord::Schema.define(version: 2020_01_16_061856) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -497,6 +497,16 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
     t.index ["user_id"], name: "index_user_manually_created_transactions_on_user_id"
   end
 
+  create_table "user_notices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "notice_id"
+    t.bigint "user_id", null: false
+    t.boolean "read"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notice_id"], name: "index_user_notices_on_notice_id"
+    t.index ["user_id"], name: "index_user_notices_on_user_id"
+  end
+
   create_table "user_pl_settings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.integer "pl_period_date"
@@ -610,6 +620,8 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
   add_foreign_key "user_icons", "users"
   add_foreign_key "user_manually_created_transactions", "at_transaction_categories"
   add_foreign_key "user_manually_created_transactions", "users"
+  add_foreign_key "user_notices", "notices"
+  add_foreign_key "user_notices", "users"
   add_foreign_key "user_pl_settings", "users"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "wallets", "users"
