@@ -2,6 +2,7 @@ class Api::V2::UsersController < ApplicationController
   before_action :authenticate_token, only: [:status]
 
   def status
+    return render json: { errors: [ERROR_TYPE::NUMBER['001003']] }, status: 422 if @current_user.nil?
     if @current_user.email_authenticated
       @response = {
         finance_registered: finance_registered?,
