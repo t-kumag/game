@@ -29,12 +29,12 @@ class Api::V1::NoticesController < ApplicationController
 
   def unread_total_count
     notices = Entities::Notice.all
-    notices_read = Entities::UserNotice.where(user_id: @current_user.id)
+    user_notice = Entities::UserNotice.where(user_id: @current_user.id)
 
     save_list = []
     notices.each do |notice|
-      if notices_read.present?
-        next if Services::UserNoticeService.already_exists?(notice, notices_read, @current_user)
+      if user_notice.present?
+        next if Services::UserNoticeService.already_exists?(notice, user_notice, @current_user)
         save_list << Services::UserNoticeService.fetch_notice_read(notice, @current_user)
       else
         save_list << Services::UserNoticeService.fetch_notice_read(notice, @current_user)
