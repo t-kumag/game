@@ -1,0 +1,2 @@
+class Migrate < ApplicationRecord
+end

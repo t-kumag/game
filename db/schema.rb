@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_15_110032) do
+ActiveRecord::Schema.define(version: 2020_01_06_093138) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -371,16 +371,6 @@ ActiveRecord::Schema.define(version: 2020_01_15_110032) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "notices_reads", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.bigint "notice_id"
-    t.bigint "user_id", null: false
-    t.boolean "read"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["notice_id"], name: "index_notices_reads_on_notice_id"
-    t.index ["user_id"], name: "index_notices_reads_on_user_id"
-  end
-
   create_table "oauth_access_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "resource_owner_id"
     t.integer "application_id"
@@ -600,8 +590,6 @@ ActiveRecord::Schema.define(version: 2020_01_15_110032) do
   add_foreign_key "goals", "goal_types"
   add_foreign_key "goals", "groups"
   add_foreign_key "goals", "users"
-  add_foreign_key "notices_reads", "notices"
-  add_foreign_key "notices_reads", "users"
   add_foreign_key "pairing_requests", "groups"
   add_foreign_key "pairing_requests", "users", column: "from_user_id"
   add_foreign_key "pairing_requests", "users", column: "to_user_id"
