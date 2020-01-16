@@ -47,7 +47,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
     )
 
     if @response[:user_distributed_transaction].share
-      options = create_activity_options(@response[:user_distributed_transaction], emoney_account_transaction_param, "familly")
+      options = create_activity_options(@response[:user_distributed_transaction], emoney_account_transaction_param, "family")
       Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
                                                 DateTime.now, :person_tran_to_familly, options)
       Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
