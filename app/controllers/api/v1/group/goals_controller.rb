@@ -145,7 +145,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     if partner_at_user_id.present?
-      user_banks = [] if user_banks.nil?
+      user_banks ||= []
       user_banks << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).try(:pluck, :id)
       user_banks.flatten!
     end
