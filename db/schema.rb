@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_06_093138) do
+ActiveRecord::Schema.define(version: 2020_01_20_092044) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
   create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_bank_id"
-    t.bigint "balance", default: 0, null: false, unsigned: true
+    t.bigint "balance", default: 0, null: false
     t.boolean "share", default: false, null: false
     t.string "fnc_id", null: false
     t.string "fnc_cd", null: false
@@ -304,9 +304,9 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
   end
 
   create_table "goal_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.integer "user_id"
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
+    t.bigint "wallet_id"
     t.bigint "add_amount", default: 0, null: false
     t.bigint "monthly_amount", default: 0, null: false
     t.bigint "first_amount", default: 0, null: false
@@ -316,13 +316,17 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
     t.datetime "updated_at", null: false
     t.bigint "goal_amount", default: 0, null: false
     t.datetime "add_date"
+    t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_logs_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_logs_on_goal_id"
+    t.index ["wallet_id"], name: "index_goal_logs_on_wallet_id"
   end
 
   create_table "goal_settings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
+    t.bigint "wallet_id"
+    t.bigint "wallet_id_id"
     t.bigint "monthly_amount", default: 0, null: false
     t.bigint "first_amount", default: 0, null: false
     t.datetime "created_at", null: false
@@ -330,6 +334,8 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
     t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_settings_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_settings_on_goal_id"
+    t.index ["wallet_id"], name: "index_goal_settings_on_wallet_id"
+    t.index ["wallet_id_id"], name: "index_goal_settings_on_wallet_id_id"
   end
 
   create_table "goal_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -497,6 +503,16 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
     t.index ["user_id"], name: "index_user_manually_created_transactions_on_user_id"
   end
 
+  create_table "user_notices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "notice_id"
+    t.bigint "user_id", null: false
+    t.boolean "read"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notice_id"], name: "index_user_notices_on_notice_id"
+    t.index ["user_id"], name: "index_user_notices_on_user_id"
+  end
+
   create_table "user_pl_settings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.integer "pl_period_date"
@@ -585,8 +601,10 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
   add_foreign_key "goal_logs", "at_user_bank_accounts"
   add_foreign_key "goal_logs", "goals"
+  add_foreign_key "goal_logs", "wallets"
   add_foreign_key "goal_settings", "at_user_bank_accounts"
   add_foreign_key "goal_settings", "goals"
+  add_foreign_key "goal_settings", "wallets"
   add_foreign_key "goals", "goal_types"
   add_foreign_key "goals", "groups"
   add_foreign_key "goals", "users"
@@ -610,6 +628,8 @@ ActiveRecord::Schema.define(version: 2020_01_06_093138) do
   add_foreign_key "user_icons", "users"
   add_foreign_key "user_manually_created_transactions", "at_transaction_categories"
   add_foreign_key "user_manually_created_transactions", "users"
+  add_foreign_key "user_notices", "notices"
+  add_foreign_key "user_notices", "users"
   add_foreign_key "user_pl_settings", "users"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "wallets", "users"
