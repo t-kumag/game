@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_16_061856) do
+ActiveRecord::Schema.define(version: 2020_01_20_092044) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -306,6 +306,7 @@ ActiveRecord::Schema.define(version: 2020_01_16_061856) do
   create_table "goal_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
+    t.bigint "wallet_id"
     t.bigint "add_amount", default: 0, null: false
     t.bigint "monthly_amount", default: 0, null: false
     t.bigint "first_amount", default: 0, null: false
@@ -318,11 +319,13 @@ ActiveRecord::Schema.define(version: 2020_01_16_061856) do
     t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_logs_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_logs_on_goal_id"
+    t.index ["wallet_id"], name: "index_goal_logs_on_wallet_id"
   end
 
   create_table "goal_settings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
+    t.bigint "wallet_id"
     t.bigint "monthly_amount", default: 0, null: false
     t.bigint "first_amount", default: 0, null: false
     t.datetime "created_at", null: false
@@ -330,6 +333,7 @@ ActiveRecord::Schema.define(version: 2020_01_16_061856) do
     t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_settings_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_settings_on_goal_id"
+    t.index ["wallet_id"], name: "index_goal_settings_on_wallet_id"
   end
 
   create_table "goal_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -595,8 +599,10 @@ ActiveRecord::Schema.define(version: 2020_01_16_061856) do
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
   add_foreign_key "goal_logs", "at_user_bank_accounts"
   add_foreign_key "goal_logs", "goals"
+  add_foreign_key "goal_logs", "wallets"
   add_foreign_key "goal_settings", "at_user_bank_accounts"
   add_foreign_key "goal_settings", "goals"
+  add_foreign_key "goal_settings", "wallets"
   add_foreign_key "goals", "goal_types"
   add_foreign_key "goals", "groups"
   add_foreign_key "goals", "users"
