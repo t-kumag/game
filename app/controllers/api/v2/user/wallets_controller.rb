@@ -9,7 +9,7 @@ class Api::V2::User::WalletsController < ApplicationController
         name: w.name,
         amount: w.balance,
         # TODO: 目標は次回対応
-        # goals: Services::GoalService.new(@current_user).goals(a.id)
+        goals: Services::GoalService.new(@current_user).goals(nil, false, w.id)
       }
     end
     render 'list', formats: 'json', handlers: 'jbuilder'

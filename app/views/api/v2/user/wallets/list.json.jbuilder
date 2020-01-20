@@ -6,8 +6,9 @@ json.wallets do
     json.goals do
       r[:goals].blank? ? [] :
           json.array!(r[:goals]) do |g|
-            json.current_amount g[:current_amount]
-            json.name g[:name]
+            json.current_amount g
+            json.name r
+            json.fugaa r[:name]
           end
     end
   end
