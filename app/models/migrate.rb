@@ -1,2 +1,0 @@
-class Migrate < ApplicationRecord
-end
