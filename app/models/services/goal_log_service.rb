@@ -20,6 +20,7 @@ class Services::GoalLogService
     params = {
         goal_id: goal.id,
         at_user_bank_account_id: goal_setting.at_user_bank_account_id,
+        wallet_id: goal_setting.wallet_id,
         monthly_amount: 0,
         first_amount: goal_setting.first_amount,
         add_amount: 0,
