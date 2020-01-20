@@ -51,9 +51,9 @@ class Api::V1::User::CardTransactionsController < ApplicationController
     if @response[:user_distributed_transaction].share
       options = create_activity_options(@response[:user_distributed_transaction], card_account_transaction_param, "family")
       Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
-                                                DateTime.now, :person_tran_to_familly, options)
+                                                DateTime.now, :person_tran_to_family, options)
       Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
-                                                DateTime.now, :person_tran_to_familly_partner, options)
+                                                DateTime.now, :person_tran_to_family_partner, options)
     end
 
     render json: {}, status: 200 and return if @response[:user_distributed_transaction].blank?

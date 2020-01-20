@@ -35,8 +35,8 @@ class Api::V2::User::WalletsController < ApplicationController
       wallet.update!(update_params)
       if wallet.share
         # TODO: アクティビティ修正
-        # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
-        # Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner)
+        # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family)
+        # Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_family_partner)
       end
       render json: {}, status: :no_content
     else

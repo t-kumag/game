@@ -55,8 +55,8 @@ class Api::V1::User::CardAccountsController < ApplicationController
         account.update!(get_account_params)
         if account.share
           options = create_activity_options("family")
-          Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly, options)
-          Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner, options)
+          Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family, options)
+          Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_family_partner, options)
         end
         render json: {}, status: 200
       else
