@@ -205,7 +205,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
       Services::ActivityService.create_activity(current_user.partner_user.id, current_user.group_id, used_date, :individual_manual_outcome_fam, options)
     else
-      options[:user_manually_created_transaction][:account] ||= "personal"
+      options[:user_manually_created_transaction][:account] ||= "person"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
     end
   end
