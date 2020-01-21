@@ -144,10 +144,11 @@ class Services::GoalService
   def goals(bank_id, with_group=false, wallet_id=nil)
     user_ids = [@user.id]
     user_ids.push(@user.partner_user.id) if with_group
-    goals = Entities::GoalSetting.where(at_user_bank_account_id: bank_id, user_id: user_ids) if bank_id.present?
-    goals = Entities::GoalSetting.where(wallet_id: wallet_id, user_id: user_ids) if wallet_id.present?
 
-    goals.map do |gs|
+    goal_settings = Entities::GoalSetting.where(at_user_bank_account_id: bank_id, user_id: user_ids) if bank_id.present?
+    goal_settings = Entities::GoalSetting.where(wallet_id: wallet_id, user_id: user_ids) if wallet_id.present?
+
+    goals = goal_settings.map do |gs|
       # 現状は goal 削除時に goal_settings はそのままのため、ここで除外する
       next if gs.goal.nil?
       user = Entities::User.find(gs.user_id)
@@ -175,7 +176,6 @@ class Services::GoalService
   end
 
   def get_user_current_amount(user, goal_id)
-    binding.pry
     goal_logs = Entities::GoalLog.where(user_id: user.id, goal_id: goal_id)
     monthly_amount = get_monthly_amount_sum(goal_logs)
     first_amount = get_first_amount_sum(goal_logs)
