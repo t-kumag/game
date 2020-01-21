@@ -74,8 +74,6 @@ class Services::AtUserService::Sync
       Rails.logger.error("ERROR Services::AtUserService::Sync#sync_account")
       SlackNotifier.ping(e)
       Rails.logger.error(e)
-      SlackNotifier.ping(e.backtrace)
-      Rails.logger.error(e.backtrace)
     end
   end
 

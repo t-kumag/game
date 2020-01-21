@@ -91,7 +91,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         partner_goal_setting.update!(get_partner_goal_setting_params)
         options = create_activity_options(goal)
         update_goal_activity(options)
-        unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
+        unless Services::GoalLogService.already_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
         end
         create_goal_finished_activity(options) if over_current_amount?(before_goal) && over_goal_amount?(goal)
