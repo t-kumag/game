@@ -15,7 +15,7 @@ location.href = `${custom_pairing_url}${token}`
 // アプリを起動処理で未インストールだった場合のタイマー処理
 let timerId = setTimeout(function() {
     // osidoriのホームページに飛ばす
-    location.href = osidori_home_url;
+    location.href = `${osidori_home_url}?token=${token}`;
 }, 5000); 
 
 /**
