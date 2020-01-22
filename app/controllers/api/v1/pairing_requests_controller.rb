@@ -16,19 +16,24 @@ class Api::V1::PairingRequestsController < ApplicationController
     puts 'receive_pairing_request =========='
     p params[:pairing_token]
 
+    @pairing_request = Entities::PairingRequest.find_by(
+      token: params[:pairing_token],
+      status: 1
+    )
+
+    unless @pairing_request
+      return render json: { errors: [ERROR_TYPE::NUMBER['006006']] }, status: 422
+    end
+
+    return render json: { errors: [ERROR_TYPE::NUMBER['006007']] }, status: 422 if DateTime.now > @pairing_request.token_expires_at
+    return render json: { errors: [ERROR_TYPE::NUMBER['006003']] }, status: 422 if @pairing_request.status.to_i == 2
+    return render json: { errors: [ERROR_TYPE::NUMBER['006002']] }, status: 422 if @pairing_request.from_user_id == @current_user.id
+
+    @pairing_request.status = 2
+    @pairing_request.save!
+
     begin
       ActiveRecord::Base.transaction do
-        @pairing_request = Entities::PairingRequest.find_by(
-          token: params[:pairing_token],
-          status: 1
-        )
-        unless @pairing_request
-          return render json: { errors: [ERROR_TYPE::NUMBER['006006']] }, status: 422
-        end
-
-        return render json: { errors: [ERROR_TYPE::NUMBER['006007']] }, status: 422 if DateTime.now > @pairing_request.token_expires_at
-        return render json: { errors: [ERROR_TYPE::NUMBER['006003']] }, status: 422 if @pairing_request.status.to_i == 2
-        return render json: { errors: [ERROR_TYPE::NUMBER['006002']] }, status: 422 if @pairing_request.from_user_id == @current_user.id
 
         from_user_group = Entities::ParticipateGroup.find_by(user_id: @pairing_request.from_user_id)
         return render json: { errors: [ERROR_TYPE::NUMBER['006004']] }, status: 422 if from_user_group.present?
@@ -39,7 +44,6 @@ class Api::V1::PairingRequestsController < ApplicationController
         new_group = Entities::Group.create!
 
         @pairing_request.to_user_id = @current_user.id
-        @pairing_request.status = 2
         @pairing_request.group_id = new_group.id
         @pairing_request.save!
 
