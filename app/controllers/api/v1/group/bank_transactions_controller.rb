@@ -40,7 +40,9 @@ class Api::V1::Group::BankTransactionsController < ApplicationController
         transaction_id,
         params[:at_transaction_category_id],
         params[:used_location],
+        params[:memo],
         params[:share],
+        params[:ignore],
         params[:share] ? @current_user.group_id : nil
     )
     render json: {}, status: 200 and return if @response.blank?

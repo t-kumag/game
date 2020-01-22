@@ -41,7 +41,9 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
         emoney_account_transaction_param[:transaction_id],
         emoney_account_transaction_param[:at_transaction_category_id],
         emoney_account_transaction_param[:used_location],
+        emoney_account_transaction_param[:memo],
         emoney_account_transaction_param[:share],
+        emoney_account_transaction_param[:ignore],
         emoney_account_transaction_param[:group_id],
     )
 
@@ -60,13 +62,18 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
     at_transaction_category_id = params[:at_transaction_category_id].present? ?
                                      params[:at_transaction_category_id] : exist_transaction[:at_transaction_category_id]
     used_location = params[:used_location].present? ? params[:used_location] : exist_transaction[:used_location]
+    memo = params[:memo].present? ? params[:memo] : exist_transaction[:memo]
     share = params[:share].present? ? params[:share] : false
+    ignore = params[:ignore].present? ? params[:ignore] : false
+
     {
         emoney_account_id: params[:emoney_account_id],
         transaction_id: transaction_id,
         at_transaction_category_id: at_transaction_category_id,
         used_location: used_location,
+        memo: memo,
         share: share,
+        ignore: ignore,
         group_id: share ? @current_user.group_id : nil
     }
   end

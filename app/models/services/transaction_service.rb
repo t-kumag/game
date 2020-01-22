@@ -43,13 +43,16 @@ class Services::TransactionService
         at_user_bank_account_id:    t.at_user_bank_transaction.try(:at_user_bank_account_id),
         at_user_card_account_id:   t.at_user_card_transaction.try(:at_user_card_account_id),
         at_user_emoney_service_account_id: t.at_user_emoney_transaction.try(:at_user_emoney_service_account_id),
+        wallet_id: wallet_id_for_taransaction(t),
         at_transaction_category_id: t.at_transaction_category_id,
         is_shared: shared_account?(t, shared_accounts) || t.share,
         is_account_shared: shared_account?(t, shared_accounts),
+        is_ignored: t.ignore,
         user_id: t.user_id,
         amount: t.amount,
         used_date: t.used_date,
         used_location: t.used_location,
+        memo: t.memo,
         transaction_id: t.at_user_bank_transaction_id || t.at_user_card_transaction_id || t.at_user_emoney_transaction_id || t.user_manually_created_transaction_id,
         type: type(t)
       }
@@ -189,5 +192,12 @@ class Services::TransactionService
       shared[:emoney_account_ids] = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
     end
     shared
+  end
+
+  def wallet_id_for_taransaction(taransaction)
+    return nil if taransaction.blank? || taransaction.user_manually_created_transaction.blank?
+    ut = taransaction.user_manually_created_transaction
+    return nil unless ut.try(:payment_method_type)
+    ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
 end
