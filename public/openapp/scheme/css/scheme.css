@@ -1,0 +1,96 @@
+@charset "UTF-8";
+/* CSS Document */
+
+*{box-sizing: border-box;}
+
+/*
+body{
+  width: 100%;
+  background-image: url(../img/bg.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+*/
+html{
+  font-size: 62.5%;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", YuGothic, "ヒラギノ角ゴ ProN W3", Hiragino Kaku Gothic ProN, Arial, "メイリオ", Meiryo, sans-serif;}
+
+html, css{
+  touch-action:none;
+}
+
+
+body{
+height: 100%;
+margin: 0;
+color: #fff;
+font-size:1.4rem;
+/* max-width: 375px; */
+  margin: 0 auto;
+}
+
+.scheme-wrapper.bg{
+  /* 画面いっぱいに背景画像を貼り付ける */
+  background: url(../img/bg.jpg) no-repeat center;
+  background-size: cover;
+  position: relative;
+  height: 100vh;
+}
+.scheme-wrapper.bg::before{
+  /* 透過した黒を上から重ねるイメージ */
+  background-color: rgba(0,0,0,0.4);
+  /* 自由に位置指定 */
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  content: ' ';
+}
+
+.scheme-wrapper main{
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top:19.7vh;
+}
+.scheme-wrapper p{
+  margin-bottom: 5px;
+  font-size: 4.8vw;
+  font-weight: bold;
+}
+.scheme-wrapper h1{
+  line-height: 1.3;
+  font-size: 5.33vw;
+}
+.scheme-wrapper img{
+  margin-top: 5.67vh;
+  margin-bottom: 2.46vh;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  width: 26.66vw;
+  height: auto;
+}
+.scheme-wrapper .btn{
+  position: relative;
+  display: inline-block;
+  border: 1px solid #AFAFAF;
+  border-radius: 5px;
+  width: 74.66vw;
+  height: 6.16vh;
+  background: -moz-linear-gradient(top, #98DE0D, #70C80E);
+  background: -webkit-linear-gradient(top, #98DE0D, #70C80E);
+  background: linear-gradient(to bottom, #98DE0D, #70C80E);
+}
+.scheme-wrapper .btn a{
+  color: #fff;
+  text-decoration: none;
+  font-size: 4.26vw;
+  font-weight: bold;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
