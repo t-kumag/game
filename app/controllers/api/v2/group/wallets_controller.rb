@@ -16,9 +16,6 @@ class Api::V2::Group::WalletsController < ApplicationController
   end
 
   def create
-    unless limit_of_registered_finance?
-      return render json: { errors: { code: '007002', message: 'five account limit of free users' } }, status: 422
-    end
     Entities::Wallet.create!(create_params)
     render json: {}, status: :no_content
   end
