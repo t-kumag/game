@@ -98,7 +98,7 @@ Resource of Transactions
 
 * category_id (int)
 * share (boolean)
-* scope (string) [income|outcome]
+* scope (string) [income|expence]
 * from (date)
 * to (date)
 
@@ -148,7 +148,7 @@ Resource of Transactions
 
 * category_id (int)
 * share (boolean)
-* scope (string) [income|outcome]
+* scope (string) [income|expence]
 * from (date)
 * to (date)
 
@@ -1531,7 +1531,7 @@ Resource of Profiles
 #### URL Parameters
 
 * category_id (int)
-* scope (string) [income|outcome]
+* scope (string) [income|expence]
 * from (date)
 * to (date)
 
@@ -1581,7 +1581,7 @@ Resource of Profiles
 
 * category_id (int)
 * share (boolean)
-* scope (string) [income|outcome]
+* scope (string) [income|expence]
 * from (date)
 * to (date)
 
@@ -3021,6 +3021,10 @@ Resource of Budget Questions
 Resource of Category
 
 ### カテゴリ取得 [GET]
+
+#### URL Parameters
+
+* type (string) [income|expense]
 
 + Request カテゴリ取得 (application/json)
 
