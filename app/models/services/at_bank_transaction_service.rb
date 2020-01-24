@@ -43,7 +43,7 @@ class Services::AtBankTransactionService
     distributed[:user_distributed_transaction].memo = memo
     distributed[:user_distributed_transaction].group_id = group_id
     distributed[:user_distributed_transaction].share = is_shared
-    distributed[:user_distributed_transaction].ignore = is_ignored if is_ignored.nil? ? is_ignored = 0 : is_ignored
+    distributed[:user_distributed_transaction].ignore = is_ignored.present? ? is_ignored : false
     distributed[:user_distributed_transaction].save!
     distributed
   end
