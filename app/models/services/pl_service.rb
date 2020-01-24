@@ -4,7 +4,7 @@ class Services::PlService
     @user = user
     @with_group = with_group
   end
-  
+
   def ignore_at_category_ids
     if exclusion_pattern?
       [
@@ -12,8 +12,8 @@ class Services::PlService
       ]
     else
       [
-        '00000' # 存在しないATカテゴリーID
-      ] 
+        "\'00000\'" # 存在しないATカテゴリーID
+      ]
     end
   end
 
@@ -400,7 +400,7 @@ class Services::PlService
   end
 
   private
-  
+
   def remove_debit_transactions(pl_bank, pl_card)
     # デビットの明細リスト
     debit_transactions = debit_transactions(pl_bank, pl_card)
