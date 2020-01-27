@@ -159,6 +159,10 @@ Rails.application.routes.draw do
         put 'pl-settings', :to => 'pl_settings#update'
         get 'pl-settings', :to => 'pl_settings#show'
 
+        resources :stock_accounts, path: '/stock-accounts' do
+          resources :asset_products, path: '/asset-products', on: :member, only: [:index]
+        end
+
       end
 
       # 共有用
@@ -180,6 +184,10 @@ Rails.application.routes.draw do
 
         resources :wallets, path: '/wallets' do
           resources :wallet_transactions, path: '/transactions', on: :member, only: [:index, :show]
+        end
+
+        resources :stock_accounts, path: '/stock-accounts' do
+          resources :asset_products, path: '/asset-products', on: :member, only: [:index]
         end
       end
 

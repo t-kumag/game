@@ -21,25 +21,12 @@ class Services::AtUserService::Sync
     puts @accounts_from_at
   end
 
-  def sync_account(rec_key, financier_type_key, financier_entity, account_entity, data_column)
+  def sync_account(rec_key, account_entity, data_column)
     begin
-      ## db
-      store_data = financier_entity.all
-      fnc_cds = store_data.map(&:fnc_cd)
-      financiers = store_data.map { |i| { i.fnc_cd => i } }
-
       ## account tracker上のデータ
       accounts = []
       if @accounts_from_at.key?(rec_key) && !@accounts_from_at[rec_key].blank?
         @accounts_from_at[rec_key].each do |i|
-          financier = nil
-          if fnc_cds.include?(fnc_cd: i['FNC_CD'])
-            financier = financiers[i['FNC_CD']]
-          else
-            src_financier = financier_entity.new(fnc_cd: i['FNC_CD'], fnc_nm: i['FNC_NM'])
-            src_financier.save!
-            financier = src_financier
-          end
 
           # バルクインサートするための初期値を設定
           account = account_entity.new(
@@ -51,7 +38,6 @@ class Services::AtUserService::Sync
           )
 
           # ATのデータをセットする
-          account[financier_type_key] = financier.id
           data_column.each do |k, v|
             # AT からのレスポンスに含まれないカラムはスキップする
             next if k == 'error_date' || k == 'error_count'
@@ -176,6 +162,74 @@ class Services::AtUserService::Sync
     p exception.backtrace
   end
 
+  # 証券データを登録する
+  # 他の金融タイプとはデータ構造が異なるので別処理
+  def sync_asset(asset_product_column, product_coloum)
+    begin
+      assets_key = "ASSETS_REC"
+      assets_product_key = "ASSETS_PRODUCT_REC"
+      product_key = "PRODUCT_REC"
+
+      puts 'sync asset_log start ==============='
+      start_date = Time.now.ago(Settings.at_sync_transaction_max_days.days).strftime('%Y%m%d')
+      end_date = Time.now.strftime('%Y%m%d')
+      token = @user.at_user.at_user_tokens.first.token
+
+      # ATデータ取得
+      stock_account = Entities::AtUserStockAccount.where(at_user_id: @user.at_user.id)
+      stock_account_ids = stock_account.pluck(:id)
+      # AT仕様に合わせてDel/Ins
+      # 商品合計を削除
+      Entities::AtUserAssetProduct.where(at_user_stock_account_id: stock_account_ids).destroy_all
+      stock_account.each do |a|
+        params = {
+            token: token,
+            fnc_id: a.fnc_id,
+            start_date: start_date,
+            end_date: end_date
+        }
+        requester = AtAPIRequest::AtUser::GetTransactions.new(params)
+        res = AtAPIClient.new(requester).request
+
+        # ATの仕様で証券は必ず配列は1件のみ
+        res = res[assets_key][0][assets_product_key] if res.key?(assets_key) && res[assets_key].count == 1
+        p res
+
+        return if res.blank?
+
+        res.each do |r|
+          # 商品合計を登録
+          save_asset_product = {}
+          asset_product_column.each do |k, v|
+            if v[:opt].blank?
+              save_asset_product[k] = r[v[:col]]
+            elsif  v[:opt] == 'rec_parse' && k.present?
+              asset_product_column.delete(k)
+            end
+          end
+          save_asset_product[:at_user_stock_account_id] = a.id
+          asset_product = Entities::AtUserAssetProduct.create!(save_asset_product)
+
+          # 商品個別を登録
+          save_product = {}
+          next unless r.key?(product_key)
+          r[product_key].each do |rp|
+            product_coloum.each do |k, v|
+              save_product[k] = rp[v[:col]]
+              save_product[:at_user_asset_product_id] = asset_product.id
+            end
+            Entities::AtUserProduct.create!(save_product)
+          end
+        end
+      end
+    rescue => e
+      SlackNotifier.ping("ERROR Services::AtUserService::Sync#sync_asset_log")
+      Rails.logger.error("ERROR Services::AtUserService::Sync#sync_asset_log")
+      SlackNotifier.ping(e)
+      Rails.logger.error(e)
+    end
+  end
+
   # ビジネスサイドの仕様
   # 無料会員はfnc_idごとに1日1回まで実行する
   # TODO: 1日1回という判断をどうやるか？
@@ -203,8 +257,6 @@ class Services::AtUserService::Sync
     if @fnc_type === 'all' || @fnc_type === 'card'
       sync_account(
         'CARD_DATA_REC',
-        'at_card_id',
-        Entities::AtCard,
         Entities::AtUserCardAccount,
         fnc_id: { col: 'FNC_ID' },
         fnc_cd: { col: 'FNC_CD' },
@@ -227,8 +279,6 @@ class Services::AtUserService::Sync
     if @fnc_type === 'all' || @fnc_type === 'bank'
       sync_account(
         'BANK_DATA_REC',
-        'at_bank_id',
-        Entities::AtBank,
         Entities::AtUserBankAccount,
         fnc_id: { col: 'FNC_ID' },
         fnc_cd: { col: 'FNC_CD' },
@@ -252,8 +302,6 @@ class Services::AtUserService::Sync
     if @fnc_type === 'all' || @fnc_type === 'etc'
       sync_account(
         'ETC_DATA_REC',
-        'at_emoney_service_id',
-        Entities::AtEmoneyService,
         Entities::AtUserEmoneyServiceAccount,
         fnc_id: { col: 'FNC_ID' },
         fnc_cd: { col: 'FNC_CD' },
@@ -267,6 +315,31 @@ class Services::AtUserService::Sync
         last_rslt_msg: { col: 'LAST_RSLT_MSG' },
         error_date: { col: 'CUSTOM_COLUMN' },
         error_count: { col: 'CUSTOM_COLUMN' }
+      )
+    end
+
+    if @fnc_type === 'all' || @fnc_type === 'stock'
+      sync_account(
+          'STOCK_DATA_REC',
+          Entities::AtUserStockAccount,
+          fnc_id: { col: 'FNC_ID' },
+          fnc_cd: { col: 'FNC_CD' },
+          fnc_nm: { col: 'FNC_NM' },
+          corp_yn: { col: 'CORP_YN' },
+          brn_cd: { col: 'BRN_CD' },
+          brn_nm: { col: 'BRN_NM' },
+          sv_type: { col: 'SV_TYPE' },
+          memo: { col: 'MEMO' },
+          balance: { col: 'BALANCE' },
+          profit_loss_amount: { col: 'PROFIT_LOSS_AMOUNT' },
+          deposit_balance: { col: 'DEPOSIT_BALANCE' },
+          use_yn: { col: 'USE_YN' },
+          cert_type: { col: 'CERT_TYPE' },
+          scrap_dtm: { col: 'SCRAP_DTM', opt: 'time_parse' },
+          last_rslt_cd: { col: 'LAST_RSLT_CD' },
+          last_rslt_msg: { col: 'LAST_RSLT_MSG' },
+          error_date: { col: 'CUSTOM_COLUMN' },
+          error_count: { col: 'CUSTOM_COLUMN' }
       )
     end
   end
@@ -338,6 +411,24 @@ class Services::AtUserService::Sync
           seq: { col: 'SEQ' }
         },
         true # has_balance
+      )
+    end
+
+    if @fnc_type === 'all' || @fnc_type === 'stock'
+      sync_asset(
+          {
+              assets_product_type: { col: 'ASSETS_PRODUCT_TYPE' },
+              assets_product_profit_loss_amount: { col: 'ASSETS_PRODUCT_PROFIT_LOSS_AMOUNT' },
+              assets_product_balance: { col: 'ASSETS_PRODUCT_BALANCE' },
+              product_rec: { col: 'PRODUCT_REC', opt: 'rec_parse' }
+          },
+          {
+              product_balance: { col: 'PRODUCT_BALANCE' },
+              product_bond_rate: { col: 'PRODUCT_BOND_RATE' },
+              product_name: { col: 'PRODUCT_NAME' },
+              product_profit_loss_rate: { col: 'PRODUCT_PROFIT_LOSS_RATE' },
+              product_profit_loss_amount: { col: 'PRODUCT_PROFIT_LOSS_AMOUNT' }
+          }
       )
     end
   end
