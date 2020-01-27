@@ -64,7 +64,7 @@ class Api::V1::UsersController < ApplicationController
 
       render json: {}, status: 200
     else
-      render json: { errors: { code: '', message: "email not found." } }, status: 422
+      render json: { errors: [ERROR_TYPE::NUMBER['001002']] }, status: 422
     end
   end
 
@@ -87,7 +87,7 @@ class Api::V1::UsersController < ApplicationController
       current_user.save!
       render json: {}, status: 200
     else
-      render json: { errors: { code: '', message: "user not found or invalid token." } }, status: 422
+      render json: { errors: [ERROR_TYPE::NUMBER['001003']] }, status: 422
     end
   end
 
@@ -98,7 +98,7 @@ class Api::V1::UsersController < ApplicationController
     # 無料ユーザーの口座数が上限に達していた場合はエラーを返し口座数を制限する
     # AT口座のエラー解消の場合は口座数の制限はスキップする
     if limit_of_registered_finance? == false && skip_account_limit == false
-        return render json: { errors: { code: '007002', message: "five account limit of free users" } }, status: 422
+        return render json: { errors: [ERROR_TYPE::NUMBER['007002']] }, status: 422
     end
 
     @response = Services::AtUserService.new(@current_user).at_url
@@ -126,8 +126,9 @@ class Api::V1::UsersController < ApplicationController
       at_user_service.sync_user_distributed_transaction
     rescue => e
       SlackNotifier.ping("ERROR Api::V1::UsersController#at_sync")
+      Rails.logger.error("ERROR Api::V1::UsersController#at_sync")
       SlackNotifier.ping(e)
-      logger.error(e.backtrace)
+      Rails.logger.error(e)
     end
 
     render json: {}, status: 200

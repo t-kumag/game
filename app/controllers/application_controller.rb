@@ -147,6 +147,7 @@ class ApplicationController < ActionController::Base
   def check_temporary_user
     @response = Entities::User.temporary_user(params[:email])
     if @response.present?
+      @error_response = [ERROR_TYPE::NUMBER['001001']]
       render 'api/v1/errors/temporary_registration', formats: 'json', handlers: 'jbuilder', status: 422
     end
   end
@@ -399,34 +400,33 @@ class ApplicationController < ActionController::Base
   end
 
   def require_group
-    render json: { errors: { code: '', message: "Require group." } }, status: 422 unless @current_user.group_id.present?
-  end
-
-  def render_disallowed_account_ids
-    render json: { errors: { code: '003002', message: "Disallowed account id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['006001']] }, status: 422 unless @current_user.group_id.present?
   end
 
   def render_disallowed_financier_ids
-    render json: { errors: { code: '', message: "Disallowed financier id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['003001']] }, status: 422
+  end
+
+  def render_disallowed_account_ids
+    render json: { errors: [ERROR_TYPE::NUMBER['003002']] }, status: 422
   end
 
   def render_disallowed_transaction_ids
-    render json: { errors: { code: '', message: "Disallowed transaction id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['004001']] }, status: 422
   end
 
   def render_disallowed_goal_ids
-    render json: { errors: { code: '', message: "Disallowed goal id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['005002']] }, status: 422
   end
 
   def render_disallowed_goal_setting_ids
-    render json: { errors: { code: '', message: "Disallowed goal setting id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422
   end
 
   def limit_of_registered_finance?
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
     at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
-    wallet_ids = @current_user.try(:wallets).try(:pluck ,:id)
 
     number_of_account =  0
     if at_user_bank_account_ids.present?
@@ -441,9 +441,6 @@ class ApplicationController < ActionController::Base
       number_of_account += at_user_emoney_service_account_ids.count
     end
 
-    if wallet_ids.present?
-      number_of_account += wallet_ids.count
-    end
     @current_user.free? && number_of_account < Settings.at_user_limit_free_account
   end
 end

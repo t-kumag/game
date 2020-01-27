@@ -15,7 +15,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
-    render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @response.blank?
+    render(json: { errors: [ERROR_TYPE::NUMBER['005001']] }, status: 422) and return if @response.blank?
 
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
@@ -72,12 +72,12 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
-    render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if before_goal.blank?
+    render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422 and return if before_goal.blank?
     goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
     partner_goal_setting = Entities::GoalSetting.find_by(id: params[:partner_goal_settings][:goal_setting_id])
 
     if goal_setting.blank? || partner_goal_setting.blank?
-      render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return
+      render json: { errors: [ERROR_TYPE::NUMBER['005005']] }, status: 422 and return
     end
 
     # 頭金を入金する際に必要
@@ -91,7 +91,7 @@ class Api::V1::Group::GoalsController < ApplicationController
         partner_goal_setting.update!(get_partner_goal_setting_params)
         options = create_activity_options(goal)
         update_goal_activity(options)
-        unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
+        unless Services::GoalLogService.already_exist_first_amount(params[:id], @current_user.id)
           goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
         end
         create_goal_finished_activity(options) if over_current_amount?(before_goal) && over_goal_amount?(goal)
@@ -112,7 +112,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     if goal.blank?
-      render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return
+      render json: { errors: [ERROR_TYPE::NUMBER['005004']] }, status: 422 and return
     end
     begin
       goal.destroy
@@ -145,6 +145,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
 
     if partner_at_user_id.present?
+      user_banks ||= []
       user_banks << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).try(:pluck, :id)
       user_banks.flatten!
     end
@@ -153,7 +154,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id) unless goal_setting.present?
 
     if user_banks.blank? || before_goal.blank? || goal_setting.blank?
-      render(json: {errors: [{code:"", message:"user not found or goal not found"}]}, status: 422) && return
+      render json: {errors: [ERROR_TYPE::NUMBER['005006']] }, status: 422 and return
     end
     
     goal_service = Services::GoalService.new(@current_user)
