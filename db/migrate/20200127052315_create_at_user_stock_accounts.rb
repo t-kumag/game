@@ -25,14 +25,14 @@ class CreateAtUserStockAccounts < ActiveRecord::Migration[5.2]
       t.string :last_rslt_cd
       t.string :last_rslt_msg
 
-      t.string :acct_no #
-      t.string :acct_kind # 普通 定期 当座 普通預金 定期預金 証券決済 仕組預金 当座貸越 残高別普通
+      t.string :acct_no
+      t.string :acct_kind
 
 
       t.datetime :error_date
       t.integer :error_count, default: 0
 
-      t.string :cert_type, null:false # 0 : 電子証明書  1 : ID/PASSWORD 2 : IC-CARD(電子証明書)
+      t.string :cert_type, null:false
       t.timestamps
       t.datetime :deleted_at
    end
