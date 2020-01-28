@@ -26,11 +26,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         end
         options[:ignore] = params.has_key?(:ignore) ? params[:ignore] : false
 
-        # 口座が財布の場合は残高を計算する
-        if params[:payment_method_type] == "wallet"
-          Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
-        end
-
+        # 支払いタイプ毎の口座残高の更新を行う。
+        create_balance_by_payment_method(params)
         transaction = Services::UserManuallyCreatedTransactionService.new(@current_user, user_manually_created_transaction).create_user_manually_created(options)
         options[:user_manually_created_transaction] = create_transaction(transaction)
         create_user_manually_activity(@current_user, transaction[:used_date], options)
@@ -60,19 +57,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         end
         options[:ignore] = params.has_key?(:ignore) ? params[:ignore] : false
 
-        # 口座が財布の場合は残高を計算する
-        if params[:payment_method_type] == "wallet"
-          if old_transaction[:payment_method_id].present?
-            # 口座が変わった場合、金額が変更された場合は財布残高の明細金額分を元に戻し再計算する。
-            if old_transaction[:payment_method_id] != params[:payment_method_id] || old_transaction[:amount] != params[:amount]
-              Services::WalletTransactionService::save_minus_balance(old_transaction[:payment_method_id], old_transaction[:amount])
-              Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
-            end
-          else
-            Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
-          end
-        end
-
+        # 支払いタイプ毎の口座残高の更新を行う。
+        update_balance_by_payment_method(params, old_transaction)
         Services::UserManuallyCreatedTransactionService.new(@current_user, user_manually_created_transaction).update_user_manually_created(options)
       end
     rescue => exception
@@ -216,6 +202,34 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     tran[:share] = transaction.share
     tran[:type] = "manually_created"
     tran
+  end
+
+  def create_balance_by_payment_method(params)
+    # 口座が財布の場合は残高を計算する
+    case params[:payment_method_type]
+    when "wallet" then
+      Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+    end
+  end
+
+  def update_balance_by_payment_method(params, old_transaction)
+    case params[:payment_method_type]
+
+    when "wallet" then
+      if old_transaction[:payment_method_id].present?
+        # 口座が変わった場合、金額が変更された場合は財布残高の明細金額分を元に戻し再計算する。
+        if old_transaction[:payment_method_id] != params[:payment_method_id] || old_transaction[:amount] != params[:amount]
+          Services::WalletTransactionService::save_minus_balance(old_transaction[:payment_method_id], old_transaction[:amount])
+          Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+        end
+      else
+        Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+      end
+    else
+      if params[:payment_method_type] != old_transaction[:payment_method_type]
+        Services::WalletTransactionService::save_minus_balance(old_transaction[:payment_method_id], old_transaction[:amount])
+      end
+    end
   end
 
 end
