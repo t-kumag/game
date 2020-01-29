@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   #   end
   # end
 
+  # System Info
+  get 'maintenance/info', to: 'maintenance#info'
+
   # get "/", to: static("index.html")
   namespace :api, format: 'json' do
     namespace :v1 do
