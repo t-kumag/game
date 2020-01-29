@@ -48,6 +48,9 @@ class Services::AtUserService
         )
       end
 
+    rescue ActiveRecord::RecordNotUnique
+      # 登録済みレコード
+      return Entities::AtUser.where(user_id: @user.id).first
     rescue AtAPIStandardError => api_err
       raise api_err
     rescue ActiveRecord::RecordInvalid => db_err
@@ -154,7 +157,7 @@ class Services::AtUserService
       res = AtAPIClient.new(requester).request
       status = res["STATUS"]
       if status == "0"
-        return true 
+        return true
       else
         return false
       end
@@ -171,7 +174,7 @@ class Services::AtUserService
   # 金融データ登録情報照会
   def accounts
     api_name = "/openfincr003.jct"
-    
+
     params = {
       # "TOKEN_KEY" => token,
       "TOKEN_KEY" => @user.at_user.at_user_token.token
@@ -267,8 +270,8 @@ class Services::AtUserService
   end
 
   def get_skip_fnc_ids
-    get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts) + 
-    get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts) + 
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_bank_accounts) +
+    get_accounts_skip_fnc_ids(@user.at_user.at_user_card_accounts) +
     get_accounts_skip_fnc_ids(@user.at_user.at_user_emoney_service_accounts)
   end
 
@@ -281,8 +284,8 @@ class Services::AtUserService
 
   # 抑止する口座情報取得
   def get_skip_account(fnc_id)
-    Entities::AtUserBankAccount.find_by(fnc_id: fnc_id) || 
-    Entities::AtUserCardAccount.find_by(fnc_id: fnc_id) || 
+    Entities::AtUserBankAccount.find_by(fnc_id: fnc_id) ||
+    Entities::AtUserCardAccount.find_by(fnc_id: fnc_id) ||
     Entities::AtUserEmoneyServiceAccount.find_by(fnc_id: fnc_id)
   end
 
