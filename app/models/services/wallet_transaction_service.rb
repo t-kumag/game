@@ -108,13 +108,15 @@ class Services::WalletTransactionService
   end
 
   def self.save_plus_balance(id, num)
-    w = Entities::Wallet.find(id)
+    w = Entities::Wallet.find_by(id: id)
+    return if w.blank?
     w.balance = w.balance + num
     w.save!
   end
 
   def self.save_minus_balance(id, num)
-    w = Entities::Wallet.find(id)
+    w = Entities::Wallet.find_by(id: id)
+    return if w.blank?
     w.balance = w.balance - num
     w.save!
   end
