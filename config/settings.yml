@@ -1,4 +1,5 @@
 defaults: &defaults
+  latest_commit: 4ff6ff5608f2590dd7cd4df809382c50c51c117f
   api_url: https://beta2.osidori-dev.com
   at_url: https://atdev.369webcash.com
   at_pwd_salt: osdrdev

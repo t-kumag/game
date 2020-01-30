@@ -4,7 +4,7 @@
 //カスタムURLスキーム
 let custom_activate_url = 'osidori://activate?token=';
 
-let osidori_home_url = 'https://www.osidori.co/';
+let osidori_home_url = './openapp/activate.html';
 
 // token が正しく取れなかった場合、空文字
 let token = getParam('token') ? getParam('token') : "";
@@ -15,7 +15,7 @@ location.href = `${custom_activate_url}${token}`
 // アプリを起動処理で未インストールだった場合のタイマー処理
 let timerId = setTimeout(function() {
     // osidoriのホームページに飛ばす
-    location.href = osidori_home_url;
+    location.href = `${osidori_home_url}?token=${token}`;
 }, 5000); 
 
 /**
