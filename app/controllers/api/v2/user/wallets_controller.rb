@@ -56,11 +56,11 @@ class Api::V2::User::WalletsController < ApplicationController
   private
 
   def update_params
-    param = params.require(:wallets).permit(:name, :share)
+    param = params.require(:wallets).permit(:name, :share, :balance)
     result = {
       group_id: @current_user.group_id,
       name: param[:name],
-      amount: param[:amount]
+      balance: param[:balance]
     }
     result[:share] = param[:share] if param.key?(:share)
     result
