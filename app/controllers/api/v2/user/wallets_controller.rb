@@ -29,7 +29,7 @@ class Api::V2::User::WalletsController < ApplicationController
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
       require_group && return if params[:wallets][:share] == true
       wallet = Entities::Wallet.find wallet_id
-      wallet.update!(update_params)
+      wallet.update!(update_params(wallet))
       if wallet.share
         # TODO: アクティビティ修正
         # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
@@ -55,13 +55,16 @@ class Api::V2::User::WalletsController < ApplicationController
 
   private
 
-  def update_params
+  def update_params(wallet)
     param = params.require(:wallets).permit(:name, :share, :balance)
+    balance = param[:balance].present? ? param[:balance] : wallet.balance
+
     result = {
       group_id: @current_user.group_id,
       name: param[:name],
-      balance: param[:balance]
+      balance: balance
     }
+
     result[:share] = param[:share] if param.key?(:share)
     result
   end
