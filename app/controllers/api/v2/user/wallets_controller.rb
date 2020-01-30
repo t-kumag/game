@@ -59,7 +59,8 @@ class Api::V2::User::WalletsController < ApplicationController
     param = params.require(:wallets).permit(:name, :share)
     result = {
       group_id: @current_user.group_id,
-      name: param[:name]
+      name: param[:name],
+      amount: param[:amount]
     }
     result[:share] = param[:share] if param.key?(:share)
     result
