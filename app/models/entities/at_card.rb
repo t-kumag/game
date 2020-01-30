@@ -9,5 +9,6 @@
 #  fnc_nm     :string(255)
 #
 
+# TODO このモデルは使用しないので影響がなければ削除する 2020-01-30
 class Entities::AtCard < ApplicationRecord
 end
