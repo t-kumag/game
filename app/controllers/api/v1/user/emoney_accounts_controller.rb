@@ -50,7 +50,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)
         require_group && return if params[:share] == true
         account = Entities::AtUserEmoneyServiceAccount.find account_id
-        account.update!(get_account_params)
+        account.update!(get_account_params(account))
         if account.share
           Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
           Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner)
@@ -61,10 +61,12 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
       end
     end
 
-    def get_account_params
+    def get_account_params(account)
+      name = params[:name].present? ? params[:name] : account.name
       {
         group_id: @current_user.group_id,
         share: params[:share],
+        fnc_nm: name
       }
     end
 
