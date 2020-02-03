@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_27_072038) do
+ActiveRecord::Schema.define(version: 2020_02_03_071606) do
+
+  create_table "_at_user_stock_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_stock_account_id"
+    t.bigint "balance", default: 0, null: false
+    t.bigint "deposit_balance"
+    t.bigint "profit_loss_amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -313,6 +322,16 @@ ActiveRecord::Schema.define(version: 2020_01_27_072038) do
     t.index ["group_id"], name: "index_at_user_stock_accounts_on_group_id"
   end
 
+  create_table "at_user_stock_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_stock_account_id"
+    t.bigint "balance", default: 0
+    t.bigint "deposit_balance", default: 0
+    t.string "profit_loss_amount", default: "0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_stock_account_id"], name: "index_at_user_stock_logs_on_at_user_stock_account_id"
+  end
+
   create_table "at_user_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.string "token"
@@ -454,6 +473,7 @@ ActiveRecord::Schema.define(version: 2020_01_27_072038) do
     t.index ["from_user_id"], name: "index_pairing_requests_on_from_user_id"
     t.index ["group_id"], name: "index_pairing_requests_on_group_id"
     t.index ["to_user_id"], name: "index_pairing_requests_on_to_user_id"
+    t.index ["token"], name: "index_pairing_requests_on_token", unique: true
   end
 
   create_table "participate_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -608,6 +628,7 @@ ActiveRecord::Schema.define(version: 2020_01_27_072038) do
     t.integer "rank", default: 0
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
+    t.index ["token"], name: "index_users_on_token", unique: true
   end
 
   create_table "wallets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -648,6 +669,7 @@ ActiveRecord::Schema.define(version: 2020_01_27_072038) do
   add_foreign_key "at_user_products", "at_user_asset_products"
   add_foreign_key "at_user_stock_accounts", "at_users"
   add_foreign_key "at_user_stock_accounts", "groups"
+  add_foreign_key "at_user_stock_logs", "at_user_stock_accounts"
   add_foreign_key "at_user_tokens", "at_users"
   add_foreign_key "at_users", "users"
   add_foreign_key "balance_logs", "at_user_bank_accounts"
