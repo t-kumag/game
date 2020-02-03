@@ -8,9 +8,10 @@ class Api::V1::User::CardAccountsController < ApplicationController
         @responses = []
 
         @current_user.at_user.at_user_card_accounts.where(share: false).each do |ca|
+          name = ca.name.present? ? ca.name : ca.fnc_nm
           @responses << {
             id: ca.id,
-            name: ca.fnc_nm,
+            name: name,
             amount: ca.current_month_used_amount,
             fnc_id: ca.fnc_id,
             last_rslt_cd: ca.last_rslt_cd,
@@ -69,7 +70,7 @@ class Api::V1::User::CardAccountsController < ApplicationController
       {
         group_id: @current_user.group_id,
         share: params[:share],
-        fnc_nm: name
+        name: name
       }
     end
 

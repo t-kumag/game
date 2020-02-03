@@ -7,9 +7,10 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
       else
         @responses = []
         @current_user.at_user.at_user_emoney_service_accounts.where(share: false).each do |a|
+          name = a.name.present? ? a.name : a.fnc_nm
           @responses << {
             id: a.id,
-            name: a.fnc_nm,
+            name: name,
             amount: a.balance,
             fnc_id: a.fnc_id,
             last_rslt_cd: a.last_rslt_cd,
@@ -66,7 +67,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
       {
         group_id: @current_user.group_id,
         share: params[:share],
-        fnc_nm: name
+        name: name
       }
     end
 
