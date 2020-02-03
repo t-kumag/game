@@ -58,10 +58,20 @@ class Api::V2::User::WalletsController < ApplicationController
   def update_params(wallet)
     param = params.require(:wallets).permit(:name, :share, :balance)
     balance = param[:balance].present? ? param[:balance] : wallet.balance
+    initial_balance = wallet.initial_balance
+
+    if param[:balance].present?
+      balance_difference = param[:balance] - wallet.balance
+      expense = wallet.initial_balance -  wallet.balance
+
+      initial_balance += balance_difference
+      balance = initial_balance - expense
+    end
 
     result = {
       group_id: @current_user.group_id,
       name: param[:name],
+      initial_balance: initial_balance,
       balance: balance
     }
 
