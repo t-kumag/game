@@ -50,11 +50,11 @@ class Api::V1::User::CardTransactionsController < ApplicationController
     )
 
     if @response[:user_distributed_transaction].share
-      options = create_activity_options(@response[:user_distributed_transaction], card_account_transaction_param)
+      options = create_activity_options(@response[:user_distributed_transaction], card_account_transaction_param, "family")
       Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
-                                                DateTime.now, :person_tran_to_familly, options)
+                                                DateTime.now, :person_tran_to_family, options)
       Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
-                                                DateTime.now, :person_tran_to_familly_partner, options)
+                                                DateTime.now, :person_tran_to_family_partner, options)
     end
 
     render json: {}, status: 200 and return if @response[:user_distributed_transaction].blank?
@@ -82,18 +82,19 @@ class Api::V1::User::CardTransactionsController < ApplicationController
   end
 
   private
-  def create_activity_options(transaction, card_account_transaction_param)
+  def create_activity_options(transaction, card_account_transaction_param, account)
     options = {}
     options[:goal] = nil
-    options[:transaction] = create_transaction(transaction, card_account_transaction_param)
+    options[:transaction] = create_transaction(transaction, card_account_transaction_param, account)
     options[:transactions] = nil
     options
   end
 
-  def create_transaction(transaction, card_account_transaction_param)
+  def create_transaction(transaction, card_account_transaction_param, account)
     tran = {}
     tran[:id] = transaction.at_user_card_transaction_id
     tran[:account_id] = card_account_transaction_param[:card_account_id]
+    tran[:account] = account
     tran[:type] = "card"
     tran
   end
