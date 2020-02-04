@@ -15,9 +15,6 @@ class Api::V2::User::WalletsController < ApplicationController
   end
 
   def create
-    unless limit_of_registered_finance?
-      return render json: { errors: { code: '007002', message: 'five account limit of free users' } }, status: 422
-    end
     Entities::Wallet.create!(create_params)
     render json: {}, status: :no_content
   end
@@ -34,8 +31,8 @@ class Api::V2::User::WalletsController < ApplicationController
       wallet.update!(update_params)
       if wallet.share
         # TODO: アクティビティ修正
-        # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
-        # Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner)
+        # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family)
+        # Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_family_partner)
       end
       render json: {}, status: :no_content
     else
