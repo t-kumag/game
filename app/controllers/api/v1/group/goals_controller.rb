@@ -141,21 +141,11 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
-    user_banks = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck, :id)
-    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id)
 
-    if partner_at_user_id.present?
-      user_banks ||= []
-      user_banks << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).try(:pluck, :id)
-      user_banks.flatten!
-    end
-
-    goal_setting = before_goal.goal_settings.find_by(at_user_bank_account_id: user_banks, user_id: @current_user.id)
-    goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id) unless goal_setting.present?
-
-    if user_banks.blank? || before_goal.blank? || goal_setting.blank?
+    if before_goal.blank? || before_goal.goal_settings.blank?
       render json: {errors: [ERROR_TYPE::NUMBER['005006']] }, status: 422 and return
-    end
+    enda
     
     goal_service = Services::GoalService.new(@current_user)
     # 「追加入金前の現在の目標貯金額」と「目標貯金総額」の状況をチェック
