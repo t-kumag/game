@@ -145,7 +145,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     if before_goal.blank? || before_goal.goal_settings.blank?
       render json: {errors: [ERROR_TYPE::NUMBER['005006']] }, status: 422 and return
-    enda
+    end
     
     goal_service = Services::GoalService.new(@current_user)
     # 「追加入金前の現在の目標貯金額」と「目標貯金総額」の状況をチェック
