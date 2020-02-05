@@ -190,7 +190,7 @@ class Services::GoalService
 
     # progress: 現在の貯金額 / 目標の貯金額
     # 切り捨てでの実装はBigDecimalを使用する必要があるために使用している
-    { progress: BigDecimal(calculate_float_result).floor(1).to_f }
+    { progress: BigDecimal(calculate_float_result).floor(2).to_f }
   end
 
   def progress_monthly(goal)
