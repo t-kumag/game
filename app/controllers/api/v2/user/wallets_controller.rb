@@ -21,16 +21,20 @@ class Api::V2::User::WalletsController < ApplicationController
   end
 
   def update
-    param = params.require(:wallets).permit(:id, :name, :share, :balance)
-    wallet = Entities::Wallet.find param[:id]
-    if disallowed_wallet_ids?([param[:id]])
+    wallet_id = params[:id].to_i
+    wallet_service = Services::WalletService.new(@current_user)
+    param = params.require(:wallets).permit(:name, :share, :balance)
+
+    if disallowed_wallet_ids?([wallet_id])
       render_disallowed_financier_ids && return
     end
 
-    if @current_user.try(:wallets).pluck(:id).include?(param[:id])
-      require_group && return if param[:share] == true
-      recalculate = Entities::Wallet.recalculate(wallet, param)
-      Entities::Wallet.update_wallet(recalculate, param, wallet)
+    if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
+      require_group && return if  params[:wallets][:share] == true
+      wallet = Entities::Wallet.find wallet_id
+
+      recalculate = wallet_service.recalculate(wallet, param)
+      wallet_service.update_wallet(recalculate, param, wallet)
       if wallet.share
         # TODO: アクティビティ修正
         # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
