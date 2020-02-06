@@ -1,13 +1,14 @@
 # Wrapper Class
-# TODO ReportServiceと合わせて実装する
 class Entities::FinanceTransaction
-  attr_reader :base, :table_name, :relation_key, :date_column
-  def initialize(model)
-    @base = model
-    @table_name = @base.table_name
-    @relation_key = @base::RELATION_KEY
-
-    @date_column = @base::DATE_COLUMN
+  attr_reader :base, :model, :relation_key, :date_column
+  def initialize(obj)
+    @base = obj
+    @model = @base.class
+    @relation_key = @model::RELATION_KEY
+    @date_column = @model::DATE_COLUMN
   end
 
+  def id
+    @base.id
+  end
 end

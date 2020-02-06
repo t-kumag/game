@@ -359,4 +359,13 @@ class Services::AtUserService
   def skip_scraping(accounts)
     accounts.reject{ |account| account.at_scraping_logs.find_by("created_at > #{@today}").present? }
   end
+
+  def save_balance_log
+     @user.at_user.at_user_bank_accounts.each do |a|
+       Services::FinanceService.save_balance_log(a, Entities::AtUserBankTransaction.new, '2019-09-01')
+     end
+     @user.at_user.at_user_emoney_service_accounts.each do |a|
+       Services::FinanceService.save_balance_log(a, Entities::AtUserEmoneyTransaction.new, '2019-09-01')
+     end
+  end
 end

@@ -20,6 +20,7 @@
 class Entities::AtUserEmoneyTransaction < ApplicationRecord
   RELATION_KEY = :at_user_emoney_transaction_id.freeze
   DATE_COLUMN = :used_date.freeze
+
   belongs_to :at_user_emoney_service_account
   has_one :user_distributed_transaction
 

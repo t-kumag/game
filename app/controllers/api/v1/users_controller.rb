@@ -129,6 +129,7 @@ class Api::V1::UsersController < ApplicationController
 
       at_user_service.sync_at_user_finance
       at_user_service.sync_user_distributed_transaction
+      at_user_service.save_balance_log
     rescue => e
       SlackNotifier.ping("ERROR Api::V1::UsersController#at_sync")
       SlackNotifier.ping(e)

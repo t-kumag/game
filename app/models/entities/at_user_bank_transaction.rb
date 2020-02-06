@@ -24,6 +24,7 @@
 class Entities::AtUserBankTransaction < ApplicationRecord
   RELATION_KEY = :at_user_bank_transaction_id.freeze
   DATE_COLUMN = :trade_date.freeze
+
   belongs_to :at_user_bank_account
   has_one :user_distributed_transaction
 
@@ -45,10 +46,6 @@ class Entities::AtUserBankTransaction < ApplicationRecord
 
   def description
     self.description1
-    # t.string "description2"
-    # t.string "description3"
-    # t.string "description4"
-    # t.string "description5"
   end
 
 end
