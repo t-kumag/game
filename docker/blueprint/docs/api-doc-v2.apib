@@ -88,6 +88,78 @@ Resource of Bank Account
 
             {}
 
+## 財布取引明細 [/api/v2/user/wallets/:wallet_id/transactions]
+Resource of Wallet Account Transactions
+
+#### URL Parameters
+
+* from (date)
+* to (date)
+
+### 明細一覧取得 [GET]
+
++ Request 財布明細一覧取得 (application/json)
+
+    + Headers
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+        {
+            "transactions": [
+               {
+                 "user_manually_created_transaction_id": 18184,
+                 "amount": -50,
+                 "used_date": "2019-09-12 00:00:00",
+                 "used_location": "1",
+                 "memo": "testteほげ",
+                 "user_id": 64,
+                 "is_account_shared": false,
+                 "is_shared": false,
+                 "is_ignored": false,
+                 "at_transaction_category_id": 1,
+                 "category_name1": "未分類",
+                 "category_name2": "未分類",
+                 "transaction_id": 113,
+                 "payment_method_id": 22,
+                 "payment_method_type": "wallet"
+               }
+            ],
+            "next_transaction_used_date" : "2019-08-05 00:00:00"
+        }
+
+### 明細詳細取得 [GET]
+
++ Request 財布明細一覧取得 (application/json)
+
+    + Headers
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+        {
+            {
+              "transactions": {
+                "amount": -50,
+                "used_date": "2019-09-12 00:00:00",
+                "used_location": "1",
+                "user_id": 64,
+                "is_account_shared": false,
+                "is_shared": false,
+                "at_transaction_category_id": 1,
+                "category_name1": "未分類",
+                "category_name2": "未分類",
+                "payment_name": "お財布D",
+                "transaction_id": 113,
+                "payment_method_id": 22,
+                "payment_method_type": "wallet"
+              }
+            }
+        }
+
+
 ## 銀行取引明細 [/api/v2/user/bank-accounts/:bank_account_id/transactions]
 Resource of Bank Account Transactions
 
@@ -450,6 +522,78 @@ Resource of Bank Account
 
     + Body
             {}
+
+## 財布取引明細 [/api/v2/group/wallets/:wallet_id/transactions]
+Resource of Wallet Account Transactions
+
+#### URL Parameters
+
+* from (date)
+* to (date)
+
+### 明細一覧取得 [GET]
+
++ Request 財布明細一覧取得 (application/json)
+
+    + Headers
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+        {
+            "transactions": [
+               {
+                 "user_manually_created_transaction_id": 18184,
+                 "amount": -50,
+                 "used_date": "2019-09-12 00:00:00",
+                 "used_location": "1",
+                 "memo": "testteほげ",
+                 "user_id": 64,
+                 "is_account_shared": true,
+                 "is_shared": false,
+                 "is_ignored": false,
+                 "at_transaction_category_id": 1,
+                 "category_name1": "未分類",
+                 "category_name2": "未分類",
+                 "transaction_id": 113,
+                 "payment_method_id": 22,
+                 "payment_method_type": "wallet"
+               }
+            ],
+            "next_transaction_used_date" : "2019-08-05 00:00:00"
+        }
+
+### 明細詳細取得 [GET]
+
++ Request 財布明細一覧取得 (application/json)
+
+    + Headers
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+        {
+            {
+              "transactions": {
+                "amount": -50,
+                "used_date": "2019-09-12 00:00:00",
+                "used_location": "1",
+                "user_id": 64,
+                "is_account_shared": false,
+                "is_shared": false,
+                "at_transaction_category_id": 1,
+                "category_name1": "未分類",
+                "category_name2": "未分類",
+                "payment_name": "お財布D",
+                "transaction_id": 113,
+                "payment_method_id": 22,
+                "payment_method_type": "wallet"
+              }
+            }
+        }
+
 
 ## 銀行取引明細 [/api/v2/group/bank-accounts/:bank_account_id/transactions]
 Resource of Bank Account Transactions
