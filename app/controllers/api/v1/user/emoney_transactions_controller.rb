@@ -33,6 +33,8 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
+    require_group && return if params[:share] == true
+
     @exist_transaction = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:emoney_account_id], transaction_id)
     emoney_account_transaction_param = get_emoney_account_transaction_param(params, transaction_id, @exist_transaction)
 

@@ -35,6 +35,8 @@ class Api::V1::User::BankTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
+    require_group && return if params[:share] == true
+
     @exist_bank_transaction = Services::AtBankTransactionService.new(@current_user).detail(params[:bank_account_id], transaction_id)
     bank_account_transaction_param = get_bank_account_transaction_param(params, transaction_id, @exist_bank_transaction)
 
