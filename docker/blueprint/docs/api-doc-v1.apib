@@ -342,19 +342,6 @@ Resource of Bank Account Transactions
                      "category_name1": "手数料",
                      "category_name2": "その他手数料",
                      "transaction_id": 191
-                   },
-                   {
-                     "at_user_bank_transaction_id": 190,
-                     "amount": 180000,
-                     "used_date": "2019-08-15 00:00:00",
-                     "used_location": "預入れ",
-                     "user_id": 19,
-                     "is_account_shared": false,
-                     "is_shared": false,
-                     "at_transaction_category_id": 123,
-                     "category_name1": "入金",
-                     "category_name2": "ATM入金",
-                     "transaction_id": 190
                    }
                 ]
 
@@ -2233,7 +2220,8 @@ Resource of Bank Account Transactions
                   "category_name1": "未分類",
                   "category_name2": "未分類",
                   "payment_name": "ミロク情報銀行",
-                  "transaction_id": 184
+                  "transaction_id": 184,
+                  "is_ignored": false
                 }
             }
 
@@ -2445,7 +2433,8 @@ Resource of Card Account Transactions
                   "category_name1": "未分類",
                   "category_name2": "未分類",
                   "payment_name": "ミロク情報カード",
-                  "transaction_id": 168
+                  "transaction_id": 168,
+                  "is_ignored": false
                 }
             }
 + Response 200 (application/json)
@@ -2647,7 +2636,9 @@ Resource of Emoney Account Transactions
                   "category_name1": "日用品",
                   "category_name2": "ファッション、アクセサリー、時計",
                   "payment_name": "ミロクスイカ",
-                  "transaction_id": 192
+                  "transaction_id": 192,
+                  "is_ignored": false
+
                 }
             }
 
