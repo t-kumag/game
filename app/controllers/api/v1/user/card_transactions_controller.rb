@@ -35,6 +35,8 @@ class Api::V1::User::CardTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
+    require_group && return if params[:share] == true
+
     @exist_card_transaction = Services::AtCardTransactionService.new(@current_user).detail(params[:card_account_id], transaction_id)
     card_account_transaction_param = get_card_account_transaction_param(params, transaction_id, @exist_card_transaction)
 
