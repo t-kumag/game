@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   rescue_from AtAPIStandardError, with: :render_at_api_error
   rescue_from ActionController::RoutingError, with: :render_404
   #     rescue_from ActionView::MissingTemplate, with: :render_404
-  #     rescue_from Exception, with: :render_500
+  rescue_from Exception, with: :render_500
 
 
   # def set_api_version
@@ -86,12 +86,16 @@ class ApplicationController < ActionController::Base
   end
 
   def render_500(e = nil)
-    logger.error e.message + "\n" + e.backtrace.join("\n")
-    ExceptionNotifier.notify_exception(e, env: request.env, data: { message: "[#{Rails.env}]" + e.message + '::' + e.backtrace[0..50].join('::') + ' ...' })
+    logger.fatal "user_id: #{@current_user.id}"
+    logger.fatal "user_agent: #{request.env["HTTP_USER_AGENT"]}"
+    super.render_500
+
+    # logger.error e.message + "\n" + e.backtrace.join("\n")
+    # ExceptionNotifier.notify_exception(e, env: request.env, data: { message: "[#{Rails.env}]" + e.message + '::' + e.backtrace[0..50].join('::') + ' ...' })
     # Airbrake.notify(e) if e # Airbrake/Errbitを使う場合はこちら
 
-    logger.info "Rendering 500 with exception: #{e.message}" if e
-    render(json: { error: '500 error' }, status: 500) && return
+    # logger.info "Rendering 500 with exception: #{e.message}" if e
+    # render(json: { error: '500 error' }, status: 500) && return
     # if request.xhr?
     #   render json: { error: '500 error' }, status: 500 and return
     # else
@@ -260,7 +264,7 @@ class ApplicationController < ActionController::Base
 
     return true if at_user_bank_transaction_ids.blank?
     at_user_bank_transaction_ids.flatten!
-    
+
     bank_transaction_ids.each do |id|
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless at_user_bank_transaction_ids.include?(id)
@@ -330,7 +334,7 @@ class ApplicationController < ActionController::Base
       user_manually_created_transaction_ids << Entities::UserManuallyCreatedTransaction.where(user_id: partner_user_id).pluck(:id)
     end
     user_manually_created_transaction_ids.flatten!
-    
+
     manually_created_transaction_ids.each do |id|
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless user_manually_created_transaction_ids.include?(id)
