@@ -18,10 +18,6 @@ class Services::FinanceService
   end
 
   # 指定範囲のdailyの残高を計算し保存する
-  #  ==Example==
-  #
-  # 
-
   def self.save_balance_log(finance, finance_transaction, from=nil, payment_method_type='')
     finance = Entities::Finance.new(finance)
     finance_transaction = Entities::FinanceTransaction.new(finance_transaction)
