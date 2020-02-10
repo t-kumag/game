@@ -1386,10 +1386,13 @@ Resource of Icon
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "icon is registered."
-                }
+                "errors": [
+                  {
+                    "code": "002002",
+                    "message": "写真の登録に失敗しました。もう一度お試しください。",
+                    "info": "Icon not found."
+                  }
+                ]
             }
 ### アイコン更新 [PUT]
 
@@ -1419,10 +1422,13 @@ Resource of Icon
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "icon not found"
-                }
+                "errors": [
+                  {
+                    "code": "002003",
+                    "message": "写真の取得に失敗しました。もう一度お試しください。",
+                    "info": "Icon not get."
+                  }
+                ]
             }
 
 
@@ -1743,6 +1749,13 @@ Resource of Goal
                         "goal_difference_amount": null,
                         "start_date": "2019-10-18",
                         "end_date": "2020-08-18",
+                         "progress_all": {
+                           "progress": 0.01
+                         },
+                         "progress_monthly": {
+                           "progress": 0.1,
+                           "icon": "best"
+                         }
                     },
                     "owner_current_amount": {
                         "monthly_amount": 0,
