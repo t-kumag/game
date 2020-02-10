@@ -2,13 +2,677 @@
 /api/v2/user/*
 
 
+## 財布 [/api/v2/user/wallets]
+Resource of Bank Account
+
+### 財布取得 [GET]
+
++ Request 財布取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "wallets": [
+                  {
+                    "id": 1,
+                    "name": "お財布A",
+                    "amount": 100,
+                    "goals": [
+                      {
+                        "current_amount": 0,
+                        "name": "結婚式"
+                      }
+                    ]
+                  }
+                ]
+            }
+
+### 財布登録 [POST /api/v2/user/wallets/:id]
+
++ Request 財布登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+            {
+             "wallets": {
+               "name": "お財布A",
+               "balance": 100
+             }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+### 財布更新 [PUT /api/v2/user/wallets/:id]
+
++ Request 財布更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+            {
+             "wallets": {
+              "name":"お財布A",
+              "share": true
+             }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+### 財布削除 [DELETE /api/v2/user/wqllets/:id]
+
++ Request 財布削除 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
+## 銀行取引明細 [/api/v2/user/bank-accounts/:bank_account_id/transactions]
+Resource of Bank Account Transactions
+
+### 銀行取引明細一覧取得 [GET]
+
+#### URL Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "transactions": [
+                   {
+                     "at_user_bank_transaction_id": 189,
+                     "amount": -100000,
+                     "used_date": "2019-08-20 00:00:00",
+                     "used_location": "引出し",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 136,
+                     "category_name1": "出金",
+                     "category_name2": "ATM出金",
+                     "transaction_id": 189
+                   },
+                   {
+                     "at_user_bank_transaction_id": 191,
+                     "amount": -105,
+                     "used_date": "2019-08-15 00:00:00",
+                     "used_location": "テスウリヨウ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 149,
+                     "category_name1": "手数料",
+                     "category_name2": "その他手数料",
+                     "transaction_id": 191
+                   },
+                   {
+                     "at_user_bank_transaction_id": 190,
+                     "amount": 180000,
+                     "used_date": "2019-08-15 00:00:00",
+                     "used_location": "預入れ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 123,
+                     "category_name1": "入金",
+                     "category_name2": "ATM入金",
+                     "transaction_id": 190
+                   }
+                ],
+                "next_transaction_used_date" : "2019-08-05 00:00:00"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
+
+## カード取引明細 [/api/v2/user/card-accounts/:card_account_id/transactions]
+Resource of Card Account Transactions
+
+### カード取引明細一覧取得 [GET]
+
+#### URL Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "transactions": [
+                   {
+                     "at_user_card_transaction_id": 251,
+                     "amount": -5400,
+                     "used_date": "2019-09-28 00:00:00",
+                     "used_location": "カフェベートーベンcard",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 30,
+                     "category_name1": "日用品",
+                     "category_name2": "ファッション、アクセサリー、時計",
+                     "transaction_id": 251
+                   },
+                   {
+                     "at_user_card_transaction_id": 252,
+                     "amount": -4900,
+                     "used_date": "2019-09-27 00:00:00",
+                     "used_location": "JOJO TOWN",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 1,
+                     "category_name1": "未分類",
+                     "category_name2": "未分類",
+                     "transaction_id": 252
+                   }
+                ],
+                "next_transaction_used_date" : "2019-08-05 00:00:00"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
+
+
+## 電子マネー取引明細 [/api/v2/user/emoney-accounts/:emoney_account_id/transactions]
+Resource of Emoney Account Transactions
+
+### 電子マネー取引明細一覧取得 [GET]
+
+#### URL Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "transactions": [
+                   {
+                     "at_user_emoney_transaction_id": 276,
+                     "amount": -150,
+                     "used_date": "2019-09-15 00:00:00",
+                     "used_location": "物販 ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 135,
+                     "category_name1": "入金",
+                     "category_name2": "その他入金",
+                     "transaction_id": 276
+                   },
+                   {
+                     "at_user_emoney_transaction_id": 275,
+                     "amount": -195,
+                     "used_date": "2019-09-15 00:00:00",
+                     "used_location": "入 東銀座出新宿区",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 1,
+                     "category_name1": "未分類",
+                     "category_name2": "未分類",
+                     "transaction_id": 275
+                   }
+                ],
+                "next_transaction_used_date" : "2019-08-05 00:00:00"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
+
+## PL期間設定 [/api/v2/user/pl-settings]
+Resource of PlSetting
+
+### PL期間設定更新 [PUT]
+
+#### Description
+
+* PL期間設定の更新を行う
+
+
+#### Body Parameters
+
+* pl_period_date (int)
+* pl_type (string) [ago|since|""]
+* group_pl_period_date (int)
+* group_pl_type (string) [ago|since|""]
+
++ Request PL期間設定更新 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+{
+  "pl_settings": {
+    "pl_period_date": 25,
+    "pl_type": "ago",
+    "group_pl_period_date": 25,
+    "group_pl_type": "ago"
+  }
+}
+
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
+### PL期間設定取得 [GET]
+
+#### Description
+
+* PL期間設定を取得する
+
+
+#### Body Parameters
+
+* pl_period_date (int)
+* pl_type (string) [ago|since|""]
+* group_pl_period_date (int)
+* group_pl_type (string) [ago|since|""]
+
++ Request Example (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+             "pl_settings": {
+              "pl_period_date": 25,
+              "pl_type": "ago",
+              "group_pl_period_date": 25,
+              "group_pl_type": "ago"
+             }
+            }
+
++ Request Example　no record (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+             "pl_settings": {
+              "pl_period_date": null,
+              "pl_type": null,
+              "group_pl_period_date": null,
+              "group_pl_type": null
+             }
+            }
+
 # Group 家族機能
 /api/v2/group/*
+
+
+## 財布 [/api/v2/group/wallets]
+Resource of Bank Account
+
+### 財布取得 [GET]
+
++ Request 財布取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "wallets": [
+                  {
+                    "id": 1,
+                    "name": "お財布A",
+                    "amount": 100,
+                    "goals": [
+                      {
+                        "current_amount": 0,
+                        "name": "結婚式"
+                      }
+                    ]
+                  }
+                ]
+            }
+
+### 財布登録 [POST /api/v2/group/wallets/:id]
+
++ Request 財布登録 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+            {
+             "wallets”: {
+               "name": "お財布A",
+               "balance": 100
+             }
+            }
+
++ Response 200 (application/json)
+
+    + Body
+            {}
+
+## 銀行取引明細 [/api/v2/group/bank-accounts/:bank_account_id/transactions]
+Resource of Bank Account Transactions
+
+### 銀行取引明細一覧取得 [GET]
+
+#### URL Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "transactions": [
+                   {
+                     "at_user_bank_transaction_id": 189,
+                     "amount": -100000,
+                     "used_date": "2019-08-20 00:00:00",
+                     "used_location": "引出し",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 136,
+                     "category_name1": "出金",
+                     "category_name2": "ATM出金",
+                     "transaction_id": 189
+                   },
+                   {
+                     "at_user_bank_transaction_id": 191,
+                     "amount": -105,
+                     "used_date": "2019-08-15 00:00:00",
+                     "used_location": "テスウリヨウ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 149,
+                     "category_name1": "手数料",
+                     "category_name2": "その他手数料",
+                     "transaction_id": 191
+                   },
+                   {
+                     "at_user_bank_transaction_id": 190,
+                     "amount": 180000,
+                     "used_date": "2019-08-15 00:00:00",
+                     "used_location": "預入れ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 123,
+                     "category_name1": "入金",
+                     "category_name2": "ATM入金",
+                     "transaction_id": 190
+                   }
+                ],
+                "next_transaction_used_date" : "2019-08-05 00:00:00"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
+
+
+## カード取引明細 [/api/v2/group/card-accounts/:card_account_id/transactions]
+Resource of Card Account Transactions
+
+### カード取引明細一覧取得 [GET]
+
+#### URL Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "transactions": [
+                   {
+                     "at_user_card_transaction_id": 251,
+                     "amount": -5400,
+                     "used_date": "2019-09-28 00:00:00",
+                     "used_location": "カフェベートーベンcard",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 30,
+                     "category_name1": "日用品",
+                     "category_name2": "ファッション、アクセサリー、時計",
+                     "transaction_id": 251
+                   },
+                   {
+                     "at_user_card_transaction_id": 252,
+                     "amount": -4900,
+                     "used_date": "2019-09-27 00:00:00",
+                     "used_location": "JOJO TOWN",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 1,
+                     "category_name1": "未分類",
+                     "category_name2": "未分類",
+                     "transaction_id": 252
+                   }
+                ],
+                "next_transaction_used_date" : "2019-08-05 00:00:00"
+            }
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
+
+
+## 電子マネー取引明細 [/api/v2/group/emoney-accounts/:emoney_account_id/transactions]
+Resource of Emoney Account Transactions
+
+### 電子マネー取引明細一覧取得 [GET]
+
+#### URL Parameters
+
+* from (date)
+* to (date)
+
++ Request 明細一覧取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
++ Response 200 (application/json)
+
+    + Body
+            {
+                "transactions": [
+                   {
+                     "at_user_emoney_transaction_id": 276,
+                     "amount": -150,
+                     "used_date": "2019-09-15 00:00:00",
+                     "used_location": "物販 ",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 135,
+                     "category_name1": "入金",
+                     "category_name2": "その他入金",
+                     "transaction_id": 276
+                   },
+                   {
+                     "at_user_emoney_transaction_id": 275,
+                     "amount": -195,
+                     "used_date": "2019-09-15 00:00:00",
+                     "used_location": "入 東銀座出新宿区",
+                     "user_id": 19,
+                     "is_account_shared": false,
+                     "is_shared": false,
+                     "at_transaction_category_id": 1,
+                     "category_name1": "未分類",
+                     "category_name2": "未分類",
+                     "transaction_id": 275
+                   }
+                ],
+                "next_transaction_used_date" : "2019-08-05 00:00:00"
+            }
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+                "errors": {
+                  "code": "",
+                  "mesasge": "Disallowed financier id."
+                }
+            }
 
 # Group その他
 /api/v2/xxx系
 
-## アクティビティ [/api/v2/user/activities]
+## アクティビティ [/api/v2/activities]
 Resource of Activity
 
 ### アクティビティ取得 [GET]
@@ -41,5 +705,3 @@ Resource of Activity
 
                   }
             }
-
-

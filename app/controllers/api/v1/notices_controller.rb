@@ -27,6 +27,39 @@ class Api::V1::NoticesController < ApplicationController
     render json: {}, status: 200
   end
 
+  def unread_total_count
+    notices = Entities::Notice.all
+    user_notice = Entities::UserNotice.where(user_id: @current_user.id)
+
+    save_list = []
+    notices.each do |notice|
+      if user_notice.present?
+        next if Services::UserNoticeService.already_exists?(notice, user_notice, @current_user)
+        save_list << Services::UserNoticeService.fetch_notice_read(notice, @current_user)
+      else
+        save_list << Services::UserNoticeService.fetch_notice_read(notice, @current_user)
+      end
+    end
+
+    Entities::UserNotice.import save_list, :on_duplicate_key_update => [:user_id, :read]
+    @unread_total_count = Entities::UserNotice.where(user_id: @current_user.id, read: false).count
+    render 'unread_total_count', formats: 'json', handlers: 'jbuilder'
+  end
+
+  def all_read
+    unread_messages = Entities::UserNotice.where(user_id: @current_user.id, read: false)
+    save_list = unread_messages.map do |urm|
+      Entities::UserNotice.new(
+          id: urm[:id],
+          notice_id: urm[:notice_id],
+          user_id: urm[:user_id],
+          read: true
+      )
+    end
+    Entities::UserNotice.import save_list, :on_duplicate_key_update => [:user_id, :read]
+    render json: {}, status: 200
+  end
+
   def index
     @notices = Entities::Notice.order(created_at: "DESC").page(params[:page])
     render 'index', formats: 'json', handlers: 'jbuilder'

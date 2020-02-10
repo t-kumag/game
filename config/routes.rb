@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   #   end
   # end
 
+  # System Info
+  get 'maintenance/info', to: 'maintenance#info'
+
   # get "/", to: static("index.html")
   namespace :api, format: 'json' do
     namespace :v1 do
@@ -14,6 +17,10 @@ Rails.application.routes.draw do
       delete 'auth/logout', to: 'auth#logout'
 
       resources :notices, :path => '/notices', :only => [:index, :create] do
+        collection do
+          get 'unread-total-count'
+          put 'all-read'
+        end
       end
       resources :activities, :path => '/activities', :only => [:index] do
       end
@@ -132,6 +139,9 @@ Rails.application.routes.draw do
     namespace :v2 do
       resources :activities, :path => '/activities', :only => [:index] do
       end
+
+      get 'user/status', :to => 'users#status'
+
       # 個人用
       namespace :user do
         resources :bank_accounts, path: '/bank-accounts' do
@@ -148,6 +158,14 @@ Rails.application.routes.draw do
           resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
+
+        resources :wallets, path: '/wallets' do
+          resources :wallet_transactions, path: '/transactions', on: :member, only: [:index, :show]
+        end
+
+        put 'pl-settings', :to => 'pl_settings#update'
+        get 'pl-settings', :to => 'pl_settings#show'
+
       end
 
       # 共有用
@@ -166,7 +184,13 @@ Rails.application.routes.draw do
           resources :emoney_transactions, path: '/transactions', on: :member, only: [:index] do
           end
         end
+
+        resources :wallets, path: '/wallets' do
+          resources :wallet_transactions, path: '/transactions', on: :member, only: [:index, :show]
+        end
       end
+
+      resources :payment_methods, path: '/payment_methods', only: [:index]
     end
   end
 end

@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   rescue_from AtAPIStandardError, with: :render_at_api_error
   rescue_from ActionController::RoutingError, with: :render_404
   #     rescue_from ActionView::MissingTemplate, with: :render_404
-  #     rescue_from Exception, with: :render_500
+  rescue_from Exception, with: :render_500
 
 
   # def set_api_version
@@ -86,12 +86,16 @@ class ApplicationController < ActionController::Base
   end
 
   def render_500(e = nil)
-    logger.error e.message + "\n" + e.backtrace.join("\n")
-    ExceptionNotifier.notify_exception(e, env: request.env, data: { message: "[#{Rails.env}]" + e.message + '::' + e.backtrace[0..50].join('::') + ' ...' })
+    logger.fatal "user_id: #{@current_user.present? ? @current_user.id : nil}"
+    logger.fatal "user_agent: #{request.env["HTTP_USER_AGENT"]}"
+    super.render_500
+
+    # logger.error e.message + "\n" + e.backtrace.join("\n")
+    # ExceptionNotifier.notify_exception(e, env: request.env, data: { message: "[#{Rails.env}]" + e.message + '::' + e.backtrace[0..50].join('::') + ' ...' })
     # Airbrake.notify(e) if e # Airbrake/Errbitを使う場合はこちら
 
-    logger.info "Rendering 500 with exception: #{e.message}" if e
-    render(json: { error: '500 error' }, status: 500) && return
+    # logger.info "Rendering 500 with exception: #{e.message}" if e
+    # render(json: { error: '500 error' }, status: 500) && return
     # if request.xhr?
     #   render json: { error: '500 error' }, status: 500 and return
     # else
@@ -147,6 +151,7 @@ class ApplicationController < ActionController::Base
   def check_temporary_user
     @response = Entities::User.temporary_user(params[:email])
     if @response.present?
+      @error_response = [ERROR_TYPE::NUMBER['001001']]
       render 'api/v1/errors/temporary_registration', formats: 'json', handlers: 'jbuilder', status: 422
     end
   end
@@ -231,6 +236,22 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  def disallowed_wallet_ids?(wallet_ids, with_group=false)
+    user_id         =  @current_user.id
+    partner_user_id =  @current_user.try(:partner_user).try(:id)
+
+    user_wallet_ids = Entities::Wallet.where(user_id: user_id).pluck(:id)
+    if partner_user_id && with_group
+      user_wallet_ids << Entities::Wallet.where(user_id: partner_user_id, share: true).pluck(:id)
+    end
+    user_wallet_ids.flatten!
+
+    wallet_ids.each do |id|
+      return true unless user_wallet_ids.include?(id)
+    end
+    false
+  end
+
   def disallowed_at_bank_transaction_ids?(bank_id, bank_transaction_ids, with_group=false)
     user_bank = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:find_by, id: bank_id)
     at_user_bank_transaction_ids = []
@@ -243,7 +264,7 @@ class ApplicationController < ActionController::Base
 
     return true if at_user_bank_transaction_ids.blank?
     at_user_bank_transaction_ids.flatten!
-    
+
     bank_transaction_ids.each do |id|
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless at_user_bank_transaction_ids.include?(id)
@@ -313,7 +334,7 @@ class ApplicationController < ActionController::Base
       user_manually_created_transaction_ids << Entities::UserManuallyCreatedTransaction.where(user_id: partner_user_id).pluck(:id)
     end
     user_manually_created_transaction_ids.flatten!
-    
+
     manually_created_transaction_ids.each do |id|
       # 自身の明細以外のidの場合、参照不可できない（groupの場合、パートナーの明細も含む）
       return true unless user_manually_created_transaction_ids.include?(id)
@@ -357,26 +378,47 @@ class ApplicationController < ActionController::Base
   end
 
   def require_group
-    render json: { errors: { code: '', message: "Require group." } }, status: 422 unless @current_user.group_id.present?
-  end
-
-  def render_disallowed_account_ids
-    render json: { errors: { code: '003002', message: "Disallowed account id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['006001']] }, status: 422 unless @current_user.group_id.present?
   end
 
   def render_disallowed_financier_ids
-    render json: { errors: { code: '', message: "Disallowed financier id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['003001']] }, status: 422
+  end
+
+  def render_disallowed_account_ids
+    render json: { errors: [ERROR_TYPE::NUMBER['003002']] }, status: 422
   end
 
   def render_disallowed_transaction_ids
-    render json: { errors: { code: '', message: "Disallowed transaction id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['004001']] }, status: 422
   end
 
   def render_disallowed_goal_ids
-    render json: { errors: { code: '', message: "Disallowed goal id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['005002']] }, status: 422
   end
 
   def render_disallowed_goal_setting_ids
-    render json: { errors: { code: '', message: "Disallowed goal setting id." } }, status: 422
+    render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422
+  end
+
+  def limit_of_registered_finance?
+    at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
+    at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
+    at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
+
+    number_of_account =  0
+    if at_user_bank_account_ids.present?
+      number_of_account += at_user_bank_account_ids.count
+    end
+
+    if at_user_card_account_ids.present?
+      number_of_account += at_user_card_account_ids.count
+    end
+
+    if at_user_emoney_service_account_ids.present?
+      number_of_account += at_user_emoney_service_account_ids.count
+    end
+
+    @current_user.free? && number_of_account < Settings.at_user_limit_free_account
   end
 end

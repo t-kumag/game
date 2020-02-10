@@ -15,7 +15,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     @response = Services::GoalService.new(@current_user).get_goal_one(params[:id])
-    render(json: { errors: { code: '', mesasge: "Record not found." } }, status: 422) and return if @response.blank?
+    render(json: { errors: [ERROR_TYPE::NUMBER['005001']] }, status: 422) and return if @response.blank?
 
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
@@ -44,12 +44,13 @@ class Api::V1::Group::GoalsController < ApplicationController
         # 頭金を入金する際に必要
         goal_service = Services::GoalService.new(@current_user)
         options = create_activity_options(goal)
-        create_goal_activity_log(options)
+        create_goal_activity(options)
 
         # 目標ログの登録
         goal.goal_settings.each do |gs|
-          goal_service.add_first_amount(goal, gs, gs.first_amount) if gs.at_user_bank_account_id.present?
+          goal_service.add_first_amount(goal, gs, gs.first_amount)
         end
+        create_goal_finished_activity(options) if over_goal_amount?(goal)
       end
 
     rescue ActiveRecord::RecordInvalid => db_err
@@ -70,13 +71,13 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_setting_ids && return
     end
 
-    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
-    render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return if goal.blank?
+    before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422 and return if before_goal.blank?
     goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
     partner_goal_setting = Entities::GoalSetting.find_by(id: params[:partner_goal_settings][:goal_setting_id])
 
     if goal_setting.blank? || partner_goal_setting.blank?
-      render json: { errors: { code: '', mesasge: "Goal settings not found." } }, status: 422 and return
+      render json: { errors: [ERROR_TYPE::NUMBER['005005']] }, status: 422 and return
     end
 
     # 頭金を入金する際に必要
@@ -84,14 +85,16 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     begin
       ActiveRecord::Base.transaction do
+        goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
         goal.update!(get_goal_params(false))
         goal_setting.update!(get_goal_setting_params)
         partner_goal_setting.update!(get_partner_goal_setting_params)
         options = create_activity_options(goal)
-        update_goal_activity_log(options)
-        unless Services::GoalLogService.alreday_exist_first_amount(params[:id], @current_user.id)
-          goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount) if goal_setting.at_user_bank_account_id.present?
+        update_goal_activity(options)
+        unless Services::GoalLogService.already_exist_first_amount(params[:id], @current_user.id)
+          goal_service.add_first_amount(goal, goal_setting, goal_setting.first_amount)
         end
+        create_goal_finished_activity(options) if over_current_amount?(before_goal) && over_goal_amount?(goal)
       end
     rescue ActiveRecord::RecordInvalid => db_err
       raise db_err
@@ -109,7 +112,7 @@ class Api::V1::Group::GoalsController < ApplicationController
 
     goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     if goal.blank?
-      render json: { errors: { code: '', mesasge: "Goal not found." } }, status: 422 and return
+      render json: { errors: [ERROR_TYPE::NUMBER['005004']] }, status: 422 and return
     end
     begin
       goal.destroy
@@ -137,30 +140,27 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_ids && return
     end
 
-    user_banks = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck, :id)
-    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id)
 
-    if partner_at_user_id.present?
-      user_banks << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).try(:pluck, :id)
-      user_banks.flatten!
-    end
-
-    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
-    goal_setting = goal.goal_settings.find_by(at_user_bank_account_id: user_banks, user_id: @current_user.id)
-
-    if user_banks.blank? || goal.blank? || goal_setting.blank?
-      render(json: {errors: [{code:"", message:"user not found or goal not found"}]}, status: 422) && return
+    if before_goal.blank? || before_goal.goal_settings.blank?
+      render json: {errors: [ERROR_TYPE::NUMBER['005006']] }, status: 422 and return
     end
     
     goal_service = Services::GoalService.new(@current_user)
-    if goal_service.check_bank_balance(params[:add_amount], goal_setting)
-      goal_service.add_money(goal, goal_setting, params[:add_amount])
-      options = create_activity_options(goal)
-      Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
-      render(json: {}, status: 200)
-    else
-      render(json: {errors: [{code:"", message:"minus balance"}]}, status: 422)
-    end
+    # 「追加入金前の現在の目標貯金額」と「目標貯金総額」の状況をチェック
+
+    goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
+    goal_service.add_money(goal, goal_setting, params[:add_amount])
+    options = create_activity_options(goal)
+
+    Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
+    Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_add_money, options)
+
+    # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達していた場合は、既にアクテビティログがあるのでログ出力は不要
+    # 「追加入金前の現在の目標貯金額」が「目標金額総額」に到達してない + 「追加入金後の現在の目標貯金額」が「目標金額総額」に到達 ->このケースのみログを書き込む
+    create_goal_finished_activity(options) if over_current_amount?(before_goal) && over_goal_amount?(goal)
+    render(json: {}, status: 200)
   end
 
   private
@@ -200,14 +200,19 @@ class Api::V1::Group::GoalsController < ApplicationController
 
   private
 
-  def create_goal_activity_log(options)
+  def create_goal_activity(options)
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_created, options)
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_created_partner, options)
   end
 
-  def update_goal_activity_log(options)
+  def update_goal_activity(options)
     Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
     Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.zone.now, :goal_updated, options)
+  end
+
+  def create_goal_finished_activity(options)
+    Services::ActivityService.create_activity(@current_user.id, @current_user.group_id, Time.now, :goal_finished, options)
+    Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id, Time.now, :goal_finished, options)
   end
 
   def create_activity_options(goal)
@@ -216,4 +221,16 @@ class Api::V1::Group::GoalsController < ApplicationController
     options[:transaction] = nil
     options
   end
+
+  # 「現在の目標貯金額」が「目標金額総額 」に到達していなければtrueを返す
+  #   -> 既に「目標金額総額 」に「現在の目標貯金額」が到達していたらfalseを返す、その地点でアクティビティログが出力されてるため
+  def over_current_amount?(goal)
+    # 目標貯金総額 > 現在の目標貯金額
+    goal.goal_amount > goal.current_amount
+  end
+
+  def over_goal_amount?(goal)
+    goal.current_amount >= goal.goal_amount
+  end
+
 end

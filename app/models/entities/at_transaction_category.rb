@@ -11,5 +11,5 @@
 #
 
 class Entities::AtTransactionCategory < ApplicationRecord
-  belongs_to :at_grouped_category
+  belongs_to :at_grouped_category, optional: true
 end

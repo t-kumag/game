@@ -4,6 +4,7 @@ class Api::V1::User::BsController < ApplicationController
   def summary
     bank_amount = 0
     emoney_amount = 0
+    wallet_amount = 0
     goal_amount = 0
 
     # TODO: 一時的な対応 tryの不要な処理を削除する
@@ -23,8 +24,13 @@ class Api::V1::User::BsController < ApplicationController
       emoney_amount = at_emoney_accounts.sum{|i| i.balance}
     end
 
+    wallets = Entities::Wallet.where(user_id: @current_user.id).where(share: false)
+    if wallets.present?
+      wallet_amount = wallets.sum{|i| i.balance}
+    end
+
     @response = {
-        amount: bank_amount + emoney_amount
+        amount: bank_amount + emoney_amount + wallet_amount
         # TODO: 目標一覧を口座取引に表示するまで目標金額はBSに含めない
         #amount: bank_amount + emoney_amount - goal_amount
     }
