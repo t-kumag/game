@@ -86,7 +86,7 @@ class ApplicationController < ActionController::Base
   end
 
   def render_500(e = nil)
-    logger.fatal "user_id: #{@current_user.id}"
+    logger.fatal "user_id: #{@current_user.present? ? @current_user.id : nil}"
     logger.fatal "user_agent: #{request.env["HTTP_USER_AGENT"]}"
     super.render_500
 
