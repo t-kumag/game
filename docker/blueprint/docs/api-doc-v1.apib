@@ -3124,6 +3124,59 @@ Resource of Notice
 
             {}
 
+###  未読件数取得 [GET /api/v1/notices/unread-total-count]
+
+
++ Request 通知取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {}
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+             "notices": {
+              "unread_total_count": 1
+             }
+            }
+
+###  未読件数取得 [GET /api/v1/notices/all-read]
+
+
++ Request 通知取得 (application/json)
+
+    + Headers
+
+            Authorization: Bearer [access_token]
+
+    + Body
+
+            {}
+
++ Response 200 (application/json)
+
+    + Body
+
+            {}
+
++ Response 400 (application/json)
+
+    + Body
+
+            {}
 
 ## ペアリング [/api/v1/pairing-requests]
 Resource of Pairing
