@@ -127,9 +127,13 @@ class Api::V1::UsersController < ApplicationController
       # http://redmine.369webcash.com/issues/2916
       # at_user_service.exec_scraping
 
+      # ATの口座情報・名声をosidoriDBに同期
       at_user_service.sync_at_user_finance
+      # 明細振り分け管理テーブルへ同期
       at_user_service.sync_user_distributed_transaction
+      # 残高のログを登録
       at_user_service.save_balance_log
+
     rescue => e
       SlackNotifier.ping("ERROR Api::V1::UsersController#at_sync")
       SlackNotifier.ping(e)

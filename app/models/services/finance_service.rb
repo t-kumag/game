@@ -22,25 +22,27 @@ class Services::FinanceService
   #
   # 
 
-  def self.save_balance_log(finance, finance_transaction, from=nil)
+  def self.save_balance_log(finance, finance_transaction, from=nil, payment_method_type='')
     finance = Entities::Finance.new(finance)
     finance_transaction = Entities::FinanceTransaction.new(finance_transaction)
 
     from = Time.zone.today.strftime('%Y-%m-%d') if from.nil?
     to = Time.zone.today.strftime('%Y-%m-%d')
 
-    ft_ids = finance_transaction.model.
-      where(finance.relation_key => finance.id).
-      where(finance_transaction.date_column => from..to).
-      pluck(:id)
+    if payment_method_type.present?
+      ft_ids = finance_transaction.model.
+        where(payment_method_id: finance.id).
+        where(payment_method_type: payment_method_type).
+        where(finance_transaction.date_column => from..to).
+        pluck(:id)
+    else
+      ft_ids = finance_transaction.model.
+        where(finance.relation_key => finance.id).
+        where(finance_transaction.date_column => from..to).
+        pluck(:id)
+    end
 
-#wallet payment_method_type payment_method_id
-    # ft_ids = finance_transaction.model.
-    #     where(payment_method_id: finance.id).
-    #     where(payment_method_type: "wallet").
-    #     where(finance_transaction.date_column => from..to).
-    #     pluck(:id)
-    # return [] if ft_ids.blank?
+    return [] if ft_ids.blank?
 
     dt_rows = Entities::UserDistributedTransaction.
       where(finance_transaction.relation_key => ft_ids).
@@ -52,11 +54,12 @@ class Services::FinanceService
     same_date = ''
     calc_balances = {}
     dt_rows.each do |t|
-      if same_date != t.used_date
-        same_date = t.used_date
+      date = t.used_date.since(1.days) #1日後
+      if same_date != date
+        same_date = date
       end
 
-      calc_balances = calc_balances.merge({t.used_date => t.amount}) do |_, old_val, new_val|
+      calc_balances = calc_balances.merge({date => t.amount}) do |_, old_val, new_val|
         # 同一keyの場合は集計する
         old_val + new_val
       end
@@ -66,7 +69,7 @@ class Services::FinanceService
 
     base_balance = finance.balance
     calc_balances.each do |k, _|
-      calc_balances[k] += base_balance
+      calc_balances[k] = base_balance - calc_balances[k]
       base_balance = calc_balances[k]
     end
 
@@ -79,12 +82,12 @@ class Services::FinanceService
       latest_date = date if from < date && latest_date < date # 明細の最終日
       save_balances << {finance.relation_key => finance.id, date: date, balance: balance}
 
-      # 配列の最後は何もしない
+      # 配列の最後は後続の処理をスキップ
       if i == calc_balances.length - 1
         break
       end
 
-      #-1の日がなければは空を代入
+      # 明細がない期間の残高を埋める処理
       yesterday = date
       31.times do
         yesterday = yesterday.ago(1.days)
@@ -95,6 +98,8 @@ class Services::FinanceService
         end
       end
     end
+
+    # p save_balances
 
     diff_date_num = 0 # 残高計算日と明細の存在する最終日との差分の日にちをカウント
     if latest_date != from
@@ -110,7 +115,7 @@ class Services::FinanceService
       end
     end
 
-    #p save_balances
+    # p save_balances
 
     # 残高ログを登録
     Entities::BalanceLog.import save_balances,

@@ -10,7 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_03_071606) do
+ActiveRecord::Schema.define(version: 2020_02_10_070828) do
+
+  create_table "__balance_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_bank_account_id"
+    t.bigint "at_user_emoney_service_account_id"
+    t.bigint "balance", default: 0, null: false
+    t.datetime "date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "base_balance"
+    t.integer "wallet_id"
+    t.index ["at_user_bank_account_id", "date"], name: "asdfasdf", unique: true
+    t.index ["at_user_bank_account_id"], name: "index_b_l_on_at_user_bank_account_id"
+    t.index ["at_user_emoney_service_account_id"], name: "index_b_l_on_at_user_emoney_service_account_id"
+  end
 
   create_table "_at_user_stock_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_stock_account_id"
@@ -353,15 +367,19 @@ ActiveRecord::Schema.define(version: 2020_02_03_071606) do
     t.index ["user_id"], name: "unique_index_at_users_on_user_id", unique: true
   end
 
-  create_table "balance_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+  create_table "balance_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "at_user_bank_account_id"
     t.bigint "at_user_emoney_service_account_id"
-    t.integer "amount", default: 0, null: false
+    t.bigint "balance", default: 0, null: false
     t.datetime "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["at_user_bank_account_id"], name: "index_b_l_on_at_user_bank_account_id"
-    t.index ["at_user_emoney_service_account_id"], name: "index_b_l_on_at_user_emoney_service_account_id"
+    t.bigint "wallet_id"
+    t.bigint "base_balance", default: 0, null: false
+    t.index ["at_user_bank_account_id", "date"], name: "index_b_l_on_at_user_bank_account_id_and_date", unique: true
+    t.index ["at_user_emoney_service_account_id", "date"], name: "index_b_l_on_at_user_emoney_service_account_id_and_date", unique: true
+    t.index ["wallet_id", "date"], name: "index_b_l_on_wallet_id_and_date", unique: true
+    t.index ["wallet_id"], name: "index_balance_logs_on_wallet_id"
   end
 
   create_table "budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -644,6 +662,8 @@ ActiveRecord::Schema.define(version: 2020_02_03_071606) do
     t.index ["user_id"], name: "index_wallets_on_user_id"
   end
 
+  add_foreign_key "__balance_logs", "at_user_bank_accounts"
+  add_foreign_key "__balance_logs", "at_user_emoney_service_accounts"
   add_foreign_key "at_scraping_logs", "at_user_bank_accounts"
   add_foreign_key "at_scraping_logs", "at_user_card_accounts"
   add_foreign_key "at_scraping_logs", "at_user_emoney_service_accounts"
@@ -672,8 +692,7 @@ ActiveRecord::Schema.define(version: 2020_02_03_071606) do
   add_foreign_key "at_user_stock_logs", "at_user_stock_accounts"
   add_foreign_key "at_user_tokens", "at_users"
   add_foreign_key "at_users", "users"
-  add_foreign_key "balance_logs", "at_user_bank_accounts"
-  add_foreign_key "balance_logs", "at_user_emoney_service_accounts"
+  add_foreign_key "balance_logs", "wallets"
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
   add_foreign_key "goal_logs", "at_user_bank_accounts"
   add_foreign_key "goal_logs", "goals"

@@ -367,5 +367,6 @@ class Services::AtUserService
      @user.at_user.at_user_emoney_service_accounts.each do |a|
        Services::FinanceService.save_balance_log(a, Entities::AtUserEmoneyTransaction.new, '2019-09-01')
      end
+     # TODO お財布も同様に処理
   end
 end
