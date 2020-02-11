@@ -6,12 +6,12 @@ class ApplicationController < ActionController::Base
   # before_filter :set_api_version
 
   # 例外ハンドル
+  rescue_from Exception, with: :render_500
   rescue_from ActiveRecord::RecordNotFound, with: :render_422
   rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
   rescue_from AtAPIStandardError, with: :render_at_api_error
   rescue_from ActionController::RoutingError, with: :render_404
   #     rescue_from ActionView::MissingTemplate, with: :render_404
-  rescue_from Exception, with: :render_500
 
 
   # def set_api_version
