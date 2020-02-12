@@ -6,12 +6,12 @@ class ApplicationController < ActionController::Base
   # before_filter :set_api_version
 
   # 例外ハンドル
+  rescue_from Exception, with: :render_500
   rescue_from ActiveRecord::RecordNotFound, with: :render_422
   rescue_from ActiveRecord::RecordInvalid, with: :render_record_invalid
   rescue_from AtAPIStandardError, with: :render_at_api_error
   rescue_from ActionController::RoutingError, with: :render_404
   #     rescue_from ActionView::MissingTemplate, with: :render_404
-  rescue_from Exception, with: :render_500
 
 
   # def set_api_version
@@ -87,7 +87,7 @@ class ApplicationController < ActionController::Base
 
   def render_500(e = nil)
     logger.fatal "user_id: #{@current_user.present? ? @current_user.id : nil}"
-    logger.fatal "user_agent: #{request.env["HTTP_USER_AGENT"]}"
+    logger.fatal "User-Agent: #{request.env["HTTP_USER_AGENT"]}"
     super.render_500
 
     # logger.error e.message + "\n" + e.backtrace.join("\n")
