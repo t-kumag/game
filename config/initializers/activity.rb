@@ -12,8 +12,8 @@ module ACTIVITY_TYPE
       person_expense_income:             { message: '個人の取引が%d件ありました', url: 'osidori://transactions'},
       person_tran_to_family:             { message: 'あなたが取引明細を家族画面に振り分けました', url: 'osidori://transactions/%d?type=%s&account_id=%d&account=%s'},
       person_tran_to_family_partner:     { message: 'パートナーが取引明細を家族画面に振り分けました', url: 'osidori://transactions/%d?type=%s&account_id=%d&account=%s'},
-      person_account_to_family:          { message: 'あなたが金融機関を家族画面に登録しました', url: 'osidori://financial-accounts&account=%s'},
-      person_account_to_family_partner:  { message: 'パートナーが金融機関を家族画面に登録しました', url: 'osidori://financial-accounts&account=%s'},
+      person_account_to_family:          { message: 'あなたが金融機関を家族画面に登録しました', url: 'osidori://financial-accounts?account=%s'},
+      person_account_to_family_partner:  { message: 'パートナーが金融機関を家族画面に登録しました', url: 'osidori://financial-accounts?account=%s'},
       family_expense_income:             { message: '家族の取引が%d件ありました', url: 'osidori://transactions'},
       individual_manual_outcome:         { message: 'あなたが取引明細を手動で作成しました', url: 'osidori://transactions/%d?type=%s&account=%s'},
       individual_manual_outcome_fam:     { message: 'パートナーが家族の取引明細を手動で作成しました。', url: 'osidori://transactions/%d?type=%s&account=%s'}
