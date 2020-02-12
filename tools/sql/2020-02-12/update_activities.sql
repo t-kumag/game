@@ -1,0 +1,1 @@
+UPDATE activities SET url = replace(url, 'financial-accounts&', 'financial-accounts?') WHERE url LIKE "%financial-accounts&%";
