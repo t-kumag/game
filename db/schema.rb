@@ -280,7 +280,7 @@ ActiveRecord::Schema.define(version: 2020_02_03_113334) do
     t.string "at_user_id"
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_at_users_on_deleted_at"
-    t.index ["user_id"], name: "index_at_users_on_user_id"
+    t.index ["user_id"], name: "unique_index_at_users_on_user_id", unique: true
   end
 
   create_table "balance_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
