@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_28_035038) do
+ActiveRecord::Schema.define(version: 2020_01_29_024444) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -280,7 +280,7 @@ ActiveRecord::Schema.define(version: 2020_01_28_035038) do
     t.string "at_user_id"
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_at_users_on_deleted_at"
-    t.index ["user_id"], name: "index_at_users_on_user_id"
+    t.index ["user_id"], name: "unique_index_at_users_on_user_id", unique: true
   end
 
   create_table "balance_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
