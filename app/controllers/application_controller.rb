@@ -236,12 +236,12 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  def disallowed_wallet_ids?(wallet_ids, with_group=false)
+  def disallowed_wallet_ids?(wallet_ids)
     user_id         =  @current_user.id
     partner_user_id =  @current_user.try(:partner_user).try(:id)
 
     user_wallet_ids = Entities::Wallet.where(user_id: user_id).pluck(:id)
-    if partner_user_id && with_group
+    if partner_user_id
       user_wallet_ids << Entities::Wallet.where(user_id: partner_user_id, share: true).pluck(:id)
     end
     user_wallet_ids.flatten!
