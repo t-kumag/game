@@ -132,15 +132,21 @@
     "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"account not found."</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-銀行口座-put" class="action put"><h4 class="action-heading"><div class="name">銀行口座更新</div><a href="#個人機能-銀行口座-put" class="method put">PUT</a><code class="uri">/api/v1/user/bank-accounts/:id</code></h4></div></div><hr class="split"><div class="right"><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/bank-accounts/:id</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">銀行口座更新</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-銀行口座-delete" class="action delete"><h4 class="action-heading"><div class="name">銀行口座削除</div><a href="#個人機能-銀行口座-delete" class="method delete">DELETE</a><code class="uri">/api/v1/user/bank-accounts/:id</code></h4></div></div><hr class="split"><div class="middle"><div id="個人機能-銀行取引明細" class="resource"><h3 class="resource-heading">銀行取引明細 <a href="#個人機能-銀行取引明細" class="permalink">&para;</a></h3><p>Resource of Bank Account Transactions</p>
 </div></div><div class="right"><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/bank-accounts/:bank_account_id/transactions</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細一覧取得</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">app</span>": <span class="hljs-value">[
@@ -172,10 +178,13 @@
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-銀行取引明細-get" class="action get"><h4 class="action-heading"><div class="name">明細一覧取得</div><a href="#個人機能-銀行取引明細-get" class="method get">GET</a><code class="uri">/api/v1/user/bank-accounts/:bank_account_id/transactions</code></h4><h4 id="header-url-parameters-2">URL Parameters <a class="permalink" href="#header-url-parameters-2" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -203,10 +212,13 @@
           "is_ignored": false
         }
     }</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id.."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"004001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その利用明細にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-銀行取引明細-get-1" class="action get"><h4 class="action-heading"><div class="name">明細詳細取得</div><a href="#個人機能-銀行取引明細-get-1" class="method get">GET</a><code class="uri">/api/v1/user/bank-accounts/:bank_account_id/transactions/:id</code></h4></div></div><hr class="split"><div class="right"><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/bank-accounts/:bank_account_id/transactions/:id</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細詳細更新</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">30</span></span>,
   "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"カフェベートーベン"</span></span>,
@@ -214,10 +226,13 @@
   "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-string">"明細メモ"</span></span>,
   "<span class="hljs-attribute">ignore</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id.."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"004001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その利用明細にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-銀行取引明細-put" class="action put"><h4 class="action-heading"><div class="name">明細詳細更新</div><a href="#個人機能-銀行取引明細-put" class="method put">PUT</a><code class="uri">/api/v1/user/bank-accounts/:bank_account_id/transactions/:id</code></h4><h4 id="header-body-parameters">Body Parameters <a class="permalink" href="#header-body-parameters" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -261,16 +276,22 @@
     "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"account not found."</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-カード口座-put" class="action put"><h4 class="action-heading"><div class="name">カード口座更新</div><a href="#個人機能-カード口座-put" class="method put">PUT</a><code class="uri">/api/v1/user/card-accounts/:id</code></h4><h4 id="header-body-parameters-1">Body Parameters <a class="permalink" href="#header-body-parameters-1" aria-hidden="true">¶</a></h4>
 </div></div><hr class="split"><div class="right"><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/card-accounts/:id</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">カード削除</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-カード口座-delete" class="action delete"><h4 class="action-heading"><div class="name">カード口座削除</div><a href="#個人機能-カード口座-delete" class="method delete">DELETE</a><code class="uri">/api/v1/user/card-accounts/:id</code></h4></div></div><hr class="split"><div class="middle"><div id="個人機能-カード取引明細" class="resource"><h3 class="resource-heading">カード取引明細 <a href="#個人機能-カード取引明細" class="permalink">&para;</a></h3><p>Resource of Card Account Transactions</p>
 </div></div><div class="right"><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/card-accounts/:card_account_id/transactions</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細一覧取得</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">app</span>": <span class="hljs-value">[
@@ -302,10 +323,13 @@
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-カード取引明細-get" class="action get"><h4 class="action-heading"><div class="name">明細一覧取得</div><a href="#個人機能-カード取引明細-get" class="method get">GET</a><code class="uri">/api/v1/user/card-accounts/:card_account_id/transactions</code></h4><h4 id="header-url-parameters-3">URL Parameters <a class="permalink" href="#header-url-parameters-3" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -332,10 +356,13 @@
     "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">168</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"004001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その利用明細にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-カード取引明細-get-1" class="action get"><h4 class="action-heading"><div class="name">明細詳細取得</div><a href="#個人機能-カード取引明細-get-1" class="method get">GET</a><code class="uri">/api/v1/user/card-accounts/:card_account_id/transactions/:id</code></h4></div></div><hr class="split"><div class="right"><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/card-accounts/:card_account_id/transactions/:id</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細詳細更新</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">30</span></span>,
   "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"カフェベートーベン"</span></span>,
@@ -343,10 +370,13 @@
   "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-string">"明細メモ"</span></span>,
   "<span class="hljs-attribute">ignore</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"004001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その利用明細にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-カード取引明細-put" class="action put"><h4 class="action-heading"><div class="name">明細詳細更新</div><a href="#個人機能-カード取引明細-put" class="method put">PUT</a><code class="uri">/api/v1/user/card-accounts/:card_account_id/transactions/:id</code></h4><h4 id="header-body-parameters-2">Body Parameters <a class="permalink" href="#header-body-parameters-2" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -390,15 +420,21 @@
     "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"account not found."</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-電子マネー口座-put" class="action put"><h4 class="action-heading"><div class="name">電子マネー口座更新</div><a href="#個人機能-電子マネー口座-put" class="method put">PUT</a><code class="uri">/api/v1/user/emoney-accounts/:id</code></h4></div></div><hr class="split"><div class="right"><div class="definition"><span class="method delete">DELETE</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/emoney-accounts/:id</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">電子マネー削除</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-電子マネー口座-delete" class="action delete"><h4 class="action-heading"><div class="name">電子マネー口座削除</div><a href="#個人機能-電子マネー口座-delete" class="method delete">DELETE</a><code class="uri">/api/v1/user/emoney-accounts/:id</code></h4></div></div><hr class="split"><div class="middle"><div id="個人機能-電子マネー取引明細" class="resource"><h3 class="resource-heading">電子マネー取引明細 <a href="#個人機能-電子マネー取引明細" class="permalink">&para;</a></h3><p>Resource of Emoney Account Transactions</p>
 </div></div><div class="right"><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/emoney-accounts/:emoney_account_id/transactions</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細一覧取得</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">app</span>": <span class="hljs-value">[
@@ -430,10 +466,13 @@
     </span>}
   ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-電子マネー取引明細-get" class="action get"><h4 class="action-heading"><div class="name">明細一覧取得</div><a href="#個人機能-電子マネー取引明細-get" class="method get">GET</a><code class="uri">/api/v1/user/emoney-accounts/:emoney_account_id/transactions</code></h4><h4 id="header-url-parameters-4">URL Parameters <a class="permalink" href="#header-url-parameters-4" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -460,10 +499,13 @@
     "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">192</span>
   </span>}
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"004001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その利用明細にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-電子マネー取引明細-get-1" class="action get"><h4 class="action-heading"><div class="name">明細詳細取得</div><a href="#個人機能-電子マネー取引明細-get-1" class="method get">GET</a><code class="uri">/api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id</code></h4></div></div><hr class="split"><div class="right"><div class="definition"><span class="method put">PUT</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細詳細更新</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">30</span></span>,
   "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"カフェベートーベン"</span></span>,
@@ -471,10 +513,13 @@
   "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-string">"明細メモ"</span></span>,
   "<span class="hljs-attribute">ignore</span>": <span class="hljs-value"><span class="hljs-literal">false</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"004001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その利用明細にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed transaction id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-電子マネー取引明細-put" class="action put"><h4 class="action-heading"><div class="name">明細詳細更新</div><a href="#個人機能-電子マネー取引明細-put" class="method put">PUT</a><code class="uri">/api/v1/user/emoney-accounts/:emoney_account_id/transactions/:id</code></h4><h4 id="header-body-parameters-3">Body Parameters <a class="permalink" href="#header-body-parameters-3" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -668,10 +713,13 @@
 </div></div><div class="right"><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/icon</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">アイコン取得</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
   "<span class="hljs-attribute">img_url</span>": <span class="hljs-value"><span class="hljs-string">"https://osdr-img-test.s3-ap-northeast-1.amazonaws.com"</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"icon not found."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"002002"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"写真の登録に失敗しました。もう一度お試しください。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Icon not found."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-アイコン-get" class="action get"><h4 class="action-heading"><div class="name">アイコン取得</div><a href="#個人機能-アイコン-get" class="method get">GET</a><code class="uri">/api/v1/user/icon</code></h4></div></div><hr class="split"><div class="right"><div class="definition"><span class="method post">POST</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v1/user/icon</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">アイコン登録</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
     <span class="hljs-string">"img_url"</span> : {S3のイメージURL}
 
@@ -1705,7 +1753,7 @@ o</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"
       "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"blank"</span>
     </span>}
   ]
-</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="その他-ユーザー-delete" class="action delete"><h4 class="action-heading"><div class="name">ユーザー削除</div><a href="#その他-ユーザー-delete" class="method delete">DELETE</a><code class="uri">/api/v1/users</code></h4></div></div><hr class="split"><div class="middle"><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 10 Feb 2020</p></div></div></div></div><script>/* eslint-env browser */
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="その他-ユーザー-delete" class="action delete"><h4 class="action-heading"><div class="name">ユーザー削除</div><a href="#その他-ユーザー-delete" class="method delete">DELETE</a><code class="uri">/api/v1/users</code></h4></div></div><hr class="split"><div class="middle"><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 13 Feb 2020</p></div></div></div></div><script>/* eslint-env browser */
 /* eslint quotes: [2, "single"] */
 'use strict';
 

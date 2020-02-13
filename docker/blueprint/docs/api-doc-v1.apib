@@ -1842,10 +1842,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "Record not found."
-              }
+              "errors": [
+                {
+                  "code": "005001",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "Record not found."
+                }
+              ]
             }
 
 
@@ -1889,10 +1892,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "five goal limit of free users"
-              }
+              "errors": [
+                {
+                  "code": "007001",
+                  "message": "登録数が上限のため追加できません(5個)",
+                  "info": "Five goal limit of free users."
+                }
+              ]
             }
 
 ### 目標追加入金登録 [POST /api/v1/group/goals/:goal_id/add_money]
@@ -1920,10 +1926,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "user not found or goal not found."
-              }
+              "errors": [
+                {
+                  "code": "005002",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "Disallowed goal id."
+                }
+              ]
             }
             o
 + Response 422 (application/json)
@@ -1931,10 +1940,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "minus balance"
-              }
+              "errors": [
+                {
+                  "code": "005006",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "User not found or goal not found."
+                }
+              ]
             }
 
 ### 目標更新 [PUT]
@@ -1981,10 +1993,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "Goal not found."
-              }
+              "errors": [
+                {
+                  "code": "005003",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "Disallowed goal setting id."
+                }
+              ]
             }
 
 + Response 422 (application/json)
@@ -1992,10 +2007,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "Goal settings not found."
-              }
+              "errors": [
+                {
+                  "code": "005005",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "Goal settings not found."
+                }
+              ]
             }
 
 ### 目標削除 [DELETE]
@@ -2017,10 +2035,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "Goal not found."
-              }
+              "errors": [
+                {
+                  "code": "005004",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "Goal not found."
+                }
+              ]
             }
 
 
@@ -2077,10 +2098,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "goal not found.s"
-              }
+              "errors": [
+                {
+                  "code": "005001",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "User not found or goal not found."
+                }
+              ]
             }
 
 ###  目標設定更新 [PUT /api/v1/group/goals/:goal_id/goal-settings/:id]
@@ -2109,10 +2133,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "goal not found."
-              }
+              "errors": [
+                {
+                  "code": "005004",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "Goal not found."
+                }
+              ]
             }
 
 
@@ -2121,10 +2148,13 @@ Resource of Goal
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "goal_setting not found."
-              }
+              "errors": [
+                {
+                  "code": "005005",
+                  "message": "その目標貯金にはアクセスできません。",
+                  "info": "Goal settings not found."
+                }
+              ]
             }
 
 ## 目標グラフデータ取得 [/api/v1/group/goal-graph]
@@ -2248,10 +2278,13 @@ Resource of Bank Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed financier id."
-                }
+                "errors": [
+                  {
+                    "code": "003001",
+                    "message": "その金融機関にはアクセスできません。",
+                    "info": "Disallowed financier id."
+                  }
+                ]
             }
 
 ### 明細詳細取得 [GET /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
@@ -2297,10 +2330,13 @@ Resource of Bank Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed transaction id.."
-                }
+                "errors": [
+                  {
+                    "code": "004001",
+                    "message": "その利用明細にはアクセスできません。",
+                    "info": "Disallowed transaction id."
+                  }
+                ]
             }
 
 ### 明細詳細更新 [PUT /api/v1/group/bank-accounts/:bank_account_id/transactions/:id]
@@ -2340,10 +2376,13 @@ Resource of Bank Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed transaction id.."
-                }
+                "errors": [
+                  {
+                    "code": "004001",
+                    "message": "その利用明細にはアクセスできません。",
+                    "info": "Disallowed transaction id."
+                  }
+                ]
             }
 
 
@@ -2459,10 +2498,13 @@ Resource of Card Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed financier id."
-                }
+                "errors": [
+                  {
+                    "code": "004001",
+                    "message": "その利用明細にはアクセスできません。",
+                    "info": "Disallowed transaction id."
+                  }
+                ]
             }
 
 
@@ -2508,10 +2550,13 @@ Resource of Card Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed transaction id."
-                }
+                "errors": [
+                  {
+                    "code": "004001",
+                    "message": "その利用明細にはアクセスできません。",
+                    "info": "Disallowed transaction id."
+                  }
+                ]
             }
 
 
@@ -2547,10 +2592,13 @@ Resource of Card Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed transaction id."
-                }
+                "errors": [
+                  {
+                    "code": "004001",
+                    "message": "その利用明細にはアクセスできません。",
+                    "info": "Disallowed transaction id."
+                  }
+                ]
             }
 
 
@@ -2666,10 +2714,13 @@ Resource of Emoney Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed financier id."
-                }
+                "errors": [
+                  {
+                    "code": "003001",
+                    "message": "その金融機関にはアクセスできません。",
+                    "info": "Disallowed financier id."
+                  }
+                ]
             }
 
 ### 明細詳細取得 [GET /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
@@ -2714,10 +2765,13 @@ Resource of Emoney Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed transaction id."
-                }
+                "errors": [
+                  {
+                    "code": "004001",
+                    "message": "その利用明細にはアクセスできません。",
+                    "info": "Disallowed transaction id."
+                  }
+                ]
             }
 
 ### 明細詳細更新 [PUT /api/v1/group/emoney-accounts/:emoney_account_id/transactions/:id]
@@ -2758,10 +2812,13 @@ Resource of Emoney Account Transactions
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "Disallowed transaction id."
-                }
+                "errors": [
+                  {
+                    "code": "004001",
+                    "message": "その利用明細にはアクセスできません。",
+                    "info": "Disallowed transaction id."
+                  }
+                ]
             }
 
 ## 電子マネー口座合計 [/api/v1/group/emoney-accounts-summary]
@@ -3288,10 +3345,13 @@ Resource of Pairing
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "pairing token not found"
-              }
+              "errors": [
+                {
+                  "code": "006006",
+                  "message": "招待をしたお客様は、OsidOriには存在しません。",
+                  "info": "Pairing token not found."
+                }
+              ]
             }
 
 + Response 422 (application/json)
@@ -3299,10 +3359,13 @@ Resource of Pairing
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "paring user not found or invalid token."
-              }
+              "errors": [
+                {
+                  "code": "006007",
+                  "message": "こちらのURLは有効期限が過ぎています。再度招待していただいてください。",
+                  "info": "Paring user not found or invalid token."
+                }
+              ]
             }
 
 + Response 422 (application/json)
@@ -3310,10 +3373,13 @@ Resource of Pairing
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "same user"
-              }
+              "errors": [
+                {
+                  "code": "006003",
+                  "message": "お客様はすでにペアリング済みです。",
+                  "info": "Paring user already exists."
+                }
+              ]
             }
 
 + Response 422 (application/json)
@@ -3321,10 +3387,13 @@ Resource of Pairing
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "paring user already exist."
-              }
+              "errors": [
+                {
+                  "code": "006002",
+                  "message": "招待したいパートナーにURLを送り、URLをタップしていただいてください。",
+                  "info": "Same user."
+                }
+              ]
             }
 
 + Response 422 (application/json)
@@ -3332,10 +3401,13 @@ Resource of Pairing
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "from user group taken"
-              }
+              "errors": [
+                {
+                  "code": "006004",
+                  "message": "招待をしたお客様は、すでにペアリング済みです。",
+                  "info": "From user group taken."
+                }
+              ]
             }
 
 + Response 422 (application/json)
@@ -3343,10 +3415,13 @@ Resource of Pairing
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "to user group taken"
-              }
+              "errors": [
+                {
+                  "code": "006005",
+                  "message": "お客様はすでにペアリング済みです。",
+                  "info": "To user group taken."
+                }
+              ]
             }
 
 
@@ -3537,10 +3612,13 @@ Resource of Users
     + Body
 
             {
-                "errors": {
-                  "code": "",
-                  "mesasge": "email not found."
-                }
+                "errors": [
+                  {
+                    "code": "001002",
+                    "message": "こちらのメールアドレスはOsidOriに登録されていません。ご確認をお願いいたします。",
+                    "info": "Email not found."
+                  }
+                ]
             }
 
 
@@ -3571,10 +3649,13 @@ Resource of Users
     + Body
 
             {
-              "errors": {
-                "code": "",
-                "mesasge": "user not found or invalid token."
-              }
+              "errors": [
+                {
+                  "code": "001003",
+                  "message": "こちらのメールアドレスはOsidOriに登録されていません。ご確認をお願いいたします。",
+                  "info": "User not found or invalid token."
+                }
+              ]
             }
 
 
