@@ -1,5 +1,5 @@
 class Api::V1::Group::BankAccountsController < ApplicationController
-  before_action :authenticate, :require_group
+  before_action :authenticate
 
   def index
     share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)

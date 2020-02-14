@@ -35,8 +35,6 @@ class Api::V1::User::BankTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
-    require_group && return if params[:share] == true
-
     @exist_bank_transaction = Services::AtBankTransactionService.new(@current_user).detail(params[:bank_account_id], transaction_id)
     bank_account_transaction_param = get_bank_account_transaction_param(params, transaction_id, @exist_bank_transaction)
 
@@ -55,7 +53,7 @@ class Api::V1::User::BankTransactionsController < ApplicationController
       options = create_activity_options(@response[:user_distributed_transaction], bank_account_transaction_param, "family")
       Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
                                                 DateTime.now, :person_tran_to_family, options)
-      Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
+      Services::ActivityService.create_activity(@current_user.partner_user.try(:id), @response[:user_distributed_transaction].group_id,
                                                 DateTime.now, :person_tran_to_family_partner, options)
     end
 
