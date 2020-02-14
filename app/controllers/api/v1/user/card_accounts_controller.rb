@@ -50,13 +50,12 @@ class Api::V1::User::CardAccountsController < ApplicationController
       end
 
       if @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id).include?(account_id)
-        require_group && return if params[:share] == true
         account = Entities::AtUserCardAccount.find account_id
         account.update!(get_account_params)
         if account.share
           options = create_activity_options("family")
           Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family, options)
-          Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_family_partner, options)
+          Services::ActivityService.create_activity(account.at_user.user.partner_user.try(:id), account.group_id,  DateTime.now, :person_account_to_family_partner, options)
         end
         render json: {}, status: 200
       else

@@ -15,7 +15,7 @@ class Api::V1::User::BankAccountsController < ApplicationController
           fnc_id: a.fnc_id,
           last_rslt_cd: a.last_rslt_cd,
           last_rslt_msg: a.last_rslt_msg,
-          goals: Services::GoalService.new(@current_user).goals(a.id)
+          goals: Services::GoalService.new(@current_user).goals(a)
         }
       end
     end
@@ -50,13 +50,12 @@ class Api::V1::User::BankAccountsController < ApplicationController
     end
 
     if @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id).include?(account_id)
-      require_group && return if params[:share] == true
       account = Entities::AtUserBankAccount.find account_id
       account.update!(get_account_params)
       if account.share
         options = create_activity_options("family")
         Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family, options)
-        Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_family_partner, options)
+        Services::ActivityService.create_activity(account.at_user.user.partner_user.try(:id), account.group_id,  DateTime.now, :person_account_to_family_partner, options)
       end
 
       render json: {}, status: 200

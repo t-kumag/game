@@ -16,7 +16,7 @@ class Api::V1::Group::BankAccountsController < ApplicationController
             fnc_id: a.fnc_id,
             last_rslt_cd: a.last_rslt_cd,
             last_rslt_msg: a.last_rslt_msg,
-            goals: Services::GoalService.new(@current_user).goals(a.id, true)
+            goals: Services::GoalService.new(@current_user).goals(a, true)
         }
       end
     end
