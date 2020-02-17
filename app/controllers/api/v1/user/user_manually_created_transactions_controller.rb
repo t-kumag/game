@@ -194,9 +194,11 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       # 無駄なキーを渡すと誤作動を起こす可能性があるので削除します。
       options.delete(:group_id)
       options.delete(:share)
+      options[:user_manually_created_transaction][:account] ||= "family"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
       Services::ActivityService.create_activity(current_user.partner_user.id, current_user.group_id, used_date, :individual_manual_outcome_fam, options)
     else
+      options[:user_manually_created_transaction][:account] ||= "person"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
     end
   end
@@ -206,6 +208,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     tran[:id] = transaction.user_manually_created_transaction_id
     tran[:share] = transaction.share
     tran[:type] = "manually_created"
+    tran[:account] = nil
     tran
   end
 
@@ -225,8 +228,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def update_balance_by_payment_method(old_transaction)
-    case params[:payment_method_type]
 
+    case params[:payment_method_type]
     when "wallet" then
       # 口座が変わった場合、金額が変更された場合は財布残高の明細金額分を元に戻し再計算する。
       if old_transaction[:payment_method_id].present?

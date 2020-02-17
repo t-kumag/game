@@ -112,11 +112,11 @@ class Services::ActivityService
       create_activity_data(user.id, nil, date, 'person_expense_income', set_activity)
     end
 
-    # message生成 家族の取引がn件ありました。familly_expense_income
+    # message生成 家族の取引がn件ありました。family_expense_income
     # ここから
     f_activity = Entities::Activity
                      .where(user_id: user.id)
-                     .where("activity_type LIKE ?", 'familly_expense_income')
+                     .where("activity_type LIKE ?", 'family_expense_income')
                      .where("created_at >= ?", date)
                      .first
 
@@ -124,7 +124,7 @@ class Services::ActivityService
       begin
         f_activity.update_attributes(
             count: nums[1],
-            message: sprintf(ACTIVITY_TYPE::NAME[:familly_expense_income][:message], nums[1])
+            message: sprintf(ACTIVITY_TYPE::NAME[:family_expense_income][:message], nums[1])
         )
       rescue => e
         # 処理を中断させない。
@@ -132,10 +132,10 @@ class Services::ActivityService
     end
 
     if f_activity.blank? && nums[1] > 0
-      set_activity = set_activity(ACTIVITY_TYPE::NAME[:familly_expense_income])
-      set_activity[:message] = sprintf(ACTIVITY_TYPE::NAME[:familly_expense_income][:message], nums[1])
+      set_activity = set_activity(ACTIVITY_TYPE::NAME[:family_expense_income])
+      set_activity[:message] = sprintf(ACTIVITY_TYPE::NAME[:family_expense_income][:message], nums[1])
       set_activity[:count] = nums[1]
-      create_activity_data(user.id, user.group_id, date, 'familly_expense_income', set_activity)
+      create_activity_data(user.id, user.group_id, date, 'family_expense_income', set_activity)
     end
   end
 
@@ -235,12 +235,17 @@ class Services::ActivityService
   end
 
   def self.convert_tran_url(transaction, defined_activity, activity)
-    activity[:url] = sprintf(defined_activity[:url], transaction[:id], transaction[:type], transaction[:account_id])
+    activity[:url] = sprintf(defined_activity[:url], transaction[:id], transaction[:type], transaction[:account_id], transaction[:account])
+    activity
+  end
+
+  def self.convert_account_url(account, defined_activity, activity)
+    activity[:url] = sprintf(defined_activity[:url], account)
     activity
   end
 
   def self.convert_user_manually_tran_url(transaction, defined_activity, activity)
-    activity[:url] = sprintf(defined_activity[:url], transaction[:id], transaction[:type])
+    activity[:url] = sprintf(defined_activity[:url], transaction[:id], transaction[:type], transaction[:account])
     activity
   end
 
@@ -267,6 +272,7 @@ class Services::ActivityService
     activity = convert_tran_url(options[:transaction], defined_activity, activity) if options[:transaction].present?
     activity = convert_user_manually_tran_url(options[:user_manually_created_transaction], defined_activity, activity) if options[:user_manually_created_transaction].present?
     activity = convert_trans_message(options[:transactions], defined_activity, activity) if options[:transactions].present?
+    activity = convert_account_url(options[:account], defined_activity, activity) if options[:account].present?
     activity
   end
 
