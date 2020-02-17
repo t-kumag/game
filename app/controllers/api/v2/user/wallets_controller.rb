@@ -22,7 +22,8 @@ class Api::V2::User::WalletsController < ApplicationController
 
   def update
     wallet_id = params[:id].to_i
-    wallet_service = Services::WalletService.new(@current_user)
+    wallet_service = Services::WalletService.new(@current_user, Entities::Wallet.find(wallet_id))
+
     param = params.require(:wallets).permit(:name, :share, :balance)
 
     if disallowed_wallet_ids?([wallet_id])
@@ -30,12 +31,11 @@ class Api::V2::User::WalletsController < ApplicationController
     end
 
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
-      require_group && return if  params[:wallets][:share] == true
-      wallet = Entities::Wallet.find wallet_id
+      require_group && return if  param[:share] == true
 
-      recalculate = wallet_service.recalculate(wallet, param)
-      wallet_service.update_wallet(recalculate, param, wallet)
-      if wallet.share
+      recalculate = wallet_service.recalculate_initial_balance_and_balance(param[:balance])
+      wallet_service.update_wallet(recalculate, param)
+      if wallet_service.share?
         # TODO: アクティビティ修正
         # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_familly)
         # Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_familly_partner)
@@ -59,30 +59,6 @@ class Api::V2::User::WalletsController < ApplicationController
   end
 
   private
-
-  def update_params(wallet)
-    balance = param[:balance].present? ? param[:balance] : wallet.balance
-    initial_balance = wallet.initial_balance
-
-    if param[:balance].present?
-      balance_difference = param[:balance] - wallet.balance
-      expense = wallet.initial_balance -  wallet.balance
-
-      initial_balance += balance_difference
-      balance = initial_balance - expense
-    end
-
-    result = {
-      group_id: @current_user.group_id,
-      name: param[:name],
-      initial_balance: initial_balance,
-      balance: balance
-    }
-
-    result[:share] = param[:share] if param.key?(:share)
-    result
-  end
-
   def create_params
     param = params.require(:wallets).permit(:name, :balance).merge(user_id: @current_user.id)
     param[:initial_balance] = param[:balance]
