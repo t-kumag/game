@@ -1,5 +1,5 @@
 class Entities::AtUserBankAccount < ApplicationRecord
-  RELATION_KEY = 'at_user_bank_id'.freeze
+  RELATION_KEY = :at_user_bank_account_id.freeze
 
   acts_as_paranoid # 論理削除
   belongs_to :at_user
@@ -8,8 +8,12 @@ class Entities::AtUserBankAccount < ApplicationRecord
   has_many :at_scraping_logs
   has_many :at_sync_transaction_logs
 
-  # TODO ReportServiceと合わせて実装する
-  def ids
-    [1]
+  def calc_balance(date)
+    Entities::BalanceLog.find_by(date: date)
   end
+
+  def calc_balances(from, to)
+    Entities::BalanceLog.find_by(date: from..to)
+  end
+
 end

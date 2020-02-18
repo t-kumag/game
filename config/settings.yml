@@ -1,4 +1,5 @@
 defaults: &defaults
+  latest_commit: 458064b8bf1efd9786e58b6f0cbb232e99c2f948
   api_url: https://beta2.osidori-dev.com
   at_url: https://atdev.369webcash.com
   at_pwd_salt: osdrdev
@@ -23,19 +24,20 @@ test:
 
 development:
   <<: *defaults
-  api_url: https://beta2.osidori-dev.com
+  api_url: https://dev-api.osidori-dev.com
   at_url: https://atdev.369webcash.com
   at_pwd_salt: osdrdev
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdrdev
+  s3_img_url: https://osidori-img-dev.s3-ap-northeast-1.amazonaws.com
 
 staging:
   <<: *defaults
   api_url: https://stg-api.osidori-dev.com
   at_url: https://atstaging.369webcash.com
-  at_pwd_salt: osdrstaging
+  at_pwd_salt: osdrstg
   at_chnl_id: CHNL_OSIDORI
-  at_account_name_prefix: osdrstaging
+  at_account_name_prefix: osdrstg
   s3_img_url: https://osidori-img-stg.s3-ap-northeast-1.amazonaws.com
 
 production:

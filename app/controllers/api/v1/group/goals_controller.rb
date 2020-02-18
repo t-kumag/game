@@ -27,7 +27,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     unless Services::GoalService.check_goal_limit_of_free_user(@current_user)
-      return render json: { errors: { code: '007001', message: "five goal limit of free users" } }, status: 422
+      return render(json: { errors: [ERROR_TYPE::NUMBER['007001']] }, status: 422)
     end
 
     goal_params = get_goal_params
@@ -141,19 +141,9 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
-    user_banks = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck, :id)
-    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id)
 
-    if partner_at_user_id.present?
-      user_banks ||= []
-      user_banks << Entities::AtUserBankAccount.where(at_user_id: partner_at_user_id, share: true).try(:pluck, :id)
-      user_banks.flatten!
-    end
-
-    goal_setting = before_goal.goal_settings.find_by(at_user_bank_account_id: user_banks, user_id: @current_user.id)
-    goal_setting = before_goal.goal_settings.find_by(user_id: @current_user.id) unless goal_setting.present?
-
-    if user_banks.blank? || before_goal.blank? || goal_setting.blank?
+    if before_goal.blank? || before_goal.goal_settings.blank?
       render json: {errors: [ERROR_TYPE::NUMBER['005006']] }, status: 422 and return
     end
     

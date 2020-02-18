@@ -15,6 +15,9 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def create
+    if disallowed_financier_id?
+      render_disallowed_financier_ids && return
+    end
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         user_manually_created_transaction = create_user_manually_created
@@ -26,11 +29,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         end
         options[:ignore] = params.has_key?(:ignore) ? params[:ignore] : false
 
-        # 口座が財布の場合は残高を計算する
-        if params[:payment_method_type] == "wallet"
-          Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
-        end
-
+        # 支払いタイプ毎の口座残高の更新を行う。
+        create_balance_by_payment_method
         transaction = Services::UserManuallyCreatedTransactionService.new(@current_user, user_manually_created_transaction).create_user_manually_created(options)
         options[:user_manually_created_transaction] = create_transaction(transaction)
         create_user_manually_activity(@current_user, transaction[:used_date], options)
@@ -44,7 +44,9 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   end
 
   def update
-
+    if disallowed_financier_id?
+      render_disallowed_financier_ids && return
+    end
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
         user_manually_created_transaction = find_transaction
@@ -60,19 +62,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         end
         options[:ignore] = params.has_key?(:ignore) ? params[:ignore] : false
 
-        # 口座が財布の場合は残高を計算する
-        if params[:payment_method_type] == "wallet"
-          if old_transaction[:payment_method_id].present?
-            # 口座が変わった場合、金額が変更された場合は財布残高の明細金額分を元に戻し再計算する。
-            if old_transaction[:payment_method_id] != params[:payment_method_id] || old_transaction[:amount] != params[:amount]
-              Services::WalletTransactionService::save_minus_balance(old_transaction[:payment_method_id], old_transaction[:amount])
-              Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
-            end
-          else
-            Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
-          end
-        end
-
+        # 支払いタイプ毎の口座残高の更新を行う。
+        update_balance_by_payment_method(old_transaction)
         Services::UserManuallyCreatedTransactionService.new(@current_user, user_manually_created_transaction).update_user_manually_created(options)
       end
     rescue => exception
@@ -155,8 +146,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
     at_transaction_category_id = save_param[:at_transaction_category_id].present? ?
                                      save_param[:at_transaction_category_id] : transaction[:at_transaction_category_id]
-    payment_method_id = save_param[:payment_method_id].present? ? save_param[:payment_method_id] : transaction[:payment_method_id]
-    payment_method_type = save_param[:payment_method_type].present? ? save_param[:payment_method_type] : transaction[:payment_method_type]
+    payment_method_id = save_param[:payment_method_id].present? ? save_param[:payment_method_id] : nil
+    payment_method_type = save_param[:payment_method_type].present? ? save_param[:payment_method_type] : nil
     used_date = save_param[:used_date].present? ? save_param[:used_date] : transaction[:used_date]
     title = save_param[:title].present? ? save_param[:title] : transaction[:title]
     amount = save_param[:amount].present? ? save_param[:amount] : transaction[:amount]
@@ -203,9 +194,11 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       # 無駄なキーを渡すと誤作動を起こす可能性があるので削除します。
       options.delete(:group_id)
       options.delete(:share)
+      options[:user_manually_created_transaction][:account] ||= "family"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
       Services::ActivityService.create_activity(current_user.partner_user.id, current_user.group_id, used_date, :individual_manual_outcome_fam, options)
     else
+      options[:user_manually_created_transaction][:account] ||= "person"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
     end
   end
@@ -215,7 +208,44 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     tran[:id] = transaction.user_manually_created_transaction_id
     tran[:share] = transaction.share
     tran[:type] = "manually_created"
+    tran[:account] = nil
     tran
+  end
+
+  def disallowed_financier_id?
+    case params[:payment_method_type]
+    when "wallet" then
+      return disallowed_wallet_ids?([params[:payment_method_id]])
+    end
+  end
+
+  def create_balance_by_payment_method
+    case params[:payment_method_type]
+    when "wallet" then
+      # 口座が財布の場合は残高を計算する
+      Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+    end
+  end
+
+  def update_balance_by_payment_method(old_transaction)
+
+    case params[:payment_method_type]
+    when "wallet" then
+      # 口座が変わった場合、金額が変更された場合は財布残高の明細金額分を元に戻し再計算する。
+      if old_transaction[:payment_method_id].present?
+        if old_transaction[:payment_method_id] != params[:payment_method_id] || old_transaction[:amount] != params[:amount]
+          Services::WalletTransactionService::save_minus_balance(old_transaction[:payment_method_id], old_transaction[:amount])
+          Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+        end
+      else
+        Services::WalletTransactionService::save_plus_balance(params[:payment_method_id], params[:amount])
+      end
+    else
+      # 支払い方法を財布から変更した場合
+      if params[:payment_method_type].blank? && params[:payment_method_type] != old_transaction[:payment_method_type]
+        Services::WalletTransactionService::save_minus_balance(old_transaction[:payment_method_id], old_transaction[:amount])
+      end
+    end
   end
 
 end

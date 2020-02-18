@@ -33,6 +33,8 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
+    require_group && return if params[:share] == true
+
     @exist_transaction = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:emoney_account_id], transaction_id)
     emoney_account_transaction_param = get_emoney_account_transaction_param(params, transaction_id, @exist_transaction)
 
@@ -48,11 +50,11 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
     )
 
     if @response[:user_distributed_transaction].share
-      options = create_activity_options(@response[:user_distributed_transaction], emoney_account_transaction_param)
+      options = create_activity_options(@response[:user_distributed_transaction], emoney_account_transaction_param, "family")
       Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
-                                                DateTime.now, :person_tran_to_familly, options)
+                                                DateTime.now, :person_tran_to_family, options)
       Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
-                                                DateTime.now, :person_tran_to_familly_partner, options)
+                                                DateTime.now, :person_tran_to_family_partner, options)
     end
     render json: {}, status: 200 and return if @response[:user_distributed_transaction].blank?
     render 'update', formats: 'json', handlers: 'jbuilder'
@@ -79,18 +81,19 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
   end
 
   private
-  def create_activity_options(transaction, emoney_account_transaction_param)
+  def create_activity_options(transaction, emoney_account_transaction_param, account)
     options = {}
     options[:goal] = nil
-    options[:transaction] = create_transaction(transaction, emoney_account_transaction_param)
+    options[:transaction] = create_transaction(transaction, emoney_account_transaction_param, account)
     options[:transactions] = nil
     options
   end
 
-  def create_transaction(transaction, card_account_transaction_param)
+  def create_transaction(transaction, card_account_transaction_param, account)
     tran  = {}
     tran[:id] = transaction.at_user_emoney_transaction_id
     tran[:account_id] = card_account_transaction_param[:emoney_account_id]
+    tran[:account] = account
     tran[:type] = "emoney"
     tran
   end
