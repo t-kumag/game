@@ -25,16 +25,13 @@ class Api::V2::User::WalletsController < ApplicationController
     wallet_service = Services::WalletService.new(@current_user, Entities::Wallet.find(wallet_id))
 
     param = params.require(:wallets).permit(:name, :share, :balance)
-
-    if disallowed_wallet_ids?([wallet_id])
-      render_disallowed_financier_ids && return
-    end
+    render_disallowed_financier_ids && return if disallowed_wallet_ids?([wallet_id])
 
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
       require_group && return if  param[:share] == true
 
-      recalculate = wallet_service.recalculate_initial_balance_and_balance(param[:balance])
-      wallet_service.update_wallet(recalculate, param)
+      wallet_service.update_recalculate_initial_balance_and_balance(param[:balance])
+      wallet_service.update_wallet(param)
       if wallet_service.share?
         # TODO: アクティビティ修正
         # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family)
