@@ -141,6 +141,20 @@ class Services::GoalService
     user.free? && Entities::Goal.where(user_id: user.id).count < Settings.at_user_limit_free_goal
   end
 
+  def self.is_checked_one_account(params)
+    params[:at_user_bank_account_id].present? && params[:wallet_id].present?
+  end
+
+  def self.setting_params(params)
+    if params[:at_user_bank_account_id].present?
+      params[:wallet_id] = nil
+    elsif params[:wallet_id].present?
+      params[:at_user_bank_account_id] = nil
+    end
+
+    return params
+  end
+
   def goals(finance, with_group=false)
     user_ids = [@user.id]
     user_ids.push(@user.partner_user.id) if with_group
