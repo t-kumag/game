@@ -3,7 +3,7 @@ class Api::V2::Group::WalletTransactionsController < ApplicationController
 
   def index
     wallet_id = params[:wallet_id].to_i
-    if disallowed_wallet_ids?([wallet_id], true)
+    if disallowed_wallet_ids?([wallet_id])
       render_disallowed_financier_ids && return
     end
 

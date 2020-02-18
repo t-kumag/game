@@ -9,5 +9,7 @@
 #  fnc_nm     :string(255)
 #
 
+# TODO このモデルは使用しないので影響がなければ削除する 2020-01-30
+# https://www.wrike.com/open.htm?id=452973113
 class Entities::AtEmoneyService < ApplicationRecord
 end

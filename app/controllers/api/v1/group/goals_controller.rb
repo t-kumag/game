@@ -27,7 +27,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     if get_goal_setting_params[:wallet_id].present? &&
-        disallowed_wallet_ids?([get_goal_setting_params[:wallet_id]], true)
+        disallowed_wallet_ids?([get_goal_setting_params[:wallet_id]])
       return render_disallowed_financier_ids
     end
 

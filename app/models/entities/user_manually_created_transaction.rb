@@ -16,6 +16,9 @@
 #
 
 class Entities::UserManuallyCreatedTransaction < ApplicationRecord
+  RELATION_KEY = :user_manually_created_transaction_id.freeze
+  DATE_COLUMN = :used_date.freeze
+
   belongs_to :payment_method, optional: true
   belongs_to :at_transaction_category
   has_one :user_distributed_transaction ,:dependent => :destroy

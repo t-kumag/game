@@ -27,11 +27,11 @@ development:
 
 staging:
   <<: *default
-  host: osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
-  port: 3306
-  database: osdrdevdb
-  username: osdrdevuser
-  password: qwermnbv10
+  host: <%= ENV.fetch("DB_HOST") %> # osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
+  port: <%= ENV.fetch("DB_PORT") %>
+  database: <%= ENV.fetch("DB_NAME") %> # osdrdevdb
+  username: <%= ENV.fetch("DB_USER") %> # osdrdevuser
+  password: <%= ENV.fetch("DB_PWD") %> # qwermnbv10
 
 #  database: db/development.sqlite3
 # Warning: The database defined as "test" will be erased and

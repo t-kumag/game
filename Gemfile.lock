@@ -165,6 +165,7 @@ GEM
     nio4r (2.3.1)
     nokogiri (1.10.1)
       mini_portile2 (~> 2.4.0)
+    parallel (1.19.1)
     paranoia (2.4.2)
       activerecord (>= 4.0, < 6.1)
     parser (2.6.0.0)
@@ -336,6 +337,7 @@ DEPENDENCIES
   listen (>= 3.0.5, < 3.2)
   mail-iso-2022-jp
   mysql2
+  parallel
   paranoia
   pry-byebug
   pry-rails

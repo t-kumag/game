@@ -30,7 +30,13 @@ FactoryBot.define do
 
     trait :with_at_user_bank_accounts do
       after(:create) do |user|
-        user.at_user = create(:at_user, :with_at_user_bank_accounts, user_id: user.id)
+        at_user = Entities::AtUser.find_by(user_id: user.id)
+        if (at_user.blank?) then
+          user.at_user = create(:at_user, :with_at_user_bank_accounts, user_id: user.id)
+        else
+          user.at_user.at_user_bank_accounts = []
+          user.at_user.at_user_bank_accounts << create(:at_user_bank_account, at_user_id: at_users.id)
+        end
       end
     end
 
@@ -42,7 +48,13 @@ FactoryBot.define do
 
     trait :with_at_user_card_accounts do
       after(:create) do |user|
-        user.at_user = create(:at_user, :with_at_user_card_accounts, user_id: user.id)
+        at_users = Entities::AtUser.find_by(user_id: user.id)
+        if (at_users.blank?) then
+          user.at_user = create(:at_user, :with_at_user_card_accounts, user_id: user.id)
+        else
+          user.at_user.at_user_card_accounts = []
+          user.at_user.at_user_card_accounts << create(:at_user_card_account, at_user_id: at_users.id)
+        end
       end
     end
 
@@ -54,7 +66,13 @@ FactoryBot.define do
 
     trait :with_at_user_emoney_accounts do
       after(:create) do |user|
-        user.at_user = create(:at_user, :with_at_user_emoney_accounts, user_id: user.id)
+        at_user = Entities::AtUser.find_by(user_id: user.id)
+        if (at_user.blank?) then
+          user.at_user = create(:at_user, :with_at_user_emoney_accounts, user_id: user.id)
+        else
+          user.at_user.at_user_emoney_service_accounts = []
+          user.at_user.at_user_emoney_service_accounts << create(:at_user_emoney_service_account, at_user_id: at_user.id)
+        end
       end
     end
 
@@ -64,24 +82,30 @@ FactoryBot.define do
       end
     end
 
+    trait :with_at_user_asset_products do
+      after(:create) do |user|
+        user.at_user = create(:at_user, :with_at_user_asset_products, user_id: user.id)
+      end
+    end
+
     trait :with_partner_user do
       after(:create) do |user|
         partner_user = create(:user)
         group = create(:group)
         create(
-          :pairing_request, 
-          from_user_id: user.id, 
+          :pairing_request,
+          from_user_id: user.id,
           to_user_id: partner_user.id,
           group_id: group.id,
           status: 2
         )
         create(
-          :participate_group, 
+          :participate_group,
           group_id: group.id,
           user_id: user.id
         )
         create(
-          :participate_group, 
+          :participate_group,
           group_id: group.id,
           user_id: partner_user.id
         )
@@ -91,8 +115,8 @@ FactoryBot.define do
     trait :with_partner_at_user_bank_accounts do
       after(:create) do |user|
         partner_user = user.partner_user
-        partner_user.at_user = create(:at_user, 
-          :with_at_user_bank_accounts, 
+        partner_user.at_user = create(:at_user,
+          :with_at_user_bank_accounts,
           user_id: partner_user.id
         )
       end
