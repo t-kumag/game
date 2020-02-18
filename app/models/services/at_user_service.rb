@@ -1,11 +1,13 @@
 require 'nkf'
 
 class Services::AtUserService
+  attr_writer :batch_yn
 
   def initialize(user, fnc_type = 'all')
     @user = user
     @fnc_type = fnc_type.blank? ? 'all' : fnc_type
     @today = Date.today
+    @batch_yn = nil
     # tokenは毎回更新する 有効期限は15分
     token
   end
@@ -127,6 +129,9 @@ class Services::AtUserService
       params = {
           at_user_id: @user.at_user.at_user_id
       }
+      if @batch_yn == "Y" || @batch_yn == "N"
+        params[:batch_yn] = @batch_yn
+      end
       requester = AtAPIRequest::AtUser::GetToken.new(params)
       res = AtAPIClient.new(requester).request
       Rails.logger.info(res)

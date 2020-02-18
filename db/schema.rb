@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_29_024444) do
+ActiveRecord::Schema.define(version: 2020_02_03_071606) do
+
+  create_table "_at_user_stock_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_stock_account_id"
+    t.bigint "balance", default: 0, null: false
+    t.bigint "deposit_balance"
+    t.bigint "profit_loss_amount"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -107,6 +116,16 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
     t.index ["at_grouped_category_id"], name: "index_at_transaction_categories_on_at_grouped_category_id"
   end
 
+  create_table "at_user_asset_products", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_stock_account_id"
+    t.string "assets_product_type"
+    t.bigint "assets_product_profit_loss_amount", default: 0
+    t.bigint "assets_product_balance", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_stock_account_id"], name: "index_at_user_asset_products_on_at_user_stock_account_id"
+  end
+
   create_table "at_user_bank_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.bigint "at_bank_id"
@@ -132,7 +151,6 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
     t.bigint "group_id"
     t.datetime "error_date"
     t.integer "error_count", default: 0
-    t.string "name"
     t.index ["at_bank_id"], name: "index_at_user_bank_accounts_on_at_bank_id"
     t.index ["at_user_id", "fnc_id"], name: "at_user_bank_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_bank_accounts_on_at_user_id"
@@ -185,7 +203,6 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
     t.bigint "group_id"
     t.datetime "error_date"
     t.integer "error_count", default: 0
-    t.string "name"
     t.index ["at_card_id"], name: "index_at_user_card_accounts_on_at_card_id"
     t.index ["at_user_id", "fnc_id"], name: "at_user_card_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_card_accounts_on_at_user_id"
@@ -236,7 +253,6 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
     t.bigint "group_id"
     t.datetime "error_date"
     t.integer "error_count", default: 0
-    t.string "name"
     t.index ["at_emoney_service_id"], name: "index_at_user_emoney_service_accounts_on_at_emoney_service_id"
     t.index ["at_user_id", "fnc_id"], name: "at_user_emoney_service_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_emoney_service_accounts_on_at_user_id"
@@ -262,6 +278,60 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
     t.index ["at_user_emoney_service_account_id"], name: "index_at_user_emoney_tran_on_at_user_emoney_service_account_id"
   end
 
+  create_table "at_user_products", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_asset_product_id"
+    t.bigint "product_balance", default: 0
+    t.bigint "product_bond_rate", default: 0
+    t.string "product_name"
+    t.bigint "product_profit_loss_rate", default: 0
+    t.bigint "product_profit_loss_amount", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_asset_product_id"], name: "index_at_user_products_on_at_user_asset_product_id"
+  end
+
+  create_table "at_user_stock_accounts", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_id"
+    t.boolean "share"
+    t.bigint "group_id"
+    t.bigint "balance", default: 0, null: false
+    t.bigint "deposit_balance", default: 0, null: false
+    t.bigint "profit_loss_amount", default: 0, null: false
+    t.string "fnc_id", null: false
+    t.string "fnc_cd", null: false
+    t.string "fnc_nm", null: false
+    t.string "corp_yn", null: false
+    t.string "brn_cd"
+    t.string "brn_nm"
+    t.string "memo"
+    t.string "use_yn", null: false
+    t.string "cert_type", null: false
+    t.string "sv_type", null: false
+    t.datetime "scrap_dtm", null: false
+    t.string "last_rslt_cd"
+    t.string "last_rslt_msg"
+    t.string "acct_no"
+    t.string "acct_kind"
+    t.datetime "error_date"
+    t.integer "error_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["at_user_id", "fnc_id"], name: "at_user_stock_accounts_at_user_id_fnc_id", unique: true
+    t.index ["at_user_id"], name: "index_at_user_stock_accounts_on_at_user_id"
+    t.index ["group_id"], name: "index_at_user_stock_accounts_on_group_id"
+  end
+
+  create_table "at_user_stock_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "at_user_stock_account_id"
+    t.bigint "balance", default: 0
+    t.bigint "deposit_balance", default: 0
+    t.string "profit_loss_amount", default: "0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["at_user_stock_account_id"], name: "index_at_user_stock_logs_on_at_user_stock_account_id"
+  end
+
   create_table "at_user_tokens", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_id"
     t.string "token"
@@ -280,7 +350,7 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
     t.string "at_user_id"
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_at_users_on_deleted_at"
-    t.index ["user_id"], name: "unique_index_at_users_on_user_id", unique: true
+    t.index ["user_id"], name: "index_at_users_on_user_id"
   end
 
   create_table "balance_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -311,7 +381,6 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
   create_table "goal_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
-    t.bigint "wallet_id"
     t.bigint "add_amount", default: 0, null: false
     t.bigint "monthly_amount", default: 0, null: false
     t.bigint "first_amount", default: 0, null: false
@@ -324,13 +393,11 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
     t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_logs_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_logs_on_goal_id"
-    t.index ["wallet_id"], name: "index_goal_logs_on_wallet_id"
   end
 
   create_table "goal_settings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "goal_id"
     t.bigint "at_user_bank_account_id"
-    t.bigint "wallet_id"
     t.bigint "monthly_amount", default: 0, null: false
     t.bigint "first_amount", default: 0, null: false
     t.datetime "created_at", null: false
@@ -338,7 +405,6 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
     t.integer "user_id"
     t.index ["at_user_bank_account_id"], name: "index_goal_settings_on_at_user_bank_account_id"
     t.index ["goal_id"], name: "index_goal_settings_on_goal_id"
-    t.index ["wallet_id"], name: "index_goal_settings_on_wallet_id"
   end
 
   create_table "goal_types", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -587,6 +653,7 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
   add_foreign_key "at_sync_transaction_monthly_date_logs", "at_user_bank_accounts"
   add_foreign_key "at_sync_transaction_monthly_date_logs", "at_user_card_accounts"
   add_foreign_key "at_sync_transaction_monthly_date_logs", "at_user_emoney_service_accounts"
+  add_foreign_key "at_user_asset_products", "at_user_stock_accounts"
   add_foreign_key "at_user_bank_accounts", "at_banks"
   add_foreign_key "at_user_bank_accounts", "at_users"
   add_foreign_key "at_user_bank_transactions", "at_transaction_categories"
@@ -599,6 +666,10 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
   add_foreign_key "at_user_emoney_service_accounts", "at_users"
   add_foreign_key "at_user_emoney_transactions", "at_transaction_categories"
   add_foreign_key "at_user_emoney_transactions", "at_user_emoney_service_accounts"
+  add_foreign_key "at_user_products", "at_user_asset_products"
+  add_foreign_key "at_user_stock_accounts", "at_users"
+  add_foreign_key "at_user_stock_accounts", "groups"
+  add_foreign_key "at_user_stock_logs", "at_user_stock_accounts"
   add_foreign_key "at_user_tokens", "at_users"
   add_foreign_key "at_users", "users"
   add_foreign_key "balance_logs", "at_user_bank_accounts"
@@ -606,10 +677,8 @@ ActiveRecord::Schema.define(version: 2020_01_29_024444) do
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
   add_foreign_key "goal_logs", "at_user_bank_accounts"
   add_foreign_key "goal_logs", "goals"
-  add_foreign_key "goal_logs", "wallets"
   add_foreign_key "goal_settings", "at_user_bank_accounts"
   add_foreign_key "goal_settings", "goals"
-  add_foreign_key "goal_settings", "wallets"
   add_foreign_key "goals", "goal_types"
   add_foreign_key "goals", "groups"
   add_foreign_key "goals", "users"

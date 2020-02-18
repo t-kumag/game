@@ -252,6 +252,32 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  def disallowed_at_stock_ids?(stock_ids, with_group=false)
+    at_user_id         =  @current_user.try(:at_user).try(:id)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+
+    at_user_stock_ids = Entities::AtUserStockAccount.where(at_user_id: at_user_id).pluck(:id)
+    if partner_at_user_id && with_group
+      at_user_stock_ids << Entities::AtUserStockAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
+    at_user_stock_ids.flatten!
+
+    stock_ids.each do |id|
+      return true unless at_user_stock_ids.include?(id)
+    end
+    false
+  end
+
+  def disallowed_at_stock_account_ids?(stock_ids)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    at_user_stock_ids = Entities::AtUserStockAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+
+    stock_ids.each do |id|
+      return true if at_user_stock_ids.include?(id)
+    end
+    false
+  end
+
   def disallowed_at_bank_transaction_ids?(bank_id, bank_transaction_ids, with_group=false)
     user_bank = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:find_by, id: bank_id)
     at_user_bank_transaction_ids = []
