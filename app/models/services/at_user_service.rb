@@ -362,4 +362,16 @@ class Services::AtUserService
   def skip_scraping(accounts)
     accounts.reject{ |account| account.at_scraping_logs.find_by("created_at > #{@today}").present? }
   end
+
+  def save_balance_log
+     # 残高を遡るの最大日数はATの明細保存期間に合わせて経過観察
+     from = Time.now.ago(Settings.at_sync_transaction_max_days.days).strftime('%Y-%m-%d')
+     @user.at_user.at_user_bank_accounts.each do |a|
+       Services::FinanceService.save_balance_log(a, Entities::AtUserBankTransaction.new, from)
+     end
+     @user.at_user.at_user_emoney_service_accounts.each do |a|
+       Services::FinanceService.save_balance_log(a, Entities::AtUserEmoneyTransaction.new, from)
+     end
+     # TODO お財布も同様に処理
+  end
 end
