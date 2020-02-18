@@ -8,9 +8,10 @@ class Api::V1::User::BankAccountsController < ApplicationController
       @responses = []
 
       @current_user.at_user.at_user_bank_accounts.where(share: false).each do |a|
+        name = a.name.present? ? a.name : a.fnc_nm
         @responses << {
           id: a.id,
-          name: a.fnc_nm,
+          name: name,
           amount: a.balance,
           fnc_id: a.fnc_id,
           last_rslt_cd: a.last_rslt_cd,
@@ -52,7 +53,7 @@ class Api::V1::User::BankAccountsController < ApplicationController
     if @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id).include?(account_id)
       require_group && return if params[:share] == true
       account = Entities::AtUserBankAccount.find account_id
-      account.update!(get_account_params)
+      account.update!(get_account_params(account))
       if account.share
         options = create_activity_options("family")
         Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family, options)
@@ -66,10 +67,12 @@ class Api::V1::User::BankAccountsController < ApplicationController
     end
   end
 
-  def get_account_params
+  def get_account_params(account)
+    name = params[:name].present? ? params[:name] : account.name
     {
       group_id: @current_user.group_id,
       share: params[:share],
+      name: name
     }
   end
 
