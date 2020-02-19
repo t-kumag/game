@@ -24,10 +24,11 @@ class Services::WalletService
   end
 
   def update_name_and_share_and_group_id(param)
+    name = params[:name].present? ? params[:name] : @wallet.name
     params = {
         group_id: @user.group_id,
         share: param[:share],
-        name: param[:name],
+        name: name,
     }
     @wallet.update!(params)
   end
