@@ -88,7 +88,10 @@ class ApplicationController < ActionController::Base
   def render_500(e = nil)
     logger.fatal "user_id: #{@current_user.present? ? @current_user.id : nil}"
     logger.fatal "User-Agent: #{request.env["HTTP_USER_AGENT"]}"
-    super.render_500
+    logger.fatal(e.message)
+    logger.fatal(e.backtrace.join("\n"))
+    render json: {"status": 500, "error": "Internal Server Error"}, status: 500
+
 
     # logger.error e.message + "\n" + e.backtrace.join("\n")
     # ExceptionNotifier.notify_exception(e, env: request.env, data: { message: "[#{Rails.env}]" + e.message + '::' + e.backtrace[0..50].join('::') + ' ...' })
