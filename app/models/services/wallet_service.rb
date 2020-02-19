@@ -5,7 +5,7 @@ class Services::WalletService
     @wallet = wallet
   end
 
-  def update_recalculate_initial_balance_and_balance(balance)
+  def update_initial_balance_and_balance(balance)
     return false unless balance.present?
     return false if balance == @wallet.balance
     initial_balance = @wallet.initial_balance
