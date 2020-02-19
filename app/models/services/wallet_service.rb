@@ -23,9 +23,10 @@ class Services::WalletService
     @wallet.update!(params)
   end
 
-  def update_name_and_group_id(param)
+  def update_name_and_share_and_group_id(param)
     params = {
         group_id: @user.group_id,
+        share: param[:share],
         name: param[:name],
     }
     @wallet.update!(params)
