@@ -8,8 +8,7 @@ class Api::V2::User::WalletsController < ApplicationController
         id: w.id,
         name: w.name,
         amount: w.balance,
-        # TODO: 目標は次回対応
-        # goals: Services::GoalService.new(@current_user).goals(a.id)
+        goals: Services::GoalService.new(@current_user).goals(w)
       }
     end
     render 'list', formats: 'json', handlers: 'jbuilder'
