@@ -10,14 +10,14 @@ RSpec.describe Api::V2::Group::AssetProductsController do
   describe '#index' do
     context 'success' do
       it 'response 200' do
-        get "/api/v2/Group/stock-accounts/#{at_user_stock_account.id}/asset-products/", headers: headers
+        get "/api/v2/group/stock-accounts/#{at_user_stock_account.id}/asset-products/", headers: headers
         expect(response.status).to eq 200
       end
 
       it 'response json' do
         expect_asset_product = at_user_asset_product
 
-        get "/api/v2/Group/stock-accounts/#{at_user_stock_account.id}/asset-products/", headers: headers
+        get "/api/v2/group/stock-accounts/#{at_user_stock_account.id}/asset-products/", headers: headers
         response_json = JSON.parse(response.body)
 
         asset_products = response_json['asset_products']
