@@ -3,6 +3,7 @@ class Entities::AtUserCardAccount < ApplicationRecord
 
   acts_as_paranoid # 論理削除
   belongs_to :at_user
+  belongs_to :at_card, optional: true
   has_many :at_user_card_transactions
   has_many :at_scraping_logs
   has_many :at_sync_transaction_logs

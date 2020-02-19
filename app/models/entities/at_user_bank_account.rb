@@ -3,6 +3,7 @@ class Entities::AtUserBankAccount < ApplicationRecord
 
   acts_as_paranoid # 論理削除
   belongs_to :at_user
+  belongs_to :at_bank, optional: true
   has_many :at_user_bank_transactions
   has_many :goal_settings
   has_many :at_scraping_logs
