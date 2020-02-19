@@ -90,7 +90,7 @@ class ApplicationController < ActionController::Base
     logger.fatal "User-Agent: #{request.env["HTTP_USER_AGENT"]}"
     logger.fatal(e.message)
     logger.fatal(e.backtrace.join("\n"))
-    render json: {"status": 500, "error": "Internal Server Error"}, status: 500
+    render(json: { errors: [ERROR_TYPE::NUMBER['008001']] }, status: 500)
 
 
     # logger.error e.message + "\n" + e.backtrace.join("\n")
