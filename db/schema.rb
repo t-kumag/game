@@ -10,16 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_03_113334) do
-
-  create_table "_at_user_stock_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
-    t.bigint "at_user_stock_account_id"
-    t.bigint "balance", default: 0, null: false
-    t.bigint "deposit_balance"
-    t.bigint "profit_loss_amount"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
+ActiveRecord::Schema.define(version: 2020_02_19_023915) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
@@ -151,6 +142,7 @@ ActiveRecord::Schema.define(version: 2020_02_03_113334) do
     t.bigint "group_id"
     t.datetime "error_date"
     t.integer "error_count", default: 0
+    t.string "name"
     t.index ["at_bank_id"], name: "index_at_user_bank_accounts_on_at_bank_id"
     t.index ["at_user_id", "fnc_id"], name: "at_user_bank_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_bank_accounts_on_at_user_id"
@@ -203,6 +195,7 @@ ActiveRecord::Schema.define(version: 2020_02_03_113334) do
     t.bigint "group_id"
     t.datetime "error_date"
     t.integer "error_count", default: 0
+    t.string "name"
     t.index ["at_card_id"], name: "index_at_user_card_accounts_on_at_card_id"
     t.index ["at_user_id", "fnc_id"], name: "at_user_card_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_card_accounts_on_at_user_id"
@@ -253,6 +246,7 @@ ActiveRecord::Schema.define(version: 2020_02_03_113334) do
     t.bigint "group_id"
     t.datetime "error_date"
     t.integer "error_count", default: 0
+    t.string "name"
     t.index ["at_emoney_service_id"], name: "index_at_user_emoney_service_accounts_on_at_emoney_service_id"
     t.index ["at_user_id", "fnc_id"], name: "at_user_emoney_service_accounts_at_user_id_fnc_id", unique: true
     t.index ["at_user_id"], name: "index_at_user_emoney_service_accounts_on_at_user_id"
@@ -350,18 +344,24 @@ ActiveRecord::Schema.define(version: 2020_02_03_113334) do
     t.string "at_user_id"
     t.datetime "deleted_at"
     t.index ["deleted_at"], name: "index_at_users_on_deleted_at"
-    t.index ["user_id"], name: "index_at_users_on_user_id"
+    t.index ["user_id"], name: "unique_index_at_users_on_user_id", unique: true
   end
 
   create_table "balance_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "at_user_bank_account_id"
     t.bigint "at_user_emoney_service_account_id"
-    t.integer "amount", default: 0, null: false
+    t.bigint "balance", default: 0, null: false
     t.datetime "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "wallet_id"
+    t.bigint "base_balance", default: 0, null: false
+    t.index ["at_user_bank_account_id", "date"], name: "index_b_l_on_at_user_bank_account_id_and_date", unique: true
     t.index ["at_user_bank_account_id"], name: "index_b_l_on_at_user_bank_account_id"
+    t.index ["at_user_emoney_service_account_id", "date"], name: "index_b_l_on_at_user_emoney_service_account_id_and_date", unique: true
     t.index ["at_user_emoney_service_account_id"], name: "index_b_l_on_at_user_emoney_service_account_id"
+    t.index ["wallet_id", "date"], name: "index_b_l_on_wallet_id_and_date", unique: true
+    t.index ["wallet_id"], name: "index_balance_logs_on_wallet_id"
   end
 
   create_table "budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -674,6 +674,7 @@ ActiveRecord::Schema.define(version: 2020_02_03_113334) do
   add_foreign_key "at_users", "users"
   add_foreign_key "balance_logs", "at_user_bank_accounts"
   add_foreign_key "balance_logs", "at_user_emoney_service_accounts"
+  add_foreign_key "balance_logs", "wallets"
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
   add_foreign_key "goal_logs", "at_user_bank_accounts"
   add_foreign_key "goal_logs", "goals"
