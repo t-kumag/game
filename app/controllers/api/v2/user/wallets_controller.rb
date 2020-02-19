@@ -28,9 +28,9 @@ class Api::V2::User::WalletsController < ApplicationController
 
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
       require_group && return if  param[:share] == true
-
       wallet_service.update_initial_balance_and_balance(param[:balance])
       wallet_service.update_name_and_share_and_group_id(param)
+
       if wallet_service.share?
         # TODO: アクティビティ修正
         # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family)
