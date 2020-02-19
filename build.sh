@@ -1,4 +1,4 @@
-#!/bin/bash
+--no-cache#!/bin/bash
 
 if [ $# -ne 2 ]; then
   echo "Usage: $0 [develop|staging|production] [rails|worker|batch]"
@@ -54,7 +54,7 @@ aws ecr put-image \
   --image-manifest "$MANIFEST"
 
 # build and push image
-docker build -t ${REPOSITORY}:${ENV} -f ${DOCKER_FILE} .
+docker build --no-cache -t ${REPOSITORY}:${ENV} -f ${DOCKER_FILE} .
 docker tag ${REPOSITORY}:${ENV} ${ECR}:${ENV}
 docker tag ${REPOSITORY}:${ENV} ${ECR}:${DATE_TAG}
 docker push ${ECR}:${ENV}
