@@ -31,7 +31,7 @@ class Api::V2::User::WalletsController < ApplicationController
       require_group && return if  param[:share] == true
 
       wallet_service.update_recalculate_initial_balance_and_balance(param[:balance])
-      wallet_service.update_wallet(param)
+      wallet_service.update_name_and_group_id(param)
       if wallet_service.share?
         # TODO: アクティビティ修正
         # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family)
