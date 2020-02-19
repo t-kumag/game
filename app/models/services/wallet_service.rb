@@ -15,20 +15,20 @@ class Services::WalletService
     initial_balance += balance_difference
     balance = initial_balance - expense
 
-    result = {
+    params = {
         initial_balance: initial_balance,
         balance: balance
     }
 
-    @wallet.update!(result)
+    @wallet.update!(params)
   end
 
   def update_wallet(param)
-    result = {
+    params = {
         group_id: @user.group_id,
         name: param[:name],
     }
-    @wallet.update!(result)
+    @wallet.update!(params)
   end
 
   def share?
