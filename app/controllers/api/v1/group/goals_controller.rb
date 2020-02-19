@@ -32,7 +32,6 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     if Services::GoalService.is_checked_one_account(get_goal_setting_params)
-      # 一旦仮で登録
       render(json: { errors: [ERROR_TYPE::NUMBER['005007']] }, status: 422) and return
     end
 
@@ -82,7 +81,6 @@ class Api::V1::Group::GoalsController < ApplicationController
     end
 
     if Services::GoalService.is_checked_one_account(get_goal_setting_params)
-      # 一旦仮で登録
       render(json: { errors: [ERROR_TYPE::NUMBER['005007']] }, status: 422) and return
     end
 
