@@ -21,15 +21,10 @@ class Api::V2::User::WalletsController < ApplicationController
 
   def update
     wallet_id = params[:id].to_i
-
-    if disallowed_wallet_ids?([wallet_id])
-      render_disallowed_financier_ids && return
-    end
+    render_disallowed_financier_ids && return if disallowed_wallet_ids?([wallet_id])
 
     wallet_service = Services::WalletService.new(@current_user, Entities::Wallet.find(wallet_id))
-
     param = params.require(:wallets).permit(:name, :share, :balance)
-    render_disallowed_financier_ids && return if disallowed_wallet_ids?([wallet_id])
 
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
       require_group && return if  param[:share] == true
