@@ -146,11 +146,8 @@ class Services::GoalService
   end
 
   def self.setting_params(params)
-
     params[:wallet_id] = nil if params[:at_user_bank_account_id].present?
     params[:at_user_bank_account_id] = nil if params[:wallet_id].present?
-
-    return params
   end
 
   def goals(finance, with_group=false)
