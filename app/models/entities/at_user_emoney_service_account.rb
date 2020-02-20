@@ -1,9 +1,9 @@
 class Entities::AtUserEmoneyServiceAccount < ApplicationRecord
-  RELATION_KEY = 'at_user_emoney_service_account_id'.freeze
+  RELATION_KEY = :at_user_emoney_service_account_id.freeze
 
   acts_as_paranoid # 論理削除
   belongs_to :at_user
-  belongs_to :at_emoney_service
+  belongs_to :at_emoney_service, optional: true
   has_many :at_user_emoney_transactions
   has_many :at_scraping_logs
   has_many :at_sync_transaction_logs

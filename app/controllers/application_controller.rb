@@ -88,7 +88,10 @@ class ApplicationController < ActionController::Base
   def render_500(e = nil)
     logger.fatal "user_id: #{@current_user.present? ? @current_user.id : nil}"
     logger.fatal "User-Agent: #{request.env["HTTP_USER_AGENT"]}"
-    super.render_500
+    logger.fatal(e.message)
+    logger.fatal(e.backtrace.join("\n"))
+    render(json: { errors: [ERROR_TYPE::NUMBER['008001']] }, status: 500)
+
 
     # logger.error e.message + "\n" + e.backtrace.join("\n")
     # ExceptionNotifier.notify_exception(e, env: request.env, data: { message: "[#{Rails.env}]" + e.message + '::' + e.backtrace[0..50].join('::') + ' ...' })
@@ -248,6 +251,32 @@ class ApplicationController < ActionController::Base
 
     wallet_ids.each do |id|
       return true unless user_wallet_ids.include?(id)
+    end
+    false
+  end
+
+  def disallowed_at_stock_ids?(stock_ids, with_group=false)
+    at_user_id         =  @current_user.try(:at_user).try(:id)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+
+    at_user_stock_ids = Entities::AtUserStockAccount.where(at_user_id: at_user_id).pluck(:id)
+    if partner_at_user_id && with_group
+      at_user_stock_ids << Entities::AtUserStockAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+    end
+    at_user_stock_ids.flatten!
+
+    stock_ids.each do |id|
+      return true unless at_user_stock_ids.include?(id)
+    end
+    false
+  end
+
+  def disallowed_at_stock_account_ids?(stock_ids)
+    partner_at_user_id =  @current_user.try(:partner_user).try(:at_user).try(:id)
+    at_user_stock_ids = Entities::AtUserStockAccount.where(at_user_id: partner_at_user_id, share: true).pluck(:id)
+
+    stock_ids.each do |id|
+      return true if at_user_stock_ids.include?(id)
     end
     false
   end
