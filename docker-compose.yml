@@ -42,35 +42,35 @@ services:
       - db
       - redis
 
-  worker:
-    container_name: worker
-    build:
-      context: .
-      dockerfile: rails.Dockerfile
-    volumes:
-      - .:/app:cached
-    environment:
-      - DB_HOST=db # osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
-      - DB_PORT=3306
-      - DB_NAME=dev_osdr_db
-      - DB_USER=devusr
-      - DB_PWD=pass
-      - TZ=Asia/Tokyo
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-
-    # development
-    command: bundle exec sidekiq -C config/sidekiq.yml
-
-    env_file: .env.development
-    tty: true
-    stdin_open: true
-    depends_on:
-      - db
-      - redis
-    links:
-      - db
-      - redis
+#  worker:
+#    container_name: worker
+#    build:
+#      context: .
+#      dockerfile: rails.Dockerfile
+#    volumes:
+#      - .:/app:cached
+#    environment:
+#      - DB_HOST=db # osidoridevdb.cbukuyrfnctk.ap-northeast-1.rds.amazonaws.com
+#      - DB_PORT=3306
+#      - DB_NAME=dev_osdr_db
+#      - DB_USER=devusr
+#      - DB_PWD=pass
+#      - TZ=Asia/Tokyo
+#      - REDIS_HOST=redis
+#      - REDIS_PORT=6379
+#
+#    # development
+#    command: bundle exec sidekiq -C config/sidekiq.yml
+#
+#    env_file: .env.development
+#    tty: true
+#    stdin_open: true
+#    depends_on:
+#      - db
+#      - redis
+#    links:
+#      - db
+#      - redis
 
   db:
     container_name: db
