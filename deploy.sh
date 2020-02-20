@@ -14,9 +14,9 @@ if [ "${ENV}" = "develop" ]; then
 elif [ "${ENV}" = "staging" ]; then
   echo ENV: ${ENV}
   PREFIX=stg
-#elif [ "${ENV}" = "production" ]; then
-#  echo ENV: ${ENV}
-#  PREFIX=prod
+elif [ "${ENV}" = "production" ]; then
+  echo ENV: ${ENV}
+  PREFIX=prod
 else
   echo "Usage: $0 [develop|staging|production] [rails|worker]"
   exit 1
