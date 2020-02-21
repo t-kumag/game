@@ -54,7 +54,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         update_user_manually_created(user_manually_created_transaction)
 
         if params[:share] === true
-          require_group && return
           options = {group_id: @current_user.group_id, share: params[:share]}
         else
           options = {}
