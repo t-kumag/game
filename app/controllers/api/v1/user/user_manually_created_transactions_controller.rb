@@ -22,7 +22,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       Entities::UserManuallyCreatedTransaction.new.transaction do
         user_manually_created_transaction = create_user_manually_created
         if params[:share] === true
-          require_group && return
           options = {group_id: @current_user.group_id, share: params[:share], transaction: nil}
         else
           options = {transaction: nil}
