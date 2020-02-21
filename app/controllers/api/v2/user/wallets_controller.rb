@@ -26,7 +26,6 @@ class Api::V2::User::WalletsController < ApplicationController
     end
 
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
-      require_group && return if params[:wallets][:share] == true
       wallet = Entities::Wallet.find wallet_id
       wallet.update!(update_params)
       if wallet.share

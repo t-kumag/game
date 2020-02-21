@@ -3,6 +3,7 @@ class Api::V1::Group::BankAccountsController < ApplicationController
 
   def index
     share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
+    share_on_bank_accounts = Services::FinanceService.new(@current_user).get_account(share_on_bank_accounts) if @current_user.group_id.nil?
     if share_on_bank_accounts.blank?
       @responses = []
     else
