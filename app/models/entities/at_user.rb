@@ -17,6 +17,7 @@ class Entities::AtUser < ApplicationRecord
   has_many :at_user_bank_accounts
   has_many :at_user_card_accounts
   has_many :at_user_emoney_service_accounts
+  has_many :at_user_stock_accounts
   has_many :at_user_tokens, inverse_of: :at_user, dependent: :destroy
 
   validates :user_id, presence: true

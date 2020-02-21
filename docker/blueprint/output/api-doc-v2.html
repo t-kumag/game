@@ -75,42 +75,45 @@
     }
 }</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-財布取引明細-get-1" class="action get"><h4 class="action-heading"><div class="name">明細詳細取得</div><a href="#個人機能-財布取引明細-get-1" class="method get">GET</a><code class="uri">/api/v2/user/wallets/:wallet_id/transactions</code></h4></div></div><hr class="split"><div class="middle"><div id="個人機能-銀行取引明細" class="resource"><h3 class="resource-heading">銀行取引明細 <a href="#個人機能-銀行取引明細" class="permalink">&para;</a></h3><p>Resource of Bank Account Transactions</p>
 </div></div><div class="right"><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v2/user/bank-accounts/:bank_account_id/transactions</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細一覧取得</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-        "<span class="hljs-attribute">transactions</span>": <span class="hljs-value">[
-           {
-             "<span class="hljs-attribute">at_user_bank_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">189</span></span>,
-             "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">100000</span></span>,
-             "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-20 00:00:00"</span></span>,
-             "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"引出し"</span></span>,
-             "<span class="hljs-attribute">memo</span>": <span class="hljs-value">nil</span>,
-             "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
-             "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">136</span></span>,
-             "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"出金"</span></span>,
-             "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"ATM出金"</span></span>,
-             "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">189</span>
-           </span>},
-           {
-             "<span class="hljs-attribute">at_user_bank_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">191</span></span>,
-             "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">105</span></span>,
-             "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-15 00:00:00"</span></span>,
-             "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"テスウリヨウ"</span></span>,
-             "<span class="hljs-attribute">memo</span>": <span class="hljs-value">nil</span>,
-             "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
-             "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">149</span></span>,
-             "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"手数料"</span></span>,
-             "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"その他手数料"</span></span>,
-             "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">191</span>
-           </span>}
-        ]</span>,
-        "<span class="hljs-attribute">next_transaction_used_date</span>" : <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
-    </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">transactions</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">at_user_bank_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">189</span></span>,
+      "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">100000</span></span>,
+      "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-20 00:00:00"</span></span>,
+      "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"引出し"</span></span>,
+      "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
+      "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">136</span></span>,
+      "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"出金"</span></span>,
+      "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"ATM出金"</span></span>,
+      "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">189</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">at_user_bank_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">191</span></span>,
+      "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">105</span></span>,
+      "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-15 00:00:00"</span></span>,
+      "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"テスウリヨウ"</span></span>,
+      "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
+      "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">149</span></span>,
+      "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"手数料"</span></span>,
+      "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"その他手数料"</span></span>,
+      "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">191</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">next_transaction_used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-銀行取引明細-get" class="action get"><h4 class="action-heading"><div class="name">銀行取引明細一覧取得</div><a href="#個人機能-銀行取引明細-get" class="method get">GET</a><code class="uri">/api/v2/user/bank-accounts/:bank_account_id/transactions</code></h4><h4 id="header-url-parameters-1">URL Parameters <a class="permalink" href="#header-url-parameters-1" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -122,42 +125,45 @@
 </ul>
 </div></div><hr class="split"><div class="middle"><div id="個人機能-カード取引明細" class="resource"><h3 class="resource-heading">カード取引明細 <a href="#個人機能-カード取引明細" class="permalink">&para;</a></h3><p>Resource of Card Account Transactions</p>
 </div></div><div class="right"><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v2/user/card-accounts/:card_account_id/transactions</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細一覧取得</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-        "<span class="hljs-attribute">transactions</span>": <span class="hljs-value">[
-           {
-             "<span class="hljs-attribute">at_user_card_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">251</span></span>,
-             "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">5400</span></span>,
-             "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-09-28 00:00:00"</span></span>,
-             "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"カフェベートーベンcard"</span></span>,
-             "<span class="hljs-attribute">memo</span>": <span class="hljs-value">nil</span>,
-             "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
-             "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">30</span></span>,
-             "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"日用品"</span></span>,
-             "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"ファッション、アクセサリー、時計"</span></span>,
-             "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">251</span>
-           </span>},
-           {
-             "<span class="hljs-attribute">at_user_card_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">252</span></span>,
-             "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">4900</span></span>,
-             "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-09-27 00:00:00"</span></span>,
-             "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"JOJO TOWN"</span></span>,
-             "<span class="hljs-attribute">memo</span>": <span class="hljs-value">nil</span>,
-             "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
-             "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
-             "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"未分類"</span></span>,
-             "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"未分類"</span></span>,
-             "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">252</span>
-           </span>}
-        ]</span>,
-        "<span class="hljs-attribute">next_transaction_used_date</span>" : <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
-    </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">transactions</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">at_user_card_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">251</span></span>,
+      "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">5400</span></span>,
+      "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-09-28 00:00:00"</span></span>,
+      "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"カフェベートーベンcard"</span></span>,
+      "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
+      "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">30</span></span>,
+      "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"日用品"</span></span>,
+      "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"ファッション、アクセサリー、時計"</span></span>,
+      "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">251</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">at_user_card_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">252</span></span>,
+      "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">4900</span></span>,
+      "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-09-27 00:00:00"</span></span>,
+      "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"JOJO TOWN"</span></span>,
+      "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
+      "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"未分類"</span></span>,
+      "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"未分類"</span></span>,
+      "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">252</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">next_transaction_used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-カード取引明細-get" class="action get"><h4 class="action-heading"><div class="name">カード取引明細一覧取得</div><a href="#個人機能-カード取引明細-get" class="method get">GET</a><code class="uri">/api/v2/user/card-accounts/:card_account_id/transactions</code></h4><h4 id="header-url-parameters-2">URL Parameters <a class="permalink" href="#header-url-parameters-2" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -169,42 +175,45 @@
 </ul>
 </div></div><hr class="split"><div class="middle"><div id="個人機能-電子マネー取引明細" class="resource"><h3 class="resource-heading">電子マネー取引明細 <a href="#個人機能-電子マネー取引明細" class="permalink">&para;</a></h3><p>Resource of Emoney Account Transactions</p>
 </div></div><div class="right"><div class="definition"><span class="method get">GET</span>&nbsp;<span class="uri"><span class="hostname"></span>/api/v2/user/emoney-accounts/:emoney_account_id/transactions</span></div><div class="tabs"><div class="example-names"><span>Requests</span><span class="tab-button">明細一覧取得</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization</span>: <span class="hljs-string">Bearer [access_token]</span></code></pre><div style="height: 1px;"></div></div></div><div class="tabs"><div class="example-names"><span>Responses</span><span class="tab-button">200</span><span class="tab-button">200</span><span class="tab-button">422</span></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-        "<span class="hljs-attribute">transactions</span>": <span class="hljs-value">[
-           {
-             "<span class="hljs-attribute">at_user_emoney_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">276</span></span>,
-             "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">150</span></span>,
-             "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-09-15 00:00:00"</span></span>,
-             "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"物販 "</span></span>,
-             "<span class="hljs-attribute">memo</span>": <span class="hljs-value">nil</span>,
-             "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
-             "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">135</span></span>,
-             "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"入金"</span></span>,
-             "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"その他入金"</span></span>,
-             "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">276</span>
-           </span>},
-           {
-             "<span class="hljs-attribute">at_user_emoney_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">275</span></span>,
-             "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">195</span></span>,
-             "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-09-15 00:00:00"</span></span>,
-             "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"入 東銀座出新宿区"</span></span>,
-             "<span class="hljs-attribute">memo</span>": <span class="hljs-value">nil</span>,
-             "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
-             "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
-             "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
-             "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"未分類"</span></span>,
-             "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"未分類"</span></span>,
-             "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">275</span>
-           </span>}
-        ]</span>,
-        "<span class="hljs-attribute">next_transaction_used_date</span>" : <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
-    </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">transactions</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">at_user_emoney_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">276</span></span>,
+      "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">150</span></span>,
+      "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-09-15 00:00:00"</span></span>,
+      "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"物販 "</span></span>,
+      "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
+      "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">135</span></span>,
+      "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"入金"</span></span>,
+      "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"その他入金"</span></span>,
+      "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">276</span>
+    </span>},
+    {
+      "<span class="hljs-attribute">at_user_emoney_transaction_id</span>": <span class="hljs-value"><span class="hljs-number">275</span></span>,
+      "<span class="hljs-attribute">amount</span>": <span class="hljs-value">-<span class="hljs-number">195</span></span>,
+      "<span class="hljs-attribute">used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-09-15 00:00:00"</span></span>,
+      "<span class="hljs-attribute">used_location</span>": <span class="hljs-value"><span class="hljs-string">"入 東銀座出新宿区"</span></span>,
+      "<span class="hljs-attribute">memo</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+      "<span class="hljs-attribute">user_id</span>": <span class="hljs-value"><span class="hljs-number">19</span></span>,
+      "<span class="hljs-attribute">is_account_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">is_shared</span>": <span class="hljs-value"><span class="hljs-literal">false</span></span>,
+      "<span class="hljs-attribute">at_transaction_category_id</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+      "<span class="hljs-attribute">category_name1</span>": <span class="hljs-value"><span class="hljs-string">"未分類"</span></span>,
+      "<span class="hljs-attribute">category_name2</span>": <span class="hljs-value"><span class="hljs-string">"未分類"</span></span>,
+      "<span class="hljs-attribute">transaction_id</span>": <span class="hljs-value"><span class="hljs-number">275</span>
+    </span>}
+  ]</span>,
+  "<span class="hljs-attribute">next_transaction_used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
+</span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="個人機能-電子マネー取引明細-get" class="action get"><h4 class="action-heading"><div class="name">電子マネー取引明細一覧取得</div><a href="#個人機能-電子マネー取引明細-get" class="method get">GET</a><code class="uri">/api/v2/user/emoney-accounts/:emoney_account_id/transactions</code></h4><h4 id="header-url-parameters-3">URL Parameters <a class="permalink" href="#header-url-parameters-3" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -378,10 +387,13 @@
   ]</span>,
   "<span class="hljs-attribute">next_transaction_used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="家族機能-銀行取引明細-get" class="action get"><h4 class="action-heading"><div class="name">銀行取引明細一覧取得</div><a href="#家族機能-銀行取引明細-get" class="method get">GET</a><code class="uri">/api/v2/group/bank-accounts/:bank_account_id/transactions</code></h4><h4 id="header-url-parameters-5">URL Parameters <a class="permalink" href="#header-url-parameters-5" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -425,10 +437,13 @@
   ]</span>,
   "<span class="hljs-attribute">next_transaction_used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="家族機能-カード取引明細-get" class="action get"><h4 class="action-heading"><div class="name">カード取引明細一覧取得</div><a href="#家族機能-カード取引明細-get" class="method get">GET</a><code class="uri">/api/v2/group/card-accounts/:card_account_id/transactions</code></h4><h4 id="header-url-parameters-6">URL Parameters <a class="permalink" href="#header-url-parameters-6" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -472,10 +487,13 @@
   ]</span>,
   "<span class="hljs-attribute">next_transaction_used_date</span>": <span class="hljs-value"><span class="hljs-string">"2019-08-05 00:00:00"</span>
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{}</code></pre><div style="height: 1px;"></div></div></div></div><div class="tab"><div><div class="inner"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span></code></pre><div style="height: 1px;"></div><h5>Body</h5><pre><code>{
-  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">{
-    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
-    "<span class="hljs-attribute">mesasge</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
-  </span>}
+  "<span class="hljs-attribute">errors</span>": <span class="hljs-value">[
+    {
+      "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"003001"</span></span>,
+      "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"その金融機関にはアクセスできません。"</span></span>,
+      "<span class="hljs-attribute">info</span>": <span class="hljs-value"><span class="hljs-string">"Disallowed financier id."</span>
+    </span>}
+  ]
 </span>}</code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="家族機能-電子マネー取引明細-get" class="action get"><h4 class="action-heading"><div class="name">電子マネー取引明細一覧取得</div><a href="#家族機能-電子マネー取引明細-get" class="method get">GET</a><code class="uri">/api/v2/group/emoney-accounts/:emoney_account_id/transactions</code></h4><h4 id="header-url-parameters-7">URL Parameters <a class="permalink" href="#header-url-parameters-7" aria-hidden="true">¶</a></h4>
 <ul>
 <li>
@@ -506,7 +524,7 @@
 
       </span>}
 }
-</span></code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="その他-アクティビティ-get" class="action get"><h4 class="action-heading"><div class="name">アクティビティ取得</div><a href="#その他-アクティビティ-get" class="method get">GET</a><code class="uri">/api/v2/activities</code></h4></div></div><hr class="split"><div class="middle"><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 13 Feb 2020</p></div></div></div></div><script>/* eslint-env browser */
+</span></code></pre><div style="height: 1px;"></div></div></div></div></div></div></div></div><div class="middle"><div id="その他-アクティビティ-get" class="action get"><h4 class="action-heading"><div class="name">アクティビティ取得</div><a href="#その他-アクティビティ-get" class="method get">GET</a><code class="uri">/api/v2/activities</code></h4></div></div><hr class="split"><div class="middle"><p style="text-align: center;" class="text-muted">Generated by&nbsp;<a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a>&nbsp;on 19 Feb 2020</p></div></div></div></div><script>/* eslint-env browser */
 /* eslint quotes: [2, "single"] */
 'use strict';
 

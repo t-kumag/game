@@ -8,9 +8,10 @@ class Api::V1::User::CardAccountsController < ApplicationController
         @responses = []
 
         @current_user.at_user.at_user_card_accounts.where(share: false).each do |ca|
+          name = ca.name.present? ? ca.name : ca.fnc_nm
           @responses << {
             id: ca.id,
-            name: ca.fnc_nm,
+            name: name,
             amount: ca.current_month_used_amount,
             fnc_id: ca.fnc_id,
             last_rslt_cd: ca.last_rslt_cd,
@@ -51,7 +52,7 @@ class Api::V1::User::CardAccountsController < ApplicationController
 
       if @current_user.try(:at_user).try(:at_user_card_accounts).pluck(:id).include?(account_id)
         account = Entities::AtUserCardAccount.find account_id
-        account.update!(get_account_params)
+        account.update!(get_account_params(account))
         if account.share
           options = create_activity_options("family")
           Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family, options)
@@ -64,10 +65,12 @@ class Api::V1::User::CardAccountsController < ApplicationController
       end
     end
 
-    def get_account_params
+    def get_account_params(account)
+      name = params[:name].present? ? params[:name] : account.name
       {
         group_id: @current_user.group_id,
         share: params[:share],
+        name: name
       }
     end
 

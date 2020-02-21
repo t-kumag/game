@@ -41,4 +41,4 @@ ADD . $ROOT_PATH
 
 EXPOSE 3000
 
-# CMD ["rake", "stock_log:insert"]
+CMD ["rake", "stock_log:insert"]

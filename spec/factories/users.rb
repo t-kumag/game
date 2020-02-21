@@ -82,6 +82,12 @@ FactoryBot.define do
       end
     end
 
+    trait :with_at_user_asset_products do
+      after(:create) do |user|
+        user.at_user = create(:at_user, :with_at_user_asset_products, user_id: user.id)
+      end
+    end
+
     trait :with_partner_user do
       after(:create) do |user|
         partner_user = create(:user)
