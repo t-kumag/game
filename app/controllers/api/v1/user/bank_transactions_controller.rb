@@ -35,9 +35,9 @@ class Api::V1::User::BankTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
-    @exist_bank_transaction = Services::AtBankTransactionService.new(@current_user).detail(params[:bank_account_id], transaction_id)
-    render_disallowed_transaction_ids && return unless @exist_bank_transaction.present?
-    bank_account_transaction_param = get_bank_account_transaction_param(params, transaction_id, @exist_bank_transaction)
+    @exist_transaction = Services::AtBankTransactionService.new(@current_user).detail(params[:bank_account_id], transaction_id)
+    render_disallowed_transaction_ids && return unless @exist_transaction.present?
+    bank_account_transaction_param = get_bank_account_transaction_param(params, transaction_id, @exist_transaction)
 
     @response = Services::AtBankTransactionService.new(@current_user).update(
         bank_account_transaction_param[:bank_account_id],
