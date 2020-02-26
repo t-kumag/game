@@ -36,7 +36,7 @@ class Api::V1::User::CardTransactionsController < ApplicationController
     end
 
     @exist_card_transaction = Services::AtCardTransactionService.new(@current_user).detail(params[:card_account_id], transaction_id)
-    render_disallowed_transaction_ids && return unless @exist_bank_transaction.present?
+    render_disallowed_transaction_ids && return unless @exist_card_transaction.present?
     card_account_transaction_param = get_card_account_transaction_param(params, transaction_id, @exist_card_transaction)
 
     @response = Services::AtCardTransactionService.new(@current_user).update(
