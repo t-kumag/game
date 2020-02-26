@@ -27,7 +27,6 @@ class Api::V2::User::StockAccountsController < ApplicationController
     end
 
     if @current_user.try(:at_user).try(:at_user_stock_accounts).pluck(:id).include?(account_id)
-      require_group && return if params[:share] == true
       account = Entities::AtUserStockAccount.find account_id
       account.update!(get_account_params)
       render json: {}, status: 204

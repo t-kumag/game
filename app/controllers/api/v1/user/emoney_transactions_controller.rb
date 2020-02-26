@@ -34,6 +34,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
     end
 
     @exist_transaction = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:emoney_account_id], transaction_id)
+    render_disallowed_transaction_ids && return unless @exist_bank_transaction.present?
     emoney_account_transaction_param = get_emoney_account_transaction_param(params, transaction_id, @exist_transaction)
 
     @response = Services::AtEmoneyTransactionService.new(@current_user).update(

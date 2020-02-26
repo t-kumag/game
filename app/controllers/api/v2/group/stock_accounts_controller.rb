@@ -1,5 +1,5 @@
 class Api::V2::Group::StockAccountsController < ApplicationController
-  before_action :authenticate, :require_group
+  before_action :authenticate
 
   def index
     @responses = []
