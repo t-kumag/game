@@ -36,35 +36,11 @@ class Api::V2::UsersController < ApplicationController
   end
 
   def transaction_shared?(with_group=false)
-    result = false
-    if with_group === false
-      account_ids = Services::FinanceService.new(@current_user).all_account_ids
-    else
-      account_ids = Services::FinanceService.new(@current_user).all_account_ids(false)
-    end
-
-    account_ids.each do |type, ids|
-      next if ids.blank?
-      case type
-      when :bank
-        transactions = Entities::AtUserBankTransaction.where(at_user_bank_account_id: ids) if ids.present?
-        transaction_ids = transactions.pluck(:id) if transactions.present?
-        result = Entities::UserDistributedTransaction.where(share: true, at_user_bank_transaction_id: transaction_ids).present?
-      when :card
-        transactions = Entities::AtUserCardTransaction.where(at_user_card_account_id: ids) if ids.present?
-        transaction_ids = transactions.pluck(:id) if transactions.present?
-        result = Entities::UserDistributedTransaction.where(share: true, at_user_card_transaction_id: transaction_ids).present?
-      when :emoney
-        transactions = Entities::AtUserEmoneyTransaction.where(at_user_emoney_service_account_id: ids) if ids.present?
-        transaction_ids = transactions.pluck(:id) if transactions.present?
-        result = Entities::UserDistributedTransaction.where(share: true, at_user_emoney_transaction_id: transaction_ids).present?
-      when :wallet
-        transactions = Entities::UserManuallyCreatedTransaction.where(payment_method_id: ids, payment_method_type: "wallet") if ids.present?
-        transaction_ids = transactions.pluck(:id) if transactions.present?
-        result = Entities::UserDistributedTransaction.where(share: true, user_manually_created_transaction_id: transaction_ids).present?
-      end
-    end
-    result
+    user_ids = [@current_user.id]
+    return Entities::UserDistributedTransaction.where(user_id: user_ids, share: true).present? unless with_group
+    
+    user_ids.push(@current_user.partner_user.id) if @current_user.partner_user.present?
+    Entities::UserDistributedTransaction.where(user_id: user_ids, share: true).present?
   end
 
   def finance_shared?(with_group=false)

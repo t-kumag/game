@@ -121,48 +121,4 @@ class Services::FinanceService
     today_balance_log = Entities::BalanceLog.find_by(finance.relation_key => finance.id, date: to)
     today_balance_log.update!(base_balance: finance.balance)
   end
-
-  # アクセス可能なすべての金融IDを取得
-  def all_account_ids(owner_only=true)
-    account_ids = {bank:[], card:[], emoney:[], wallet:[]}
-
-    if owner_only
-      return {} if @user.at_user.blank?
-
-      Entities::AtUserBankAccount.where(at_user_id: @user.at_user.id).find_each do |ba|
-        account_ids[:bank] << ba.id
-      end
-
-      Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).find_each do |ca|
-        account_ids[:card] << ca.id
-      end
-
-      Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.at_user.id).find_each do |ea|
-        account_ids[:emoney] << ea.id
-      end
-
-      Entities::Wallet.where(user_id: @user.id).find_each do |w|
-        account_ids[:wallet] << w.id
-      end
-    else
-      return {} if @user.partner_user.blank? || @user.partner_user.at_user.blank?
-
-      Entities::AtUserBankAccount.where(at_user_id: @user.partner_user.at_user.id, share: true).find_each do |ba|
-        account_ids[:bank] << ba.id
-      end
-
-      Entities::AtUserCardAccount.where(at_user_id: @user.partner_user.at_user.id, share: true).find_each do |ca|
-        account_ids[:card] << ca.id
-      end
-
-      Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.partner_user.at_user.id, share: true).find_each do |ea|
-        account_ids[:emoney] << ea.id
-      end
-
-      Entities::Wallet.where(user_id: @user.partner_user.id, share: true).find_each do |w|
-        account_ids[:wallet] << w.id
-      end
-    end
-    account_ids
-  end
 end
