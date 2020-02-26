@@ -32,10 +32,11 @@ class Api::V2::User::WalletsController < ApplicationController
       wallet_service.update_name_and_share_and_group_id(param)
 
       if wallet_service.share?
-        # TODO: アクティビティ修正
-        # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family)
-        # Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_family_partner)
+        options = create_activity_options(wallet_service.get_wallet, 'family')
+        Services::ActivityService.create_activity(@current_user.id, @current_user.group_id,  DateTime.now, :person_wallet_to_family, options)
+        Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id,  DateTime.now, :person_wallet_to_family_partner, options)
       end
+
       render json: {}, status: :no_content
     else
       render json: { errors: { code: '', mesasge: 'wallet not found.' } }, status: 422
@@ -59,5 +60,21 @@ class Api::V2::User::WalletsController < ApplicationController
     param = params.require(:wallets).permit(:name, :balance).merge(user_id: @current_user.id)
     param[:initial_balance] = param[:balance]
     param
+  end
+
+  def create_activity_options(wallet, account)
+    options = {}
+    options[:goal] = nil
+    options[:transaction] = nil
+    options[:transactions] = nil
+    options[:wallet] = create_wallet(wallet, account)
+    options
+  end
+
+  def create_wallet(w, account)
+    wallet = {}
+    wallet[:id] = w.id
+    wallet[:account] = account
+    wallet
   end
 end

@@ -37,4 +37,8 @@ class Services::WalletService
     @wallet.share
   end
 
+  def get_wallet
+    @wallet
+  end
+
 end
