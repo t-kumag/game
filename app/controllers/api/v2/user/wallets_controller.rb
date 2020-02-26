@@ -21,14 +21,15 @@ class Api::V2::User::WalletsController < ApplicationController
 
   def update
     wallet_id = params[:id].to_i
-    if disallowed_wallet_ids?([wallet_id])
-      render_disallowed_financier_ids && return
-    end
+    render_disallowed_financier_ids && return if disallowed_wallet_ids?([wallet_id])
+
+    wallet_service = Services::WalletService.new(@current_user, Entities::Wallet.find(wallet_id))
+    param = params.require(:wallets).permit(:name, :share, :balance)
 
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
-      wallet = Entities::Wallet.find wallet_id
-      wallet.update!(update_params)
-      if wallet.share
+      wallet_service.update_initial_balance_and_balance(param[:balance])
+      wallet_service.update_name_and_share_and_group_id(param)
+      if wallet_service.share?
         # TODO: アクティビティ修正
         # Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family)
         # Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_family_partner)
@@ -52,17 +53,6 @@ class Api::V2::User::WalletsController < ApplicationController
   end
 
   private
-
-  def update_params
-    param = params.require(:wallets).permit(:name, :share)
-    result = {
-      group_id: @current_user.group_id,
-      name: param[:name]
-    }
-    result[:share] = param[:share] if param.key?(:share)
-    result
-  end
-
   def create_params
     param = params.require(:wallets).permit(:name, :balance).merge(user_id: @current_user.id)
     param[:initial_balance] = param[:balance]
