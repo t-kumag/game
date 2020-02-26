@@ -19,14 +19,11 @@ class Api::V2::User::PlSettingsController < ApplicationController
     end
     @response.update!(update_params)
 
-    partner_pl_setting = nil
     if @current_user.partner_user.present?
       partner_pl_setting = Entities::UserPlSetting.find_by(user_id: @current_user.partner_user.id)
-    end
-    if partner_pl_setting.blank? and @current_user.partner_user.present?
-      partner_pl_setting = Entities::UserPlSetting.create!(user_id: @current_user.partner_user.id)
-    end
-    if @current_user.partner_user.present?
+      unless partner_pl_setting.present?
+        partner_pl_setting = Entities::UserPlSetting.create!(user_id: @current_user.partner_user.id)
+      end
       partner_pl_setting.update!(partner_update_params)
     end
 
