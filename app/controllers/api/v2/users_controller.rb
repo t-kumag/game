@@ -36,17 +36,12 @@ class Api::V2::UsersController < ApplicationController
   end
 
   def transaction_shared?(with_group=false)
-    account_ids = {}
     result = false
-
     if with_group === false
       account_ids = Services::FinanceService.new(@current_user).all_account_ids
-      result = Entities::UserDistributedTransaction.where(user_id: @current_user.id,share: true).present?
-    elsif @current_user.partner_user.present?
+    else
       account_ids = Services::FinanceService.new(@current_user).all_account_ids(false)
-      result = Entities::UserDistributedTransaction.where(user_id: @current_user.partner_user.id, share: true).present?
     end
-    return true if result == true
 
     account_ids.each do |type, ids|
       next if ids.blank?
@@ -68,9 +63,8 @@ class Api::V2::UsersController < ApplicationController
         transaction_ids = transactions.pluck(:id) if transactions.present?
         result = Entities::UserDistributedTransaction.where(share: true, user_manually_created_transaction_id: transaction_ids).present?
       end
-      return true if result == true
     end
-    false
+    result
   end
 
   def finance_shared?(with_group=false)
