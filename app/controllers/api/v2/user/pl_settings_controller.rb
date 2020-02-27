@@ -23,6 +23,7 @@ class Api::V2::User::PlSettingsController < ApplicationController
       partner_pl_setting = Entities::UserPlSetting.find_by(user_id: @current_user.partner_user.id)
       unless partner_pl_setting.present?
         partner_pl_setting = Entities::UserPlSetting.create!(user_id: @current_user.partner_user.id)
+        partner_pl_setting.update!(pl_period_date: 1, pl_type: "")
       end
       partner_pl_setting.update!(partner_update_params)
     end
