@@ -123,28 +123,28 @@ class Services::FinanceService
   end
 
   # アクセス可能なすべての金融IDを取得
-  def all_account_ids(owner_only=true)
+  def all_account_ids(with_group=false)
     account_ids = {bank:[], card:[], emoney:[], wallet:[]}
 
-    if owner_only
-      return {} if @user.at_user.blank?
+    return {} if @user.at_user.blank?
 
-      Entities::AtUserBankAccount.where(at_user_id: @user.at_user.id).find_each do |ba|
-        account_ids[:bank] << ba.id
-      end
+    Entities::AtUserBankAccount.where(at_user_id: @user.at_user.id).find_each do |ba|
+      account_ids[:bank] << ba.id
+    end
 
-      Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).find_each do |ca|
-        account_ids[:card] << ca.id
-      end
+    Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).find_each do |ca|
+      account_ids[:card] << ca.id
+    end
 
-      Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.at_user.id).find_each do |ea|
-        account_ids[:emoney] << ea.id
-      end
+    Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.at_user.id).find_each do |ea|
+      account_ids[:emoney] << ea.id
+    end
 
-      Entities::Wallet.where(user_id: @user.id).find_each do |w|
-        account_ids[:wallet] << w.id
-      end
-    else
+    Entities::Wallet.where(user_id: @user.id).find_each do |w|
+      account_ids[:wallet] << w.id
+    end
+
+    if with_group
       return {} if @user.partner_user.blank? || @user.partner_user.at_user.blank?
 
       Entities::AtUserBankAccount.where(at_user_id: @user.partner_user.at_user.id, share: true).find_each do |ba|
