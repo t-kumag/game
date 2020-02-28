@@ -31,6 +31,11 @@ class Services::WalletService
         name: name,
     }
     @wallet.update!(params)
+
+    if true == param[:share]
+      user_manually_created_transactions = Entities::UserManuallyCreatedTransaction.where(payment_method_type: "wallet", payment_method_id: @wallet.id)
+      user_distributed_transactions = Entities::UserDistributedTransaction.where(user_manually_created_transaction_id: user_manually_created_transactions.pluck(:id)).update_all(share: true)
+    end
   end
 
   def share?

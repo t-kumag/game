@@ -102,7 +102,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       # シェアしていない明細は、422を返す
       transacticon = nil unless transacticon.try(:user_distributed_transaction).try(:share)
     end
-    
+
     transacticon
   end
 
@@ -215,6 +215,15 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   def disallowed_financier_id?
     case params[:payment_method_type]
     when "wallet" then
+      # 明細の持ち主と財布の持ち主が違う場合はNG
+      # 共有された口座の明細を個人明細に更新できるようになった時、この処理は削除し再考する
+      if false == params[:share]
+         user_manually_created_transaction = Entities::UserManuallyCreatedTransaction.find_by(id: params[:id])
+         user_id = user_manually_created_transaction.present? ? user_manually_created_transaction.id : @current_user.id
+         wallet = Entities::Wallet.find_by(id: params[:payment_method_id])
+         return false if user_id == wallet.user_id
+      end
+
       return disallowed_wallet_ids?([params[:payment_method_id]])
     end
   end
