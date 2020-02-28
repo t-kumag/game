@@ -7,7 +7,7 @@ class Api::V2::User::StockAccountsController < ApplicationController
       @current_user.at_user.at_user_stock_accounts.where(share: false).each do |a|
       @responses << {
           id: a.id,
-          name: a.fnc_nm,
+          name: a.name.present? ? a.name : a.fnc_nm,
           balance: a.balance,
           deposit_balance: a.deposit_balance,
           profit_loss_amount: a.profit_loss_amount,
@@ -31,8 +31,7 @@ class Api::V2::User::StockAccountsController < ApplicationController
       account.update!(get_account_params)
       render json: {}, status: 204
     else
-      # TODO(fujiura): code の検討と、エラー処理共通化
-      render json: { errors: { code: '', mesasge: "account not found." } }, status: 200
+      render json: { errors: [ERROR_TYPE::NUMBER['003001']] }, status: 422
     end
   end
 
@@ -51,10 +50,11 @@ class Api::V2::User::StockAccountsController < ApplicationController
   private
 
   def get_account_params
-    param = params.require(:stock_accounts).permit(:share)
+    param = params.require(:stock_accounts).permit(:share, :name)
     {
-        group_id: @current_user.group_id,
-        share: param[:share],
+        group_id: param[:share] == true ? @current_user.group_id : nil,
+        share: param[:share] == true ? 1 : 0,
+        name: param[:name],
     }
   end
 end

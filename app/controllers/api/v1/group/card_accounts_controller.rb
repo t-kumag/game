@@ -9,9 +9,10 @@ class Api::V1::Group::CardAccountsController < ApplicationController
       else
         @responses = []
         share_on_card_accounts.each do |ca|
+          name = ca.name.present? ? ca.name : ca.fnc_nm
           @responses << {
               id: ca.id,
-              name: ca.fnc_nm,
+              name: name,
               amount: ca.current_month_used_amount,
               fnc_id: ca.fnc_id,
               last_rslt_cd: ca.last_rslt_cd,

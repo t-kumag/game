@@ -8,7 +8,7 @@ class Api::V2::Group::StockAccountsController < ApplicationController
       share_on_stock_accounts.each do |a|
         @responses << {
           id: a.id,
-          name: a.fnc_nm,
+          name: a.name.present? ? a.name : a.fnc_nm,
           balance: a.balance,
           deposit_balance: a.deposit_balance,
           profit_loss_amount: a.profit_loss_amount,
