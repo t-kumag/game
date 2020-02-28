@@ -32,7 +32,7 @@ class Api::V2::User::WalletsController < ApplicationController
       if wallet_service.share?
         options = create_activity_options(wallet_service.get_wallet, 'family')
         Services::ActivityService.create_activity(@current_user.id, @current_user.group_id,  DateTime.now, :person_wallet_to_family, options)
-        Services::ActivityService.create_activity(@current_user.partner_user.id, @current_user.group_id,  DateTime.now, :person_wallet_to_family_partner, options)
+        Services::ActivityService.create_activity(@current_user.partner_user.try(:id), @current_user.group_id,  DateTime.now, :person_wallet_to_family_partner, options)
       end
 
       render json: {}, status: :no_content
