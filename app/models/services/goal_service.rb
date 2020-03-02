@@ -141,10 +141,23 @@ class Services::GoalService
     user.free? && Entities::Goal.where(user_id: user.id).count < Settings.at_user_limit_free_goal
   end
 
-  def goals(bank_id, with_group=false)
+  def self.is_checked_one_account(params)
+    params[:at_user_bank_account_id].present? && params[:wallet_id].present?
+  end
+
+  def self.setting_params(params)
+    params[:wallet_id] = nil if params[:at_user_bank_account_id].present?
+    params[:at_user_bank_account_id] = nil if params[:wallet_id].present?
+    params
+  end
+
+  def goals(finance, with_group=false)
     user_ids = [@user.id]
     user_ids.push(@user.partner_user.id) if with_group
-    goals = Entities::GoalSetting.where(at_user_bank_account_id: bank_id, user_id: user_ids).map do |gs|
+    goal_settings = Entities::GoalSetting.where(at_user_bank_account_id: finance.id, user_id: user_ids) if finance.instance_of?(Entities::AtUserBankAccount)
+    goal_settings = Entities::GoalSetting.where(wallet_id: finance.id, user_id: user_ids) if finance.instance_of?(Entities::Wallet)
+
+    goals = goal_settings.map do |gs|
       # 現状は goal 削除時に goal_settings はそのままのため、ここで除外する
       next if gs.goal.nil?
       user = Entities::User.find(gs.user_id)

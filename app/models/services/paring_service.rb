@@ -29,6 +29,8 @@ class Services::ParingService
       at_user_bank_account_ids = user.try(:at_user).try(:at_user_bank_accounts).try(:where, share: true).try(:pluck, :id)
       at_user_card_account_ids = user.try(:at_user).try(:at_user_card_accounts).try(:where, share: true).try(:pluck, :id)
       at_user_emoney_service_account_ids = user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share: true).try(:pluck, :id)
+      at_user_stock_account_ids = user.try(:at_user).try(:at_user_stock_accounts).try(:where, share: true).try(:pluck, :id)
+      wallet_ids = user.try(:wallets).try(:where, share: true).try(:pluck, :id)
 
       if at_user_bank_account_ids.present?
         Services::AtUserService.new(user).delete_account(Entities::AtUserBankAccount, at_user_bank_account_ids)
@@ -40,6 +42,14 @@ class Services::ParingService
 
       if at_user_emoney_service_account_ids.present?
         Services::AtUserService.new(user).delete_account(Entities::AtUserEmoneyServiceAccount, at_user_emoney_service_account_ids)
+      end
+
+      if at_user_stock_account_ids.present?
+        Services::AtUserService.new(user).delete_account(Entities::AtUserStockAccount, at_user_stock_account_ids)
+      end
+
+      if wallet_ids.present?
+        Entities::Wallet.where(id: wallet_ids).destroy_all
       end
 
     end

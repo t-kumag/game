@@ -20,6 +20,7 @@ class Services::GoalLogService
     params = {
         goal_id: goal.id,
         at_user_bank_account_id: goal_setting.at_user_bank_account_id,
+        wallet_id: goal_setting.wallet_id,
         monthly_amount: 0,
         first_amount: goal_setting.first_amount,
         add_amount: 0,
@@ -52,6 +53,7 @@ class Services::GoalLogService
     {
         goal_id: goal_setting.goal_id,
         at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
+        wallet_id:  goal_setting.wallet_id,
         add_amount: 0,
         monthly_amount: goal_setting.monthly_amount,
         before_current_amount: goal.current_amount,
@@ -66,6 +68,7 @@ class Services::GoalLogService
     {
         goal_id: goal_setting[:goal_id],
         at_user_bank_account_id:  goal_setting.at_user_bank_account_id,
+        wallet_id:  goal_setting.wallet_id,
         add_amount: 0,
         monthly_amount: goal_setting.monthly_amount,
         before_current_amount: old_goal_log[:after_current_amount],

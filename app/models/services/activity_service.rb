@@ -254,6 +254,11 @@ class Services::ActivityService
     activity
   end
 
+  def self.convert_wallet_url(wallet, defined_activity, activity)
+    activity[:url] = sprintf(defined_activity[:url], wallet[:id], wallet[:account])
+    activity
+  end
+
   def self.create_base_activity(user, account)
     activity = Entities::Activity.new
     activity[:count] = 0
@@ -273,6 +278,7 @@ class Services::ActivityService
     activity = convert_user_manually_tran_url(options[:user_manually_created_transaction], defined_activity, activity) if options[:user_manually_created_transaction].present?
     activity = convert_trans_message(options[:transactions], defined_activity, activity) if options[:transactions].present?
     activity = convert_account_url(options[:account], defined_activity, activity) if options[:account].present?
+    activity = convert_wallet_url(options[:wallet], defined_activity, activity) if options[:wallet].present?
     activity
   end
 
