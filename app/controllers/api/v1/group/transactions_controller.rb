@@ -1,5 +1,5 @@
 class Api::V1::Group::TransactionsController < ApplicationController
-  before_action :authenticate, :require_group
+  before_action :authenticate
 
   def index
     @response = []
@@ -23,7 +23,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
         true,                # with_group
         params[:from],
         params[:to]
-    ).list
+    ).list if @current_user.partner_user.present?
 
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'
@@ -51,7 +51,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
         true,                # with_group
         params[:from],
         params[:to]
-    ).grouped
+    ).grouped if @current_user.partner_user.present?
 
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'
