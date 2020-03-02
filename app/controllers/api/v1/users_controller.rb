@@ -132,8 +132,8 @@ class Api::V1::UsersController < ApplicationController
     rescue => e
       SlackNotifier.ping("ERROR Api::V1::UsersController#at_sync")
       Rails.logger.error("ERROR Api::V1::UsersController#at_sync")
-      SlackNotifier.ping(e)
-      Rails.logger.error(e)
+      SlackNotifier.ping(e.full_message)
+      Rails.logger.error(e.full_message)
     end
 
     render json: {}, status: 200
