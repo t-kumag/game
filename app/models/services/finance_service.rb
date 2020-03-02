@@ -123,4 +123,9 @@ class Services::FinanceService
     today_balance_log = Entities::BalanceLog.find_by(finance.relation_key => finance.id, date: to)
     today_balance_log.update!(base_balance: finance.balance) if today_balance_log.present?
   end
+
+  def get_account(finance)
+    finance.where(at_user_id: @user.at_user, share: true)
+  end
+
 end
