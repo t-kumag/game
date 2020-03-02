@@ -26,8 +26,17 @@ class Api::V1::Group::GoalsController < ApplicationController
       return render_disallowed_financier_ids
     end
 
+    if get_goal_setting_params[:wallet_id].present? &&
+        disallowed_wallet_ids?([get_goal_setting_params[:wallet_id]])
+      return render_disallowed_financier_ids
+    end
+
+    if Services::GoalService.is_checked_one_account(get_goal_setting_params)
+      render(json: { errors: [ERROR_TYPE::NUMBER['005007']] }, status: 422) and return
+    end
+
     unless Services::GoalService.check_goal_limit_of_free_user(@current_user)
-      return render(json: { errors: [ERROR_TYPE::NUMBER['007001']] }, status: 422)
+      render(json: { errors: [ERROR_TYPE::NUMBER['007001']] }, status: 422) and return
     end
 
     goal_params = get_goal_params
@@ -71,6 +80,10 @@ class Api::V1::Group::GoalsController < ApplicationController
       render_disallowed_goal_setting_ids && return
     end
 
+    if Services::GoalService.is_checked_one_account(get_goal_setting_params)
+      render(json: { errors: [ERROR_TYPE::NUMBER['005007']] }, status: 422) and return
+    end
+
     before_goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
     render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422 and return if before_goal.blank?
     goal_setting = Entities::GoalSetting.find_by(id: params[:goal_settings][:goal_setting_id])
@@ -87,8 +100,13 @@ class Api::V1::Group::GoalsController < ApplicationController
       ActiveRecord::Base.transaction do
         goal = Entities::Goal.find_by(id: params[:id], group_id: @current_user.group_id)
         goal.update!(get_goal_params(false))
-        goal_setting.update!(get_goal_setting_params)
-        partner_goal_setting.update!(get_partner_goal_setting_params)
+
+        goal_setting_params = Services::GoalService.setting_params(get_goal_setting_params)
+        partner_goal_setting_params =  Services::GoalService.setting_params(get_partner_goal_setting_params)
+
+        goal_setting.update!(goal_setting_params)
+        partner_goal_setting.update!(partner_goal_setting_params)
+
         options = create_activity_options(goal)
         update_goal_activity(options)
         unless Services::GoalLogService.already_exist_first_amount(params[:id], @current_user.id)
@@ -168,6 +186,7 @@ class Api::V1::Group::GoalsController < ApplicationController
   def get_goal_setting_params
     params.require(:goal_settings).permit(
       :at_user_bank_account_id,
+      :wallet_id,
       :monthly_amount,
       :first_amount
     ).merge(user_id: @current_user.id)
@@ -177,6 +196,7 @@ class Api::V1::Group::GoalsController < ApplicationController
     params.require(:partner_goal_settings).permit(
       :at_user_bank_account_id,
       :monthly_amount,
+      :wallet_id,
       :first_amount
     ).merge(user_id: @current_user.partner_user.id)
   end

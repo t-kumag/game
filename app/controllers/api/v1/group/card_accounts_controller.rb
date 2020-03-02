@@ -1,16 +1,18 @@
 class Api::V1::Group::CardAccountsController < ApplicationController
-    before_action :authenticate, :require_group
+    before_action :authenticate
 
     def index
       share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
+      share_on_card_accounts = Services::FinanceService.new(@current_user).get_account(share_on_card_accounts) if @current_user.group_id.nil?
       if share_on_card_accounts.blank?
         @responses = []
       else
         @responses = []
         share_on_card_accounts.each do |ca|
+          name = ca.name.present? ? ca.name : ca.fnc_nm
           @responses << {
               id: ca.id,
-              name: ca.fnc_nm,
+              name: name,
               amount: ca.current_month_used_amount,
               fnc_id: ca.fnc_id,
               last_rslt_cd: ca.last_rslt_cd,

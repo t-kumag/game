@@ -65,6 +65,7 @@ module AtAPIRequest
           "USER_ID" => "#{ACCOUNT_NAME_PREFIX}_#{params[:at_user_id]}",
           # "USER_PW" => params[:at_user_password],
         }
+        @params["BATCH_YN"] = params[:batch_yn] if params.has_key?(:batch_yn) || !params[:batch_yn].blank?
       end
     end
 
