@@ -7,24 +7,24 @@ class Api::V1::Group::BsController < ApplicationController
     wallet_amount = 0
     stock_amount = 0
 
-    share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
-    share_on_emoney_accounts = Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
-    share_on_stock_accounts = Entities::AtUserStockAccount.where(group_id: @current_user.group_id).where(share: true)
+    share_on_bank_accounts = Services::AtBankTransactionService.new(@current_user).get_group_account()
+    share_on_emoney_accounts = Services::AtEmoneyTransactionService.new(@current_user).get_group_account()
+    share_on_stock_accounts = Services::AtStockTransactionService.new(@current_user).get_group_account()
 
-    if share_on_bank_accounts && is_group?
+    if share_on_bank_accounts
       bank_amount = share_on_bank_accounts.sum{|i| i.balance}
     end
 
-    if share_on_emoney_accounts && is_group?
+    if share_on_emoney_accounts
       emoney_amount = share_on_emoney_accounts.sum{|i| i.balance}
     end
 
-    if share_on_stock_accounts && is_group?
+    if share_on_stock_accounts
       stock_amount = share_on_stock_accounts.sum{|i| i.balance}
     end
 
-    wallets =  Entities::Wallet.where(group_id: @current_user.group_id).where(share: true)
-    if wallets.present? && is_group?
+    wallets = Services::WalletTransactionService.new(@current_user).get_group_account()
+    if wallets.present?
       wallet_amount = wallets.sum{|i| i.balance}
     end
 

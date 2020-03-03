@@ -2,11 +2,8 @@ class Api::V1::Group::CardAccountsController < ApplicationController
     before_action :authenticate
 
     def index
-      share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
-
-      unless is_group?
-        share_on_card_accounts = Services::FinanceService.new(@current_user).get_account(share_on_card_accounts)
-      end
+      share_on_card_accounts = Services::AtCardTransactionService.new(@current_user).get_group_account()
+      share_on_card_accounts = Services::FinanceService.new(@current_user).get_account(share_on_card_accounts)
 
       if share_on_card_accounts.blank?
         @responses = []
@@ -28,8 +25,8 @@ class Api::V1::Group::CardAccountsController < ApplicationController
     end
 
     def summary
-      share_on_card_accounts = Entities::AtUserCardAccount.where(group_id: @current_user.group_id).where(share: true)
-      if share_on_card_accounts.blank? || is_group? === false
+      share_on_card_accounts = Services::AtCardTransactionService.new(@current_user).get_group_account()
+      if share_on_card_accounts.blank?
           @response = {
             amount: 0,
         }

@@ -2,11 +2,8 @@ class Api::V1::Group::BankAccountsController < ApplicationController
   before_action :authenticate
 
   def index
-    share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
-
-    unless is_group?
-      share_on_bank_accounts = Services::FinanceService.new(@current_user).get_account(share_on_bank_accounts)
-    end
+    share_on_bank_accounts = Services::AtBankTransactionService.new(@current_user).get_group_account()
+    share_on_bank_accounts = Services::FinanceService.new(@current_user).get_account(share_on_bank_accounts)
 
     if share_on_bank_accounts.blank?
       @responses = []
@@ -31,8 +28,8 @@ class Api::V1::Group::BankAccountsController < ApplicationController
 
   # TODO: user_distributed_transactionsを参照するようにする
   def summary
-    share_on_bank_accounts = Entities::AtUserBankAccount.where(group_id: @current_user.group_id).where(share: true)
-    if share_on_bank_accounts.blank? || is_group? === false
+    share_on_bank_accounts = Services::AtBankTransactionService.new(@current_user).get_group_account()
+    if share_on_bank_accounts.blank?
       @response = {
           amount: 0,
       }

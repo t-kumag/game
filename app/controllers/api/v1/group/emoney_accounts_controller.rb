@@ -2,11 +2,8 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
     before_action :authenticate
 
     def index
-      share_on_emoney_service_accounts = Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
-
-      unless is_group?
-        share_on_emoney_service_accounts = Services::FinanceService.new(@current_user).get_account(share_on_emoney_service_accounts)
-      end
+      share_on_emoney_service_accounts = Services::AtEmoneyTransactionService.new(@current_user).get_group_account()
+      share_on_emoney_service_accounts = Services::FinanceService.new(@current_user).get_account(share_on_emoney_service_accounts)
 
       if share_on_emoney_service_accounts.blank?
         @responses = []
@@ -29,8 +26,8 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
 
     # TODO: user_distributed_transactionsを参照するようにする
     def summary
-      share_on_emoney_service_accounts = Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
-      if share_on_emoney_service_accounts.blank? || is_group? === false
+      share_on_emoney_service_accounts = Services::AtEmoneyTransactionService.new(@current_user).get_group_account()
+      if share_on_emoney_service_accounts.blank?
         @response = {
             amount: 0,
         }
