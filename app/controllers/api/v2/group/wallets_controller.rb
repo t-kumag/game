@@ -3,14 +3,18 @@ class Api::V2::Group::WalletsController < ApplicationController
 
   def index
     @responses = []
-    Entities::Wallet.where(group_id: @current_user.group_id, share: true).each do |w|
-      @responses << {
-        id: w.id,
-        name: w.name,
-        amount: w.balance,
-        goals: Services::GoalService.new(@current_user).goals(w, true)
-      }
+
+    unless is_group?
+      Entities::Wallet.where(group_id: @current_user.group_id, share: true).each do |w|
+        @responses << {
+            id: w.id,
+            name: w.name,
+            amount: w.balance,
+            goals: Services::GoalService.new(@current_user).goals(w, true)
+        }
+      end
     end
+
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 

@@ -3,7 +3,11 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
 
     def index
       share_on_emoney_service_accounts = Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
-      share_on_emoney_service_accounts = Services::FinanceService.new(@current_user).get_account(share_on_emoney_service_accounts) if @current_user.group_id.nil?
+
+      unless is_group?
+        share_on_emoney_service_accounts = Services::FinanceService.new(@current_user).get_account(share_on_emoney_service_accounts)
+      end
+
       if share_on_emoney_service_accounts.blank?
         @responses = []
       else
@@ -26,7 +30,7 @@ class Api::V1::Group::EmoneyAccountsController < ApplicationController
     # TODO: user_distributed_transactionsを参照するようにする
     def summary
       share_on_emoney_service_accounts = Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
-      if share_on_emoney_service_accounts.blank?
+      if share_on_emoney_service_accounts.blank? || is_group? === false
         @response = {
             amount: 0,
         }

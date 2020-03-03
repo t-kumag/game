@@ -450,4 +450,8 @@ class ApplicationController < ActionController::Base
 
     @current_user.free? && number_of_account < Settings.at_user_limit_free_account
   end
+
+  def is_group?
+    @current_user.group_id.present?
+  end
 end
