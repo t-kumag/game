@@ -1,8 +1,9 @@
 class Api::V1::Group::EmoneyAccountsController < ApplicationController
-    before_action :authenticate, :require_group
+    before_action :authenticate
 
     def index
       share_on_emoney_service_accounts = Entities::AtUserEmoneyServiceAccount.where(group_id: @current_user.group_id).where(share: true)
+      share_on_emoney_service_accounts = Services::FinanceService.new(@current_user).get_account(share_on_emoney_service_accounts) if @current_user.group_id.nil?
       if share_on_emoney_service_accounts.blank?
         @responses = []
       else

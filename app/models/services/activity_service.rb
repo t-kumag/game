@@ -24,6 +24,7 @@ class Services::ActivityService
   end
 
   def self.create_activity(user_id, group_id, used_date, activity_type, options={})
+    return false unless user_id.present?
     activity = activity_assign_parameter(activity_type, options)
     create_activity_data(user_id, group_id, used_date, activity_type, activity)
   end

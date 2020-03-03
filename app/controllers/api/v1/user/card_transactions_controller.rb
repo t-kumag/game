@@ -35,10 +35,9 @@ class Api::V1::User::CardTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
-    require_group && return if params[:share] == true
-
-    @exist_card_transaction = Services::AtCardTransactionService.new(@current_user).detail(params[:card_account_id], transaction_id)
-    card_account_transaction_param = get_card_account_transaction_param(params, transaction_id, @exist_card_transaction)
+    @exist_transaction = Services::AtCardTransactionService.new(@current_user).detail(params[:card_account_id], transaction_id)
+    render_disallowed_transaction_ids && return unless @exist_transaction.present?
+    card_account_transaction_param = get_card_account_transaction_param(params, transaction_id, @exist_transaction)
 
     @response = Services::AtCardTransactionService.new(@current_user).update(
         card_account_transaction_param[:card_account_id],
@@ -55,7 +54,7 @@ class Api::V1::User::CardTransactionsController < ApplicationController
       options = create_activity_options(@response[:user_distributed_transaction], card_account_transaction_param, "family")
       Services::ActivityService.create_activity(@current_user.id, @response[:user_distributed_transaction].group_id,
                                                 DateTime.now, :person_tran_to_family, options)
-      Services::ActivityService.create_activity(@current_user.partner_user.id, @response[:user_distributed_transaction].group_id,
+      Services::ActivityService.create_activity(@current_user.partner_user.try(:id), @response[:user_distributed_transaction].group_id,
                                                 DateTime.now, :person_tran_to_family_partner, options)
     end
 
