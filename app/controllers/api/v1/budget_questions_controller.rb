@@ -18,6 +18,8 @@ class Api::V1::BudgetQuestionsController < ApplicationController
     # TODO: バリデーション
     # TODO 例外処理と共通化
     begin
+      Entities::UserBudgetQuestion.where(user_id: @current_user.id).delete_all
+
       if params[:budget_questions].present?
         Entities::UserBudgetQuestion.new.transaction do
           params[:budget_questions].each do |budget_question|
