@@ -84,9 +84,9 @@ class Api::V2::UsersController < ApplicationController
             where(share: true).
             present?
       end
-      return true if result === true
+      break if result === true
     end
-    false
+    result
   end
 
   def finance_shared?(with_group=false)
