@@ -6,7 +6,7 @@ class Api::V2::User::PlSettingsController < ApplicationController
     if @response.present?
       render 'show', formats: 'json', handlers: 'jbuilder'
     else
-      @response = Entities::UserPlSetting.new(user_id: @current_user.id)
+      @response = Entities::UserPlSetting.new(user_id: @current_user.id, pl_period_date: 1, pl_type: "")
       @response.save!
       render 'no_record', formats: 'json', handlers: 'jbuilder'
     end
