@@ -6,7 +6,7 @@ class Api::V2::User::PlSettingsController < ApplicationController
     if @response.present?
       render 'show', formats: 'json', handlers: 'jbuilder'
     else
-      @response = Entities::UserPlSetting.new(user_id: @current_user.id, pl_period_date: 1, pl_type: "")
+      @response = Entities::UserPlSetting.new(user_id: @current_user.id)
       @response.save!
       render 'no_record', formats: 'json', handlers: 'jbuilder'
     end
@@ -22,7 +22,10 @@ class Api::V2::User::PlSettingsController < ApplicationController
     if @current_user.partner_user.present?
       partner_pl_setting = Entities::UserPlSetting.find_by(user_id: @current_user.partner_user.id)
       unless partner_pl_setting.present?
-        partner_pl_setting = Entities::UserPlSetting.create!(user_id: @current_user.partner_user.id, pl_period_date: 1, pl_type: "")
+        partner_pl_setting = Entities::UserPlSetting.create!(user_id: @current_user.partner_user.id)
+      end
+      unless partner_pl_setting.pl_period_date.present?
+        partner_pl_setting.update!(pl_period_date: 1, pl_type: "")
       end
       partner_pl_setting.update!(partner_update_params)
     end
