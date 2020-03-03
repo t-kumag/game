@@ -9,6 +9,8 @@ class Services::FinanceService
   end
 
   def find_finance(key, val)
+    return nil if user.at_user.blank?
+
     f = Entities::AtUserBankAccount.find_by(at_user_id: user.at_user.id, key => val)
     return f if f.present?
     f = Entities::AtUserCardAccount.find_by(at_user_id: user.at_user.id, key => val)
@@ -165,4 +167,9 @@ class Services::FinanceService
     end
     account_ids
   end
+
+  def get_account(finance)
+    finance.where(at_user_id: @user.at_user, share: true)
+  end
+
 end
