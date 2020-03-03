@@ -124,6 +124,50 @@ class Services::FinanceService
     today_balance_log.update!(base_balance: finance.balance) if today_balance_log.present?
   end
 
+  # アクセス可能なすべての金融IDを取得
+  def all_account_ids(with_group=false)
+    account_ids = {bank:[], card:[], emoney:[], wallet:[]}
+
+    return {} if @user.at_user.blank?
+
+    Entities::AtUserBankAccount.where(at_user_id: @user.at_user.id).find_each do |ba|
+      account_ids[:bank] << ba.id
+    end
+
+    Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).find_each do |ca|
+      account_ids[:card] << ca.id
+    end
+
+    Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.at_user.id).find_each do |ea|
+      account_ids[:emoney] << ea.id
+    end
+
+    Entities::Wallet.where(user_id: @user.id).find_each do |w|
+      account_ids[:wallet] << w.id
+    end
+
+    if with_group
+      return {} if @user.partner_user.blank? || @user.partner_user.at_user.blank?
+
+      Entities::AtUserBankAccount.where(at_user_id: @user.partner_user.at_user.id, share: true).find_each do |ba|
+        account_ids[:bank] << ba.id
+      end
+
+      Entities::AtUserCardAccount.where(at_user_id: @user.partner_user.at_user.id, share: true).find_each do |ca|
+        account_ids[:card] << ca.id
+      end
+
+      Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.partner_user.at_user.id, share: true).find_each do |ea|
+        account_ids[:emoney] << ea.id
+      end
+
+      Entities::Wallet.where(user_id: @user.partner_user.id, share: true).find_each do |w|
+        account_ids[:wallet] << w.id
+      end
+    end
+    account_ids
+  end
+
   def get_account(finance)
     finance.where(at_user_id: @user.at_user, share: true)
   end
