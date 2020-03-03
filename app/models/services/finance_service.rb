@@ -119,7 +119,7 @@ class Services::FinanceService
 
     # 残高計算に使用した基準となる残高の値を登録。計算がバグっていた場合のリカバリ用の値
     today_balance_log = Entities::BalanceLog.find_by(finance.relation_key => finance.id, date: to)
-    today_balance_log.update!(base_balance: finance.balance)
+    today_balance_log.update!(base_balance: finance.balance) if today_balance_log.present?
   end
 
   # アクセス可能なすべての金融IDを取得

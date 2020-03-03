@@ -25,7 +25,7 @@ module ERROR_TYPE
       '006006' => { code: '006006', message: '招待をしたお客様は、OsidOriには存在しません。', info: 'Pairing token not found.'},
       '006007' => { code: '006007', message: 'こちらのURLは有効期限が過ぎています。再度招待していただいてください。', info: 'Paring user not found or invalid token.'},
       '007001' => { code: '007001', message: '登録数が上限のため追加できません(5個)', info: 'Five goal limit of free users.'},
-      '007002' => { code: '007002', message: '登録数が上限のため追加できません(5個)', info: 'Five account limit of free users.'},
+      '007002' => { code: '007002', message: '登録数が上限のため追加できません(7個)', info: 'Seven account limit of free users.'},
       '007003' => { code: '007003', message: 'この機能はプレミアムプランへの登録が必要です。ぜひお試しください。', info: 'Not premium user.'},
       '008001' => { code: '008001', message: 'ネットワークエラー', info: ''},
   }.freeze

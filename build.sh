@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 [develop|staging|production] [rails|worker|batch]"
+  echo "Usage: $0 [develop|staging|production] [rails|worker|batch|stocklog]"
   exit 1
 fi
 
@@ -15,7 +15,7 @@ elif [ "${ENV}" = "staging" ]; then
 elif [ "${ENV}" = "production" ]; then
   echo ENV: ${ENV}
 else
-  echo "Usage: $0 [develop|staging|production] [rails|worker|batch]"
+  echo "Usage: $0 [develop|staging|production] [rails|worker|batch|stocklog]"
   exit 1
 fi
 
@@ -28,8 +28,11 @@ elif [ "${TARGET}" = "worker" ]; then
 elif [ "${TARGET}" = "batch" ]; then
   REPOSITORY=osidori/batch-acmm
   DOCKER_FILE=batch.Dockerfile 
+elif [ "${TARGET}" = "stocklog" ]; then
+  REPOSITORY=osidori/batch-stocklog
+  DOCKER_FILE=batcn_stock_log.Dockerfile
 else
-  echo "Usage: $0 [develop|staging|production] [rails|worker|batch]"
+  echo "Usage: $0 [develop|staging|production] [rails|worker|batch|stocklog]"
   exit 1
 fi
 echo Target: ${TARGET} / ${REPOSITORY}
