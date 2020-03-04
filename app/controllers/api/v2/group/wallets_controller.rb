@@ -4,7 +4,7 @@ class Api::V2::Group::WalletsController < ApplicationController
   def index
     @responses = []
 
-    Services::AtCardTransactionService.new(@current_user).get_group_account().each do |w|
+    Services::WalletTransactionService.new(@current_user).get_group_account().each do |w|
       @responses << {
           id: w.id,
           name: w.name,

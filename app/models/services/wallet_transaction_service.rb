@@ -122,7 +122,7 @@ class Services::WalletTransactionService
   end
 
   def get_group_account()
-    Entities::Wallet.where(group_id: @user.group_id).where(share: true)
+    Entities::Wallet
         .where(group_id: @user.group_id)
         .where(user_id: [@user.id, @user.partner_user.try(:id)])
         .where(share: true)
