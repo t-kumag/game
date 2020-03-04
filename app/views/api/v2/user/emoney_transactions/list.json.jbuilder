@@ -5,6 +5,7 @@ json.transactions do
     json.used_date transaction.used_date.strftime('%Y-%m-%d %H:%M:%S')
     json.used_location transaction.used_location
     json.memo transaction.memo
+    json.type transaction.type
     json.user_id transaction.user_id
     json.is_account_shared @transactions[:is_account_shared]
     json.is_shared transaction.share

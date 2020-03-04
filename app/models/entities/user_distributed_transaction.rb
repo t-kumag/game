@@ -64,4 +64,11 @@ class Entities::UserDistributedTransaction < ApplicationRecord
     # UserDistributedTransaction.left_joins(:user_manually_created_transaction).left_joins(:at_user_card_transaction).left_joins(:at_user_bank_transaction).left_joins(:at_user_emoney_transaction).where(user_distributed_transaction: { id: nil })
   end
 
+  def type
+    return "bank" unless self.at_user_bank_transaction_id.nil?
+    return "card" unless self.at_user_card_transaction_id.nil?
+    return "emoney" unless self.at_user_emoney_transaction_id.nil?
+    return "manually_created" unless self.user_manually_created_transaction_id.nil?
+  end
+
 end

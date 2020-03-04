@@ -11,4 +11,6 @@ json.app do
   json.payment_name @response[:payment_name]
   json.transaction_id @response[:transaction_id]
   json.is_ignored @response[:is_ignored]
+  json.memo @response[:memo]
+  json.type @response[:type]
 end
