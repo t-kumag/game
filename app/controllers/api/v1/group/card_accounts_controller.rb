@@ -2,8 +2,7 @@ class Api::V1::Group::CardAccountsController < ApplicationController
     before_action :authenticate
 
     def index
-      share_on_card_accounts = Services::AtCardTransactionService.new(@current_user).get_group_account()
-      share_on_card_accounts = Services::FinanceService.new(@current_user).get_account(share_on_card_accounts)
+      share_on_card_accounts = Services::FinanceService.new(@current_user).get_account(Entities::AtUserCardAccount)
 
       if share_on_card_accounts.blank?
         @responses = []
