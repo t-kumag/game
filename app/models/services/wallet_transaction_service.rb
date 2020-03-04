@@ -60,6 +60,7 @@ class Services::WalletTransactionService
       used_date: transaction[:user_distributed_transaction].used_date,
       used_location: transaction[:user_distributed_transaction].used_location,
       memo: transaction[:user_distributed_transaction].memo,
+      type: transaction[:user_distributed_transaction].type,
       user_id: transaction[:user_distributed_transaction].user_id,
       is_account_shared: transaction[:is_account_shared],
       is_shared: wallet.share || transaction[:user_distributed_transaction].share,
