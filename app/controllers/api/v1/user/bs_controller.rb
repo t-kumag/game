@@ -21,7 +21,6 @@ class Api::V1::User::BsController < ApplicationController
 
     if at_bank_accounts
       bank_amount = at_bank_accounts.sum{|i| i.balance}
-      goal_amount = Services::GoalService.new(@current_user).goal_amount(at_bank_accounts.pluck(:id))
     end
     
     if at_emoney_accounts
