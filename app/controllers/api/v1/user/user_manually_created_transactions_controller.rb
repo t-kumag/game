@@ -100,7 +100,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       # シェアしていない明細は、422を返す
       transacticon = nil unless transacticon.try(:user_distributed_transaction).try(:share)
     end
-    
+
     transacticon
   end
 
