@@ -1,7 +1,6 @@
 FactoryBot.define do
   factory :at_user_emoney_service_account, :class => Entities::AtUserEmoneyServiceAccount do
     at_user_id           { 0 }
-    at_emoney_service_id { 0 }
     balance              { 0 }
     share                { 0 }
     fnc_id               { "test" }
@@ -19,8 +18,6 @@ FactoryBot.define do
     group_id             { nil }
     error_date           { nil }
     error_count          { 0 }
-
-    at_emoney_service
 
     trait :with_at_user_emoney_transactions do
       after(:create) do |at_user_emoney_service_account|
