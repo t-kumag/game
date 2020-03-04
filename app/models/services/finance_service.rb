@@ -169,7 +169,7 @@ class Services::FinanceService
   end
 
   def get_account(finance)
-    finance.where(at_user_id: @user.at_user, share: true)
+    finance.where(at_user_id: [@user.at_user, @user.partner_user.try(:at_user)], share: true)
   end
 
 end

@@ -137,4 +137,11 @@ class Services::AtCardTransactionService
     # distributed_transactions
   end
 
+  def get_group_account()
+    Entities::AtUserCardAccount
+        .where(group_id: @user.group_id)
+        .where(at_user_id: [@user.try(:at_user).try(:id), @user.partner_user.try(:at_user).try(:id)])
+        .where(share: true)
+  end
+
 end
