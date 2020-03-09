@@ -17,6 +17,8 @@ class Services::FinanceService
     return f if f.present?
     f = Entities::AtUserEmoneyServiceAccount.find_by(at_user_id: user.at_user.id, key => val)
     return f if f.present?
+    f = Entities::AtUserStockAccount.find_by(at_user_id: user.at_user.id, key => val)
+    return f if f.present?
   end
 
   # 指定範囲のdailyの残高を計算し保存する
