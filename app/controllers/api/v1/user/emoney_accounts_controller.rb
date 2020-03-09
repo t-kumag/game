@@ -74,7 +74,7 @@ class Api::V1::User::EmoneyAccountsController < ApplicationController
     def destroy
       account_id = params[:id].to_i
 
-      render_disallowed_account_ids && return if disallowed_at_emoney_account_ids?([account_id])
+      render_disallowed_to_delete_account_ids && return if disallowed_at_emoney_account_ids?([account_id])
       render_disallowed_financier_ids && return if disallowed_at_emoney_ids?([account_id])
 
       if @current_user.try(:at_user).try(:at_user_emoney_service_accounts).pluck(:id).include?(account_id)

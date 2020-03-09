@@ -414,8 +414,12 @@ class ApplicationController < ActionController::Base
     render json: { errors: [ERROR_TYPE::NUMBER['003001']] }, status: 422
   end
 
-  def render_disallowed_account_ids
+  def render_disallowed_to_delete_account_ids
     render json: { errors: [ERROR_TYPE::NUMBER['003002']] }, status: 422
+  end
+
+  def render_disallowed_to_update_account_ids
+    render json: { errors: [ERROR_TYPE::NUMBER['003003']] }, status: 422
   end
 
   def render_disallowed_transaction_ids
