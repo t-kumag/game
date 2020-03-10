@@ -174,4 +174,14 @@ class Services::FinanceService
     finance.where(at_user_id: [@user.at_user, @user.partner_user.try(:at_user)], share: true)
   end
 
+  def update_group()
+    @user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:update, group_id: @user.group_id)
+    @user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:update, group_id: @user.group_id)
+    @user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:update, group_id: @user.group_id)
+
+    @user.partner_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:update, group_id: @user.group_id)
+    @user.partner_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:update, group_id: @user.group_id)
+    @user.partner_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:update, group_id: @user.group_id)
+  end
+
 end
