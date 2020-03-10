@@ -48,7 +48,7 @@ class Api::V1::PairingRequestsController < ApplicationController
           Entities::ParticipateGroup.create!(group_id: new_group.id, user_id: @pairing_request.from_user_id)
           Entities::ParticipateGroup.create!(group_id: new_group.id, user_id: @pairing_request.to_user_id)
 
-          Services::FinanceService.new(@current_user).update_group()
+          update_group
 
           Services::ActivityService.create_activity(@pairing_request.from_user_id, new_group.id, Time.zone.now, :pairing_created)
           Services::ActivityService.create_activity(@pairing_request.to_user_id, new_group.id, Time.zone.now, :pairing_created)
@@ -67,5 +67,17 @@ class Api::V1::PairingRequestsController < ApplicationController
   def destroy
     Services::ParingService.new(@current_user).cancel
     render json: {}, status: 200
+  end
+
+  private
+
+  def update_group()
+    @current_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
+    @current_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
+    @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
+
+    @current_user.partner_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
+    @current_user.partner_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
+    @current_user.partner_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
   end
 end
