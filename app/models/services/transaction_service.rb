@@ -12,13 +12,6 @@ class Services::TransactionService
     @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
   end
 
-  def type(transaction)
-    return "bank" unless transaction.at_user_bank_transaction_id.nil?
-    return "card" unless transaction.at_user_card_transaction_id.nil?
-    return "emoney" unless transaction.at_user_emoney_transaction_id.nil?
-    return "manually_created" unless transaction.user_manually_created_transaction_id.nil?
-  end
-
   def fetch_transactions(ids, from, to)
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
@@ -54,7 +47,7 @@ class Services::TransactionService
         used_location: t.used_location,
         memo: t.memo,
         transaction_id: t.at_user_bank_transaction_id || t.at_user_card_transaction_id || t.at_user_emoney_transaction_id || t.user_manually_created_transaction_id,
-        type: type(t)
+        type: t.type
       }
     }
     response

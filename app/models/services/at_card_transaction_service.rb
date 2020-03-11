@@ -25,6 +25,7 @@ class Services::AtCardTransactionService
       used_date: distributed[:user_distributed_transaction].at_user_card_transaction.used_date,
       used_location: distributed[:user_distributed_transaction].used_location,
       memo: distributed[:user_distributed_transaction].memo,
+      type: distributed[:user_distributed_transaction].type,
       user_id: distributed[:user_distributed_transaction].user_id,
       is_account_shared: distributed[:is_account_shared],
       is_shared: distributed[:user_distributed_transaction].at_user_card_transaction.at_user_card_account.share || distributed[:user_distributed_transaction].share,
