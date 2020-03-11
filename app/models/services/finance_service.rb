@@ -29,6 +29,12 @@ class Services::FinanceService
     from = Time.zone.today.strftime('%Y-%m-%d') if from.nil?
     to = Time.zone.today.strftime('%Y-%m-%d')
 
+    # 当日の残高を取得、当日データがなければ保存する
+    base_balance = finance.balance
+    today_balance_log = Entities::BalanceLog.find_by(finance.relation_key => finance.id, date: to)
+    Entities::BalanceLog.create!(finance.relation_key => finance.id, date: to, balance: base_balance, base_balance: base_balance) if today_balance_log.blank?
+
+    # 明細取得
     ft_ids = self.finance_transaction_ids(finance, finance_transaction, payment_method_type, from, to)
     return if ft_ids.blank?
 
@@ -53,8 +59,6 @@ class Services::FinanceService
       end
     end
 
-    # 当日の残高を取得
-    base_balance = finance.balance
     # 日毎の残高を計算
     calc_balances.each do |k, _|
       calc_balances[k] = base_balance - calc_balances[k]
