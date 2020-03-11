@@ -75,12 +75,14 @@ class Api::V1::PairingRequestsController < ApplicationController
     @current_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
     @current_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
     @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
+    @current_user.try(:at_user).try(:at_user_stock_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
     @current_user.try(:wallets).try(:where, share:true).try(:update, group_id: @current_user.group_id)
     Entities::UserDistributedTransaction.where(user_id: @current_user.id, share: true).update(group_id: @current_user.group_id)
 
     @current_user.partner_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
     @current_user.partner_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
     @current_user.partner_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
+    @current_user.partner_user.try(:at_user).try(:at_user_stock_accounts).try(:where, share:true).try(:update, group_id: @current_user.group_id)
     @current_user.partner_user.try(:wallets).try(:where, share:true).try(:update, group_id: @current_user.group_id)
     Entities::UserDistributedTransaction.where(user_id: @current_user.partner_user.id, share: true).update(group_id: @current_user.group_id)
   end
