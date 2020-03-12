@@ -147,7 +147,14 @@ class Services::FinanceService
     end
 
     if with_group
-      return account_ids if @user.partner_user.blank? || @user.partner_user.at_user.blank?
+
+      return account_ids if @user.partner_user.blank?
+
+      Entities::Wallet.where(user_id: @user.partner_user.id).find_each do |w|
+        account_ids[:wallet] << w.id
+      end
+
+      return account_ids if @user.partner_user.at_user.blank?
 
       Entities::AtUserBankAccount.where(at_user_id: @user.partner_user.at_user.id).find_each do |ba|
         account_ids[:bank] << ba.id
@@ -161,9 +168,7 @@ class Services::FinanceService
         account_ids[:emoney] << ea.id
       end
 
-      Entities::Wallet.where(user_id: @user.partner_user.id).find_each do |w|
-        account_ids[:wallet] << w.id
-      end
+
     end
     account_ids
   end

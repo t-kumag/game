@@ -97,7 +97,16 @@ class Api::V2::UsersController < ApplicationController
     shared_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:pluck ,:id)
     shared_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:pluck ,:id)
     shared_emoney_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:pluck ,:id)
-    return shared_bank_account_ids.present? || shared_card_account_ids.present? || shared_emoney_account_ids.present? unless with_group
+    shared_stock_account_ids = @current_user.try(:at_user).try(:at_user_stock_accounts).try(:where, share:true).try(:pluck ,:id)
+    shared_wallet_ids = @current_user.try(:wallets).try(:where, share:true).try(:pluck ,:id)
+
+    unless with_group
+      return shared_bank_account_ids.present? ||
+        shared_card_account_ids.present? ||
+        shared_emoney_account_ids.present? ||
+        shared_stock_account_ids.present? ||
+        shared_wallet_ids.present?
+    end
 
     if @current_user.partner_user.present?
       if shared_bank_account_ids.present? 
@@ -118,11 +127,29 @@ class Api::V2::UsersController < ApplicationController
         shared_emoney_account_ids = @current_user.partner_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:pluck ,:id)
       end
 
+      if shared_stock_account_ids.present?
+        shared_stock_account_ids << @current_user.partner_user.try(:at_user).try(:at_user_stock_accounts).try(:where, share:true).try(:pluck ,:id)
+      else
+        shared_stock_account_ids = @current_user.partner_user.try(:at_user).try(:at_user_stock_accounts).try(:where, share:true).try(:pluck ,:id)
+      end
+
+      if shared_wallet_ids.present?
+        shared_wallet_ids << @current_user.partner_user.try(:wallets).try(:where, share:true).try(:pluck ,:id)
+      else
+        shared_wallet_ids = @current_user.partner_user.try(:wallets).try(:where, share:true).try(:pluck ,:id)
+      end
+
       shared_bank_account_ids.try(:flatten!)
       shared_card_account_ids.try(:flatten!)
       shared_emoney_account_ids.try(:flatten!)
+      shared_stock_account_ids.try(:flatten!)
+      shared_wallet_ids.try(:flatten!)
     end
         
-    shared_bank_account_ids.present? || shared_card_account_ids.present? || shared_emoney_account_ids.present? 
+    shared_bank_account_ids.present? ||
+      shared_card_account_ids.present? ||
+      shared_emoney_account_ids.present? ||
+      shared_stock_account_ids.present? ||
+      shared_wallet_ids.present?
   end
 end
