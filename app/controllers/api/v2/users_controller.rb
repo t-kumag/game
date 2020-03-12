@@ -46,14 +46,18 @@ class Api::V2::UsersController < ApplicationController
         joins(:user_manually_created_transaction).
         where(user_id: @current_user.id, share: true).
         present?
-    elsif with_group === true && @current_user.partner_user.present?
+    elsif with_group === true
       account_ids = Services::FinanceService.new(@current_user).all_account_ids(true)
+      user_ids = [@current_user.id]
+      user_ids << @current_user.partner_user.id if @current_user.partner_user.present?
       result = Entities::UserDistributedTransaction.
         joins(:user_manually_created_transaction).
-        where(user_id: [@current_user.id, @current_user.partner_user.id], share: true).
+        where(user_id: user_ids, share: true).
         present?
     end
     return true if result === true
+
+    # 削除されていない口座の明細かチェックする
     account_ids.each do |type, ids|
       next if ids.blank?
       case type
