@@ -21,7 +21,7 @@ class Api::V2::User::WalletsController < ApplicationController
 
   def update
     wallet_id = params[:id].to_i
-    render_disallowed_financier_ids && return if disallowed_wallet_ids?([wallet_id])
+    render_disallowed_to_update_account_ids && return if disallowed_wallet_ids?([wallet_id])
 
     wallet_service = Services::WalletService.new(@current_user, Entities::Wallet.find(wallet_id))
     param = params.require(:wallets).permit(:name, :share, :balance)
@@ -44,9 +44,9 @@ class Api::V2::User::WalletsController < ApplicationController
   def destroy
     wallet_id = params[:id].to_i
     if disallowed_wallet_ids?([wallet_id])
-      render_disallowed_financier_ids && return
+      render_disallowed_to_delete_account_ids && return
     end
-    
+
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
       Entities::Wallet.find(wallet_id).destroy
     end
