@@ -153,7 +153,7 @@ class Services::GoalService
 
   def goals(finance, with_group=false)
     user_ids = [@user.id]
-    user_ids.push(@user.partner_user.id) if with_group
+    user_ids.push(@user.partner_user.id) if with_group && @user.partner_user.try(:id).present?
     goal_settings = Entities::GoalSetting.where(at_user_bank_account_id: finance.id, user_id: user_ids) if finance.instance_of?(Entities::AtUserBankAccount)
     goal_settings = Entities::GoalSetting.where(wallet_id: finance.id, user_id: user_ids) if finance.instance_of?(Entities::Wallet)
 

@@ -9,11 +9,15 @@ class Services::FinanceService
   end
 
   def find_finance(key, val)
+    return nil if user.at_user.blank?
+
     f = Entities::AtUserBankAccount.find_by(at_user_id: user.at_user.id, key => val)
     return f if f.present?
     f = Entities::AtUserCardAccount.find_by(at_user_id: user.at_user.id, key => val)
     return f if f.present?
     f = Entities::AtUserEmoneyServiceAccount.find_by(at_user_id: user.at_user.id, key => val)
+    return f if f.present?
+    f = Entities::AtUserStockAccount.find_by(at_user_id: user.at_user.id, key => val)
     return f if f.present?
   end
 
@@ -121,4 +125,58 @@ class Services::FinanceService
     today_balance_log = Entities::BalanceLog.find_by(finance.relation_key => finance.id, date: to)
     today_balance_log.update!(base_balance: finance.balance) if today_balance_log.present?
   end
+
+  # 自分とパートナーの削除されていない口座のIDを取得
+  def all_account_ids(with_group=false)
+    account_ids = {bank:[], card:[], emoney:[], wallet:[]}
+
+    if @user.at_user.present?
+      Entities::AtUserBankAccount.where(at_user_id: @user.at_user.id).find_each do |ba|
+        account_ids[:bank] << ba.id
+      end
+
+      Entities::AtUserCardAccount.where(at_user_id: @user.at_user.id).find_each do |ca|
+        account_ids[:card] << ca.id
+      end
+
+      Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.at_user.id).find_each do |ea|
+        account_ids[:emoney] << ea.id
+      end
+
+      Entities::Wallet.where(user_id: @user.id).find_each do |w|
+        account_ids[:wallet] << w.id
+      end
+    end
+
+    if with_group
+
+      return account_ids if @user.partner_user.blank?
+
+      Entities::Wallet.where(user_id: @user.partner_user.id).find_each do |w|
+        account_ids[:wallet] << w.id
+      end
+
+      return account_ids if @user.partner_user.at_user.blank?
+
+      Entities::AtUserBankAccount.where(at_user_id: @user.partner_user.at_user.id).find_each do |ba|
+        account_ids[:bank] << ba.id
+      end
+
+      Entities::AtUserCardAccount.where(at_user_id: @user.partner_user.at_user.id).find_each do |ca|
+        account_ids[:card] << ca.id
+      end
+
+      Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.partner_user.at_user.id).find_each do |ea|
+        account_ids[:emoney] << ea.id
+      end
+
+
+    end
+    account_ids
+  end
+
+  def get_account(finance)
+    finance.where(at_user_id: [@user.at_user, @user.partner_user.try(:at_user)], share: true)
+  end
+
 end

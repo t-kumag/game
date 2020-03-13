@@ -60,6 +60,7 @@ class Services::WalletTransactionService
       used_date: transaction[:user_distributed_transaction].used_date,
       used_location: transaction[:user_distributed_transaction].used_location,
       memo: transaction[:user_distributed_transaction].memo,
+      type: transaction[:user_distributed_transaction].type,
       user_id: transaction[:user_distributed_transaction].user_id,
       is_account_shared: transaction[:is_account_shared],
       is_shared: wallet.share || transaction[:user_distributed_transaction].share,
@@ -119,5 +120,12 @@ class Services::WalletTransactionService
     return if w.blank?
     w.balance = w.balance - num
     w.save!
+  end
+
+  def get_group_account()
+    Entities::Wallet
+        .where(group_id: @user.group_id)
+        .where(user_id: [@user.id, @user.partner_user.try(:id)])
+        .where(share: true)
   end
 end

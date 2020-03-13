@@ -414,8 +414,12 @@ class ApplicationController < ActionController::Base
     render json: { errors: [ERROR_TYPE::NUMBER['003001']] }, status: 422
   end
 
-  def render_disallowed_account_ids
+  def render_disallowed_to_delete_account_ids
     render json: { errors: [ERROR_TYPE::NUMBER['003002']] }, status: 422
+  end
+
+  def render_disallowed_to_update_account_ids
+    render json: { errors: [ERROR_TYPE::NUMBER['003003']] }, status: 422
   end
 
   def render_disallowed_transaction_ids
@@ -434,6 +438,7 @@ class ApplicationController < ActionController::Base
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)
     at_user_emoney_service_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:pluck, :id)
+    at_user_stock_account_ids = @current_user.try(:at_user).try(:at_user_stock_accounts).try(:pluck, :id)
 
     number_of_account =  0
     if at_user_bank_account_ids.present?
@@ -446,6 +451,10 @@ class ApplicationController < ActionController::Base
 
     if at_user_emoney_service_account_ids.present?
       number_of_account += at_user_emoney_service_account_ids.count
+    end
+
+    if at_user_stock_account_ids.present?
+      number_of_account += at_user_stock_account_ids.count
     end
 
     @current_user.free? && number_of_account < Settings.at_user_limit_free_account

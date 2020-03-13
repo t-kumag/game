@@ -92,7 +92,12 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def at_url
-    finance = Services::FinanceService.new(@current_user).find_finance(:fnc_id, params[:fnc_id]) if params.has_key?(:fnc_id)
+
+    if params.has_key?(:fnc_id)
+      finance = Services::FinanceService.new(@current_user).find_finance(:fnc_id, params[:fnc_id])
+      render_disallowed_to_update_account_ids && return unless finance.present?
+    end
+
     skip_account_limit = check_finance_error(finance)
 
     # 無料ユーザーの口座数が上限に達していた場合はエラーを返し口座数を制限する

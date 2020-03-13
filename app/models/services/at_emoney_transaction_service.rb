@@ -26,6 +26,7 @@ class Services::AtEmoneyTransactionService
       used_date: distributed[:user_distributed_transaction].at_user_emoney_transaction.used_date,
       used_location: distributed[:user_distributed_transaction].used_location,
       memo: distributed[:user_distributed_transaction].memo,
+      type: distributed[:user_distributed_transaction].type,
       user_id: distributed[:user_distributed_transaction].user_id,
       is_account_shared: distributed[:is_account_shared],
       is_shared: distributed[:user_distributed_transaction].at_user_emoney_transaction.at_user_emoney_service_account.share || distributed[:user_distributed_transaction].share,
@@ -139,6 +140,13 @@ class Services::AtEmoneyTransactionService
     #                                  .page(page)
     # end
     # distributed_transactions
+  end
+
+  def get_group_account()
+    Entities::AtUserEmoneyServiceAccount
+        .where(group_id: @user.group_id)
+        .where(at_user_id: [@user.try(:at_user).try(:id), @user.partner_user.try(:at_user).try(:id)])
+        .where(share: true)
   end
 
 end

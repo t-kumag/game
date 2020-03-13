@@ -51,13 +51,12 @@ class Api::V1::User::BankAccountsController < ApplicationController
     end
 
     if @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id).include?(account_id)
-      require_group && return if params[:share] == true
       account = Entities::AtUserBankAccount.find account_id
       account.update!(get_account_params(account))
       if account.share
         options = create_activity_options("family")
         Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family, options)
-        Services::ActivityService.create_activity(account.at_user.user.partner_user.id, account.group_id,  DateTime.now, :person_account_to_family_partner, options)
+        Services::ActivityService.create_activity(account.at_user.user.partner_user.try(:id), account.group_id,  DateTime.now, :person_account_to_family_partner, options)
       end
 
       render json: {}, status: 200
@@ -79,7 +78,7 @@ class Api::V1::User::BankAccountsController < ApplicationController
   def destroy
     account_id = params[:id].to_i
 
-    render_disallowed_account_ids && return if disallowed_at_bank_account_ids?([account_id])
+    render_disallowed_to_delete_account_ids && return if disallowed_at_bank_account_ids?([account_id])
     render_disallowed_financier_ids && return if disallowed_at_bank_ids?([account_id])
 
     if @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id).include?(account_id)

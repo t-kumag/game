@@ -22,7 +22,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       Entities::UserManuallyCreatedTransaction.new.transaction do
         user_manually_created_transaction = create_user_manually_created
         if params[:share] === true
-          require_group && return
           options = {group_id: @current_user.group_id, share: params[:share], transaction: nil}
         else
           options = {transaction: nil}
@@ -55,7 +54,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         update_user_manually_created(user_manually_created_transaction)
 
         if params[:share] === true
-          require_group && return
           options = {group_id: @current_user.group_id, share: params[:share]}
         else
           options = {}
@@ -102,7 +100,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       # シェアしていない明細は、422を返す
       transacticon = nil unless transacticon.try(:user_distributed_transaction).try(:share)
     end
-    
+
     transacticon
   end
 
@@ -196,7 +194,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       options.delete(:share)
       options[:user_manually_created_transaction][:account] ||= "family"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)
-      Services::ActivityService.create_activity(current_user.partner_user.id, current_user.group_id, used_date, :individual_manual_outcome_fam, options)
+      Services::ActivityService.create_activity(current_user.partner_user.try(:id), current_user.group_id, used_date, :individual_manual_outcome_fam, options)
     else
       options[:user_manually_created_transaction][:account] ||= "person"
       Services::ActivityService.create_activity(current_user.id, current_user.group_id, used_date, :individual_manual_outcome, options)

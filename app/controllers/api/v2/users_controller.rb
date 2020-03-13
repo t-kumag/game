@@ -36,18 +36,77 @@ class Api::V2::UsersController < ApplicationController
   end
 
   def transaction_shared?(with_group=false)
-    user_ids = [@current_user.id]
-    return Entities::UserDistributedTransaction.where(user_id: user_ids, share: true).present? unless with_group
-    
-    user_ids.push(@current_user.partner_user.id) if @current_user.partner_user.present?
-    Entities::UserDistributedTransaction.where(user_id: user_ids, share: true).present?
+    account_ids = {}
+    result = false
+
+    # 金融口座ID取得 手動明細の共有チェック
+    if with_group === false
+      account_ids = Services::FinanceService.new(@current_user).all_account_ids
+      result = Entities::UserDistributedTransaction.
+        joins(:user_manually_created_transaction).
+        where(user_id: @current_user.id, share: true).
+        present?
+    elsif with_group === true
+      account_ids = Services::FinanceService.new(@current_user).all_account_ids(true)
+      user_ids = [@current_user.id]
+      user_ids << @current_user.partner_user.id if @current_user.partner_user.present?
+      result = Entities::UserDistributedTransaction.
+        joins(:user_manually_created_transaction).
+        where(user_id: user_ids, share: true).
+        present?
+    end
+    return true if result === true
+
+    # 削除されていない口座の明細かチェックする
+    account_ids.each do |type, ids|
+      next if ids.blank?
+      case type
+      when :bank
+        result = Entities::UserDistributedTransaction.
+          joins(:at_user_bank_transaction).
+          where("at_user_bank_transactions.at_user_bank_account_id" => ids).
+            where(share: true).
+            present?
+      when :card
+        result = Entities::UserDistributedTransaction.
+            joins(:at_user_card_transaction).
+            where("at_user_card_transactions.at_user_card_account_id" => ids).
+            where(share: true).
+            present?
+      when :emoney
+        result = Entities::UserDistributedTransaction.
+            joins(:at_user_emoney_transaction).
+            where("at_user_emoney_transactions.at_user_emoney_service_account_id" => ids).
+            where(share: true).
+            present?
+      when :wallet
+        result = Entities::UserDistributedTransaction.
+            joins(:user_manually_created_transaction).
+            where(
+              "user_manually_created_transactions.payment_method_type" => "wallet",
+              "user_manually_created_transactions.payment_method_id" => ids).
+            where(share: true).
+            present?
+      end
+      break if result === true
+    end
+    result
   end
 
   def finance_shared?(with_group=false)
     shared_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:where, share:true).try(:pluck ,:id)
     shared_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:where, share:true).try(:pluck ,:id)
     shared_emoney_account_ids = @current_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:pluck ,:id)
-    return shared_bank_account_ids.present? || shared_card_account_ids.present? || shared_emoney_account_ids.present? unless with_group
+    shared_stock_account_ids = @current_user.try(:at_user).try(:at_user_stock_accounts).try(:where, share:true).try(:pluck ,:id)
+    shared_wallet_ids = @current_user.try(:wallets).try(:where, share:true).try(:pluck ,:id)
+
+    unless with_group
+      return shared_bank_account_ids.present? ||
+        shared_card_account_ids.present? ||
+        shared_emoney_account_ids.present? ||
+        shared_stock_account_ids.present? ||
+        shared_wallet_ids.present?
+    end
 
     if @current_user.partner_user.present?
       if shared_bank_account_ids.present? 
@@ -68,11 +127,29 @@ class Api::V2::UsersController < ApplicationController
         shared_emoney_account_ids = @current_user.partner_user.try(:at_user).try(:at_user_emoney_service_accounts).try(:where, share:true).try(:pluck ,:id)
       end
 
+      if shared_stock_account_ids.present?
+        shared_stock_account_ids << @current_user.partner_user.try(:at_user).try(:at_user_stock_accounts).try(:where, share:true).try(:pluck ,:id)
+      else
+        shared_stock_account_ids = @current_user.partner_user.try(:at_user).try(:at_user_stock_accounts).try(:where, share:true).try(:pluck ,:id)
+      end
+
+      if shared_wallet_ids.present?
+        shared_wallet_ids << @current_user.partner_user.try(:wallets).try(:where, share:true).try(:pluck ,:id)
+      else
+        shared_wallet_ids = @current_user.partner_user.try(:wallets).try(:where, share:true).try(:pluck ,:id)
+      end
+
       shared_bank_account_ids.try(:flatten!)
       shared_card_account_ids.try(:flatten!)
       shared_emoney_account_ids.try(:flatten!)
+      shared_stock_account_ids.try(:flatten!)
+      shared_wallet_ids.try(:flatten!)
     end
         
-    shared_bank_account_ids.present? || shared_card_account_ids.present? || shared_emoney_account_ids.present? 
+    shared_bank_account_ids.present? ||
+      shared_card_account_ids.present? ||
+      shared_emoney_account_ids.present? ||
+      shared_stock_account_ids.present? ||
+      shared_wallet_ids.present?
   end
 end
