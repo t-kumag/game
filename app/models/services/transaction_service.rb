@@ -193,4 +193,21 @@ class Services::TransactionService
     return nil unless ut.try(:payment_method_type)
     ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
+
+  def self.expense_list(taransaction, total_tran_count)
+    expense = {}
+
+    expense[:transaction] = taransaction.dup
+    expense[:count] = 0
+    expense[:total] = 0
+    expense[:percent] = nil
+
+    taransaction.each_with_index do |tr, i|
+      expense[:count] = i + 1
+      expense[:total] += tr[:amount]
+    end
+    expense
+
+    #expense[:percent] = (expense[:total].to_f(3) / total_tran_count.to_f(3) * 100).ceil(1)
+  end
 end
