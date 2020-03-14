@@ -194,19 +194,17 @@ class Services::TransactionService
     ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
 
-  def fetch_expense_all(transactions)
-    transaction_lists = set_transactions_list
+  def fetch_expense_all(transactions, response)
     transactions.each do |t|
       if t[:is_account_shared] && t[:is_shared]
-        transaction_lists[:family] << t
+        response[:family] << t
       elsif t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == @user.id
-        transaction_lists[:owner] << t
+        response[:owner] << t
       else
-        transaction_lists[:partner] << t
+        response[:partner] << t
       end
     end
-
-    transaction_lists
+    response
   end
 
   def fetch_expense(taransactions, total_tran_count)
@@ -232,11 +230,4 @@ class Services::TransactionService
     (count.to_f / total_tran_count.to_f * 100).ceil(1)
   end
 
-  def set_transactions_list
-    transaction_list = {}
-    transaction_list[:family] = []
-    transaction_list[:owner] = []
-    transaction_list[:partner] = []
-    transaction_list
-  end
 end

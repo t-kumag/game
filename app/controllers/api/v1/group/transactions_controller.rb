@@ -59,10 +59,10 @@ class Api::V1::Group::TransactionsController < ApplicationController
 
   def expense_transactions
     @response = set_response
-    response = []
+    transactions = []
 
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
-    response += Services::TransactionService.new(
+    transactions += Services::TransactionService.new(
         @current_user,
         nil,                 # category_id
         true,                # share
@@ -73,7 +73,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
     ).list
 
 
-    response += Services::TransactionService.new(
+    transactions += Services::TransactionService.new(
         @current_user.partner_user,
         nil,                 # category_id
         true,                # share
@@ -92,12 +92,13 @@ class Api::V1::Group::TransactionsController < ApplicationController
         nil,                 # from
         nil                  # to
     )
+    binding.pry
 
-    transaction = tr_service.fetch_expense_all(response)
+    transaction = tr_service.fetch_expense_all(transactions, @response)
 
-    @response[:family] = tr_service.fetch_expense(transaction[:family], response.count)
-    @response[:owner] = tr_service.fetch_expense(transaction[:owner], response.count)
-    @response[:partner] = tr_service.fetch_expense(transaction[:partner], response.count)
+    @response[:family] = tr_service.fetch_expense(transaction[:family], transactions.count)
+    @response[:owner] = tr_service.fetch_expense(transaction[:owner], transactions.count)
+    @response[:partner] = tr_service.fetch_expense(transaction[:partner], transactions.count)
 
     # TODO: マージした明細の時系列での並べ替え
     render 'expense_list', formats: 'json', handlers: 'jbuilder'
@@ -106,9 +107,10 @@ class Api::V1::Group::TransactionsController < ApplicationController
 
   private
   def set_response
-    @response = {}
-    @response[:family] = {}
-    @response[:owner] = {}
-    @response[:partner] = {}
+    response = {}
+    response[:family] = {}
+    response[:owner] = {}
+    response[:partner] = {}
+    response
   end
 end
