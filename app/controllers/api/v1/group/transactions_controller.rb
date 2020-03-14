@@ -92,7 +92,6 @@ class Api::V1::Group::TransactionsController < ApplicationController
         nil,                 # from
         nil                  # to
     )
-    binding.pry
 
     transaction = tr_service.fetch_expense_all(transactions, @response)
 
