@@ -194,20 +194,64 @@ class Services::TransactionService
     ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
 
-  def self.expense_list(taransaction, total_tran_count)
-    expense = {}
+  def fetch_family(transactions)
 
-    expense[:transaction] = taransaction.dup
-    expense[:count] = 0
-    expense[:total] = 0
-    expense[:percent] = nil
-
-    taransaction.each_with_index do |tr, i|
-      expense[:count] = i + 1
-      expense[:total] += tr[:amount]
+    transactions.reject do |t|
+      if t[:is_account_shared] && t[:is_shared]
+        # シェアしている口座の明細 or シェアしている明細は削除しない
+        false
+      else
+        # シェアしていない口座の明細 or シェアしていない明細は削除する
+        true
+      end
     end
-    expense
+  end
 
-    #expense[:percent] = (expense[:total].to_f(3) / total_tran_count.to_f(3) * 100).ceil(1)
+  def fetch_owner(transactions)
+
+    transactions.reject do |t|
+      if t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == @user.id
+        # シェアしている口座の明細 or シェアしている明細は削除しない
+        false
+      else
+        # シェアしていない口座の明細 or シェアしていない明細は削除する
+        true
+      end
+    end
+  end
+
+  def fetch_partner(transactions)
+
+    transactions.reject do |t|
+      if t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == @user.partner_user.id
+        # シェアしている口座の明細 or シェアしている明細は削除しない
+        false
+      else
+        # シェアしていない口座の明細 or シェアしていない明細は削除する
+        true
+      end
+    end
+  end
+
+  def fetch_expense(taransactions, total_tran_count)
+
+    expense = {}
+    expense[:transaction] = taransactions.dup
+    expense[:count] = 0
+    expense[:total_amount] = 0
+    expense[:percent] = 0.0
+
+    taransactions.each_with_index do |tr, i|
+      expense[:count] = i + 1
+      expense[:total_amount] += tr[:amount]
+    end
+
+    expense[:percent] = calculate_percent(expense[:count], total_tran_count)
+    expense
+  end
+
+  def calculate_percent(count, total_tran_count)
+    return 0.0 if count.to_i.zero?
+    (count.to_f / total_tran_count.to_f * 100).ceil(1)
   end
 end

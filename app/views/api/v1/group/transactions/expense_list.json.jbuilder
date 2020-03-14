@@ -1,9 +1,12 @@
 #json.error  'sample'
 
 json.errors []
-json.app do
-  json.owner_expense do
-    json.array!(@response[:owner]) do |r|
+json.owner_expense do
+  json.count @response[:owner][:count]
+  json.percent @response[:owner][:percent]
+  json.total_amount @response[:owner][:total_amount]
+  json.transaction do
+    json.array!(@response[:owner][:transaction]) do |r|
       json.at_user_bank_account_id           r[:at_user_bank_account_id] if r[:at_user_bank_account_id].present?
       json.at_user_card_account_id           r[:at_user_card_account_id] if r[:at_user_card_account_id].present?
       json.at_user_emoney_service_account_id r[:at_user_emoney_service_account_id] if r[:at_user_emoney_service_account_id].present?
@@ -22,9 +25,14 @@ json.app do
       json.is_ignored r[:is_ignored]
     end
   end
+end
 
-  json.partner_expense do
-    json.array!(@response[:partner]) do |r|
+json.partner_expense do
+  json.count @response[:partner][:count]
+  json.percent @response[:partner][:percent]
+  json.total_amount @response[:partner][:total_amount]
+  json.transaction do
+    json.array!(@response[:partner][:transaction]) do |r|
       json.at_user_bank_account_id           r[:at_user_bank_account_id] if r[:at_user_bank_account_id].present?
       json.at_user_card_account_id           r[:at_user_card_account_id] if r[:at_user_card_account_id].present?
       json.at_user_emoney_service_account_id r[:at_user_emoney_service_account_id] if r[:at_user_emoney_service_account_id].present?
@@ -43,9 +51,14 @@ json.app do
       json.is_ignored r[:is_ignored]
     end
   end
+end
 
-  json.family_expense do
-    json.array!(@response[:family]) do |r|
+json.family_expense do
+  json.count @response[:family][:count]
+  json.percent @response[:family][:percent]
+  json.total_amount @response[:family][:total_amount]
+  json.transaction do
+    json.array!(@response[:family][:transaction]) do |r|
       json.at_user_bank_account_id           r[:at_user_bank_account_id] if r[:at_user_bank_account_id].present?
       json.at_user_card_account_id           r[:at_user_card_account_id] if r[:at_user_card_account_id].present?
       json.at_user_emoney_service_account_id r[:at_user_emoney_service_account_id] if r[:at_user_emoney_service_account_id].present?
