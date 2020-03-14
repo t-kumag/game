@@ -93,13 +93,11 @@ class Api::V1::Group::TransactionsController < ApplicationController
         nil                  # to
     )
 
-    family_transaction = tr_service.fetch_family(response)
-    owner_transaction = tr_service .fetch_owner(response)
-    partner_transaction = tr_service.fetch_partner(response)
+    transaction = tr_service.fetch_expense_all(response)
 
-    @response[:family] = tr_service.fetch_expense(family_transaction, response.count)
-    @response[:owner] = tr_service.fetch_expense(owner_transaction, response.count)
-    @response[:partner] = tr_service.fetch_expense(partner_transaction, response.count)
+    @response[:family] = tr_service.fetch_expense(transaction[:family], response.count)
+    @response[:owner] = tr_service.fetch_expense(transaction[:owner], response.count)
+    @response[:partner] = tr_service.fetch_expense(transaction[:partner], response.count)
 
     # TODO: マージした明細の時系列での並べ替え
     render 'expense_list', formats: 'json', handlers: 'jbuilder'

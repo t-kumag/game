@@ -194,43 +194,19 @@ class Services::TransactionService
     ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
 
-  def fetch_family(transactions)
-
-    transactions.reject do |t|
+  def fetch_expense_all(transactions)
+    transaction_lists = set_transactions_list
+    transactions.each do |t|
       if t[:is_account_shared] && t[:is_shared]
-        # シェアしている口座の明細 or シェアしている明細は削除しない
-        false
+        transaction_lists[:family] << t
+      elsif t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == @user.id
+        transaction_lists[:owner] << t
       else
-        # シェアしていない口座の明細 or シェアしていない明細は削除する
-        true
+        transaction_lists[:partner] << t
       end
     end
-  end
 
-  def fetch_owner(transactions)
-
-    transactions.reject do |t|
-      if t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == @user.id
-        # シェアしている口座の明細 or シェアしている明細は削除しない
-        false
-      else
-        # シェアしていない口座の明細 or シェアしていない明細は削除する
-        true
-      end
-    end
-  end
-
-  def fetch_partner(transactions)
-
-    transactions.reject do |t|
-      if t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == @user.partner_user.id
-        # シェアしている口座の明細 or シェアしている明細は削除しない
-        false
-      else
-        # シェアしていない口座の明細 or シェアしていない明細は削除する
-        true
-      end
-    end
+    transaction_lists
   end
 
   def fetch_expense(taransactions, total_tran_count)
@@ -250,8 +226,17 @@ class Services::TransactionService
     expense
   end
 
+  private
   def calculate_percent(count, total_tran_count)
     return 0.0 if count.to_i.zero?
     (count.to_f / total_tran_count.to_f * 100).ceil(1)
+  end
+
+  def set_transactions_list
+    transaction_list = {}
+    transaction_list[:family] = []
+    transaction_list[:owner] = []
+    transaction_list[:partner] = []
+    transaction_list
   end
 end
