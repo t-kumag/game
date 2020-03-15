@@ -45,6 +45,8 @@ class Services::AtUserService::Sync
               account[k] = i[v[:col]]
             elsif v[:opt] == 'time_parse'
               account[k] = Time.parse(i[v[:col]])
+            elsif v[:opt] == 'empty_0'
+              account[k] = i[v[:col]].empty ? 0 : i[v[:col]]
             end
           end
 
@@ -331,7 +333,7 @@ class Services::AtUserService::Sync
           memo: { col: 'MEMO' },
           balance: { col: 'BALANCE' },
           profit_loss_amount: { col: 'PROFIT_LOSS_AMOUNT' },
-          deposit_balance: { col: 'DEPOSIT_BALANCE' },
+          deposit_balance: { col: 'DEPOSIT_BALANCE', opt: 'empty_0' },
           use_yn: { col: 'USE_YN' },
           cert_type: { col: 'CERT_TYPE' },
           scrap_dtm: { col: 'SCRAP_DTM', opt: 'time_parse' },
