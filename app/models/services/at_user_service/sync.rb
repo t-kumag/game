@@ -46,7 +46,7 @@ class Services::AtUserService::Sync
             elsif v[:opt] == 'time_parse'
               account[k] = Time.parse(i[v[:col]])
             elsif v[:opt] == 'empty_0'
-              account[k] = i[v[:col]].empty ? 0 : i[v[:col]]
+              account[k] = nil == i[v[:col]] ? 0 : i[v[:col]]
             end
           end
 
