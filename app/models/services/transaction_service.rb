@@ -220,8 +220,12 @@ class Services::TransactionService
   end
 
   def fetch_pair_diff_total_amount(response)
-    response[:owner][:total_amount] + response[:partner][:total_amount]
+    total_amount = response[:owner][:total_amount] + response[:partner][:total_amount]
+    diff_amount = response[:owner][:total_amount].abs - response[:partner][:total_amount].abs
+    return +diff_amount if total_amount >= 0
+    -diff_amount
   end
+
   def fetch_pair_total_amount(response)
     response[:family][:total_amount] + response[:owner][:total_amount] + response[:partner][:total_amount]
   end
