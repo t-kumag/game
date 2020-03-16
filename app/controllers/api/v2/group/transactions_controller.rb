@@ -56,7 +56,6 @@ class Api::V2::Group::TransactionsController < ApplicationController
     response[:family] = []
     response[:owner] = []
     response[:partner] = []
-    response[:diff_total] = nil
     response
   end
 
