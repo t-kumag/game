@@ -194,7 +194,19 @@ class Services::TransactionService
     ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
 
-  def fetch_expense_all(transactions, response)
+  def fetch_tran_type(transactions, type)
+    trans = fetch_summary_all_type(transactions, type)
+
+    if type == "family"
+      return trans[:family]
+    elsif type == "owner"
+      return trans[:owner]
+    else
+      return trans[:partner]
+    end
+  end
+
+  def fetch_summary_all_type(transactions, response)
     transactions.each do |t|
       if t[:is_account_shared] && t[:is_shared]
         response[:family] << t
@@ -207,10 +219,16 @@ class Services::TransactionService
     response
   end
 
+  def fetch_pair_diff_total_amount(response)
+    response[:owner][:total_amount] + response[:partner][:total_amount]
+  end
+  def fetch_pair_total_amount(response)
+    response[:family][:total_amount] + response[:owner][:total_amount] + response[:partner][:total_amount]
+  end
+
   def fetch_expense(taransactions, total_tran_count)
 
     expense = {}
-    expense[:transaction] = taransactions.dup
     expense[:count] = 0
     expense[:total_amount] = 0
     expense[:percent] = 0.0

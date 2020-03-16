@@ -98,7 +98,6 @@ Rails.application.routes.draw do
         get 'pl-grouped-categories', :to => 'pl#grouped_categories'
         get 'transactions', :to => 'transactions#index'
         get 'grouped-transactions', :to => 'transactions#grouped_transactions'
-        get 'expense-transactions', :to => 'transactions#expense_transactions'
 
         get 'goal-graph/:id', :to => 'goals#graph'
 
@@ -197,6 +196,8 @@ Rails.application.routes.draw do
         resources :stock_accounts, path: '/stock-accounts' do
           resources :asset_products, path: '/asset-products', on: :member, only: [:index]
         end
+
+        get 'summary-transactions', :to => 'transactions#summary_transactions'
       end
 
       resources :payment_methods, path: '/payment_methods', only: [:index]

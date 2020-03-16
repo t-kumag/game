@@ -25,6 +25,19 @@ class Api::V1::Group::TransactionsController < ApplicationController
         params[:to]
     ).list if @current_user.partner_user.present?
 
+    if params.has_key?(:type)
+      tr_service = Services::TransactionService.new(
+          @current_user,
+          nil,                 # category_id
+          true,                # share
+          nil,                 # scope
+          true,                # with_group
+          nil,                 # from
+          nil                  # to
+      )
+      @response = tr_service.fetch_tran_type(@response, set_response)
+    end
+
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
@@ -57,59 +70,12 @@ class Api::V1::Group::TransactionsController < ApplicationController
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
-  def expense_transactions
-    @response = set_response
-    transactions = []
-
-    # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
-    transactions += Services::TransactionService.new(
-        @current_user,
-        nil,                 # category_id
-        true,                # share
-        nil,                 # scope
-        true,                # with_group
-        params[:from],
-        params[:to]
-    ).list
-
-
-    transactions += Services::TransactionService.new(
-        @current_user.partner_user,
-        nil,                 # category_id
-        true,                # share
-        nil,                 # scope
-        true,                # with_group
-        params[:from],
-        params[:to]
-    ).list if @current_user.partner_user.present?
-
-    tr_service = Services::TransactionService.new(
-        @current_user,
-        nil,                 # category_id
-        true,                # share
-        nil,                 # scope
-        true,                # with_group
-        nil,                 # from
-        nil                  # to
-    )
-
-    transaction = tr_service.fetch_expense_all(transactions, @response)
-
-    @response[:family] = tr_service.fetch_expense(transaction[:family], transactions.count)
-    @response[:owner] = tr_service.fetch_expense(transaction[:owner], transactions.count)
-    @response[:partner] = tr_service.fetch_expense(transaction[:partner], transactions.count)
-
-    # TODO: マージした明細の時系列での並べ替え
-    render 'expense_list', formats: 'json', handlers: 'jbuilder'
-
-  end
-
   private
   def set_response
     response = {}
-    response[:family] = {}
-    response[:owner] = {}
-    response[:partner] = {}
+    response[:family] = []
+    response[:owner] = []
+    response[:partner] = []
     response
   end
 end
