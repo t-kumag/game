@@ -331,7 +331,7 @@ class Services::AtUserService::Sync
           brn_nm: { col: 'BRN_NM' },
           sv_type: { col: 'SV_TYPE' },
           memo: { col: 'MEMO' },
-          balance: { col: 'BALANCE' },
+          balance: { col: 'BALANCE', opt: 'default_0' },
           profit_loss_amount: { col: 'PROFIT_LOSS_AMOUNT' },
           deposit_balance: { col: 'DEPOSIT_BALANCE', opt: 'default_0' },
           use_yn: { col: 'USE_YN' },
