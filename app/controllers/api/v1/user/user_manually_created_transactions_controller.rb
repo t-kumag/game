@@ -213,7 +213,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   def disallowed_financier_id?
     case params[:payment_method_type]
     when "wallet" then
-      return disallowed_wallet_ids?([params[:payment_method_id]])
+      return disallowed_wallet_ids?([params[:payment_method_id]], true)
     end
   end
 
