@@ -332,7 +332,7 @@ class Services::AtUserService::Sync
           sv_type: { col: 'SV_TYPE' },
           memo: { col: 'MEMO' },
           balance: { col: 'BALANCE', opt: 'default_0' },
-          profit_loss_amount: { col: 'PROFIT_LOSS_AMOUNT' },
+          profit_loss_amount: { col: 'PROFIT_LOSS_AMOUNT', opt: 'default_0' },
           deposit_balance: { col: 'DEPOSIT_BALANCE', opt: 'default_0' },
           use_yn: { col: 'USE_YN' },
           cert_type: { col: 'CERT_TYPE' },
