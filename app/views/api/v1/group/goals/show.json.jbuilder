@@ -34,7 +34,6 @@ json.app do
       json.goal_setting_id r.id
       json.user_id r.user_id
       json.at_user_bank_account_id r.at_user_bank_account_id
-      json.wallet_id r.wallet_id
       json.monthly_amount r.monthly_amount
       json.first_amount r.first_amount
     end
