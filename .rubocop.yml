@@ -54,3 +54,9 @@ RedundantReturn:
 
 DotPosition:
   EnforcedStyle: trailing
+
+Style/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Layout/SpaceAfterColon:
+  Enabled: false
