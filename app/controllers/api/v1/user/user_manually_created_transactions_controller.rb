@@ -149,7 +149,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     used_date = save_param[:used_date].present? ? save_param[:used_date] : transaction[:used_date]
     title = save_param[:title].present? ? save_param[:title] : transaction[:title]
     amount = save_param[:amount].present? ? save_param[:amount] : transaction[:amount]
-    used_location = save_param[:used_location].nil? ? transaction[:used_location] : save_param[:used_location]
+    used_location = save_param[:used_location].present? ? save_param[:used_location] : transaction[:used_location]
     memo = save_param[:memo].present? ? save_param[:memo] : transaction[:memo]
 
     {
