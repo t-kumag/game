@@ -194,11 +194,11 @@ class Services::TransactionService
     ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
 
-  def fetch_tran_type(transactions, type)
-    trans = fetch_summary_distributed_type(transactions, type)
-    if type == "family"
+  def fetch_tran_type(transactions, distributed_type, response)
+    trans = fetch_summary_distributed_type(transactions, response)
+    if distributed_type == "family"
       return trans[:family]
-    elsif type == "owner"
+    elsif distributed_type == "owner"
       return trans[:owner]
     else
       return trans[:partner]

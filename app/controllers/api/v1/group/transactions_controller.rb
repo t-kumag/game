@@ -39,7 +39,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
           nil,                 # from
           nil                  # to
       )
-      @response = tr_service.fetch_tran_type(@response, set_response)
+      @response = tr_service.fetch_tran_type(@response, params[:distributed_type], set_response)
     end
 
     # TODO: マージした明細の時系列での並べ替え
