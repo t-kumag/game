@@ -233,6 +233,7 @@ class Services::TransactionService
 
     expense = {}
     expense[:amount] = 0
+    expense[:count] = 0
 
     taransactions.each_with_index do |tr, i|
       expense[:count] = i + 1

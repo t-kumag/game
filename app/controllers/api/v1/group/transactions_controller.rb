@@ -3,7 +3,11 @@ class Api::V1::Group::TransactionsController < ApplicationController
 
   def index
     @response = []
-   
+
+    if disallowed_transaction_ids_date?(params[:from])
+      render_disallowed_transaction_ids_date && return
+    end
+
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
     @response += Services::TransactionService.new(
         @current_user,

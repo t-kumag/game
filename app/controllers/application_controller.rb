@@ -406,6 +406,12 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  def disallowed_transaction_ids_date?(date)
+    return false unless date.present?
+    return false if date >= Time.new.prev_month(3).strftime("%Y-%m-01")
+    true
+  end
+
   def require_group
     render json: { errors: [ERROR_TYPE::NUMBER['006001']] }, status: 422 unless @current_user.group_id.present?
   end
@@ -432,6 +438,10 @@ class ApplicationController < ActionController::Base
 
   def render_disallowed_goal_setting_ids
     render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422
+  end
+
+  def render_disallowed_transaction_ids_date
+    render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
   end
 
   def limit_of_registered_finance?

@@ -2,6 +2,11 @@ class Api::V2::Group::TransactionsController < ApplicationController
   before_action :authenticate
 
   def summary_transactions
+
+    if disallowed_transaction_ids_date?(params[:from])
+      render_disallowed_transaction_ids_date && return
+    end
+
     @response = set_response
     transactions = []
 
