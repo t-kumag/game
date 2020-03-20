@@ -219,30 +219,30 @@ class Services::TransactionService
     response
   end
 
-  def fetch_pair_diff_total_amount(response)
-    total_amount = response[:owner][:total_amount] + response[:partner][:total_amount]
-    diff_amount = response[:owner][:total_amount].abs - response[:partner][:total_amount].abs
+  def fetch_owner_partner_diff_amount(response)
+    total_amount = response[:owner][:amount] + response[:partner][:amount]
+    diff_amount = response[:owner][:amount].abs - response[:partner][:amount].abs
     return +diff_amount if total_amount >= 0
     -diff_amount
   end
 
-  def fetch_pair_total_amount(response)
-    response[:family][:total_amount] + response[:owner][:total_amount] + response[:partner][:total_amount]
+  def fetch_total_amount(response)
+    response[:family][:amount] + response[:owner][:amount] + response[:partner][:amount]
   end
 
-  def fetch_expense(taransactions, total_tran_count)
+  def fetch_detail(taransactions, total_tran_count)
 
     expense = {}
     expense[:count] = 0
-    expense[:total_amount] = 0
-    expense[:percent] = 0.0
+    expense[:amount] = 0
+    expense[:rate] = 0.0
 
     taransactions.each_with_index do |tr, i|
       expense[:count] = i + 1
-      expense[:total_amount] += tr[:amount]
+      expense[:amount] += tr[:amount]
     end
 
-    expense[:percent] = calculate_percent(expense[:count], total_tran_count)
+    expense[:rate] = calculate_percent(expense[:count], total_tran_count)
     expense
   end
 
