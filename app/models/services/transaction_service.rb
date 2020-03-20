@@ -195,8 +195,7 @@ class Services::TransactionService
   end
 
   def fetch_tran_type(transactions, type)
-    trans = fetch_summary_all_type(transactions, type)
-
+    trans = fetch_summary_distributed_type(transactions, type)
     if type == "family"
       return trans[:family]
     elsif type == "owner"
@@ -206,7 +205,7 @@ class Services::TransactionService
     end
   end
 
-  def fetch_summary_all_type(transactions, response)
+  def fetch_summary_distributed_type(transactions, response)
     transactions.each do |t|
       if t[:is_account_shared] && t[:is_shared]
         response[:family] << t
@@ -233,9 +232,7 @@ class Services::TransactionService
   def fetch_detail(taransactions, total_tran_count)
 
     expense = {}
-    expense[:count] = 0
     expense[:amount] = 0
-    expense[:rate] = 0.0
 
     taransactions.each_with_index do |tr, i|
       expense[:count] = i + 1

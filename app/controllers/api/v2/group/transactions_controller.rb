@@ -37,7 +37,7 @@ class Api::V2::Group::TransactionsController < ApplicationController
         nil                  # to
     )
 
-    transaction = tr_service.fetch_summary_all_type(transactions, @response)
+    transaction = tr_service.fetch_summary_distributed_type(transactions, @response)
 
     @response[:family] = tr_service.fetch_detail(transaction[:family], transactions.count)
     @response[:owner] = tr_service.fetch_detail(transaction[:owner], transactions.count)

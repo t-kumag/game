@@ -25,7 +25,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
         params[:to]
     ).list if @current_user.partner_user.present?
 
-    if params.has_key?(:type)
+    if params.has_key?(:distributed_type)
       tr_service = Services::TransactionService.new(
           @current_user,
           nil,                 # category_id
