@@ -221,7 +221,7 @@ class Services::TransactionService
   def fetch_owner_partner_diff_amount(response)
     total_amount = response[:owner][:amount] + response[:partner][:amount]
     diff_amount = response[:owner][:amount].abs - response[:partner][:amount].abs
-    return +diff_amount if total_amount >= 0
+    return diff_amount.abs if total_amount >= 0
     -diff_amount
   end
 
@@ -247,7 +247,7 @@ class Services::TransactionService
   private
   def calculate_percent(count, total_tran_count)
     return 0.0 if count.to_i.zero?
-    (count.to_f / total_tran_count.to_f * 100).ceil(1)
+    (count.to_f / total_tran_count.to_f * 100).round(1)
   end
 
 end
