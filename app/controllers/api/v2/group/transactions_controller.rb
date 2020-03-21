@@ -3,7 +3,7 @@ class Api::V2::Group::TransactionsController < ApplicationController
 
   def summary_transactions
 
-    if disallowed_transaction_ids_date?(params[:from])
+    if disallowed_transactions_date?(params[:from])
       render_disallowed_transactions_date && return
     end
 

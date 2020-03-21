@@ -406,7 +406,7 @@ class ApplicationController < ActionController::Base
     false
   end
 
-  def disallowed_transaction_ids_date?(date)
+  def disallowed_transactions_date?(date)
     return false unless date.present?
     return false if date >= Time.new.prev_month(3).strftime("%Y-%m-01")
     true
