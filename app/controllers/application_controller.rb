@@ -440,7 +440,7 @@ class ApplicationController < ActionController::Base
     render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422
   end
 
-  def render_disallowed_transaction_ids_date
+  def render_disallowed_transactions_date
     render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
   end
 
