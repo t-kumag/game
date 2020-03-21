@@ -219,10 +219,8 @@ class Services::TransactionService
   end
 
   def fetch_owner_partner_diff_amount(response)
-    total_amount = response[:owner][:amount] + response[:partner][:amount]
     diff_amount = response[:owner][:amount].abs - response[:partner][:amount].abs
-    return diff_amount.abs if total_amount >= 0
-    -diff_amount
+    diff_amount.abs
   end
 
   def fetch_total_amount(response)
