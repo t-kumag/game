@@ -104,6 +104,7 @@ class Api::V1::UsersController < ApplicationController
 
     # 無料ユーザーの口座数が上限に達していた場合はエラーを返し口座数を制限する
     # AT口座のエラー解消の場合は口座数の制限はスキップする
+    # ログイン情報編集の場合はスキップする
     if limit_of_registered_finance? == false && skip_account_limit == false && modify_account == false
         return render json: { errors: [ERROR_TYPE::NUMBER['007002']] }, status: 422
     end
