@@ -30,16 +30,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
     ).list if @current_user.partner_user.present?
 
     if params.has_key?(:distributed_type)
-      tr_service = Services::TransactionService.new(
-          @current_user,
-          nil,                 # category_id
-          true,                # share
-          nil,                 # scope
-          true,                # with_group
-          nil,                 # from
-          nil                  # to
-      )
-      @response = tr_service.fetch_tran_type(@response, params[:distributed_type], set_response)
+      @response = Services::TransactionService.fetch_tran_type(@response, params[:distributed_type])
     end
 
     # TODO: マージした明細の時系列での並べ替え
@@ -74,12 +65,4 @@ class Api::V1::Group::TransactionsController < ApplicationController
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
 
-  private
-  def set_response
-    response = {}
-    response[:family] = []
-    response[:owner] = []
-    response[:partner] = []
-    response
-  end
 end

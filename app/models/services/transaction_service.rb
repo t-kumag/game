@@ -194,8 +194,8 @@ class Services::TransactionService
     ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
 
-  def fetch_tran_type(transactions, distributed_type, response)
-    trans = fetch_summary_distributed_type(transactions, response)
+  def self.fetch_tran_type(transactions, distributed_type)
+    trans = fetch_summary_distributed_type(transactions, set_response)
     if distributed_type == "family"
       return trans[:family]
     elsif distributed_type == "owner"
@@ -205,11 +205,12 @@ class Services::TransactionService
     end
   end
 
-  def fetch_summary_distributed_type(transactions, response)
+  def self.fetch_summary_distributed_type(transactions, user)
+    response = set_response
     transactions.each do |t|
       if t[:is_account_shared] && t[:is_shared]
         response[:family] << t
-      elsif t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == @user.id
+      elsif t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == user.id
         response[:owner] << t
       else
         response[:partner] << t
@@ -218,34 +219,42 @@ class Services::TransactionService
     response
   end
 
-  def fetch_owner_partner_diff_amount(response)
+  def self.fetch_owner_partner_diff_amount(response)
     diff_amount = response[:owner][:amount].abs - response[:partner][:amount].abs
     diff_amount.abs
   end
 
-  def fetch_total_amount(response)
+  def self.fetch_total_amount(response)
     response[:family][:amount] + response[:owner][:amount] + response[:partner][:amount]
   end
 
-  def fetch_detail(taransactions, total_tran_count)
+  def self.fetch_detail(taransactions, total_tran_count)
 
-    expense = {}
-    expense[:amount] = 0
-    expense[:count] = 0
+    summary = {}
+    summary[:amount] = 0
+    summary[:count] = 0
 
     taransactions.each_with_index do |tr, i|
-      expense[:count] = i + 1
-      expense[:amount] += tr[:amount]
+      summary[:count] = i + 1
+      summary[:amount] += tr[:amount]
     end
 
-    expense[:rate] = calculate_percent(expense[:count], total_tran_count)
-    expense
+    summary[:rate] = calculate_percent(summary[:count], total_tran_count)
+    summary
   end
 
   private
-  def calculate_percent(count, total_tran_count)
+  def self.calculate_percent(count, total_tran_count)
     return 0.0 if count.to_i.zero?
     (count.to_f / total_tran_count.to_f * 100).round(1)
+  end
+
+  def self.set_response
+    response = {}
+    response[:family] = []
+    response[:owner] = []
+    response[:partner] = []
+    response
   end
 
 end

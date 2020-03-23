@@ -32,23 +32,13 @@ class Api::V2::Group::TransactionsController < ApplicationController
         params[:to]
     ).list if @current_user.partner_user.present?
 
-    tr_service = Services::TransactionService.new(
-        @current_user,
-        nil,                 # category_id
-        true,                # share
-        nil,                 # scope
-        true,                # with_group
-        nil,                 # from
-        nil                  # to
-    )
+    transaction = Services::TransactionService.fetch_summary_distributed_type(transactions, @response)
 
-    transaction = tr_service.fetch_summary_distributed_type(transactions, @response)
-
-    @response[:family] = tr_service.fetch_detail(transaction[:family], transactions.count)
-    @response[:owner] = tr_service.fetch_detail(transaction[:owner], transactions.count)
-    @response[:partner] = tr_service.fetch_detail(transaction[:partner], transactions.count)
-    @response[:owner_partner_diff_amount] = tr_service.fetch_owner_partner_diff_amount(@response)
-    @response[:total_amount] = tr_service.fetch_total_amount(@response)
+    @response[:family] = Services::TransactionService.fetch_detail(transaction[:family], transactions.count)
+    @response[:owner] = Services::TransactionService.fetch_detail(transaction[:owner], transactions.count)
+    @response[:partner] = Services::TransactionService.fetch_detail(transaction[:partner], transactions.count)
+    @response[:owner_partner_diff_amount] = Services::TransactionService.fetch_owner_partner_diff_amount(@response)
+    @response[:total_amount] = Services::TransactionService.fetch_total_amount(@response)
 
     # TODO: マージした明細の時系列での並べ替え
     render 'summary_list', formats: 'json', handlers: 'jbuilder'
