@@ -71,9 +71,7 @@ class Services::FinanceService
       format_calc_balances[k.ago(1.days)] = v
     end
 
-  #  p calc_balances
-  #  p format_calc_balances
-
+    # DB登録する変数のデータ構造の確認はcalc_balancesとformat_calc_balancesを出力する
     # DB insert用に整形する
     save_balances = []
     latest_date = from
