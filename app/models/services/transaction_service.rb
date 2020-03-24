@@ -219,13 +219,13 @@ class Services::TransactionService
     response
   end
 
-  def self.fetch_owner_partner_diff_amount(response)
-    diff_amount = response[:owner][:amount].abs - response[:partner][:amount].abs
+  def self.fetch_owner_partner_diff_amount(summary)
+    diff_amount = summary[:owner][:amount].abs - summary[:partner][:amount].abs
     diff_amount.abs
   end
 
-  def self.fetch_total_amount(response)
-    response[:family][:amount] + response[:owner][:amount] + response[:partner][:amount]
+  def self.fetch_total_amount(summary)
+    summary[:family][:amount] + summary[:owner][:amount] + summary[:partner][:amount]
   end
 
   def self.fetch_detail(taransactions, total_tran_count)
