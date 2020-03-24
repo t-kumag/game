@@ -30,7 +30,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
     ).list if @current_user.partner_user.present?
 
     if params.has_key?(:distributed_type)
-      @response = Services::TransactionService.fetch_tran_type(@response, params[:distributed_type])
+      @response = Services::TransactionService.fetch_tran_type(@response, params[:distributed_type], @current_user)
     end
 
     # TODO: マージした明細の時系列での並べ替え
