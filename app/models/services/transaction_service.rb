@@ -231,15 +231,23 @@ class Services::TransactionService
   def self.fetch_detail(taransactions, total_tran_count)
 
     summary = {}
-    summary[:amount] = 0
-    summary[:count] = 0
 
-    taransactions.each_with_index do |tr, i|
-      summary[:count] = i + 1
-      summary[:amount] += tr[:amount]
+    taransactions.each do |key, detail|
+      summary[key] = {}
+      summary[key][:rate] = 0.0
+      summary[key][:amount] = 0
+      summary[key][:count] = 0
+      detail.each_with_index do |tr, i|
+        summary[key] = {
+            count: i + 1,
+            amount: summary[key][:amount] += tr[:amount],
+            rate: calculate_percent(summary[key][:count], total_tran_count)
+        }
+      end
     end
 
-    summary[:rate] = calculate_percent(summary[:count], total_tran_count)
+    summary[:owner_partner_diff_amount] = fetch_owner_partner_diff_amount(summary)
+    summary[:total_amount] = fetch_total_amount(summary)
     summary
   end
 

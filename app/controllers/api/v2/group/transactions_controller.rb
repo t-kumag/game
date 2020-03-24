@@ -32,13 +32,8 @@ class Api::V2::Group::TransactionsController < ApplicationController
         params[:to]
     ).list if @current_user.partner_user.present?
 
-    transaction = Services::TransactionService.fetch_summary_distributed_type(transactions, @response)
-
-    @response[:family] = Services::TransactionService.fetch_detail(transaction[:family], transactions.count)
-    @response[:owner] = Services::TransactionService.fetch_detail(transaction[:owner], transactions.count)
-    @response[:partner] = Services::TransactionService.fetch_detail(transaction[:partner], transactions.count)
-    @response[:owner_partner_diff_amount] = Services::TransactionService.fetch_owner_partner_diff_amount(@response)
-    @response[:total_amount] = Services::TransactionService.fetch_total_amount(@response)
+    transaction = Services::TransactionService.fetch_summary_distributed_type(transactions, @current_user)
+    @response = Services::TransactionService.fetch_detail(transaction, transactions.count)
 
     # TODO: マージした明細の時系列での並べ替え
     render 'summary_list', formats: 'json', handlers: 'jbuilder'
