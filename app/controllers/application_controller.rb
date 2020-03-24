@@ -409,6 +409,7 @@ class ApplicationController < ActionController::Base
   # 3ヶ月前の月初め(1日)までを閲覧可能期間とする
   # 例) 現在を2020/3/11と仮定 => 2019/12/01 ~ 2020/03/31まで閲覧可能
   def disallowed_transactions_date?(date)
+    return false unless @current_user.free?
     return false unless date.present?
     return false if date >= Time.new.prev_month(3).strftime("%Y-%m-01")
     true

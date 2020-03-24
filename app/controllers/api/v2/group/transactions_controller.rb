@@ -7,7 +7,6 @@ class Api::V2::Group::TransactionsController < ApplicationController
       render_disallowed_transactions_date && return
     end
 
-    @response = set_response
     transactions = []
 
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
@@ -38,15 +37,6 @@ class Api::V2::Group::TransactionsController < ApplicationController
     # TODO: マージした明細の時系列での並べ替え
     render 'summary_list', formats: 'json', handlers: 'jbuilder'
 
-  end
-
-  private
-  def set_response
-    response = {}
-    response[:family] = []
-    response[:owner] = []
-    response[:partner] = []
-    response
   end
 
 end
