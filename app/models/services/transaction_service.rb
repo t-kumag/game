@@ -241,7 +241,7 @@ class Services::TransactionService
         summary[key] = {
             count: i + 1,
             amount: summary[key][:amount] += tr[:amount],
-            rate: calculate_percent(summary[key][:count], total_tran_count)
+            rate: calculate_percent(i + 1, total_tran_count)
         }
       end
     end
