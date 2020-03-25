@@ -202,7 +202,7 @@ class Services::TransactionService
       return trans[:family]
     when "owner" then
       return trans[:owner]
-    else
+    when "partner" then
       return trans[:partner]
     end
   end
