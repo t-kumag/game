@@ -263,7 +263,7 @@ class Services::TransactionService
     # 家族率、個人率、パートナー率の中で最大値取得
     max_rate = summary_rate.max{ |x, y| x[1] <=> y[1] }
 
-    # 数値を四捨五入することによって合計割合が100にならないケースが存在した場合最大値で調整する
+    # 数値を四捨五入することによって合計割合が100にならないケースが存在した場合、最大値で調整する
     Hash[*max_rate].map { |key, _|
       summary_rate.delete(key)
       summary[key][:rate] = 100 - summary_rate.values.inject(:+)
