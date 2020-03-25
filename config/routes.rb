@@ -196,6 +196,8 @@ Rails.application.routes.draw do
         resources :stock_accounts, path: '/stock-accounts' do
           resources :asset_products, path: '/asset-products', on: :member, only: [:index]
         end
+
+        get 'summary-transactions', :to => 'transactions#summary_transactions'
       end
 
       resources :payment_methods, path: '/payment_methods', only: [:index]
