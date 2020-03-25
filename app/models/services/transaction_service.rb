@@ -196,9 +196,11 @@ class Services::TransactionService
 
   def self.fetch_tran_type(transactions, distributed_type, user)
     trans = fetch_summary_distributed_type(transactions, user)
-    if distributed_type == "family"
+
+    case distributed_type
+    when "family" then
       return trans[:family]
-    elsif distributed_type == "owner"
+    when "owner" then
       return trans[:owner]
     else
       return trans[:partner]
@@ -212,7 +214,7 @@ class Services::TransactionService
         response[:family] << t
       elsif t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == user.id
         response[:owner] << t
-      else
+      elsif t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] != user.id
         response[:partner] << t
       end
     end
