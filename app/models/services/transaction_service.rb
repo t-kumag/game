@@ -228,13 +228,27 @@ class Services::TransactionService
     summary[:family][:amount] + summary[:owner][:amount] + summary[:partner][:amount]
   end
 
+  def self.fetch_tran_rate(summary)
+    summary_rate = {family: summary[:family][:rate], owner: summary[:owner][:rate], partner: summary[:partner][:rate]}
+    # 家族率、個人率、パートナー率の中で最大値取得
+    max_rate = summary_rate.max{ |x, y| x[1] <=> y[1] }
+
+    # 数値を四捨五入することによって合計割合が100%にならないケースが存在
+    # 最大値で調整する
+    Hash[*max_rate].map { |key, _|
+      summary_rate.delete(key)
+      summary[key][:rate] = 100 - summary_rate.values.inject(:+)
+    }
+    summary
+  end
+
   def self.fetch_detail(taransactions, total_tran_count)
 
     summary = {}
 
     taransactions.each do |key, detail|
       summary[key] = {}
-      summary[key][:rate] = 0.0
+      summary[key][:rate] = 0
       summary[key][:amount] = 0
       summary[key][:count] = 0
       detail.each_with_index do |tr, i|
@@ -246,6 +260,7 @@ class Services::TransactionService
       end
     end
 
+    summary = fetch_tran_rate(summary)
     summary[:owner_partner_diff_amount] = fetch_owner_partner_diff_amount(summary)
     summary[:total_amount] = fetch_total_amount(summary)
     summary
@@ -254,7 +269,7 @@ class Services::TransactionService
   private
   def self.calculate_percent(transaction_count, total_tran_count)
     return 0.0 if transaction_count.to_i.zero?
-    (transaction_count.to_f / total_tran_count.to_f * 100).round(1)
+    (transaction_count.to_f / total_tran_count.to_f * 100).round
   end
 
   def self.set_response
