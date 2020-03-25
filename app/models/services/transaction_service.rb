@@ -268,7 +268,7 @@ class Services::TransactionService
 
   private
   def self.calculate_percent(transaction_count, total_tran_count)
-    return 0.0 if transaction_count.to_i.zero?
+    return 0 if transaction_count.to_i.zero?
     (transaction_count.to_f / total_tran_count.to_f * 100).round
   end
 
