@@ -228,13 +228,39 @@ class Services::TransactionService
     summary[:family][:amount] + summary[:owner][:amount] + summary[:partner][:amount]
   end
 
+  # ①計算した数値を全て四捨五入
+  # ②最大値を除く、合計値を取得
+  # ③合計値 - 100で最大値を再取得
+  #  => 四捨五入すると全ての値の合計が99だったり、101という結果になることを防ぐため
+  # ④該当の変数に再代入する
+
+  # 例)
+  # 1. 下記割合と仮定する
+  # 家族 95.3%
+  # 個人 3.5%
+  # パートナー 1.2%
+
+  # 2. 四捨五入した値
+  # 家族 95 %
+  # 個人 4%
+  # パートナー 1%
+
+  # 3. 最大値を除く合計値
+  # 4 + 1 = 5
+  # なので
+  # 100 - 5で家族に95を代入する
+  # よって下記割合となる。
+
+  # 家族 95 %
+  # 個人 4%
+  # パートナー 1%
   def self.fetch_tran_rate(summary)
+    # それぞれの値のをhash値にする
     summary_rate = {family: summary[:family][:rate], owner: summary[:owner][:rate], partner: summary[:partner][:rate]}
     # 家族率、個人率、パートナー率の中で最大値取得
     max_rate = summary_rate.max{ |x, y| x[1] <=> y[1] }
 
-    # 数値を四捨五入することによって合計割合が100%にならないケースが存在
-    # 最大値で調整する
+    # 数値を四捨五入することによって合計割合が100にならないケースが存在した場合最大値で調整する
     Hash[*max_rate].map { |key, _|
       summary_rate.delete(key)
       summary[key][:rate] = 100 - summary_rate.values.inject(:+)
