@@ -257,8 +257,9 @@ class Services::TransactionService
   # 個人 4%
   # パートナー 1%
   def self.fetch_tran_rate(summary)
-    # それぞれの値のをhash値にする
+    # それぞれの率の値をhash値にする
     summary_rate = {family: summary[:family][:rate], owner: summary[:owner][:rate], partner: summary[:partner][:rate]}
+
     # 家族率、個人率、パートナー率の中で最大値取得
     max_rate = summary_rate.max{ |x, y| x[1] <=> y[1] }
 
