@@ -243,7 +243,7 @@ class Services::TransactionService
   # パートナー 1.2%
 
   # 2. 四捨五入した値
-  # 家族 95 %
+  # 家族 95%
   # 個人 4%
   # パートナー 1%
 
@@ -253,7 +253,7 @@ class Services::TransactionService
   # 100 - 5で家族に95を代入する
   # よって下記割合となる。
 
-  # 家族 95 %
+  # 家族 95%
   # 個人 4%
   # パートナー 1%
   def self.fetch_tran_rate(summary)
