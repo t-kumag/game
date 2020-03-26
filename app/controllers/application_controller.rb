@@ -112,6 +112,7 @@ class ApplicationController < ActionController::Base
   def authenticate
     return render_unauthorized unless authenticate_token
     activated?
+    category_version
   end
 
   # def token_authenticate
@@ -133,6 +134,10 @@ class ApplicationController < ActionController::Base
 
   def render_forbidden
     render json: {}, status: :forbidden
+  end
+
+  def category_version
+    @category_version = request.headers['CategoryVersion'].present? ? request.headers['CategoryVersion'] : 1
   end
 
   def render_unauthorized

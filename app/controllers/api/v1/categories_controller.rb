@@ -29,11 +29,11 @@ class Api::V1::CategoriesController < ApplicationController
 
   def grouped_categories
     if params[:type] === 'income'
-      c = Entities::AtGroupedCategory.where(category_type: 'income').order(:order_key)
+      c = Entities::AtGroupedCategory.where(category_type: 'income', version: @category_version).order(:order_key)
     elsif params[:type] === 'expense'
-      c = Entities::AtGroupedCategory.where(category_type: 'expense').order(:order_key)
+      c = Entities::AtGroupedCategory.where(category_type: 'expense', version: @category_version).order(:order_key)
     else
-      c = Entities::AtGroupedCategory.all.order(:order_key)
+      c = Entities::AtGroupedCategory.where(version: @category_version).order(:order_key)
     end
     c
   end
