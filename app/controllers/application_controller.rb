@@ -406,6 +406,15 @@ class ApplicationController < ActionController::Base
     false
   end
 
+  # 3ヶ月前の月初め(1日)までを閲覧可能期間とする
+  # 例) 現在を2020/3/11と仮定 => 2019/12/01 ~ 2020/03/31まで閲覧可能
+  def disallowed_transactions_date?(date)
+    return false unless @current_user.free?
+    return false unless date.present?
+    return false if date >= Time.new.prev_month(3).strftime("%Y-%m-01")
+    true
+  end
+
   def require_group
     render json: { errors: [ERROR_TYPE::NUMBER['006001']] }, status: 422 unless @current_user.group_id.present?
   end
@@ -432,6 +441,10 @@ class ApplicationController < ActionController::Base
 
   def render_disallowed_goal_setting_ids
     render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422
+  end
+
+  def render_disallowed_transactions_date
+    render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
   end
 
   def limit_of_registered_finance?

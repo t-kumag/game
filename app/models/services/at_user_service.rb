@@ -369,14 +369,21 @@ class Services::AtUserService
   end
 
   def save_balance_log
-     # 残高を遡るの最大日数はATの明細保存期間に合わせて経過観察
-     from = Time.now.ago(Settings.at_sync_transaction_max_days.days).strftime('%Y-%m-%d')
-     @user.at_user.at_user_bank_accounts.each do |a|
-       Services::FinanceService.save_balance_log(a, Entities::AtUserBankTransaction.new, from)
-     end
-     @user.at_user.at_user_emoney_service_accounts.each do |a|
-       Services::FinanceService.save_balance_log(a, Entities::AtUserEmoneyTransaction.new, from)
-     end
-     # TODO お財布も同様に処理
+    begin
+       # 残高を遡るの最大日数はATの明細保存期間に合わせて経過観察
+       from = Time.now.ago(Settings.at_sync_transaction_max_days.days).strftime('%Y-%m-%d')
+       @user.at_user.at_user_bank_accounts.each do |a|
+         Services::FinanceService.save_balance_log(a, Entities::AtUserBankTransaction.new, from)
+       end
+       @user.at_user.at_user_emoney_service_accounts.each do |a|
+         Services::FinanceService.save_balance_log(a, Entities::AtUserEmoneyTransaction.new, from)
+       end
+       @user.wallets.each do |a|
+         Services::FinanceService.save_balance_log(a, Entities::UserManuallyCreatedTransaction.new, from, "wallet")
+       end
+    rescue => e
+      SlackNotifier.ping(e.full_message)
+      Rails.logger.error(e.full_message)
+    end
   end
 end

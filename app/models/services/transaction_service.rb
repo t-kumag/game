@@ -193,4 +193,120 @@ class Services::TransactionService
     return nil unless ut.try(:payment_method_type)
     ut.payment_method_id if ut.payment_method_type == "wallet" && ut.payment_method_id
   end
+
+  def self.fetch_tran_type(transactions, distributed_type, user)
+    trans = fetch_summary_distributed_type(transactions, user)
+
+    case distributed_type
+    when "family" then
+      return trans[:family]
+    when "owner" then
+      return trans[:owner]
+    when "partner" then
+      return trans[:partner]
+    end
+  end
+
+  def self.fetch_summary_distributed_type(transactions, user)
+    response = set_response
+    transactions.each do |t|
+      if t[:is_account_shared] && t[:is_shared]
+        response[:family] << t
+      elsif t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] == user.id
+        response[:owner] << t
+      elsif t[:is_shared] == true && t[:is_account_shared] == false && t[:user_id] != user.id
+        response[:partner] << t
+      end
+    end
+    response
+  end
+
+  def self.fetch_owner_partner_diff_amount(summary)
+    diff_amount = summary[:owner][:amount].abs - summary[:partner][:amount].abs
+    diff_amount.abs
+  end
+
+  def self.fetch_total_amount(summary)
+    summary[:family][:amount] + summary[:owner][:amount] + summary[:partner][:amount]
+  end
+
+  # ①計算した数値を全て四捨五入
+  # ②最大値を除く、合計値を取得
+  # ③合計値 - 100で最大値を再取得
+  #  => 四捨五入すると全ての値の合計が99だったり、101という結果になることを防ぐため
+  # ④該当の変数に最大値を再代入する
+
+  # 例)
+  # 1. 下記割合と仮定する
+  # 家族 95.3%
+  # 個人 3.5%
+  # パートナー 1.2%
+
+  # 2. 四捨五入した値
+  # 家族 95%
+  # 個人 4%
+  # パートナー 1%
+
+  # 3. 最大値を除く合計値
+  # 4 + 1 = 5
+  # なので
+  # 100 - 5で家族に95を代入する
+  # よって下記割合となる。
+
+  # 家族 95%
+  # 個人 4%
+  # パートナー 1%
+  def self.fetch_tran_rate(summary)
+    # それぞれの率の値をhash値にする
+    summary_rate = {family: summary[:family][:rate], owner: summary[:owner][:rate], partner: summary[:partner][:rate]}
+
+    # 家族率、個人率、パートナー率の中で最大値取得
+    max_rate = summary_rate.max{ |x, y| x[1] <=> y[1] }
+
+    # 数値を四捨五入することによって合計割合が100にならないケースが存在した場合、最大値で調整する
+    Hash[*max_rate].map { |key, _|
+      summary_rate.delete(key)
+      summary[key][:rate] = 100 - summary_rate.values.inject(:+)
+    }
+    summary
+  end
+
+  def self.fetch_detail(taransactions, total_tran_count)
+
+    summary = {}
+
+    taransactions.each do |key, detail|
+      summary[key] = {}
+      summary[key][:rate] = 0
+      summary[key][:amount] = 0
+      summary[key][:count] = 0
+      detail.each_with_index do |tr, i|
+        summary[key] = {
+            count: i + 1,
+            amount: summary[key][:amount] += tr[:amount],
+            rate: calculate_percent(i + 1, total_tran_count)
+        }
+      end
+    end
+
+    summary = fetch_tran_rate(summary)
+    summary[:owner_partner_diff_amount] = fetch_owner_partner_diff_amount(summary)
+    summary[:total_amount] = fetch_total_amount(summary)
+    summary
+  end
+
+  private
+  def self.calculate_percent(transaction_count, total_tran_count)
+    return 0 if transaction_count.to_i.zero?
+    (transaction_count.to_f / total_tran_count.to_f * 100).round
+  end
+
+  def self.set_response
+    response = {}
+    response[:family] = []
+    response[:owner] = []
+    response[:partner] = []
+    response
+  end
+
 end

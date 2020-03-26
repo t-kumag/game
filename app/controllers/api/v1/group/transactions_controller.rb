@@ -3,7 +3,11 @@ class Api::V1::Group::TransactionsController < ApplicationController
 
   def index
     @response = []
-   
+
+    if disallowed_transactions_date?(params[:from])
+      render_disallowed_transactions_date && return
+    end
+
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
     @response += Services::TransactionService.new(
         @current_user,
@@ -24,6 +28,10 @@ class Api::V1::Group::TransactionsController < ApplicationController
         params[:from],
         params[:to]
     ).list if @current_user.partner_user.present?
+
+    if params.has_key?(:distributed_type)
+      @response = Services::TransactionService.fetch_tran_type(@response, params[:distributed_type], @current_user)
+    end
 
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'
@@ -56,4 +64,5 @@ class Api::V1::Group::TransactionsController < ApplicationController
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
+
 end

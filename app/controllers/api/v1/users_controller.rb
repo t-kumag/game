@@ -93,16 +93,19 @@ class Api::V1::UsersController < ApplicationController
 
   def at_url
 
+    modify_account = false
     if params.has_key?(:fnc_id)
       finance = Services::FinanceService.new(@current_user).find_finance(:fnc_id, params[:fnc_id])
       render_disallowed_to_update_account_ids && return unless finance.present?
+      modify_account = true
     end
 
     skip_account_limit = check_finance_error(finance)
 
     # 無料ユーザーの口座数が上限に達していた場合はエラーを返し口座数を制限する
     # AT口座のエラー解消の場合は口座数の制限はスキップする
-    if limit_of_registered_finance? == false && skip_account_limit == false
+    # ログイン情報編集の場合はスキップする
+    if limit_of_registered_finance? == false && skip_account_limit == false && modify_account == false
         return render json: { errors: [ERROR_TYPE::NUMBER['007002']] }, status: 422
     end
 
