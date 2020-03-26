@@ -31,7 +31,7 @@ class AtAPIClient
   end
 
   def validate_http_response_status(response)
-    unless response.status.to_s.start_with?("2")
+    unless response.status.to_s.match?(/2\d{2}/)
       raise response.body # body に十分な情報が入っているとする
     end
   end
