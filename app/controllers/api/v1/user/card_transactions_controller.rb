@@ -13,6 +13,7 @@ class Api::V1::User::CardTransactionsController < ApplicationController
         params[:from],
         params[:to]
     ).list(account_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
 
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
@@ -25,6 +26,8 @@ class Api::V1::User::CardTransactionsController < ApplicationController
     end
 
     @response = Services::AtCardTransactionService.new(@current_user).detail(params[:card_account_id], transaction_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
+
     render json: {}, status: 200 and return if @response.blank?
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
@@ -65,6 +68,7 @@ class Api::V1::User::CardTransactionsController < ApplicationController
   def get_card_account_transaction_param(params, transaction_id, exist_transaction)
     at_transaction_category_id = params[:at_transaction_category_id].present? ?
                                      params[:at_transaction_category_id] : exist_transaction[:at_transaction_category_id]
+    at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(at_transaction_category_id)
     used_location = params[:used_location].present? ? params[:used_location] : exist_transaction[:used_location]
     memo = params[:memo].present? ? params[:memo] : exist_transaction[:memo]
     share = params[:share].present? ? params[:share] : false

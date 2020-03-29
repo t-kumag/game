@@ -13,6 +13,7 @@ class Api::V1::Group::CardTransactionsController < ApplicationController
         params[:from],
         params[:to]
     ).list(account_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
 
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
@@ -25,6 +26,8 @@ class Api::V1::Group::CardTransactionsController < ApplicationController
     end
 
     @response = Services::AtCardTransactionService.new(@current_user, true).detail(params[:card_account_id], transaction_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
+
     render json: {}, status: 200 and return if @response.blank?
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
@@ -35,10 +38,11 @@ class Api::V1::Group::CardTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
+    at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(params[:at_transaction_category_id])
     @response = Services::AtCardTransactionService.new(@current_user, true).update(
         params[:card_account_id],
         transaction_id,
-        params[:at_transaction_category_id],
+        at_transaction_category_id,
         params[:used_location],
         params[:memo],
         params[:share],
