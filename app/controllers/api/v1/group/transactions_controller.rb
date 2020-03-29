@@ -11,8 +11,9 @@ class Api::V1::Group::TransactionsController < ApplicationController
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
     @response += Services::TransactionService.new(
         @current_user,
+        @category_version,
         params[:category_id],
-        true,                # share 
+        true,                # share
         params[:scope],
         true,                # with_group
         params[:from],
@@ -21,8 +22,9 @@ class Api::V1::Group::TransactionsController < ApplicationController
 
     @response += Services::TransactionService.new(
         @current_user.partner_user,
+        @category_version,
         params[:category_id],
-        true,                # share 
+        true,                # share
         params[:scope],
         true,                # with_group
         params[:from],
@@ -33,6 +35,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
       @response = Services::TransactionService.fetch_tran_type(@response, params[:distributed_type], @current_user)
     end
 
+    @category_map = Services::CategoryService.new(@category_version).category_map
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
@@ -43,6 +46,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
     @response += Services::TransactionService.new(
         @current_user,
+        @category_version,
         params[:category_id],
         true,                # share
         params[:scope],
@@ -53,6 +57,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
 
     @response += Services::TransactionService.new(
         @current_user.partner_user,
+        @category_version,
         params[:category_id],
         true,                # share
         params[:scope],
@@ -61,6 +66,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
         params[:to]
     ).grouped if @current_user.partner_user.present?
 
+    @category_map = Services::CategoryService.new(@category_version).category_map
     # TODO: マージした明細の時系列での並べ替え
     render 'list', formats: 'json', handlers: 'jbuilder'
   end
