@@ -22,7 +22,7 @@ class Services::CategoryService
             category_map[max_category['id']] = now_category
             break
           end
-          category_map[max_category['id']] = undefined_category[0]
+          category_map[max_category['id']] = undefined_category[0].to_h
         end
       end
     end
@@ -39,24 +39,9 @@ class Services::CategoryService
     end
   end
 
-private
-  def get_transaction_categories(version)
-    sql = <<-EOS
-    SELECT
-      atc.id
-      , atc.before_version_id
-      , atc.category_name1
-      , atc.category_name2
-    FROM
-      at_transaction_categories atc
-    LEFT JOIN
-      at_grouped_categories agc
-    ON
-      agc.id = atc.at_grouped_category_id
-    WHERE
-      agc.version=#{version}
-    EOS
-    ActiveRecord::Base.connection.select_all(sql).to_hash
+  def category_name_map
+    category = Entities::AtTransactionCategory.joins(:at_grouped_category).where(at_grouped_categories: {version: @category_version})
+    category.map{ |category| [category['id'], {category_name1: category[:category_name1], category_name2: category[:category_name2]}]}.to_h
   end
 
   def get_undefined_transaction_category(version)
@@ -76,6 +61,26 @@ private
       agc.version=#{version}
       AND atc.at_category_id = "0000"
     EOS
-    ActiveRecord::Base.connection.select_all(sql).to_hash
+    ActiveRecord::Base.connection.select_all(sql)
+  end
+
+private
+  def get_transaction_categories(version)
+    sql = <<-EOS
+    SELECT
+      atc.id
+      , atc.before_version_id
+      , atc.category_name1
+      , atc.category_name2
+    FROM
+      at_transaction_categories atc
+    LEFT JOIN
+      at_grouped_categories agc
+    ON
+      agc.id = atc.at_grouped_category_id
+    WHERE
+      agc.version=#{version}
+    EOS
+    ActiveRecord::Base.connection.select_all(sql)
   end
 end
