@@ -2,11 +2,14 @@ class Api::V1::CategoriesController < ApplicationController
   before_action :authenticate
 
   def index
+    @category_service = Services::CategoryService.new(@category_version)
+    unless @category_service.is_support_version?
+      render_disallowed_support_category_version && return
+    end
 
-    latest_version = Entities::AtGroupedCategory.all.pluck(:version).max
     ids = nil
-    if @category_version.to_s != latest_version.to_s
-      ids = Entities::AtTransactionCategory.joins(:at_grouped_category).where(at_grouped_categories: {version: latest_version})
+    unless @category_service.is_latest_version?
+      ids = Entities::AtTransactionCategory.joins(:at_grouped_category).where(at_grouped_categories: {version: @category_service.latest_version})
       ids = ids.pluck(:before_version_id)
     end
     @responses = []

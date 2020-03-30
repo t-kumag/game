@@ -6,11 +6,18 @@ class Services::CategoryService
   def initialize(category_version)
     @category_version = category_version
     @latest_version = Entities::AtGroupedCategory.all.pluck(:version).max.to_s
-    @is_latest_version = @category_version.to_s == @latest_version.to_s
+  end
+
+  def is_support_version?
+    @latest_version.to_i - @category_version.to_i <= 1
+  end
+
+  def latest_version
+    @latest_version
   end
 
   def is_latest_version?
-    @is_latest_version
+    @category_version.to_s == @latest_version.to_s
   end
 
   # 最新のカテゴリID（各テーブルに入っているat_transaction_category_id）と
@@ -50,7 +57,7 @@ class Services::CategoryService
       return at_transaction_category_id
     else
       at_transaction_category = Entities::AtTransactionCategory.joins(:at_grouped_category).where(before_version_id: at_transaction_category_id, at_grouped_categories: {version: @latest_version})
-      return at_transaction_category[0].id
+      return at_transaction_category[0].try(:id)
     end
   end
 

@@ -21,7 +21,12 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     end
     begin
       Entities::UserManuallyCreatedTransaction.new.transaction do
-        user_manually_created_transaction = create_user_manually_created
+        save_params = get_create_user_manually_created_params
+        if save_params[:at_transaction_category_id].nil?
+          render_need_restart && return
+        end
+        user_manually_created_transaction = Entities::UserManuallyCreatedTransaction.create!(save_params)
+
         if params[:share] === true
           options = {group_id: @current_user.group_id, share: params[:share], transaction: nil}
         else
@@ -52,7 +57,11 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         user_manually_created_transaction = find_transaction
         old_transaction = user_manually_created_transaction.dup
         render_disallowed_transaction_ids && return if user_manually_created_transaction.blank?
-        update_user_manually_created(user_manually_created_transaction)
+        save_params = get_update_user_manually_created_params(user_manually_created_transaction)
+        if save_params[:at_transaction_category_id].nil?
+          render_need_restart && return
+        end
+        user_manually_created_transaction.update!(save_params)
 
         if params[:share] === true
           options = {group_id: @current_user.group_id, share: params[:share]}
@@ -105,7 +114,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     transacticon
   end
 
-  def create_user_manually_created
+  def get_create_user_manually_created_params
     convert_amount params
     save_params = params.permit(
       :at_transaction_category_id,
@@ -120,12 +129,10 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       user_id: @current_user.id
     )
     save_params[:at_transaction_category_id] = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(save_params[:at_transaction_category_id])
-
-    Entities::UserManuallyCreatedTransaction.create!(save_params)
-
+    save_params
   end
 
-  def update_user_manually_created(transaction)
+  def get_update_user_manually_created_params(transaction)
     convert_amount params
     save_params = params.permit(
       :at_transaction_category_id,
@@ -138,8 +145,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :memo
     )
 
-    transaction.update!(update_param(save_params, transaction))
-    transaction
+    update_param(save_params, transaction)
   end
 
   def update_param(save_param, transaction)
@@ -147,6 +153,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     at_transaction_category_id = save_param[:at_transaction_category_id].present? ?
                                      save_param[:at_transaction_category_id] : transaction[:at_transaction_category_id]
     at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(at_transaction_category_id)
+
     payment_method_id = save_param[:payment_method_id].present? ? save_param[:payment_method_id] : nil
     payment_method_type = save_param[:payment_method_type].present? ? save_param[:payment_method_type] : nil
     used_date = save_param[:used_date].present? ? save_param[:used_date] : transaction[:used_date]

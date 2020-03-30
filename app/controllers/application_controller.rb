@@ -452,6 +452,14 @@ class ApplicationController < ActionController::Base
     render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
   end
 
+  def render_disallowed_support_category_version
+    render json: { errors: [ERROR_TYPE::NUMBER['009001']] }, status: 422
+  end
+
+  def render_need_restart
+    render json: { errors: [ERROR_TYPE::NUMBER['009002']] }, status: 422
+  end
+
   def limit_of_registered_finance?
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
     at_user_card_account_ids = @current_user.try(:at_user).try(:at_user_card_accounts).try(:pluck ,:id)

@@ -41,6 +41,9 @@ class Api::V1::User::CardTransactionsController < ApplicationController
     @exist_transaction = Services::AtCardTransactionService.new(@current_user).detail(params[:card_account_id], transaction_id)
     render_disallowed_transaction_ids && return unless @exist_transaction.present?
     card_account_transaction_param = get_card_account_transaction_param(params, transaction_id, @exist_transaction)
+    if card_account_transaction_param[:at_transaction_category_id].nil?
+      render_need_restart && return
+    end
 
     @response = Services::AtCardTransactionService.new(@current_user).update(
         card_account_transaction_param[:card_account_id],
@@ -69,6 +72,7 @@ class Api::V1::User::CardTransactionsController < ApplicationController
     at_transaction_category_id = params[:at_transaction_category_id].present? ?
                                      params[:at_transaction_category_id] : exist_transaction[:at_transaction_category_id]
     at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(at_transaction_category_id)
+
     used_location = params[:used_location].present? ? params[:used_location] : exist_transaction[:used_location]
     memo = params[:memo].present? ? params[:memo] : exist_transaction[:memo]
     share = params[:share].present? ? params[:share] : false
