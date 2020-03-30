@@ -11,8 +11,6 @@ class Api::V1::CategoriesController < ApplicationController
     end
     @responses = []
     grouped_categories.each do |ca|
-      p ids
-      p nil == ids
       transaction_categories = []
       ca.at_transaction_categories.each do |atc|
 
