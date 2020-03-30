@@ -277,6 +277,12 @@ class Services::PlService
     pl_emoney = group_by_category_id(pl_emoney)
 
     pl_user_manually_created = user_manually_created_category_summary(share, from, to)
+
+    pl_bank = set_category_name(pl_bank)
+    pl_card = set_category_name(pl_card)
+    pl_emoney = set_category_name(pl_emoney)
+    pl_user_manually_created = set_category_name(pl_user_manually_created)
+
     merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
   end
 
@@ -311,7 +317,6 @@ class Services::PlService
   end
 
   def group_by_category_id(pl)
-    category_name_map = @category_service.category_name_map
     after_summaries = []
     pl.each do |v|
       next if v['at_transaction_category_id'].blank?
@@ -327,8 +332,8 @@ class Services::PlService
        if summary.blank?
         after_summaries << {
           at_transaction_category_id: v['at_transaction_category_id'],
-          category_name1: category_name_map[v['at_transaction_category_id'].to_i][:category_name1],
-          category_name2: category_name_map[v['at_transaction_category_id'].to_i][:category_name2],
+          category_name1: v['category_name1'],
+          category_name2: v['category_name2'],
           amount_receipt: v['amount_receipt'],
           amount_payment: v['amount_payment']
         }.stringify_keys
@@ -338,8 +343,8 @@ class Services::PlService
         summary['amount_payment'] ||= 0
         after_summaries[idx] = {
           at_transaction_category_id: v['at_transaction_category_id'],
-          category_name1: category_name_map[v['at_transaction_category_id'].to_i][:category_name1],
-          category_name2: category_name_map[v['at_transaction_category_id'].to_i][:category_name2],
+          category_name1: v['category_name1'],
+          category_name2: v['category_name2'],
           amount_receipt: v['amount_receipt'] + summary['amount_receipt'],
           amount_payment: v['amount_payment'] + summary['amount_payment']
         }.stringify_keys
@@ -430,6 +435,16 @@ class Services::PlService
     pl_bank.reject do |t|
       debit_transactions_ids.include? t['at_user_bank_transaction_id']
     end
+  end
+
+  def set_category_name(transactions)
+    category_name_map = @category_service.category_name_map
+    transactions.each do |transaction|
+      at_transaction_category_id = transaction['at_transaction_category_id'].to_i
+      transaction['category_name1'] = category_name_map[at_transaction_category_id][:category_name1]
+      transaction['category_name2'] = category_name_map[at_transaction_category_id][:category_name2]
+    end
+    transactions
   end
 
   def debit_transactions(pl_bank, pl_card)
