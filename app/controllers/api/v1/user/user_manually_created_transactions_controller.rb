@@ -11,6 +11,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
   def show
     @response = find_transaction
     render_disallowed_transaction_ids && return if @response.blank?
+    @category_map = Services::CategoryService.new(@category_version).category_map
     render :show, formats: :json, handlers: :jbuilder
   end
 
@@ -118,6 +119,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     ).merge(
       user_id: @current_user.id
     )
+    save_params[:at_transaction_category_id] = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(save_params[:at_transaction_category_id])
 
     Entities::UserManuallyCreatedTransaction.create!(save_params)
 
@@ -144,6 +146,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
 
     at_transaction_category_id = save_param[:at_transaction_category_id].present? ?
                                      save_param[:at_transaction_category_id] : transaction[:at_transaction_category_id]
+    at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(at_transaction_category_id)
     payment_method_id = save_param[:payment_method_id].present? ? save_param[:payment_method_id] : nil
     payment_method_type = save_param[:payment_method_type].present? ? save_param[:payment_method_type] : nil
     used_date = save_param[:used_date].present? ? save_param[:used_date] : transaction[:used_date]

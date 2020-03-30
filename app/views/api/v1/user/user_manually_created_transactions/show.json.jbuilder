@@ -3,9 +3,10 @@ json.error @error if @error.present?
 json.app do
   json.id @response.id
   json.at_transaction_category do
-    json.id @response.at_transaction_category.id
-    json.category_name1 @response.at_transaction_category.category_name1
-    json.category_name2 @response.at_transaction_category.category_name2
+    json.id @category_map[@response.at_transaction_category.id]['id']
+    json.category_name1 @category_map[@response.at_transaction_category.id]['category_name1']
+    json.category_name2 @category_map[@response.at_transaction_category.id]['category_name2']
+
   end
   json.used_date @response.used_date
   json.title @response.title
