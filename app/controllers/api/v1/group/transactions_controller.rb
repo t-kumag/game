@@ -5,7 +5,7 @@ class Api::V1::Group::TransactionsController < ApplicationController
     @response = []
 
     # プレミアム機能を一時コメントアウト
-    # 4月中旬頃に復活予定
+    # 4月中旬頃にアプリの課金対応の改修後に再度反映予定
     #if disallowed_transactions_date?(params[:from])
     #  render_disallowed_transactions_date && return
     #end
