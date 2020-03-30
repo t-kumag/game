@@ -443,9 +443,11 @@ class ApplicationController < ActionController::Base
     render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422
   end
 
-  def render_disallowed_transactions_date
-    render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
-  end
+  # プレミアム機能を一時コメントアウト
+  # 4月中旬頃にアプリの課金対応の改修後に再度反映予定
+  #def render_disallowed_transactions_date
+  #  render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
+  #end
 
   def limit_of_registered_finance?
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)
