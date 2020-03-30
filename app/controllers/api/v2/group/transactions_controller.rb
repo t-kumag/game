@@ -3,9 +3,11 @@ class Api::V2::Group::TransactionsController < ApplicationController
 
   def summary_transactions
 
-    if disallowed_transactions_date?(params[:from])
-      render_disallowed_transactions_date && return
-    end
+    # プレミアム機能を一時コメントアウト
+    # 4月中旬頃に復活予定
+    #if disallowed_transactions_date?(params[:from])
+    #  render_disallowed_transactions_date && return
+    #end
 
     transactions = []
 
