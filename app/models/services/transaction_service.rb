@@ -17,10 +17,10 @@ class Services::TransactionService
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
       convert_ids = []
-      max_version = Entities::AtGroupedCategory.all.pluck(:version).max
+      @category_service = Services::CategoryService.new(@category_version)
 
-      if (max_version != @category_version)
-        undefined_category = Services::CategoryService.new(@category_version).get_undefined_transaction_category(@category_version)
+      unless @category_service.is_latest_version?
+        undefined_category = @category_service.get_undefined_transaction_category(@category_version)
         undefined_id = undefined_category[0].to_h['id']
         if ids.try(:include?, undefined_id)
           ids << nil

@@ -3,10 +3,10 @@ class Api::V1::CategoriesController < ApplicationController
 
   def index
 
-    max_version = Entities::AtGroupedCategory.all.pluck(:version).max
+    latest_version = Entities::AtGroupedCategory.all.pluck(:version).max
     ids = nil
-    if @category_version.to_s != max_version.to_s
-      ids = Entities::AtTransactionCategory.joins(:at_grouped_category).where(at_grouped_categories: {version: max_version})
+    if @category_version.to_s != latest_version.to_s
+      ids = Entities::AtTransactionCategory.joins(:at_grouped_category).where(at_grouped_categories: {version: latest_version})
       ids = ids.pluck(:before_version_id)
     end
     @responses = []
@@ -14,7 +14,7 @@ class Api::V1::CategoriesController < ApplicationController
       transaction_categories = []
       ca.at_transaction_categories.each do |atc|
 
-        if nil == ids || ids.try(:include?, atc.id)
+        if ids.nil? || ids.try(:include?, atc.id)
           transaction_categories << {
               at_transaction_category_id: atc.id,
               at_transaction_category_category_name1: atc.category_name2

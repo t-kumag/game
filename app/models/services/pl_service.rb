@@ -25,13 +25,12 @@ class Services::PlService
   end
 
   def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
-    max_version = Entities::AtGroupedCategory.all.pluck(:version).max
-    undefined_category = Services::CategoryService.new(@category_version).get_undefined_transaction_category(@category_version)
+    undefined_category = @category_service.get_undefined_transaction_category(@category_version)
     undefined_id = undefined_category[0].to_h['id'].to_s
 
     sql = <<-EOS
       SELECT
-        #{@category_version.to_s == max_version.to_s ?
+        #{@category_service.is_latest_version? ?
           'udt.at_transaction_category_id' :
           'CASE WHEN atc.before_version_id is null then "' + undefined_id + '" ELSE atc.before_version_id END AS at_transaction_category_id'
         },
@@ -79,12 +78,12 @@ class Services::PlService
   end
 
   def card_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
-    max_version = Entities::AtGroupedCategory.all.pluck(:version).max
-    undefined_category = Services::CategoryService.new(@category_version).get_undefined_transaction_category(@category_version)
+    undefined_category = @category_service.get_undefined_transaction_category(@category_version)
     undefined_id = undefined_category[0].to_h['id'].to_s
+
     sql = <<-EOS
       SELECT
-        #{@category_version.to_s == max_version.to_s ?
+        #{@category_service.is_latest_version? ?
           'udt.at_transaction_category_id' :
           'CASE WHEN atc.before_version_id is null then "' + undefined_id + '" ELSE atc.before_version_id END AS at_transaction_category_id'
         },
@@ -128,12 +127,12 @@ class Services::PlService
   end
 
   def emoney_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
-    max_version = Entities::AtGroupedCategory.all.pluck(:version).max
-    undefined_category = Services::CategoryService.new(@category_version).get_undefined_transaction_category(@category_version)
+    undefined_category = @category_service.get_undefined_transaction_category(@category_version)
     undefined_id = undefined_category[0].to_h['id'].to_s
+
     sql = <<-EOS
       SELECT
-        #{@category_version.to_s == max_version.to_s ?
+        #{@category_service.is_latest_version? ?
           'udt.at_transaction_category_id' :
           'CASE WHEN atc.before_version_id is null then "' + undefined_id + '" ELSE atc.before_version_id END AS at_transaction_category_id'
         },
@@ -181,12 +180,12 @@ class Services::PlService
   end
 
   def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
-    max_version = Entities::AtGroupedCategory.all.pluck(:version).max
-    undefined_category = Services::CategoryService.new(@category_version).get_undefined_transaction_category(@category_version)
+    undefined_category = @category_service.get_undefined_transaction_category(@category_version)
     undefined_id = undefined_category[0].to_h['id'].to_s
+
     sql = <<-EOS
       SELECT
-        #{@category_version.to_s == max_version.to_s ?
+        #{@category_service.is_latest_version? ?
           'udt.at_transaction_category_id' :
           'CASE WHEN atc.before_version_id is null then "' + undefined_id + '" ELSE atc.before_version_id END AS at_transaction_category_id'
         },
@@ -264,6 +263,8 @@ class Services::PlService
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
 
+    @category_service = Services::CategoryService.new(@category_version)
+
     # P/L 用の明細を取得
     pl_bank = bank_category_summary(share, from, to)
     pl_card = card_category_summary(share, from, to)
@@ -310,7 +311,7 @@ class Services::PlService
   end
 
   def group_by_category_id(pl)
-    category_name_map = Services::CategoryService.new(@category_version).category_name_map
+    category_name_map = @category_service.category_name_map
     after_summaries = []
     pl.each do |v|
       next if v['at_transaction_category_id'].blank?
