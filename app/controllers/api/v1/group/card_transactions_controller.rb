@@ -39,6 +39,9 @@ class Api::V1::Group::CardTransactionsController < ApplicationController
     end
 
     at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(params[:at_transaction_category_id])
+    if at_transaction_category_id.nil?
+      render_need_restart && return
+    end
     @response = Services::AtCardTransactionService.new(@current_user, true).update(
         params[:card_account_id],
         transaction_id,

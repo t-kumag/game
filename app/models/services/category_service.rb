@@ -22,8 +22,8 @@ class Services::CategoryService
 
   # 最新のカテゴリID（各テーブルに入っているat_transaction_category_id）と
   # アプリのカテゴリバージョンのカテゴリID、カテゴリ名１、カテゴリ名２の連想配列を作成する
-  # 最新の例) {272=>{"id"=>272, "before_version_id"=>19, "category_name1"=>"食費", "category_name2"=>"食費"}}
-  # 旧の例) {272=>{"id"=>19, "before_version_id"=>nil, "category_name1"=>"食費", "category_name2"=>"パン、サンドイッチ"}}
+  # 最新の例) {155=>{"id"=>155, "before_version_id"=>19, "category_name1"=>"食費", "category_name2"=>"食費"}}
+  # 旧の例) {155=>{"id"=>19, "before_version_id"=>nil, "category_name1"=>"食費", "category_name2"=>"パン、サンドイッチ"}}
   def category_map
     category_map = nil
     if self.is_latest_version?
@@ -48,13 +48,16 @@ class Services::CategoryService
     category_map
   end
 
-  # 最新バージョンのカテゴリIDに置き換える
-  # アプリのカテゴリバージョンと最新バージョンが一致する場合、そのまま返す。
+  # 最新バージョンのカテゴリIDに置き換える。最新バージョンにないIDの場合nilを返す。
+  # アプリのカテゴリバージョンと最新バージョンが一致する場合、最新バージョンのカテゴリ一覧のIDかを確認して返す。
+  #   例）155(食費=>食費) の場合155(食費=>食費)を返す。
+  #       19(食費=>パン、サンドイッチ) の場合nilを返す。
   # 一致しない場合、before_version_idにリクエストされたカテゴリIDが入っているIDを返す。
-  #　　例）19(食費=>パン、サンドイッチ) の場合、272(食費=>食費)を返す
+  #   例）19(食費=>パン、サンドイッチ) の場合155(食費=>食費)を返す。
   def convert_at_transaction_category_id(at_transaction_category_id)
     if self.is_latest_version?
-      return at_transaction_category_id
+      at_transaction_category = Entities::AtTransactionCategory.joins(:at_grouped_category).where(id: at_transaction_category_id, at_grouped_categories: {version: @latest_version})
+      return at_transaction_category[0].try(:id)
     else
       at_transaction_category = Entities::AtTransactionCategory.joins(:at_grouped_category).where(before_version_id: at_transaction_category_id, at_grouped_categories: {version: @latest_version})
       return at_transaction_category[0].try(:id)
@@ -62,7 +65,7 @@ class Services::CategoryService
   end
 
   # アプリのカテゴリバージョンのカテゴリIDとカテゴリ名１、カテゴリ名２の連想配列を作る。
-  # 例）{272=>{"category_name1"=>"食費", "category_name2"=>"食費"}}
+  # 例）{155=>{"category_name1"=>"食費", "category_name2"=>"食費"}}
   def category_name_map
     category = Entities::AtTransactionCategory.joins(:at_grouped_category).where(at_grouped_categories: {version: @category_version})
     category.map{ |category| [category['id'], {category_name1: category[:category_name1], category_name2: category[:category_name2]}]}.to_h
