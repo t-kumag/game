@@ -8,11 +8,12 @@ class Api::V2::Group::WalletTransactionsController < ApplicationController
     end
 
     @transactions = Services::WalletTransactionService.new(
-        @current_user,
-        true,
-        params[:from],
-        params[:to]
+      @current_user,
+      true,
+      params[:from],
+      params[:to]
     ).list(wallet_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
 
     render(json: {}, status: 200) && return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
@@ -21,6 +22,7 @@ class Api::V2::Group::WalletTransactionsController < ApplicationController
   def show
     transaction_id = params[:id].to_i
     @response = Services::WalletTransactionService.new(@current_user, true).detail(params[:wallet_id], transaction_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
     render(json: {}, status: 200) && return if @response.blank?
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
