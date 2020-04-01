@@ -6,8 +6,8 @@ RSpec.describe Api::V1::Group::TransactionsController do
   let(:params) { {
     category_id: 1,
     share: 0,
-    from: '2019-12-29',
-    to: '2019-12-31',
+    from: '2020-01-29',
+    to: '202020-01-31',
   } }
   let!(:at_grouped_category) { create(:at_grouped_category) }
   let!(:at_transaction_category) { create(:at_transaction_category) }

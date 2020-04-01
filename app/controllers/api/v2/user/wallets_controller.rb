@@ -48,6 +48,9 @@ class Api::V2::User::WalletsController < ApplicationController
     end
 
     if @current_user.try(:wallets).pluck(:id).include?(wallet_id)
+      Entities::UserManuallyCreatedTransaction.where(payment_method_type: "wallet")
+          .where(payment_method_id: wallet_id)
+          .update_all(payment_method_type: nil, payment_method_id: nil)
       Entities::Wallet.find(wallet_id).destroy
     end
     render json: {}, status: :no_content
