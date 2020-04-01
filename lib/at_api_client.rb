@@ -31,13 +31,8 @@ class AtAPIClient
   end
 
   def validate_http_response_status(response)
-    case response.status
-    when 400
-      raise BadRequest, response.body # body に十分な情報が入っているとする
-    when 404
-      raise NotFound, response.body
-    when 500..599
-      raise ServerError, response.body
+    unless response.status.between?(200, 299)
+      raise response.body # body に十分な情報が入っているとする
     end
   end
 
@@ -50,12 +45,10 @@ class AtAPIClient
         req.body = JSON.pretty_generate(@requester.params)
       end
       validate_http_response_status(response)
-    rescue Faraday::Error::TimeoutError => e
+    rescue Faraday::Error::TimeoutError, Faraday::Error::ClientError => e
+      # ConnectionFailed でもいいが、親クラスである ClientError で全部拾ってしまう
       p e
-      raise Timeout, e.message
-    rescue Faraday::Error::ClientError => e # ConnectionFailed でもいいが、親クラスである ClientError で全部拾ってしまう
-      p e
-      raise ServerError, e.message # 500系と混ざってしまうので、もうちょい情報増やすか例外分けてもいいかも
+      raise e # 500系と混ざってしまうので、もうちょい情報増やすか例外分けてもいいかも
     end
     return json_from(response.body)
   end
@@ -68,10 +61,10 @@ class AtAPIClient
         req.params = @requester.params
       end
       validate_http_response_status(response)
-    rescue Faraday::Error::TimeoutError => e
-      raise Timeout, e.message
-    rescue Faraday::Error::ClientError => e # ConnectionFailed でもいいが、親クラスである ClientError で全部拾ってしまう
-      raise ServerError, e.message # 500系と混ざってしまうので、もうちょい情報増やすか例外分けてもいいかも
+    rescue Faraday::Error::TimeoutError, Faraday::Error::ClientError => e
+      # ConnectionFailed でもいいが、親クラスである ClientError で全部拾ってしまう
+      p e
+      raise e # 500系と混ざってしまうので、もうちょい情報増やすか例外分けてもいいかも
     end
     return json_from(response.body)
   end
