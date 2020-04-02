@@ -17,5 +17,17 @@ FactoryBot.define do
       end
     end
 
+    trait :v2_at_grouped_category do
+      after(:create) do |at_grouped_category|
+        v2_at_grouped_category = create(:at_grouped_category, version: 2)
+        create(:at_transaction_category,
+          at_category_id: 2,
+          category_name1: "未分類",
+          category_name2: "未分類",
+          at_grouped_category_id: v2_at_grouped_category.id,
+          before_version_id: 1
+        )
+      end
+    end
   end
 end
