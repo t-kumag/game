@@ -65,8 +65,8 @@ class Api::V1::User::CardTransactionsController < ApplicationController
   def get_card_account_transaction_param(params, transaction_id, exist_transaction)
     at_transaction_category_id = params[:at_transaction_category_id].present? ?
                                      params[:at_transaction_category_id] : exist_transaction[:at_transaction_category_id]
-    used_location = params[:used_location].present? ? params[:used_location] : exist_transaction[:used_location]
-    memo = params[:memo].present? ? params[:memo] : exist_transaction[:memo]
+    used_location = params[:used_location].nil? ? exist_transaction[:used_location] : params[:used_location]
+    memo = params[:memo].blank? ? nil : params[:memo]
     share = params[:share].present? ? params[:share] : false
     ignore = params[:ignore].present? ? params[:ignore] : false
 
