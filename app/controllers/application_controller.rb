@@ -448,9 +448,11 @@ class ApplicationController < ActionController::Base
     render json: { errors: [ERROR_TYPE::NUMBER['005003']] }, status: 422
   end
 
-  def render_disallowed_transactions_date
-    render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
-  end
+  # プレミアム機能を一時コメントアウト
+  # 4月中旬頃にアプリの課金対応の改修後に再度反映予定
+  #def render_disallowed_transactions_date
+  #  render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
+  #end
 
   def render_disallowed_support_category_version
     render json: { errors: [ERROR_TYPE::NUMBER['009001']] }, status: 422

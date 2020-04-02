@@ -160,7 +160,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     title = save_param[:title].present? ? save_param[:title] : transaction[:title]
     amount = save_param[:amount].present? ? save_param[:amount] : transaction[:amount]
     used_location = save_param[:used_location].nil? ? transaction[:used_location] : save_param[:used_location]
-    memo = save_param[:memo].nil? ? transaction[:memo] : save_param[:memo]
+    memo = save_param[:memo].blank? ? nil : save_param[:memo]
 
     {
         at_transaction_category_id: at_transaction_category_id,

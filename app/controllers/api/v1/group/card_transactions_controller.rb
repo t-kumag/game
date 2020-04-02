@@ -38,23 +38,46 @@ class Api::V1::Group::CardTransactionsController < ApplicationController
       render_disallowed_transaction_ids && return
     end
 
+    @exist_transaction = Services::AtCardTransactionService.new(@current_user, true).detail(params[:card_account_id], transaction_id)
+    render_disallowed_transaction_ids && return unless @exist_transaction.present?
+    card_account_transaction_param = get_card_account_transaction_param(params, transaction_id, @exist_transaction)
     at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(params[:at_transaction_category_id])
-    if at_transaction_category_id.nil?
-      render_need_restart && return
-    end
+
     @response = Services::AtCardTransactionService.new(@current_user, true).update(
-        params[:card_account_id],
-        transaction_id,
-        at_transaction_category_id,
-        params[:used_location],
-        params[:memo],
-        params[:share],
-        params[:ignore],
-        params[:share] ? @current_user.group_id : nil
-    )
+        card_account_transaction_param[:card_account_id],
+        card_account_transaction_param[:transaction_id],
+        card_account_transaction_param[:at_transaction_category_id],
+        card_account_transaction_param[:used_location],
+        card_account_transaction_param[:memo],
+        card_account_transaction_param[:share],
+        card_account_transaction_param[:ignore],
+        card_account_transaction_param[:group_id],
+        )
     render json: {}, status: 200 and return if @response.blank?
 
     render 'update', formats: 'json', handlers: 'jbuilder'
   end
 
+  private
+  def get_card_account_transaction_param(params, transaction_id, exist_transaction)
+    at_transaction_category_id = params[:at_transaction_category_id].present? ?
+                                     params[:at_transaction_category_id] : exist_transaction[:at_transaction_category_id]
+    at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(at_transaction_category_id)
+
+    used_location = params[:used_location].nil? ? exist_transaction[:used_location] : params[:used_location]
+    memo = params[:memo].blank? ? nil : params[:memo]
+    share = params[:share].present? ? params[:share] : false
+    ignore = params[:ignore].present? ? params[:ignore] : false
+
+    {
+        card_account_id: params[:card_account_id],
+        transaction_id: transaction_id,
+        at_transaction_category_id: at_transaction_category_id,
+        used_location: used_location,
+        memo: memo,
+        share: share,
+        ignore: ignore,
+        group_id: share ? @current_user.group_id : nil
+    }
+  end
 end

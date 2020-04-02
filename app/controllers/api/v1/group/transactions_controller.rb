@@ -4,9 +4,11 @@ class Api::V1::Group::TransactionsController < ApplicationController
   def index
     @response = []
 
-    if disallowed_transactions_date?(params[:from])
-      render_disallowed_transactions_date && return
-    end
+    # プレミアム機能を一時コメントアウト
+    # 4月中旬頃にアプリの課金対応の改修後に再度反映予定
+    #if disallowed_transactions_date?(params[:from])
+    #  render_disallowed_transactions_date && return
+    #end
 
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
     @response += Services::TransactionService.new(

@@ -71,7 +71,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
     at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(at_transaction_category_id)
 
     used_location = params[:used_location].nil? ? exist_transaction[:used_location] : params[:used_location]
-    memo = params[:memo].nil? ? exist_transaction[:memo]: params[:memo]
+    memo = params[:memo].blank? ? nil : params[:memo]
     share = params[:share].present? ? params[:share] : false
     ignore = params[:ignore].present? ? params[:ignore] : false
 
