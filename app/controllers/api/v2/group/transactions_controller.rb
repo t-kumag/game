@@ -16,7 +16,7 @@ class Api::V2::Group::TransactionsController < ApplicationController
         @current_user,
         nil,                 # category_id
         true,                # share
-        nil,                 # scope
+        params[:scope],      # scope
         true,                # with_group
         params[:from],
         params[:to]
@@ -27,7 +27,7 @@ class Api::V2::Group::TransactionsController < ApplicationController
         @current_user.partner_user,
         nil,                 # category_id
         true,                # share
-        nil,                 # scope
+        params[:scope],      # scope
         true,                # with_group
         params[:from],
         params[:to]
