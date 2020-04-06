@@ -271,7 +271,7 @@ class Services::TransactionService
     summary
   end
 
-  def self.fetch_detail(taransactions, total_tran_count)
+  def self.fetch_detail(taransactions, total_amount)
 
     summary = {}
 
@@ -280,11 +280,13 @@ class Services::TransactionService
       summary[key][:rate] = 0
       summary[key][:amount] = 0
       summary[key][:count] = 0
+
       detail.each_with_index do |tr, i|
+        key_amount = summary[key][:amount] += tr[:amount]
         summary[key] = {
             count: i + 1,
-            amount: summary[key][:amount] += tr[:amount],
-            rate: calculate_percent(i + 1, total_tran_count)
+            amount: key_amount,
+            rate: calculate_percent(key_amount, total_amount)
         }
       end
     end
@@ -296,9 +298,8 @@ class Services::TransactionService
   end
 
   private
-  def self.calculate_percent(transaction_count, total_tran_count)
-    return 0 if transaction_count.to_i.zero?
-    (transaction_count.to_f / total_tran_count.to_f * 100).round
+  def self.calculate_percent(transaction_amount, total_amount)
+    (transaction_amount.to_f / total_amount.to_f * 100).round
   end
 
   def self.set_response
