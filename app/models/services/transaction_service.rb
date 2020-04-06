@@ -281,6 +281,8 @@ class Services::TransactionService
       summary[key][:amount] = 0
       summary[key][:count] = 0
 
+      next if total_amount.to_i.zero?
+
       detail.each_with_index do |tr, i|
         key_amount = summary[key][:amount] += tr[:amount]
         summary[key] = {
@@ -291,7 +293,7 @@ class Services::TransactionService
       end
     end
 
-    summary = fetch_tran_rate(summary)
+    summary = fetch_tran_rate(summary) unless total_amount.to_i.zero?
     summary[:owner_partner_diff_amount] = fetch_owner_partner_diff_amount(summary)
     summary[:total_amount] = fetch_total_amount(summary)
     summary
