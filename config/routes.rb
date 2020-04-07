@@ -140,6 +140,9 @@ Rails.application.routes.draw do
       resources :activities, :path => '/activities', :only => [:index] do
       end
 
+      post 'purchase/app-store-receipt-verification', to: 'purchase#app_store_receipt_verification'
+      post 'purchase/google-play-receipt-verification', to: 'purchase#google_play_receipt_verification'
+
       get 'user/status', :to => 'users#status'
 
       # 個人用

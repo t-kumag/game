@@ -14,6 +14,12 @@ defaults: &defaults
   pairing_token_salt: 2dhp2fw5gra4aks
   s3_img_url: https://osdr-img-test.s3-ap-northeast-1.amazonaws.com
 
+  app_store_secret: e19f70c68e664697b9accb0099800c62
+
+  google_play_client_id: 1034374124750-i86np3b87kf5mlf72395qo42idvnumv6.apps.googleusercontent.com
+  google_play_client_secret: pE74Gdih8-uum0oJJ4c4X8km
+  google_play_refresh_token: 1//0esbnohovqnN8CgYIARAAGA4SNwF-L9IrqQFz-EB4cOXNrAU2cjWrnl3Ju53QDMleRgUdqfGys2gHP_IwaLh4tt42xrwe6lyivwI
+
 test:
   <<: *defaults
   api_url: https://beta2.osidori-dev.com
@@ -31,6 +37,9 @@ development:
   at_account_name_prefix: osdrdev
   s3_img_url: https://osidori-img-dev.s3-ap-northeast-1.amazonaws.com
 
+  app_store_bundle_id: com.osidori.inc
+  app_store_receipt_verification_url: https://sandbox.itunes.apple.com/verifyReceipt
+
 staging:
   <<: *defaults
   api_url: https://stg-api.osidori-dev.com
@@ -40,6 +49,9 @@ staging:
   at_account_name_prefix: osdrstg
   s3_img_url: https://osidori-img-stg.s3-ap-northeast-1.amazonaws.com
 
+  app_store_bundle_id: com.stg.osidori.inc
+  app_store_receipt_verification_url: https://sandbox.itunes.apple.com/verifyReceipt
+
 production:
   <<: *defaults
   api_url: https://api-osidori.com
@@ -48,3 +60,6 @@ production:
   at_chnl_id: CHNL_OSIDORI
   at_account_name_prefix: osdr
   s3_img_url: https://osidori-img.s3-ap-northeast-1.amazonaws.com
+
+  app_store_bundle_id: osidori.inc
+  app_store_receipt_verification_url: https://buy.itunes.apple.com/verifyReceipt

@@ -91,4 +91,8 @@ class Entities::User < ApplicationRecord
     return {} if participate_group.blank?
     Entities::User.find(participate_group.user_id)
   end
+
+  def update_rank_premium
+    self.update!(rank: 1)
+  end
 end
