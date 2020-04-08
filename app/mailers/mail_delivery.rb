@@ -7,7 +7,7 @@ class MailDelivery < ApplicationMailer
       mail( :to => user.email,
             :subject => '【OsidOri】登録を完了してはじめよう')
     rescue => e
-      return render_500 e
+      raise e
     end
   end
 
@@ -17,7 +17,7 @@ class MailDelivery < ApplicationMailer
       mail( :to => user.email,
             :subject => '【OsidOri】パスワード再設定のご連絡')
     rescue => e
-      return render_500 e
+      raise e
     end
   end
   
@@ -27,7 +27,7 @@ class MailDelivery < ApplicationMailer
       mail( :to => user.email,
             :subject => '【OsidOri】口座連携エラーが発生しました')
     rescue => e
-      return render_500 e
+      raise e
     end
   end
 
@@ -37,7 +37,7 @@ class MailDelivery < ApplicationMailer
       mail( :to => user.email,
             :subject => '【OsidOri】口座連携エラーのためスクレイピングスキップしました。' )
     rescue => e
-      return render_500 e
+      raise e
     end
   end
 
@@ -47,7 +47,7 @@ class MailDelivery < ApplicationMailer
       mail( :to => user.email,
             :subject => '【OsidOri】ペアリング完了です！' )
     rescue => e
-      return render_500 e
+      raise e
     end
   end
 
