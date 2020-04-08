@@ -41,7 +41,7 @@ Metrics/ModuleLength:
   Enabled: false
 
 Metrics/AbcSize:
-  Max: 20
+  Max: 50
 
 FormatString:
   EnforcedStyle: percent
