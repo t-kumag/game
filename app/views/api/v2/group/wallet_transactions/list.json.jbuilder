@@ -10,9 +10,9 @@ json.transactions do
     json.is_account_shared @transactions[:is_account_shared]
     json.is_shared transaction.share
     json.is_ignored transaction.ignore
-    json.at_transaction_category_id transaction.at_transaction_category_id
-    json.category_name1 transaction.at_transaction_category.category_name1
-    json.category_name2 transaction.at_transaction_category.category_name2
+    json.at_transaction_category_id @category_map[transaction.at_transaction_category_id]['id']
+    json.category_name1 @category_map[transaction.at_transaction_category_id]['category_name1']
+    json.category_name2 @category_map[transaction.at_transaction_category_id]['category_name2']
     json.transaction_id transaction.user_manually_created_transaction_id
     json.payment_method_id transaction.user_manually_created_transaction.payment_method_id
     json.payment_method_type transaction.user_manually_created_transaction.payment_method_type

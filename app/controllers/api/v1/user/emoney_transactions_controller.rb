@@ -11,6 +11,7 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
         params[:from],
         params[:to]
     ).list(account_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
 
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'
@@ -23,6 +24,8 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
     end
 
     @response = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:emoney_account_id], transaction_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
+
     render json: {}, status: 200 and return if @response.blank?
     render 'show', formats: 'json', handlers: 'jbuilder'
   end
@@ -36,6 +39,9 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
     @exist_transaction = Services::AtEmoneyTransactionService.new(@current_user).detail(params[:emoney_account_id], transaction_id)
     render_disallowed_transaction_ids && return unless @exist_transaction.present?
     emoney_account_transaction_param = get_emoney_account_transaction_param(params, transaction_id, @exist_transaction)
+    if emoney_account_transaction_param[:at_transaction_category_id].nil?
+      render_need_restart && return
+    end
 
     @response = Services::AtEmoneyTransactionService.new(@current_user).update(
         emoney_account_transaction_param[:emoney_account_id],
@@ -62,6 +68,8 @@ class Api::V1::User::EmoneyTransactionsController < ApplicationController
   def get_emoney_account_transaction_param(params, transaction_id, exist_transaction)
     at_transaction_category_id = params[:at_transaction_category_id].present? ?
                                      params[:at_transaction_category_id] : exist_transaction[:at_transaction_category_id]
+    at_transaction_category_id = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(at_transaction_category_id)
+
     used_location = params[:used_location].nil? ? exist_transaction[:used_location] : params[:used_location]
     memo = params[:memo].blank? ? nil : params[:memo]
     share = params[:share].present? ? params[:share] : false

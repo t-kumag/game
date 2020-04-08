@@ -15,6 +15,7 @@ RSpec.describe Api::V1::User::BankTransactionsController do
   }
   let!(:at_grouped_category) { create(:at_grouped_category) }
   let!(:at_transaction_category) { create(:at_transaction_category) }
+  let!(:categories) { create(:at_grouped_category, :with_at_transaction_categories) }
 
   describe '#show' do
     context 'success' do
