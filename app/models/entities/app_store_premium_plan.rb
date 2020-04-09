@@ -3,7 +3,7 @@ class Entities::AppStorePremiumPlan < ApplicationRecord
     list = {}
     self.all.map do |plan|
       list["#{Settings.app_store_bundle_id}.#{plan.product_id}"] = plan
-    end
-    list
+  end
+  list
   end
 end

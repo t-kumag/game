@@ -1,4 +1,4 @@
-class Api::V2::PurchaseController < ApplicationController
+class Api::V2::PurchasesController < ApplicationController
   before_action :authenticate
 
   # AppStoreの購入確認処理
@@ -23,13 +23,6 @@ class Api::V2::PurchaseController < ApplicationController
       return render_500 e
     end
     render(json: {}, status: 204)
-  end
-
-  # 選択可能なプランを返す
-  def plans
-    # TODO 自分が購入した場合
-    # TODO 相手が購入した場合
-    #
   end
 end
 

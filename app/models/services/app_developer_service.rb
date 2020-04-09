@@ -10,7 +10,8 @@ class Services::AppDeveloperService
     requester = AppDeveloperAPIRequest::AppStore::ReceiptVerification.new({'receipt_data' => params['receipt_data']})
     res = AppDeveloperApiClient.new(requester).request
 
-    p res
+    # # TODO debug
+    # p res
     # p res['receipt']['in_app'].first
 
     fail StandardError, '007105' if res.blank?
@@ -128,7 +129,7 @@ class Services::AppDeveloperService
     requester = AppDeveloperAPIRequest::GooglePlay::ReceiptVerification.new(params)
     res = AppDeveloperApiClient.new(requester).request
 
-    p res # debug
+    #p res # debug
 
     if res['orderId'].blank? || res['startTimeMillis'].blank? || res['expiryTimeMillis'].blank?
       fail StandardError, '007202'
@@ -201,6 +202,8 @@ class Services::AppDeveloperService
   private
 end
 
+
+# # TODO debug
 # params = {
 #     "product_id" => "monthly_plan",
 #     "purchase_token" => "aogipmpcmflncngblhbkfhje.AO-J1OwgR4DIW_tu7r9C9PYrAr1d5bjEQSqzpRQYvyLLuBMHVXxCu98bqkGGVGN-r_S_i86nQqxcj6ixfhpGqulQvaOWGQZRHfAr3kyOs3dWfXYgBiIt9K4",
