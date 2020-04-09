@@ -10,10 +10,10 @@ class Services::AppDeveloperService
     requester = AppDeveloperAPIRequest::AppStore::ReceiptVerification.new({'receipt_data' => params['receipt_data']})
     res = AppDeveloperApiClient.new(requester).request
 
-    # p res['latest_receipt_info']
+    p res
     # p res['receipt']['in_app'].first
 
-    fail StandardError, 'Error App Store Receipt Verification Response Empty' if res.blank?
+    fail StandardError, '007105' if res.blank?
 
     # # TODO debug
     # res['status'] = 0
@@ -26,30 +26,37 @@ class Services::AppDeveloperService
     case res['status']
     when 0
       p 'status OK'
-    when 21002 # TODO: 送信したレシートのフォーマットのエラー
+    when 21002 # レシートのフォーマットのエラー
       p 'receipt NG'
-      fail StandardError, 'Error App Store Receipt Verification 21002'
-    when 21004 # TODO: 購入情報エラー　共有シークレットが間違っている
+      fail StandardError, '007101'
+    when 21004 # 共有シークレットなど環境情報のエラー
       p 'secret NG'
-      fail StandardError, 'Error App Store Receipt Verification 21004'
-    when 21007 # TODO: prod環境でもstagingの情報を返す場合がある
-      p 'enviroment NG'
-      fail StandardError, 'Error App Store Receipt Verification 21007'
+      fail StandardError, '007102'
+    when 21007 # 送信先は本番環境でもstagingの情報を返してきた場合のエラー
+      fail StandardError, '007103'
     else
-      fail StandardError, 'Error App Store Receipt Verification Status NG'
+      fail StandardError, '007104'
     end
 
+    # レシートの不一致
     unless res['latest_receipt'] != params['receipt_data']
-      fail StandardError, 'Error App Store Receipt Verification Receipt NG'
+      fail StandardError, '007106'
     end
 
     if res['receipt']['bundle_id'] != 'com.osidori.inc'
-      fail StandardError, 'Error App Store Receipt Verification Bundle Id NG'
+      fail StandardError, '007107'
     end
 
+
     res['latest_receipt_info'].each do |r|
-      #
       next unless r['transaction_id'].present? && r['purchase_date'].present? && r['expires_date'].present?
+
+      # 期限切れを確認
+      if r['expires_date'] < Time.zone.now
+        # fail StandardError, '007108'
+        next
+      end
+
       # 購入情報と購入ログを更新
       save_app_store_purchase_and_purchase_log(r, res['latest_receipt'])
 
@@ -111,7 +118,7 @@ class Services::AppDeveloperService
   def google_play_receipt_verification(params)
     requester = AppDeveloperAPIRequest::GooglePlay::GeAccessToken.new
     res = AppDeveloperApiClient.new(requester).request
-    fail StandardError, 'Error Google Play Receipt Verification Response Empty' if res.blank?
+    fail StandardError, '007201' if res.blank?
 
     params = {
       'product_id' => params['product_id'],
@@ -124,16 +131,19 @@ class Services::AppDeveloperService
     p res # debug
 
     if res['orderId'].blank? || res['startTimeMillis'].blank? || res['expiryTimeMillis'].blank?
-      fail StandardError, 'Error Google Play Receipt Verification Empty orderId,startTimeMillis,expiryTimeMillis'
+      fail StandardError, '007202'
     end
     # 購入情報と購入ログを更新
     save_google_play_purchase_and_purchase_log(res, params['product_id'])
 
     if @google_play_premium_plans[params['product_id']].blank?
-      fail StandardError, 'Error Google Play Receipt Verification Not Found plan'
+      fail StandardError, '007203'
     end
+
+    # 期限切れを確認
     if Time.zone.at(res['expiryTimeMillis'].to_i / 1000.0) < Time.zone.now
-      fail StandardError, 'Error Google Play Receipt Verification Over Expiry'
+      #fail StandardError, '007204'
+      return true
     end
 
     case params['product_id']
@@ -198,7 +208,7 @@ end
 #     }
 #
 #
-params = {
-  'product_id' => 'monthly_plan',
-  'purchase_token' => 'aogipmpcmflncngblhbkfhje.AO-J1OwgR4DIW_tu7r9C9PYrAr1d5bjEQSqzpRQYvyLLuBMHVXxCu98bqkGGVGN-r_S_i86nQqxcj6ixfhpGqulQvaOWGQZRHfAr3kyOs3dWfXYgBiIt9K4'
-}
+# params = {
+#   'product_id' => 'monthly_plan',
+#   'purchase_token' => 'aogipmpcmflncngblhbkfhje.AO-J1OwgR4DIW_tu7r9C9PYrAr1d5bjEQSqzpRQYvyLLuBMHVXxCu98bqkGGVGN-r_S_i86nQqxcj6ixfhpGqulQvaOWGQZRHfAr3kyOs3dWfXYgBiIt9K4'
+# }

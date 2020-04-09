@@ -30,5 +30,22 @@ module ERROR_TYPE
       '007003' => { code: '007003', message: 'この機能はプレミアムプランへの登録が必要です。ぜひお試しください。', info: 'Not premium user.'},
       '007004' => { code: '007004', message: 'プレミアムプランに加入すると、現在から3ヶ月以前の収支を表示することができます。', info: 'Not premium user.'},
       '008001' => { code: '008001', message: 'ネットワークエラー', info: ''},
+
+      # app store receipt verification
+      '007101' => { code: '007101', message: '', info: 'Error App Store Receipt Verification 21002'},
+      '007102' => { code: '007102', message: '', info: 'Error App Store Receipt Verification 21004'},
+      '007103' => { code: '007103', message: '', info: 'Error App Store Receipt Verification 21007'},
+      '007104' => { code: '007104', message: '', info: 'Error App Store Receipt Verification Status NG'},
+      '007105' => { code: '007105', message: '', info: 'Error App Store Receipt Verification Response Empty'},
+      '007106' => { code: '007106', message: '', info: 'Error App Store Receipt Verification Receipt NG'},
+      '007107' => { code: '007107', message: '', info: 'Error App Store Receipt Verification Bundle Id NG'},
+      '007108' => { code: '007108', message: '', info: 'Error App Store Receipt Verification Over Expiry'},
+
+      # google store receipt verification
+      '007201' => { code: '007201', message: '', info: 'Error Google Play Receipt Verification Response Empty'},
+      '007202' => { code: '007202', message: '', info: 'Error Google Play Receipt Verification Empty orderId,startTimeMillis,expiryTimeMillis'},
+      '007203' => { code: '007203', message: '', info: 'Error Google Play Receipt Verification Not Found plan'},
+      '007204' => { code: '007204', message: '', info: 'Error Google Play Receipt Verification Over Expiry'},
+
   }.freeze
 end
