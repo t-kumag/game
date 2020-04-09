@@ -14,6 +14,7 @@ class Api::V2::Group::TransactionsController < ApplicationController
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
     transactions += Services::TransactionService.new(
         @current_user,
+        @category_version,
         nil,                 # category_id
         true,                # share
         params[:scope],      # scope
@@ -25,6 +26,7 @@ class Api::V2::Group::TransactionsController < ApplicationController
 
     transactions += Services::TransactionService.new(
         @current_user.partner_user,
+        @category_version,
         nil,                 # category_id
         true,                # share
         params[:scope],      # scope

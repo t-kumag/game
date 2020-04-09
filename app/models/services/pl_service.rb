@@ -1,8 +1,9 @@
 # TODO 目標単位でも集計できるようにする
 class Services::PlService
-  def initialize(user, with_group=false)
+  def initialize(user, category_version, with_group=false)
     @user = user
     @with_group = with_group
+    @category_version = category_version
   end
 
   def ignore_at_category_ids
@@ -24,21 +25,25 @@ class Services::PlService
   end
 
   def bank_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+    undefined_category = @category_service.get_undefined_transaction_category(@category_version)
+    undefined_id = undefined_category[0].to_h['id'].to_s
+
     sql = <<-EOS
       SELECT
-        udt.at_transaction_category_id,
+        #{@category_service.is_latest_version? ?
+          'udt.at_transaction_category_id' :
+          'CASE WHEN atc.before_version_id is null then "' + undefined_id + '" ELSE atc.before_version_id END AS at_transaction_category_id'
+        },
         udt.at_user_bank_transaction_id,
         aubt.at_user_bank_account_id,
-      CASE
-        WHEN udt.amount > 0 THEN udt.amount
-        ELSE 0
-      END AS amount_receipt,
-      CASE
-        WHEN udt.amount < 0 THEN udt.amount
-        ELSE 0
-      END AS amount_payment,
-        atc.category_name1,
-        atc.category_name2
+        CASE
+          WHEN udt.amount > 0 THEN udt.amount
+          ELSE 0
+        END AS amount_receipt,
+        CASE
+          WHEN udt.amount < 0 THEN udt.amount
+          ELSE 0
+        END AS amount_payment
       FROM
         user_distributed_transactions as udt
       INNER JOIN
@@ -73,17 +78,21 @@ class Services::PlService
   end
 
   def card_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+    undefined_category = @category_service.get_undefined_transaction_category(@category_version)
+    undefined_id = undefined_category[0].to_h['id'].to_s
+
     sql = <<-EOS
       SELECT
-        udt.at_transaction_category_id,
+        #{@category_service.is_latest_version? ?
+          'udt.at_transaction_category_id' :
+          'CASE WHEN atc.before_version_id is null then "' + undefined_id + '" ELSE atc.before_version_id END AS at_transaction_category_id'
+        },
         udt.at_user_card_transaction_id,
         auct.at_user_card_account_id,
-      CASE
-        WHEN udt.amount < 0 THEN udt.amount
-        ELSE 0
-      END AS amount_payment,
-        atc.category_name1,
-        atc.category_name2
+        CASE
+          WHEN udt.amount < 0 THEN udt.amount
+          ELSE 0
+        END AS amount_payment
       FROM
         user_distributed_transactions as udt
       INNER JOIN
@@ -118,21 +127,25 @@ class Services::PlService
   end
 
   def emoney_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+    undefined_category = @category_service.get_undefined_transaction_category(@category_version)
+    undefined_id = undefined_category[0].to_h['id'].to_s
+
     sql = <<-EOS
       SELECT
-        udt.at_transaction_category_id,
+        #{@category_service.is_latest_version? ?
+          'udt.at_transaction_category_id' :
+          'CASE WHEN atc.before_version_id is null then "' + undefined_id + '" ELSE atc.before_version_id END AS at_transaction_category_id'
+        },
         udt.at_user_emoney_transaction_id,
         auet.at_user_emoney_service_account_id,
-      CASE
-        WHEN udt.amount > 0 THEN udt.amount
-        ELSE 0
-      END AS amount_receipt,
-      CASE
-        WHEN udt.amount < 0 THEN udt.amount
-        ELSE 0
-      END AS amount_payment,
-        atc.category_name1,
-        atc.category_name2
+        CASE
+          WHEN udt.amount > 0 THEN udt.amount
+          ELSE 0
+        END AS amount_receipt,
+        CASE
+          WHEN udt.amount < 0 THEN udt.amount
+          ELSE 0
+        END AS amount_payment
       FROM
         user_distributed_transactions as udt
       INNER JOIN
@@ -167,19 +180,23 @@ class Services::PlService
   end
 
   def user_manually_created_category_summary(share, from=Time.zone.today.beginning_of_month, to=Time.zone.today.end_of_month)
+    undefined_category = @category_service.get_undefined_transaction_category(@category_version)
+    undefined_id = undefined_category[0].to_h['id'].to_s
+
     sql = <<-EOS
       SELECT
-        udt.at_transaction_category_id,
-      CASE
-        WHEN udt.amount < 0 THEN udt.amount
-        ELSE 0
-      END AS amount_payment,
-      CASE
-        WHEN udt.amount > 0 THEN udt.amount
-        ELSE 0
-      END AS amount_receipt,
-        atc.category_name1,
-        atc.category_name2
+        #{@category_service.is_latest_version? ?
+          'udt.at_transaction_category_id' :
+          'CASE WHEN atc.before_version_id is null then "' + undefined_id + '" ELSE atc.before_version_id END AS at_transaction_category_id'
+        },
+        CASE
+          WHEN udt.amount < 0 THEN udt.amount
+          ELSE 0
+        END AS amount_payment,
+        CASE
+          WHEN udt.amount > 0 THEN udt.amount
+          ELSE 0
+        END AS amount_receipt
       FROM
         user_distributed_transactions as udt
       INNER JOIN
@@ -246,6 +263,8 @@ class Services::PlService
     from = from || Time.zone.today.beginning_of_month
     to = to || Time.zone.today.end_of_month
 
+    @category_service = Services::CategoryService.new(@category_version)
+
     # P/L 用の明細を取得
     pl_bank = bank_category_summary(share, from, to)
     pl_card = card_category_summary(share, from, to)
@@ -258,6 +277,12 @@ class Services::PlService
     pl_emoney = group_by_category_id(pl_emoney)
 
     pl_user_manually_created = user_manually_created_category_summary(share, from, to)
+
+    pl_bank = set_category_name(pl_bank)
+    pl_card = set_category_name(pl_card)
+    pl_emoney = set_category_name(pl_emoney)
+    pl_user_manually_created = set_category_name(pl_user_manually_created)
+
     merge_category_summary(pl_user_manually_created, merge_category_summary(pl_emoney, merge_category_summary(pl_card, pl_bank)))
   end
 
@@ -369,7 +394,7 @@ class Services::PlService
     to = to || Time.zone.today.end_of_month
 
     # PL を大項目ごとに集計し直すため、大項目の一覧を取得
-    grouped_categories = Entities::AtGroupedCategory.all.map { |category|
+    grouped_categories = Entities::AtGroupedCategory.where(version: @category_version).map { |category|
       {
         id: category.id,
         name: category.category_name,
@@ -410,6 +435,16 @@ class Services::PlService
     pl_bank.reject do |t|
       debit_transactions_ids.include? t['at_user_bank_transaction_id']
     end
+  end
+
+  def set_category_name(transactions)
+    category_name_map = @category_service.category_name_map
+    transactions.each do |transaction|
+      at_transaction_category_id = transaction['at_transaction_category_id'].to_i
+      transaction['category_name1'] = category_name_map[at_transaction_category_id][:category_name1]
+      transaction['category_name2'] = category_name_map[at_transaction_category_id][:category_name2]
+    end
+    transactions
   end
 
   def debit_transactions(pl_bank, pl_card)

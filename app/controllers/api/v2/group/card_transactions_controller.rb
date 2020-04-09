@@ -13,6 +13,7 @@ class Api::V2::Group::CardTransactionsController < ApplicationController
         params[:from],
         params[:to]
     ).list(account_id)
+    @category_map = Services::CategoryService.new(@category_version).category_map
 
     render json: {}, status: 200 and return if @transactions.blank?
     render 'list', formats: 'json', handlers: 'jbuilder'

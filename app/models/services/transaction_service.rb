@@ -1,10 +1,11 @@
 class Services::TransactionService
-  def initialize(user, category_id, share, scope=nil, with_group=false, from, to)
+  def initialize(user, category_version, category_id, share, scope=nil, with_group=false, from, to)
     @user = user
     @category_id = category_id
     @share = share == "true" ? true : false
     @with_group = with_group
     @scope = scope
+    @category_version = category_version
 
     # from の 00:00:00 から to の 23:59:59 までのデータを取得
     # from/to の指定がなければ当月の月初から月末までのデータを取得
@@ -15,10 +16,25 @@ class Services::TransactionService
   def fetch_transactions(ids, from, to)
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
-      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-      card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-      emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-      user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      convert_ids = []
+      @category_service = Services::CategoryService.new(@category_version)
+
+      unless @category_service.is_latest_version?
+        undefined_category = @category_service.get_undefined_transaction_category(@category_version)
+        undefined_id = undefined_category[0].to_h['id']
+        if ids.try(:include?, undefined_id)
+          ids << nil
+        end
+        bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
+        card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
+        emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
+        user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
+      else
+        bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+        card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+        emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+        user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
+      end
     else
       bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, used_date: from..to)
       card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, used_date: from..to)

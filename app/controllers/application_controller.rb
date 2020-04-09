@@ -112,6 +112,7 @@ class ApplicationController < ActionController::Base
   def authenticate
     return render_unauthorized unless authenticate_token
     activated?
+    category_version
   end
 
   # def token_authenticate
@@ -133,6 +134,10 @@ class ApplicationController < ActionController::Base
 
   def render_forbidden
     render json: {}, status: :forbidden
+  end
+
+  def category_version
+    @category_version = request.headers['CategoryVersion'].present? ? request.headers['CategoryVersion'] : 1
   end
 
   def render_unauthorized
@@ -448,6 +453,14 @@ class ApplicationController < ActionController::Base
   #def render_disallowed_transactions_date
   #  render json: { errors: [ERROR_TYPE::NUMBER['007004']] }, status: 422
   #end
+
+  def render_disallowed_support_category_version
+    render json: { errors: [ERROR_TYPE::NUMBER['009001']] }, status: 422
+  end
+
+  def render_need_restart
+    render json: { errors: [ERROR_TYPE::NUMBER['009002']] }, status: 422
+  end
 
   def limit_of_registered_finance?
     at_user_bank_account_ids = @current_user.try(:at_user).try(:at_user_bank_accounts).try(:pluck ,:id)

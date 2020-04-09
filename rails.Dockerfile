@@ -47,4 +47,3 @@ EXPOSE 3000
 #CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "production", "-C", "config/puma/production.rb"]
 #CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "staging", "-C", "config/puma/staging.rb"]
 CMD ["bundle", "exec", "puma", "-t", "5:5", "-p", "3000", "-e", "development", "-C", "config/puma/development.rb"]
-

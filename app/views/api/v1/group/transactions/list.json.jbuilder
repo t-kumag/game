@@ -17,7 +17,7 @@ json.app do
     json.is_shared r[:is_shared]
     json.is_account_shared r[:is_account_shared]
     json.transaction_id r[:transaction_id]
-    json.at_transaction_category_id r[:at_transaction_category_id]
+    json.at_transaction_category_id @category_map[r[:at_transaction_category_id]]['id']
     json.is_ignored r[:is_ignored]
   end
 end

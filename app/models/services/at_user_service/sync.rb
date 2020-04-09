@@ -72,7 +72,7 @@ class Services::AtUserService::Sync
     token = @user.at_user.at_user_tokens.first.token
 
     # db
-    category_map = Entities::AtTransactionCategory.all.map { |i| [i.at_category_id, i] }.to_h
+    category_map = create_category_map
 
     # ATの同期log
     sync_account_ids = []
@@ -112,9 +112,9 @@ class Services::AtUserService::Sync
 
           at_category_id = i['CATEGORY_ID']
           at_transaction_category_id = if category_map.key?(at_category_id)
-                                         category_map[at_category_id].id
+                                         category_map[at_category_id]
                                        else
-                                         1 # 未分類
+                                         category_map["0000"] # 未分類
           end
 
           tran = transaction_entity.new
@@ -500,5 +500,31 @@ class Services::AtUserService::Sync
     if Rails.env.development?
       #SlackNotifier.ping("INFO 金融エラー通知テスト") # debug
     end
+  end
+
+  def create_category_map
+    sql = <<-EOS
+    SELECT
+      atc.at_category_id
+      , atc.id
+    FROM
+      at_transaction_categories atc
+    LEFT JOIN
+      at_grouped_categories agc
+    ON
+      agc.id = atc.at_grouped_category_id
+    WHERE
+      agc.version=(SELECT max(version) FROM at_grouped_categories)
+      AND atc.at_category_id <> ""
+    EOS
+    transaction_categories =  ActiveRecord::Base.connection.select_all(sql).to_hash
+
+    category_map = {}
+    transaction_categories.each do | transaction_category |
+      transaction_category['at_category_id'].split(/,/).each do | at_categori_id |
+        category_map[at_categori_id] = transaction_category['id']
+      end
+    end
+    return category_map
   end
 end
