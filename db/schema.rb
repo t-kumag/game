@@ -10,18 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_02_26_050715) do
+ActiveRecord::Schema.define(version: 2020_04_09_124005) do
 
   create_table "activities", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "group_id"
     t.integer "count", default: 0, null: false
     t.string "activity_type", null: false
+    t.string "url"
+    t.string "message"
     t.datetime "date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "message", default: ""
-    t.string "url"
+  end
+
+  create_table "app_store_premium_plans", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.string "product_id", null: false
+    t.string "name", null: false
+    t.string "description", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "at_banks", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -71,7 +79,6 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
     t.datetime "latest_date", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id"
   end
 
   create_table "at_sync_transaction_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -363,7 +370,7 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
     t.index ["at_user_emoney_service_account_id", "date"], name: "index_b_l_on_at_user_emoney_service_account_id_and_date", unique: true
     t.index ["at_user_emoney_service_account_id"], name: "index_b_l_on_at_user_emoney_service_account_id"
     t.index ["wallet_id", "date"], name: "index_b_l_on_wallet_id_and_date", unique: true
-    t.index ["wallet_id"], name: "index_b_l_on_wallet_id"
+    t.index ["wallet_id"], name: "index_balance_logs_on_wallet_id"
   end
 
   create_table "budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -439,6 +446,14 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
     t.index ["user_id"], name: "index_goals_on_user_id"
   end
 
+  create_table "google_play_premium_plans", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.string "product_id", null: false
+    t.string "name", null: false
+    t.string "description", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -480,7 +495,6 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
     t.index ["group_id"], name: "index_pairing_requests_on_group_id"
     t.index ["to_user_id"], name: "index_pairing_requests_on_to_user_id"
     t.index ["token"], name: "index_pairing_requests_on_token", unique: true
-    t.index ["token"], name: "token", unique: true
   end
 
   create_table "participate_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -492,6 +506,21 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
     t.index ["deleted_at"], name: "index_participate_groups_on_deleted_at"
     t.index ["group_id"], name: "index_participate_groups_on_group_id"
     t.index ["user_id"], name: "index_participate_groups_on_user_id"
+  end
+
+  create_table "user_app_store_purchase_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "transaction_id"
+    t.bigint "app_store_premium_plan_id"
+    t.string "product_id", null: false
+    t.datetime "purchase_date", null: false
+    t.datetime "expires_date", null: false
+    t.boolean "is_trial_period", default: false, null: false
+    t.text "receipt", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_store_premium_plan_id"], name: "index_user_app_store_purchase_logs_on_app_store_premium_plan_id"
+    t.index ["user_id"], name: "index_user_app_store_purchase_logs_on_user_id"
   end
 
   create_table "user_budget_questions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
@@ -539,9 +568,9 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "used_location"
+    t.text "memo"
     t.bigint "amount", default: 0, null: false
     t.bigint "at_transaction_category_id"
-    t.text "memo"
     t.boolean "ignore", default: false
     t.index ["at_transaction_category_id"], name: "index_u_d_t_on_at_transaction_category_id"
     t.index ["at_user_bank_transaction_id"], name: "index_u_d_t_on_at_user_bank_transaction_id"
@@ -556,6 +585,20 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
     t.index ["user_manually_created_transaction_id"], name: "index_u_d_t_on_user_manually_created_transaction_id"
   end
 
+  create_table "user_google_play_purchase_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "order_id", null: false
+    t.bigint "google_play_premium_plan_id"
+    t.boolean "auto_renewing", default: false, null: false
+    t.datetime "start_time_millis", null: false
+    t.datetime "expiry_time_millis", null: false
+    t.string "purchase_token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["google_play_premium_plan_id"], name: "index_u_g_p_p_l_on_google_play_premium_plan_id"
+    t.index ["user_id"], name: "index_user_google_play_purchase_logs_on_user_id"
+  end
+
   create_table "user_icons", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.string "img_url", null: false
@@ -567,20 +610,20 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
   create_table "user_manually_created_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "at_transaction_category_id"
-    t.bigint "payment_method_id"
     t.date "used_date", null: false
     t.string "title"
     t.bigint "amount", default: 0, null: false
     t.string "used_location"
+    t.text "memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "memo"
     t.string "payment_method_type"
+    t.integer "payment_method_id"
     t.index ["at_transaction_category_id"], name: "index_u_m_c_t_on_at_transaction_category_id"
     t.index ["user_id"], name: "index_user_manually_created_transactions_on_user_id"
   end
 
-  create_table "user_notices", options: "ENGINE=InnoDB DEFAULT CHARSET=latin1", force: :cascade do |t|
+  create_table "user_notices", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "notice_id"
     t.bigint "user_id", null: false
     t.boolean "read"
@@ -612,6 +655,21 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
     t.index ["user_id"], name: "index_user_profiles_on_user_id"
   end
 
+  create_table "user_purchases", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "app_store_premium_plan_id"
+    t.bigint "google_play_premium_plan_id"
+    t.string "order_transaction_id", null: false
+    t.datetime "subscription_start_at", null: false
+    t.datetime "subscription_expires_at", null: false
+    t.datetime "purchase_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["app_store_premium_plan_id"], name: "index_user_purchases_on_app_store_premium_plan_id"
+    t.index ["google_play_premium_plan_id"], name: "index_user_purchases_on_google_play_premium_plan_id"
+    t.index ["user_id"], name: "index_user_purchases_on_user_id"
+  end
+
   create_table "user_transactions", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.integer "log_user_id"
     t.integer "group_id"
@@ -641,7 +699,7 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
   create_table "wallets", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC", force: :cascade do |t|
     t.bigint "user_id"
     t.string "name"
-    t.integer "initial_balance"
+    t.integer "initial_balance", default: 0, null: false
     t.integer "balance", default: 0, null: false
     t.integer "group_id"
     t.boolean "share", default: false, null: false
@@ -679,11 +737,16 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
   add_foreign_key "at_user_stock_logs", "at_user_stock_accounts"
   add_foreign_key "at_user_tokens", "at_users"
   add_foreign_key "at_users", "users"
+  add_foreign_key "balance_logs", "at_user_bank_accounts"
+  add_foreign_key "balance_logs", "at_user_emoney_service_accounts"
+  add_foreign_key "balance_logs", "wallets"
   add_foreign_key "email_authentication_tokens", "users", column: "users_id"
   add_foreign_key "goal_logs", "at_user_bank_accounts"
   add_foreign_key "goal_logs", "goals"
+  add_foreign_key "goal_logs", "wallets"
   add_foreign_key "goal_settings", "at_user_bank_accounts"
   add_foreign_key "goal_settings", "goals"
+  add_foreign_key "goal_settings", "wallets"
   add_foreign_key "goals", "goal_types"
   add_foreign_key "goals", "groups"
   add_foreign_key "goals", "users"
@@ -692,6 +755,8 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
   add_foreign_key "pairing_requests", "users", column: "to_user_id"
   add_foreign_key "participate_groups", "groups"
   add_foreign_key "participate_groups", "users"
+  add_foreign_key "user_app_store_purchase_logs", "app_store_premium_plans"
+  add_foreign_key "user_app_store_purchase_logs", "users"
   add_foreign_key "user_budget_questions", "budget_questions"
   add_foreign_key "user_budget_questions", "users"
   add_foreign_key "user_cancel_answers", "user_cancel_questions"
@@ -704,6 +769,8 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
   add_foreign_key "user_distributed_transactions", "groups"
   add_foreign_key "user_distributed_transactions", "user_manually_created_transactions"
   add_foreign_key "user_distributed_transactions", "users"
+  add_foreign_key "user_google_play_purchase_logs", "google_play_premium_plans"
+  add_foreign_key "user_google_play_purchase_logs", "users"
   add_foreign_key "user_icons", "users"
   add_foreign_key "user_manually_created_transactions", "at_transaction_categories"
   add_foreign_key "user_manually_created_transactions", "users"
@@ -711,5 +778,8 @@ ActiveRecord::Schema.define(version: 2020_02_26_050715) do
   add_foreign_key "user_notices", "users"
   add_foreign_key "user_pl_settings", "users"
   add_foreign_key "user_profiles", "users"
+  add_foreign_key "user_purchases", "app_store_premium_plans"
+  add_foreign_key "user_purchases", "google_play_premium_plans"
+  add_foreign_key "user_purchases", "users"
   add_foreign_key "wallets", "users"
 end

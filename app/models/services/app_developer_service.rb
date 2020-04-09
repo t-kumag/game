@@ -129,13 +129,13 @@ class Services::AppDeveloperService
     requester = AppDeveloperAPIRequest::GooglePlay::ReceiptVerification.new(params)
     res = AppDeveloperApiClient.new(requester).request
 
-    #p res # debug
+    p res # debug
 
     if res['orderId'].blank? || res['startTimeMillis'].blank? || res['expiryTimeMillis'].blank?
       fail StandardError, '007202'
     end
     # 購入情報と購入ログを更新
-    save_google_play_purchase_and_purchase_log(res, params['product_id'])
+    save_google_play_purchase_and_purchase_log(res, params)
 
     if @google_play_premium_plans[params['product_id']].blank?
       fail StandardError, '007203'
@@ -165,18 +165,17 @@ class Services::AppDeveloperService
     raise e
   end
 
-  def save_google_play_purchase_and_purchase_log(row, product_id)
+  def save_google_play_purchase_and_purchase_log(row, request_params)
     purchase_log = Entities::UserGooglePlayPurchaseLog.find_by(order_id: row['orderId'])
     params = {
-      google_play_premium_plan_id: @google_play_premium_plans[product_id].id,
+      google_play_premium_plan_id: @google_play_premium_plans[request_params['product_id']].id,
       order_id: row['orderId'],
       user_id: @user.id,
       auto_renewing: row['autoRenewing'],
       start_time_millis: Time.zone.at(row['startTimeMillis'].to_i / 1000.0).strftime('%Y-%m-%d %H:%M:%S'),
       expiry_time_millis: Time.zone.at(row['expiryTimeMillis'].to_i / 1000.0).strftime('%Y-%m-%d %H:%M:%S'),
-      purchase_token: row['purchaseToken']
+      purchase_token: request_params['purchase_token']
     }
-
     if purchase_log.blank?
       Entities::UserGooglePlayPurchaseLog.create!(params)
     else
@@ -186,12 +185,13 @@ class Services::AppDeveloperService
     purchase = Entities::UserPurchase.find_by(order_transaction_id: row['orderId'])
     params = {
       user_id: @user.id,
-      google_play_premium_plan_id: @google_play_premium_plans[product_id].id,
+      google_play_premium_plan_id: @google_play_premium_plans[request_params['product_id']].id,
       order_transaction_id: row['orderId'],
       subscription_start_at: Time.zone.at(row['startTimeMillis'].to_i / 1000.0).strftime('%Y-%m-%d %H:%M:%S'),
       subscription_expires_at: Time.zone.at(row['expiryTimeMillis'].to_i / 1000.0).strftime('%Y-%m-%d %H:%M:%S'),
       purchase_at: Time.zone.now
     }
+    p params
     if purchase.blank?
       Entities::UserPurchase.create!(params)
     else
