@@ -1,18 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::UsersController do
-  let(:user) { create(:user) }
+  let(:user) { create(:user, :with_at_user) }
   let(:headers) { { Authorization: 'Bearer ' + user.token } }
-  let(:params) { { email: user.email } } 
+  let(:params) { { email: user.email } }
   let(:user_after_create) { Entities::User.find(user.id) }
-  
+
   describe '#create' do
-    let(:params) { { email: 'test1@example.com', password: 'testtest' } } 
+    let(:params) { { email: 'test1@example.com', password: 'testtest' } }
     let(:user_after_create) { Entities::User.find_by(email: params[:email]) }
-  
+
     context 'success' do
       it 'response 200' do
-        post '/api/v1/users', params: params 
+        post '/api/v1/users', params: params
         expect(response.status).to eq 200
       end
 
@@ -33,7 +33,7 @@ RSpec.describe Api::V1::UsersController do
 
     context 'success' do
       it 'response 200' do
-        post '/api/v1/user/resend', params: params, headers: headers 
+        post '/api/v1/user/resend', params: params, headers: headers
         expect(response.status).to eq 200
       end
     end
@@ -42,7 +42,7 @@ RSpec.describe Api::V1::UsersController do
   describe '#change_password_request' do
     context 'success' do
       it 'response 200' do
-        post '/api/v1/users/change_password_request', params: params, headers: headers 
+        post '/api/v1/users/change_password_request', params: params, headers: headers
         expect(response.status).to eq 200
       end
 
@@ -54,17 +54,17 @@ RSpec.describe Api::V1::UsersController do
   end
 
   describe '#change_password' do
-  
-    let(:user) { create(:user, password: 'testtest') } 
-    let(:params) { { 
+
+    let(:user) { create(:user, password: 'testtest') }
+    let(:params) { {
       token: user.token,
       password: user.password,
       password_confirm: user.password,
-    } } 
+    } }
 
     context 'success' do
       it 'response 200' do
-        post '/api/v1/users/change_password', params: params, headers: headers 
+        post '/api/v1/users/change_password', params: params, headers: headers
         expect(response.status).to eq 200
       end
 
@@ -76,19 +76,19 @@ RSpec.describe Api::V1::UsersController do
   end
 
   describe '#at_url' do
-    let(:user) { create(:at_user_all_accounts) } 
+    let(:user) { create(:at_user_all_accounts) }
 
     context 'success' do
       it 'response 200' do
-        get '/api/v1/user/at-url', headers: headers 
+        get '/api/v1/user/at-url', headers: headers
         expect(response.status).to eq 200
       end
     end
   end
 
   describe '#activate' do
-    let(:user) { create(:user, email_authenticated: 0) } 
-    let(:params) { { token: user.token } } 
+    let(:user) { create(:user, email_authenticated: 0) }
+    let(:params) { { token: user.token } }
 
     context 'success' do
       it 'response 200' do
@@ -117,10 +117,10 @@ RSpec.describe Api::V1::UsersController do
   end
 
   describe '#destroy' do
-    let(:params) { { 
+    let(:params) { {
       user_cancel_reason: 'test',
       user_cancel_checklists: [1]
-    } } 
+    } }
     context 'success' do
       it 'response 200' do
         delete '/api/v1/users', headers: headers, params: params
