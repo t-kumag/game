@@ -9,10 +9,7 @@ class Services::AppDeveloperService
   def app_store_receipt_verification(params)
     requester = AppDeveloperAPIRequest::AppStore::ReceiptVerification.new({'receipt_data' => params['receipt_data']})
     res = AppDeveloperApiClient.new(requester).request
-
-    # # TODO debug
-    # p res
-    # p res['receipt']['in_app'].first
+    Rails.logger.info(res)
 
     fail StandardError, '007105' if res.blank?
 
@@ -26,12 +23,13 @@ class Services::AppDeveloperService
 
     case res['status']
     when 0
-      p 'status OK'
+      Rails.logger.info('status OK')
     when 21002 # レシートのフォーマットのエラー
-      p 'receipt NG'
+      Rails.logger.info('receipt NG')
       fail StandardError, '007101'
     when 21004 # 共有シークレットなど環境情報のエラー
-      p 'secret NG'
+      Rails.logger.info('secret NG')
+      Rails.logger.info(res)
       fail StandardError, '007102'
     when 21007 # 送信先は本番環境でもstagingの情報を返してきた場合のエラー
       fail StandardError, '007103'
@@ -47,7 +45,6 @@ class Services::AppDeveloperService
     if res['receipt']['bundle_id'] != 'com.osidori.inc'
       fail StandardError, '007107'
     end
-
 
     res['latest_receipt_info'].each do |r|
       next unless r['transaction_id'].present? && r['purchase_date'].present? && r['expires_date'].present?
@@ -128,8 +125,7 @@ class Services::AppDeveloperService
     }
     requester = AppDeveloperAPIRequest::GooglePlay::ReceiptVerification.new(params)
     res = AppDeveloperApiClient.new(requester).request
-
-    p res # debug
+    Rails.logger.info(res)
 
     if res['orderId'].blank? || res['startTimeMillis'].blank? || res['expiryTimeMillis'].blank?
       fail StandardError, '007202'
@@ -191,7 +187,7 @@ class Services::AppDeveloperService
       subscription_expires_at: Time.zone.at(row['expiryTimeMillis'].to_i / 1000.0).strftime('%Y-%m-%d %H:%M:%S'),
       purchase_at: Time.zone.now
     }
-    p params
+    Rails.logger.info(params)
     if purchase.blank?
       Entities::UserPurchase.create!(params)
     else
