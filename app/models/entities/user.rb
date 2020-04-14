@@ -95,4 +95,8 @@ class Entities::User < ApplicationRecord
   def update_rank_premium
     self.update!(rank: 1)
   end
+
+  def update_rank_free
+    self.update!(rank: 0)
+  end
 end
