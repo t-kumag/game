@@ -1,13 +1,15 @@
 class Services::AppDeveloperService
+  attr_accessor :google_play_access_token
   def initialize(user)
     @user = user
     @app_store_premium_plans = Entities::AppStorePremiumPlan.all_plans
     @google_play_premium_plans = Entities::GooglePlayPremiumPlan.all_plans
+    @google_play_access_token = ''
   end
 
   # TODO: バッチからも参照する予定
   def app_store_receipt_verification(params)
-    requester = AppDeveloperAPIRequest::AppStore::ReceiptVerification.new({'receipt_data' => params['receipt_data']})
+    requester = AppDeveloperAPIRequest::AppStore::ReceiptVerification.new('receipt_data' => params['receipt_data'])
     res = AppDeveloperApiClient.new(requester).request
     Rails.logger.info(res)
 
@@ -79,6 +81,57 @@ class Services::AppDeveloperService
     raise e
   end
 
+  def google_play_receipt_verification(params)
+    requester = AppDeveloperAPIRequest::GooglePlay::GeAccessToken.new
+    res = AppDeveloperApiClient.new(requester).request
+    fail StandardError, '007201' if res.blank?
+
+    @google_play_access_token = res['access_token']
+    params = {
+      'product_id' => params['product_id'],
+      'purchase_token' => params['purchase_token'],
+      'access_token' => @google_play_access_token
+    }
+    requester = AppDeveloperAPIRequest::GooglePlay::ReceiptVerification.new(params)
+    res = AppDeveloperApiClient.new(requester).request
+    Rails.logger.info(res)
+
+    if res['orderId'].blank? || res['startTimeMillis'].blank? || res['expiryTimeMillis'].blank?
+      fail StandardError, '007202'
+    end
+    # 購入情報と購入ログを更新
+    save_google_play_purchase_and_purchase_log(res, params)
+
+    if @google_play_premium_plans[params['product_id']].blank?
+      fail StandardError, '007203'
+    end
+
+    # 期限切れを確認
+    if Time.zone.at(res['expiryTimeMillis'].to_i / 1000.0) < Time.zone.now
+      # fail StandardError, '007204'
+      return true
+    end
+
+    case params['product_id']
+    when 'monthly_plan'
+      @user.update_rank_premium
+    when 'yearly_plan'
+      @user.update_rank_premium
+    when 'monthly_plan_with_partner'
+      @user.update_rank_premium
+      @user.partner_user.update_rank_premium if @user.partner_user.present?
+    when 'yearly_plan_with_partner'
+      @user.update_rank_premium
+      @user.partner_user.update_rank_premium if @user.partner_user.present?
+    end
+
+    true
+  rescue => e
+    raise e
+  end
+
+  private
+
   def save_app_store_purchase_and_purchase_log(row, receipt)
     purchase_log = Entities::UserAppStorePurchaseLog.find_by(transaction_id: row['transaction_id'])
     params = {
@@ -111,54 +164,6 @@ class Services::AppDeveloperService
     else
       purchase.update!(params)
     end
-  end
-
-  def google_play_receipt_verification(params)
-    requester = AppDeveloperAPIRequest::GooglePlay::GeAccessToken.new
-    res = AppDeveloperApiClient.new(requester).request
-    fail StandardError, '007201' if res.blank?
-
-    params = {
-      'product_id' => params['product_id'],
-      'purchase_token' => params['purchase_token'],
-      'access_token' => res['access_token']
-    }
-    requester = AppDeveloperAPIRequest::GooglePlay::ReceiptVerification.new(params)
-    res = AppDeveloperApiClient.new(requester).request
-    Rails.logger.info(res)
-
-    if res['orderId'].blank? || res['startTimeMillis'].blank? || res['expiryTimeMillis'].blank?
-      fail StandardError, '007202'
-    end
-    # 購入情報と購入ログを更新
-    save_google_play_purchase_and_purchase_log(res, params)
-
-    if @google_play_premium_plans[params['product_id']].blank?
-      fail StandardError, '007203'
-    end
-
-    # 期限切れを確認
-    if Time.zone.at(res['expiryTimeMillis'].to_i / 1000.0) < Time.zone.now
-      #fail StandardError, '007204'
-      return true
-    end
-
-    case params['product_id']
-    when 'monthly_plan'
-      @user.update_rank_premium
-    when 'yearly_plan'
-      @user.update_rank_premium
-    when 'monthly_plan_with_partner'
-      @user.update_rank_premium
-      @user.partner_user.update_rank_premium if @user.partner_user.present?
-    when 'yearly_plan_with_partner'
-      @user.update_rank_premium
-      @user.partner_user.update_rank_premium if @user.partner_user.present?
-    end
-
-    true
-  rescue => e
-    raise e
   end
 
   def save_google_play_purchase_and_purchase_log(row, request_params)
@@ -194,20 +199,4 @@ class Services::AppDeveloperService
       purchase.update!(params)
     end
   end
-
-  private
 end
-
-
-# # TODO debug
-# params = {
-#     "product_id" => "monthly_plan",
-#     "purchase_token" => "aogipmpcmflncngblhbkfhje.AO-J1OwgR4DIW_tu7r9C9PYrAr1d5bjEQSqzpRQYvyLLuBMHVXxCu98bqkGGVGN-r_S_i86nQqxcj6ixfhpGqulQvaOWGQZRHfAr3kyOs3dWfXYgBiIt9K4",
-#     "access_token" => "ya29.a0Ae4lvC3sHZoyoa1yQe_jRzT8N3IBppYq9g0bI9Z3aDKiqlka28jTAXg0eJR3UfQHmZwdGUEM8KQJ87vIhQiYs9j3iijzjaCnfcodp8BhTup45o8WSmaVuPaTFhiv4jJ2GOoRzlUg_Gxq8A8Purm4-9GVb2vKqy275R_6"
-#     }
-#
-#
-# params = {
-#   'product_id' => 'monthly_plan',
-#   'purchase_token' => 'aogipmpcmflncngblhbkfhje.AO-J1OwgR4DIW_tu7r9C9PYrAr1d5bjEQSqzpRQYvyLLuBMHVXxCu98bqkGGVGN-r_S_i86nQqxcj6ixfhpGqulQvaOWGQZRHfAr3kyOs3dWfXYgBiIt9K4'
-# }

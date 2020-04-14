@@ -41,7 +41,13 @@ Metrics/ModuleLength:
   Enabled: false
 
 Metrics/AbcSize:
-  Max: 50
+  Max: 100
+CyclomaticComplexity:
+  Max: 30
+PerceivedComplexity:
+  Max: 30
+AssignmentBranchCondition:
+  Max: 100
 
 FormatString:
   EnforcedStyle: percent

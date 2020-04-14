@@ -25,5 +25,3 @@ class Api::V2::PurchasesController < ApplicationController
     render(json: {}, status: 204)
   end
 end
-
-
