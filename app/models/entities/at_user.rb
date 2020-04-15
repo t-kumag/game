@@ -58,7 +58,7 @@ class Entities::AtUser < ApplicationRecord
   # end
 
   def token
-    self.at_user_tokens.first.token
+    self.try(:at_user_tokens).try(:first).try(:token)
   end
 
   private
