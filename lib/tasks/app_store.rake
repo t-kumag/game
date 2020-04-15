@@ -12,6 +12,9 @@
 # pending_renewal_infoの全要素の項目is_in_billing_retry_periodが"0"である
 # 同リストの全要素の項目auto_renew_statusが"0"である
 
+# 自動更新の対象
+# 有料ユーザー かつ 有効期限が切れているユーザー
+
 # CMD: rake app_store:update_purchase
 namespace :app_store do
   desc "AppStore 課金の自動更新状況を更新する"
@@ -53,7 +56,6 @@ namespace :app_store do
             # 有効期限が切れたがアップルが自動更新を試みているか。is_in_billing_retry_periodがオフになっている
             res['pending_renewal_info'].each do |info|
               if info['auto_renew_status'] === '0' && info['is_in_billing_retry_period'] === '0'
-                # TODO: これだとみんな無料になる。。。
                 user.update_rank_free # 無料ユーザーに戻す
               end
             end

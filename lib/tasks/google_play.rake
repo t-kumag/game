@@ -10,6 +10,9 @@
 # ケース3. その購読は自動更新されない
 # 戻り値で示された有効期限expiryTimeMillisが過去を示す
 
+# 自動更新の対象
+# 有料ユーザー かつ 有効期限が切れているユーザー
+
 # CMD: rake google_play:update_purchase
 namespace :google_play do
   desc "課金の自動更新を登録する"
@@ -53,7 +56,6 @@ namespace :google_play do
 
             # 下記の対象ユーザーを無料ユーザーに戻す
             if Time.zone.at(res['expiryTimeMillis'].to_i / 1000.0).strftime('%Y-%m-%d %H:%M:%S') < Time.zone.now
-              # TODO: これだとみんな無料になる。。。
               user.update_rank_free # 無料ユーザーに戻す
             end
           end
