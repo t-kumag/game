@@ -47,7 +47,7 @@ class Api::V1::User::BankAccountsController < ApplicationController
   def update
     account_id = params[:id].to_i
     if disallowed_at_bank_ids?([account_id])
-      render_disallowed_financier_ids && return
+      render_disallowed_to_update_account_ids && return
     end
 
     if @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id).include?(account_id)
