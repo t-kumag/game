@@ -16,4 +16,5 @@ json.app do
   if @icon.present?
     json.img_url "#{Settings.s3_img_url}#{@icon.img_url}" if @icon.try(:img_url).present?
   end
+  json.rank  @current_user.rank
 end
