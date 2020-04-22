@@ -1,0 +1,30 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>slide</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="js/oneStroke.js"></script>
+		<link rel="stylesheet" href="css/oneStroke.css">
+	</head>
+	<body>
+		<div class="content" id="slide">
+			<div class="boxes"></div>
+		</div>
+
+		<script>
+			$(function() {
+				oneStroke = new OneStroke(30);
+				oneStroke.create_field();
+
+				$(document).on("mouseover", ".box", function() {
+					oneStroke.move($(this));
+				});
+
+				$(document).on('click', '.next', function () {
+					oneStroke.step_count = oneStroke.step_count + 5;
+					oneStroke.create_field();
+				});
+			});
+		</script>
+	</body>
+</html>

@@ -1,0 +1,23 @@
+.content {
+	margin-top: 10px;
+	margin-bottom:10px;
+}
+.boxes {
+	margin-top: 10px;
+	margin-bottom:10px;
+	position: relative;
+	font-size : xx-small;
+	text-align: center;
+	vertical-align: middle;
+}
+.box {
+	position: absolute;
+	width: 14;
+	height: 14;
+	border:1px solid;
+	font-size: xx-small;
+	background-color: #EEEEEE;
+}
+.selected {
+	background-color: #000066;
+}
