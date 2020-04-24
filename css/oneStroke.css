@@ -12,11 +12,11 @@
 }
 .box {
 	position: absolute;
-	width: 14;
-	height: 14;
+	width: 29px;
+	height: 29px;
 	border:1px solid;
 	font-size: xx-small;
-	background-color: #EEEEEE;
+	background-color: #E0E0E0;
 }
 .selected {
 	background-color: #000066;

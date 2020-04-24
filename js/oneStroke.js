@@ -1,5 +1,6 @@
-class OneStroke {
+const box_size = 30;
 
+class OneStroke {
 	constructor(step_count) {
 		this._step_count = step_count;
 		this.reset();
@@ -18,6 +19,10 @@ class OneStroke {
 
 		// ゲーム進行用
 		this.move_history = [];
+
+		this._start_x = null;
+		this._start_y = null;
+		this._tap_start_pos = null;
 	}
 
 	set step_count(step_count) {
@@ -26,6 +31,23 @@ class OneStroke {
 
 	get step_count() {
 		return this._step_count;
+	}
+
+	set tap_start(box) {
+		this._start_x = box == null ? null : box.offset().left;
+		this._start_y = box == null ? null : box.offset().top;
+	}
+
+	get tap_start() {
+		return `${this._start_x},${this._start_y}`
+	}
+
+	set tap_start_pos(box) {
+		this._tap_start_pos = box == null ? null : box.attr("pos");
+	}
+
+	get tap_start_pos() {
+		return this._tap_start_pos;
 	}
 
     /**
@@ -52,7 +74,7 @@ class OneStroke {
 			if (i == 0) {
 				box.addClass("selected");
 			}
-			box.offset({top: box_position[1] * 15, left: box_position[0] * 15});
+			box.offset({top: box_position[1] * box_size, left: box_position[0] * box_size});
 			$(".boxes").append(box);
 			i ++;
 		}
@@ -152,12 +174,18 @@ class OneStroke {
 	 * ゲーム進行用
 	 */
 	move(box) {
+		var result = false;
 		if (this.check_move_able(box)) {
 			this.move_history.push(box.attr("pos"));
 			box.addClass("selected");
-		} else if (this.check_return_able(box)) {
+			result = true;
+		} else if (this.check_back_able(box)) {
 			this.move_history.pop();
 			box.removeClass("selected");
+			result = true;
+		} else if (this.check_retun_able(box)) {
+			this.box_return(box);
+			result = true;
 		}
 
 		if (this.step_count == $("div.box.selected").length - 1) {
@@ -165,6 +193,7 @@ class OneStroke {
 			var btn = $("<button class='next'>").html("next");
 			$(".boxes").append(btn);
 		}
+		return result;
 	}
 
 	/**
@@ -183,9 +212,8 @@ class OneStroke {
 			 next_pos == `${Number(pos[0])},${Number(pos[1]) - 1}`
 			) && !box.hasClass("selected")) {
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	/**
@@ -193,15 +221,36 @@ class OneStroke {
 	 * 洗濯済み、または初期位置の場合除外
 	 * 戻れることの確認
 	 */
-	check_return_able(box) {
+	check_back_able(box) {
 		// 選択したマス
-		var return_pos = box.attr("pos");
+		var back_pos = box.attr("pos");
 		var now_pos = this.move_history[this.move_history.length - 1];
 		var init_pos = this.move_history[0];
-		if (return_pos == now_pos && return_pos != init_pos && box.hasClass("selected")) {
+		if (back_pos == now_pos && back_pos != init_pos && box.hasClass("selected")) {
 			return true;
-		} else {
-			return false;
+		}
+		return false;
+	}
+
+	check_retun_able(box) {
+		// 選択したマス
+		if (box.hasClass("selected")) {
+			return true;
+		}
+	}
+
+	box_return(box) {
+		var return_pos = box.attr("pos");
+
+		for (let i = this.move_history.length - 1; i >= 0; i--) {
+			var history_box = this.move_history[i];
+			if (history_box == return_pos) {
+				break;
+			}
+			if (history_box != this.move_history[0]) {
+				$(`div[pos='${history_box}']`).removeClass("selected");
+				this.move_history.pop();
+			}
 		}
 	}
 }

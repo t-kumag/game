@@ -1,13 +1,14 @@
 <html>
 	<head>
+		<meta name="viewport" content="width=device-width" >
 		<meta charset="UTF-8">
-		<title>slide</title>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-		<script src="js/oneStroke.js"></script>
+		<title>mogame</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js?v=1"></script>
+		<script src="js/oneStroke.js?v=1"></script>
 		<link rel="stylesheet" href="css/oneStroke.css">
 	</head>
 	<body>
-		<div class="content" id="slide">
+		<div class="content">
 			<div class="boxes"></div>
 		</div>
 
@@ -18,6 +19,44 @@
 
 				$(document).on("mouseover", ".box", function() {
 					oneStroke.move($(this));
+				});
+
+				$(document).on("touchstart", ".box", function(event) {
+					oneStroke.tap_start = $(this);
+					oneStroke.tap_start_pos = $(this);
+					oneStroke.move($(this));
+				});
+
+				$(document).on("touchmove", ".box", function(event) {
+					var startX = Number(oneStroke.tap_start.split(",")[0]);
+					var startY = Number(oneStroke.tap_start.split(",")[1]);
+
+					var pressX = Math.floor(event.originalEvent.changedTouches[0].pageX);
+					var pressY = Math.floor(event.originalEvent.changedTouches[0].pageY);
+
+					var moveX = pressX - startX;
+					var moveY = pressY - startY;
+					moveX = moveX < 0 ? Math.ceil((moveX - box_size) / box_size) : Math.floor(moveX / box_size);
+					moveY = moveY < 0 ? Math.ceil((moveY - box_size) / box_size) : Math.floor(moveY / box_size);
+
+					var tap_start_pos = oneStroke.tap_start_pos.split(",");
+					var move_pos = `${Number(tap_start_pos[0]) + moveX},${Number(tap_start_pos[1]) + moveY}`;
+
+					if (oneStroke.tap_start_pos != move_pos) {
+						var moved_box = $(`div[pos='${move_pos}']`);
+						if (moved_box.length > 0) {
+							var result = oneStroke.move(moved_box);
+							if (result) {
+								oneStroke.tap_start = moved_box;
+								oneStroke.tap_start_pos = moved_box;
+							}
+						}
+					}
+				});
+
+				$(document).on("touchend", ".box", function(event) {
+					oneStroke.tap_start = null;
+					oneStroke.tap_start_pos = null;
 				});
 
 				$(document).on('click', '.next', function () {
