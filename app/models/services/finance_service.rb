@@ -168,14 +168,36 @@ class Services::FinanceService
       Entities::AtUserEmoneyServiceAccount.where(at_user_id: @user.partner_user.at_user.id).find_each do |ea|
         account_ids[:emoney] << ea.id
       end
-
-
     end
     account_ids
   end
 
   def get_account(finance)
     finance.where(at_user_id: [@user.at_user, @user.partner_user.try(:at_user)], share: true)
+  end
+
+  def update_account(at_user_accounts, params)
+    ActiveRecord::Base.transaction do
+      before_share = at_user_accounts.share
+      after_share = params[:share]
+      at_user_accounts.update!(params)
+
+      if (before_share ！= after_share)
+        if ("Entities::AtUserBankAccount" == at_user_accounts.class.name)
+          transactions = Entities::AtUserBankTransaction.where(at_user_bank_account_id: at_user_accounts.id)
+          user_distributed_transactions = Entities::UserDistributedTransaction.where(at_user_bank_transaction_id: transactions.pluck(:id))
+        elsif ("Entities::AtUserCardAccount" == at_user_accounts.class.name)
+          transactions = Entities::AtUserCardTransaction.where(at_user_card_account_id: at_user_accounts.id)
+          user_distributed_transactions = Entiteis::UserDistributedTransaction.where(at_user_card_transaction_id: transactions.pluck(:id))
+        elsif ("Entities::AtUserEmoneyServiceAccount" == at_user_accounts.class.name)
+          transactions = Entities::AtUserEmoneyTransaction.where(at_user_emoney_account_id: at_user_accounts.id)
+          user_distributed_transactions = Entities::UserDistributedTransaction.where(at_user_emoney_transaction_id: transactions.pluck(:id))
+        end
+        user_distributed_transactions.update_all("share": after_share)
+      end
+
+    end
+    return at_user_accounts
   end
 
   private

@@ -52,7 +52,7 @@ class Api::V1::User::BankAccountsController < ApplicationController
 
     if @current_user.try(:at_user).try(:at_user_bank_accounts).pluck(:id).include?(account_id)
       account = Entities::AtUserBankAccount.find account_id
-      account.update!(get_account_params(account))
+      account = Services::FinanceService.new(@current_user).update_account(account, get_account_params(account))
       if account.share
         options = create_activity_options("family")
         Services::ActivityService.create_activity(account.at_user.user_id, account.group_id,  DateTime.now, :person_account_to_family, options)
@@ -97,4 +97,3 @@ class Api::V1::User::BankAccountsController < ApplicationController
     options
   end
 end
-
