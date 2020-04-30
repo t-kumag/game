@@ -22,17 +22,6 @@ class Api::V1::Group::TransactionsController < ApplicationController
         params[:to]
     ).list
 
-    @response += Services::TransactionService.new(
-        @current_user.partner_user,
-        @category_version,
-        params[:category_id],
-        true,                # share
-        params[:scope],
-        true,                # with_group
-        params[:from],
-        params[:to]
-    ).list if @current_user.partner_user.present?
-
     if params.has_key?(:distributed_type)
       @response = Services::TransactionService.fetch_tran_type(@response, params[:distributed_type], @current_user)
     end
