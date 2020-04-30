@@ -126,7 +126,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :used_location,
       :memo
     ).merge(
-      user_id: @current_user.id
+      user_id: @current_user.id,
+      share: false
     )
     save_params[:at_transaction_category_id] = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(save_params[:at_transaction_category_id])
     save_params
@@ -170,7 +171,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         title: title,
         amount: amount,
         used_location: used_location,
-        memo: memo
+        memo: memo,
+        share: false
     }
   end
 
@@ -195,7 +197,6 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
     return -params[:amount] if params[:amount] < 0
     0
   end
-
 
   def create_user_manually_activity(current_user, used_date, options)
     if options[:user_manually_created_transaction][:share]

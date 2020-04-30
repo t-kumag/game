@@ -25,17 +25,20 @@ class Services::TransactionService
         if ids.try(:include?, undefined_id)
           ids << nil
         end
+        # 旧バージョンのカテゴリの場合、旧バージョンのbefore_version_idで検索する。
         bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
         card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
         emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
         user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
       else
+        # 最新バージョンのカテゴリの場合、idで検索する。
         bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
         card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
         emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
         user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
       end
     else
+      # カテゴリの指定がない場合、全て取得する。
       bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, used_date: from..to)
       card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, used_date: from..to)
       emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, used_date: from..to)
@@ -78,6 +81,7 @@ class Services::TransactionService
     shared_accounts = get_shared_account_ids
 
     if @with_group === true
+      # 家族画面
       transactions = fetch_transactions(ids, @from, @to)
       # 削除済み口座の明細を除外する
       transactions = remove_delete_account_transaction transactions
@@ -89,6 +93,7 @@ class Services::TransactionService
       sort_by_used_date transactions
 
     else
+      # 個人画面
       transactions = fetch_transactions(ids, @from, @to)
       # 削除済み口座の明細を除外する
       transactions = remove_delete_account_transaction transactions

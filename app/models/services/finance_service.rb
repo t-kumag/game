@@ -193,7 +193,8 @@ class Services::FinanceService
           transactions = Entities::AtUserEmoneyTransaction.where(at_user_emoney_account_id: at_user_accounts.id)
           user_distributed_transactions = Entities::UserDistributedTransaction.where(at_user_emoney_transaction_id: transactions.pluck(:id))
         end
-        user_distributed_transactions.update_all("share": after_share)
+        distribute_user_id = after_share ? nil : @user.id
+        user_distributed_transactions.update_all("share": after_share, "distribute_user_id": distribute_user_id)
       end
 
     end

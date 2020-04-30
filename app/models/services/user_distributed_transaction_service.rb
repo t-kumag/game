@@ -42,6 +42,7 @@ class Services::UserDistributedTransactionService
         Entities::UserDistributedTransaction.new(
           user_id: @user.id,
           share: account.share,
+          distribute_user_id: @user.id,
           used_date: transaction.trade_date,
           used_location: transaction.description1,
           amount: transaction.amount,
@@ -63,6 +64,7 @@ class Services::UserDistributedTransactionService
         Entities::UserDistributedTransaction.new(
             user_id: @user.id,
             share: account.share,
+            distribute_user_id: @user.id,
             used_date: transaction.used_date,
             used_location: transaction.branch_desc,
             amount: transaction.amount,
@@ -84,6 +86,7 @@ class Services::UserDistributedTransactionService
         Entities::UserDistributedTransaction.new(
             user_id: @user.id,
             share: account.share,
+            distribute_user_id: @user.id,
             used_date: transaction.used_date,
             used_location: transaction.description,
             amount: transaction.amount,

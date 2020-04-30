@@ -5,11 +5,13 @@ class Services::UserManuallyCreatedTransactionService
   end
 
   def create_user_manually_created(options)
+    share = options.has_key?(:share) ? options[:share] : false
     Entities::UserDistributedTransaction.create!(
         user_id: @transaction.user_id,
         used_date: @transaction.used_date,
         group_id: options.has_key?(:group_id) ? options[:group_id] : nil,
-        share: options.has_key?(:share) ? options[:share] : false,
+        share: share,
+        distribute_user_id: share ? @user.id : nil,
         ignore: options[:ignore],
         at_user_bank_transaction_id: nil,
         at_user_card_transaction_id: nil,
@@ -24,12 +26,14 @@ class Services::UserManuallyCreatedTransactionService
 
   def update_user_manually_created(options)
     user_distribute_transaction = Entities::UserDistributedTransaction.find_by(user_manually_created_transaction_id:  @transaction.id, user_id: @transaction.user_id)
+    share = options.has_key?(:share) ? options[:share] : false
     user_distribute_transaction.update!(
         {
             user_id: @transaction.user_id,
             used_date: @transaction.used_date,
             group_id: options.has_key?(:group_id) ? options[:group_id] : nil,
-            share: options.has_key?(:share) ? options[:share] : false,
+            share: share,
+            distribute_user_id: share ? @user.id : nil,
             ignore: options[:ignore],
             at_user_bank_transaction_id: nil,
             at_user_card_transaction_id: nil,
