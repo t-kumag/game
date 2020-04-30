@@ -21,10 +21,10 @@ class Services::TransactionService
 
     # 削除された口座の明細を削除
     transactions = remove_delete_account_transaction transactions
+    # 個人画面の場合、共有された明細を削除
     unless @with_group
       transactions = remove_shared_transaction(transactions, shared_accounts)
     end
-
     # レスポンスの形に成形する
     transactions = generate_response_from_transactions(transactions, shared_accounts)
     # scopeがincomeの場合入金のみにする
@@ -50,7 +50,7 @@ class Services::TransactionService
       if @share
         # 個人画面　振り分けた明細を含む
         # 自分のdistribute_user_id、明細のshare:falseで検索
-        condition = {distribute_user_id: @user.id, share: false}
+        condition = {distribute_user_id: @user.id}
       else
         # 個人画面　振り分けた明細を含めない
         # 自分のdistribute_user_id＋自分のuser_idでshare:trueで検索
@@ -77,40 +77,6 @@ class Services::TransactionService
     card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).joins(:at_transaction_category).where(condition)
     emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).joins(:at_transaction_category).where(condition)
     user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).joins(:at_transaction_category).where(condition)
-    bank_tarnsactions + card_transactions + emoney_transactions + user_manually_created_transactions
-  end
-
-  def fetch_transactions_old(ids, from, to)
-    # カテゴリ ID の指定がなければ全件抽出
-    if ids.present?
-      convert_ids = []
-      @category_service = Services::CategoryService.new(@category_version)
-
-      unless @category_service.is_latest_version?
-        undefined_category = @category_service.get_undefined_transaction_category(@category_version)
-        undefined_id = undefined_category[0].to_h['id']
-        if ids.try(:include?, undefined_id)
-          ids << nil
-        end
-        # 旧バージョンのカテゴリの場合、旧バージョンのbefore_version_idで検索する。
-        bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
-        card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
-        emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
-        user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).joins(:at_transaction_category).where(user_id: @user.id, used_date: from..to, at_transaction_categories: {before_version_id: ids})
-      else
-        # 最新バージョンのカテゴリの場合、idで検索する。
-        bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-        card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-        emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-        user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, at_transaction_category_id: ids, used_date: from..to)
-      end
-    else
-      # カテゴリの指定がない場合、全て取得する。
-      bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).where(user_id: @user.id, used_date: from..to)
-      card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).where(user_id: @user.id, used_date: from..to)
-      emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).where(user_id: @user.id, used_date: from..to)
-      user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).where(user_id: @user.id, used_date: from..to)
-    end
     bank_tarnsactions + card_transactions + emoney_transactions + user_manually_created_transactions
   end
 
@@ -204,9 +170,8 @@ class Services::TransactionService
       shared_accounts[:card_account_ids].include?(transaction.at_user_card_transaction.at_user_card_account_id)
     elsif transaction.try(:at_user_emoney_transaction).try(:at_user_emoney_service_account_id)
       shared_accounts[:emoney_account_ids].include?(transaction.at_user_emoney_transaction.at_user_emoney_service_account_id)
-    else
-      # 手動明細は口座に紐づかないため口座シェア判定はfalse固定
-      false
+    elsif transaction.try(:user_manyally_created_transaction).try(:user_manually_created_transaction_id)
+      shared_accounts[:user_manually_created_transaction_ids].includes?(transaction.user_manually_created_transaction.id)
     end
   end
 
@@ -221,6 +186,7 @@ class Services::TransactionService
     if @user.try(:at_user).try(:at_user_emoney_service_accounts)
       shared[:emoney_account_ids] = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
     end
+    shared[:user_manually_created_transaction_ids] = Entities::UserManuallyCreatedTransaction.where(share: true, user_id: @user.id).plusck(:id)
     shared
   end
 

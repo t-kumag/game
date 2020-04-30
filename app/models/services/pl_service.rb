@@ -59,9 +59,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id in (#{user_ids.join(',')})
-      AND
-        #{sql_shared("auba", share)}
+      #{sql_user_shared("auba", share)}
       AND
         udt.ignore = 0
       AND
@@ -108,9 +106,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id in (#{user_ids.join(',')})
-      AND
-        #{sql_shared("auca", share)}
+      #{sql_user_shared("auba", share)}
       AND
         udt.ignore = 0
       AND
@@ -161,9 +157,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id in (#{user_ids.join(',')})
-      AND
-        #{sql_shared("auea", share)}
+      #{sql_user_shared("auba", share)}
       AND
         udt.ignore = 0
       AND
@@ -208,9 +202,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-        udt.user_id in (#{user_ids.join(',')})
-      AND
-        udt.share in (#{share.join(',')})
+      #{sql_user_shared("umct", share)}
       AND
         udt.ignore = 0
       AND
@@ -220,6 +212,30 @@ class Services::PlService
     EOS
 
     ActiveRecord::Base.connection.select_all(sql).to_hash
+  end
+
+  def sql_user_shared(account, share)
+    if @with_group
+      # 明細のshare:trueで検索
+      <<-EOS
+        (udt.user_id in (#{user_ids.join(',')}) AND (udt.share = 1))
+      EOS
+    else
+      if share.size > 1
+        # 個人 家族ON シェアしていない口座 and 全明細
+        <<-EOS
+          (
+            (udt.distribute_user_id = #{@user.id} AND udt.share = 0)
+            OR (#{account}.share=0 AND udt.distribute_user_id = #{@user.id} AND udt.share = 1)
+          )
+        EOS
+      else
+        # 個人 家族OFF シェアしていない明細
+        <<-EOS
+          (udt.distribute_user_id = #{@user.id} AND udt.share = 0)
+        EOS
+      end
+    end
   end
 
   def sql_shared(account, share)
