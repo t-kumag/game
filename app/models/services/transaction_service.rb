@@ -13,7 +13,74 @@ class Services::TransactionService
     @to = to ? Time.parse(to).end_of_day : Time.zone.today.end_of_month.end_of_day
   end
 
+  def list(ids = @category_id)
+    shared_accounts = get_shared_account_ids
+
+    # 明細を取得
+    transactions = fetch_transactions(ids, @from, @to)
+
+    # 削除された口座の明細を削除
+    transactions = remove_delete_account_transaction transactions
+    unless @with_group
+      transactions = remove_shared_transaction(transactions, shared_accounts)
+    end
+
+    # レスポンスの形に成形する
+    transactions = generate_response_from_transactions(transactions, shared_accounts)
+    # scopeがincomeの場合入金のみにする
+    remove_scope_income(transactions)
+    # scopeがexpenseの場合出金のみにする
+    remove_scope_expence(transactions)
+    # used_dateでソート
+    sort_by_used_date transactions
+
+  end
+
   def fetch_transactions(ids, from, to)
+    convert_ids = []
+    @category_service = Services::CategoryService.new(@category_version)
+
+    condition = {}
+    # ユーザーとshareの条件
+    if @with_group
+      # 家族画面　
+      # 自分とパートナーのuser_id、明細のshare:trueで検索
+      condition = {user_id: [@user.id, @user.partner_user.id], share: true}
+    else
+      if @share
+        # 個人画面　振り分けた明細を含む
+        # 自分のdistribute_user_id、明細のshare:falseで検索
+        condition = {distribute_user_id: @user.id, share: false}
+      else
+        # 個人画面　振り分けた明細を含めない
+        # 自分のdistribute_user_id＋自分のuser_idでshare:trueで検索
+        condition = {distribute_user_id: @user.id, share: false}
+      end
+    end
+
+    # カテゴリの条件
+    if ids.present? && @category_service.is_latest_version?
+      condition.merge(at_transaction_category_id: ids)
+    elsif ids.present?
+      undefined_category = @category_service.get_undefined_transaction_category(@category_version)
+      undefined_id = undefined_category[0].to_h['id']
+      if ids.try(:include?, undefined_id)
+        ids << nil
+      end
+      condition.merge(at_transaction_categories: {before_version_id: ids})
+    end
+
+    # 期間の条件
+    condition.merge(used_date: from..to)
+
+    bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).joins(:at_transaction_category).where(condition)
+    card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).joins(:at_transaction_category).where(condition)
+    emoney_transactions = Entities::UserDistributedTransaction.joins(:at_user_emoney_transaction).includes(:at_user_emoney_transaction).joins(:at_transaction_category).where(condition)
+    user_manually_created_transactions = Entities::UserDistributedTransaction.joins(:user_manually_created_transaction).includes(:user_manually_created_transaction).joins(:at_transaction_category).where(condition)
+    bank_tarnsactions + card_transactions + emoney_transactions + user_manually_created_transactions
+  end
+
+  def fetch_transactions_old(ids, from, to)
     # カテゴリ ID の指定がなければ全件抽出
     if ids.present?
       convert_ids = []
@@ -57,7 +124,7 @@ class Services::TransactionService
         at_user_emoney_service_account_id: t.at_user_emoney_transaction.try(:at_user_emoney_service_account_id),
         wallet_id: wallet_id_for_taransaction(t),
         at_transaction_category_id: t.at_transaction_category_id,
-        is_shared: shared_account?(t, shared_accounts) || t.share,
+        is_shared: t.share,
         is_account_shared: shared_account?(t, shared_accounts),
         is_ignored: t.ignore,
         user_id: t.user_id,
@@ -77,34 +144,6 @@ class Services::TransactionService
     transactions.sort_by! { |a| [a[:used_date], i += 1] }.reverse!
   end
 
-  def list(ids = @category_id)
-    shared_accounts = get_shared_account_ids
-
-    if @with_group === true
-      # 家族画面
-      transactions = fetch_transactions(ids, @from, @to)
-      # 削除済み口座の明細を除外する
-      transactions = remove_delete_account_transaction transactions
-      # シェアしていない口座の明細 or シェアしていない明細を削除する
-      transactions = remove_not_shared_transaction(transactions, shared_accounts)
-      transactions = generate_response_from_transactions(transactions, shared_accounts)
-      remove_scope_income(transactions)
-      remove_scope_expence(transactions)
-      sort_by_used_date transactions
-
-    else
-      # 個人画面
-      transactions = fetch_transactions(ids, @from, @to)
-      # 削除済み口座の明細を除外する
-      transactions = remove_delete_account_transaction transactions
-      transactions = remove_shared_transaction(transactions, shared_accounts)
-      transactions = generate_response_from_transactions(transactions, shared_accounts)
-      remove_scope_income(transactions)
-      remove_scope_expence(transactions)
-      sort_by_used_date transactions
-    end
-  end
-
   def remove_scope_income(transactions)
     if @scope == "income"
       transactions.reject! {|t| t[:amount] < 0}
@@ -120,7 +159,6 @@ class Services::TransactionService
   def remove_shared_transaction(transactions, shared_accounts)
     transactions.reject do |t|
       if @share === true
-        # 家族ONの場合
         if shared_account?(t, shared_accounts)
           # シェアしている口座の明細は削除する
           true
@@ -128,28 +166,6 @@ class Services::TransactionService
           # シェアしていない口座の明細 or シェアしていない明細は削除しない
           false
         end
-      else
-        # 家族OFFの場合
-        if shared_account?(t, shared_accounts) || t.share
-          # シェアしている口座の明細 or シェアしている明細は削除する
-          true
-        else
-          # シェアしていない口座の明細 or シェアしていない明細は削除しない
-          false
-        end
-      end
-    end
-  end
-
-  def remove_not_shared_transaction(transactions, shared_accounts)
-
-    transactions.reject do |t|
-      if shared_account?(t, shared_accounts) || t.share
-        # シェアしている口座の明細 or シェアしている明細は削除しない
-        false
-      else
-        # シェアしていない口座の明細 or シェアしていない明細は削除する
-        true
       end
     end
   end

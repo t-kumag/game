@@ -45,6 +45,7 @@ class Services::UserDistributedTransactionService
           distribute_user_id: @user.id,
           used_date: transaction.trade_date,
           used_location: transaction.description1,
+          group_id: @user.group_id,
           amount: transaction.amount,
           at_transaction_category_id: transaction.at_transaction_category_id,
           at_user_bank_transaction_id: transaction.id
@@ -67,6 +68,7 @@ class Services::UserDistributedTransactionService
             distribute_user_id: @user.id,
             used_date: transaction.used_date,
             used_location: transaction.branch_desc,
+            group_id: @user.group_id,
             amount: transaction.amount,
             at_transaction_category_id: transaction.at_transaction_category_id,
             at_user_card_transaction_id: transaction.id
@@ -89,6 +91,7 @@ class Services::UserDistributedTransactionService
             distribute_user_id: @user.id,
             used_date: transaction.used_date,
             used_location: transaction.description,
+            group_id: @user.group_id,
             amount: transaction.amount,
             at_transaction_category_id: transaction.at_transaction_category_id,
             at_user_emoney_transaction_id: transaction.id
