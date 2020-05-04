@@ -25,6 +25,8 @@ class Services::WalletService
 
   def update_name_and_share_and_group_id(param)
     name = param[:name].present? ? param[:name] : @wallet.name
+    before_share = @wallet.share
+    after_share = param[:share]
     params = {
         group_id: @user.group_id,
         share: param[:share],
@@ -32,9 +34,10 @@ class Services::WalletService
     }
     @wallet.update!(params)
 
-    if true == param[:share]
+    if before_share != after_share
       user_manually_created_transactions = Entities::UserManuallyCreatedTransaction.where(payment_method_type: "wallet", payment_method_id: @wallet.id)
-      Entities::UserDistributedTransaction.where(user_manually_created_transaction_id: user_manually_created_transactions.pluck(:id)).update_all(share: true)
+      user_manually_created_transactions.update_all(share: after_share)
+      Entities::UserDistributedTransaction.where(user_manually_created_transaction_id: user_manually_created_transactions.pluck(:id)).update_all(share: after_share)
     end
   end
 

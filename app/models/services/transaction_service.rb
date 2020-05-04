@@ -41,37 +41,43 @@ class Services::TransactionService
     @category_service = Services::CategoryService.new(@category_version)
 
     condition = {}
+
     # ユーザーとshareの条件
     if @with_group
       # 家族画面　
       # 自分とパートナーのuser_id、明細のshare:trueで検索
-      condition = {user_id: [@user.id, @user.partner_user.id], share: true}
+      user_ids = [@user.id]
+      partner_user_id = @user.try(:partner_user).try(:id)
+      user_ids.push(partner_user_id) if partner_user_id.present?
+      condition.store(:user_id, user_ids)
+      condition.store(:share, true)
     else
       if @share
         # 個人画面　振り分けた明細を含む
         # 自分のdistribute_user_id、明細のshare:falseで検索
-        condition = {distribute_user_id: @user.id}
+        condition.store(:distribute_user_id, @user.id)
       else
         # 個人画面　振り分けた明細を含めない
         # 自分のdistribute_user_id＋自分のuser_idでshare:trueで検索
-        condition = {distribute_user_id: @user.id, share: false}
+        condition.store(:distribute_user_id, @user.id)
+        condition.store(:share, false)
       end
     end
 
     # カテゴリの条件
     if ids.present? && @category_service.is_latest_version?
-      condition.merge(at_transaction_category_id: ids)
+      condition.store(:at_transaction_category_id, ids)
     elsif ids.present?
       undefined_category = @category_service.get_undefined_transaction_category(@category_version)
       undefined_id = undefined_category[0].to_h['id']
       if ids.try(:include?, undefined_id)
         ids << nil
       end
-      condition.merge(at_transaction_categories: {before_version_id: ids})
+      condition.store(:at_transaction_categories, {before_version_id: ids})
     end
 
     # 期間の条件
-    condition.merge(used_date: from..to)
+    condition.store(:used_date, from..to)
 
     bank_tarnsactions   = Entities::UserDistributedTransaction.joins(:at_user_bank_transaction).includes(:at_user_bank_transaction).joins(:at_transaction_category).where(condition)
     card_transactions   = Entities::UserDistributedTransaction.joins(:at_user_card_transaction).includes(:at_user_card_transaction).joins(:at_transaction_category).where(condition)
@@ -124,14 +130,12 @@ class Services::TransactionService
 
   def remove_shared_transaction(transactions, shared_accounts)
     transactions.reject do |t|
-      if @share === true
-        if shared_account?(t, shared_accounts)
-          # シェアしている口座の明細は削除する
-          true
-        else
-          # シェアしていない口座の明細 or シェアしていない明細は削除しない
-          false
-        end
+      if shared_account?(t, shared_accounts) && t.share
+        # シェアしている口座の明細は削除する
+        true
+      else
+        # シェアしていない口座の明細 or シェアしていない明細は削除しない
+        false
       end
     end
   end
@@ -170,23 +174,31 @@ class Services::TransactionService
       shared_accounts[:card_account_ids].include?(transaction.at_user_card_transaction.at_user_card_account_id)
     elsif transaction.try(:at_user_emoney_transaction).try(:at_user_emoney_service_account_id)
       shared_accounts[:emoney_account_ids].include?(transaction.at_user_emoney_transaction.at_user_emoney_service_account_id)
-    elsif transaction.try(:user_manyally_created_transaction).try(:user_manually_created_transaction_id)
-      shared_accounts[:user_manually_created_transaction_ids].includes?(transaction.user_manually_created_transaction.id)
+    elsif transaction.try(:user_manually_created_transaction).try(:id)
+      shared_accounts[:user_manually_created_transaction_ids].include?(transaction.user_manually_created_transaction.id)
     end
   end
 
   def get_shared_account_ids
     shared = {}
+
+    partner_user = @user.try(:partner_user)
     if @user.try(:at_user).try(:at_user_bank_accounts)
       shared[:bank_account_ids] = @user.at_user.at_user_bank_accounts.where(share: true).pluck(:id)
+      shared[:bank_account_ids] += partner_user.at_user.at_user_bank_accounts.where(share: true).pluck(:id) if partner_user.present?
     end
     if @user.try(:at_user).try(:at_user_card_accounts)
       shared[:card_account_ids] =  @user.at_user.at_user_card_accounts.where(share: true).pluck(:id)
+      shared[:card_account_ids] += partner_user.at_user.at_user_card_accounts.where(share: true).pluck(:id) if partner_user.present?
     end
     if @user.try(:at_user).try(:at_user_emoney_service_accounts)
       shared[:emoney_account_ids] = @user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id)
+      shared[:emoney_account_ids] += partner_user.at_user.at_user_emoney_service_accounts.where(share: true).pluck(:id) if partner_user.present?
     end
-    shared[:user_manually_created_transaction_ids] = Entities::UserManuallyCreatedTransaction.where(share: true, user_id: @user.id).plusck(:id)
+    user_ids = [@user.id]
+    partner_user_id = partner_user.try(:id)
+    user_ids.push(partner_user_id) if partner_user.present?
+    shared[:user_manually_created_transaction_ids] = Entities::UserManuallyCreatedTransaction.where(share: true, user_id: user_ids).pluck(:id)
     shared
   end
 

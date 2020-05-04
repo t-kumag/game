@@ -12,7 +12,7 @@ class Api::V2::Group::TransactionsController < ApplicationController
     transactions = []
 
     # 同じグループに種属するユーザの明細を自ユーザ含めてユーザごとに取得しマージする
-    transactions += Services::TransactionService.new(
+    transactions = Services::TransactionService.new(
         @current_user,
         @category_version,
         nil,                 # category_id
@@ -22,18 +22,6 @@ class Api::V2::Group::TransactionsController < ApplicationController
         params[:from],
         params[:to]
     ).list
-
-
-    transactions += Services::TransactionService.new(
-        @current_user.partner_user,
-        @category_version,
-        nil,                 # category_id
-        true,                # share
-        params[:scope],      # scope
-        true,                # with_group
-        params[:from],
-        params[:to]
-    ).list if @current_user.partner_user.present?
 
     transaction = Services::TransactionService.fetch_summary_distributed_type(transactions, @current_user)
     @response = Services::TransactionService.fetch_detail(transaction, transactions.sum{|i| i[:amount]})

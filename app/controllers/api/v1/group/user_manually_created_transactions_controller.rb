@@ -153,7 +153,7 @@ class Api::V1::Group::UserManuallyCreatedTransactionsController < ApplicationCon
         used_location: used_location,
         memo: memo,
         share: true,
-        group_id: @user.group_id
+        group_id: @current_user.group_id
     }
   end
 

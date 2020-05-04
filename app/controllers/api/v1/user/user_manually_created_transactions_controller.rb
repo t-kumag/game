@@ -127,6 +127,7 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
       :memo
     ).merge(
       user_id: @current_user.id,
+      group_id: @current_user.group_id,
       share: false
     )
     save_params[:at_transaction_category_id] = Services::CategoryService.new(@category_version).convert_at_transaction_category_id(save_params[:at_transaction_category_id])
@@ -172,7 +173,8 @@ class Api::V1::User::UserManuallyCreatedTransactionsController < ApplicationCont
         amount: amount,
         used_location: used_location,
         memo: memo,
-        share: false
+        share: false,
+        group_id: @user.try(:group_id)
     }
   end
 

@@ -106,7 +106,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-      #{sql_user_shared("auba", share)}
+      #{sql_user_shared("auca", share)}
       AND
         udt.ignore = 0
       AND
@@ -157,7 +157,7 @@ class Services::PlService
       ON
         udt.at_transaction_category_id = atc.id
       WHERE
-      #{sql_user_shared("auba", share)}
+      #{sql_user_shared("auea", share)}
       AND
         udt.ignore = 0
       AND
